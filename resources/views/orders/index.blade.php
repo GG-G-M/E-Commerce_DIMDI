@@ -31,10 +31,14 @@
                                     <span class="badge bg-danger">Cancelled</span>
                                 @elseif($order->order_status == 'completed')
                                     <span class="badge bg-success">Completed</span>
+                                @elseif($order->order_status == 'delivered')
+                                    <span class="badge bg-success">Delivered</span>
                                 @elseif($order->order_status == 'shipped')
                                     <span class="badge bg-info">Shipped</span>
                                 @elseif($order->order_status == 'processing')
                                     <span class="badge bg-primary">Processing</span>
+                                @elseif($order->order_status == 'confirmed')
+                                    <span class="badge bg-secondary">Confirmed</span>
                                 @else
                                     <span class="badge bg-warning">Pending</span>
                                 @endif

@@ -15,6 +15,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
         'phone',
         'address',
         'city',
@@ -44,5 +45,10 @@ class User extends Authenticatable
     public function carts(): HasMany
     {
         return $this->hasMany(Cart::class);
+    }
+
+        public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }

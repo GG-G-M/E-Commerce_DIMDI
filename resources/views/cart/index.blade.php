@@ -12,7 +12,7 @@
                     @foreach($cartItems as $item)
                     <div class="row align-items-center mb-4 pb-4 border-bottom">
                         <div class="col-md-2">
-                            <img src="{{ $item->product->image ?: 'https://via.placeholder.com/100x100' }}" 
+                            <img src="{{ $item->product->image_url }}" 
                                  alt="{{ $item->product->name }}" class="img-fluid rounded">
                         </div>
                         <div class="col-md-4">

@@ -11,7 +11,7 @@
                 <a href="{{ route('products.index') }}" class="btn btn-light btn-lg">Shop Now</a>
             </div>
             <div class="col-lg-6">
-                <img src="https://via.placeholder.com/600x400" alt="Hero Image" class="img-fluid rounded">
+                <img src="https://picsum.photos/600/400?random=1" alt="Hero Image" class="img-fluid rounded">
             </div>
         </div>
     </div>
@@ -28,7 +28,7 @@
                     @if($product->has_discount)
                     <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
                     @endif
-                    <img src="{{ $product->image ?: 'https://via.placeholder.com/300x200' }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                    <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
