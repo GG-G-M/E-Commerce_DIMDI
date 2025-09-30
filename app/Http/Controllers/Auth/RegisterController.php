@@ -51,7 +51,7 @@ class RegisterController extends Controller
         return redirect()->intended('/')->with('success', 'Registration successful! Welcome to DIMDI Store.');
     }
 
-    private function transferGuestCartToUser(User $user)
+    private function transferGuestCartToUser(User $user) // Fixed type hint
     {
         $sessionId = session()->get('cart_session_id');
         

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -31,6 +32,7 @@ class LoginController extends Controller
             // Transfer guest cart to user after login
             $this->transferGuestCartToUser(Auth::user());
 
+            // Redirect to intended URL or home
             return redirect()->intended('/')->with('success', 'Login successful! Welcome back.');
         }
 
@@ -49,7 +51,7 @@ class LoginController extends Controller
         return redirect('/')->with('success', 'You have been logged out successfully.');
     }
 
-    private function transferGuestCartToUser(User $user)
+    private function transferGuestCartToUser(User $user) // Fixed type hint
     {
         $sessionId = session()->get('cart_session_id');
         
