@@ -12,7 +12,7 @@
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <img src="{{ $product->image ?: 'https://via.placeholder.com/500x400' }}" class="img-fluid rounded" alt="{{ $product->name }}">
+            <img src="{{ $product->image_url }}" class="img-fluid rounded" alt="{{ $product->name }}">
         </div>
         <div class="col-lg-6">
             <h1 class="h2">{{ $product->name }}</h1>
@@ -80,7 +80,7 @@
             @foreach($relatedProducts as $relatedProduct)
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="card product-card h-100">
-                    <img src="{{ $relatedProduct->image ?: 'https://via.placeholder.com/300x200' }}" class="card-img-top product-image" alt="{{ $relatedProduct->name }}">
+                    <img src="{{ $relatedProduct->image_url }}" class="card-img-top product-image" alt="{{ $relatedProduct->name }}">
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title">{{ $relatedProduct->name }}</h6>
                         <div class="mt-auto">

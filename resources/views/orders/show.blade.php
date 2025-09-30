@@ -51,8 +51,8 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ $item->product->image ?: 'https://via.placeholder.com/50x50' }}" 
-                                                 alt="{{ $item->product_name }}" class="img-thumbnail me-3" style="width: 50px;">
+                                            <img src="{{ $item->product->image_url }}" 
+                                                 alt="{{ $item->product_name }}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                             <div>
                                                 <h6 class="mb-0">{{ $item->product_name }}</h6>
                                                 <small class="text-muted">SKU: {{ $item->product->sku }}</small>
