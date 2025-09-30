@@ -55,8 +55,21 @@
                         <a class="nav-link" href="{{ route('products.index') }}">Products</a>
                     </li>
                 </ul>
-                
+
+
+
                 <ul class="navbar-nav">
+                    
+                    @auth
+                        @if(Auth::user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                <i class="fas fa-cog me-1"></i>Admin
+                            </a>
+                        </li>
+                        @endif
+                    @endauth
+
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                             <i class="fas fa-shopping-cart"></i>
