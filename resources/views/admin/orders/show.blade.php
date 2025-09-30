@@ -70,6 +70,17 @@
                         </span>
                     </span>
                 </div>
+                @if($order->order_status == 'cancelled')
+                <div class="alert alert-danger mt-3">
+                    <h6><i class="fas fa-ban me-2"></i>Order Cancelled</h6>
+                    @if($order->cancellation_reason)
+                        <p class="mb-1"><strong>Reason:</strong> {{ $order->cancellation_reason }}</p>
+                    @endif
+                    @if($order->cancelled_at)
+                        <small class="text-muted">Cancelled on: {{ $order->cancelled_at->format('M d, Y g:i A') }}</small>
+                    @endif
+                </div>
+                @endif
                 <hr>
                 <div class="mb-2">
                     <span>Subtotal:</span>

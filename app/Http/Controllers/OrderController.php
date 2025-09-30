@@ -31,6 +31,9 @@ class OrderController extends Controller
         // Authorization check
         $this->authorizeOrderView($order);
 
+        // Reload the order with fresh data
+        $order->load('items.product');
+
         return view('orders.show', compact('order'));
     }
 

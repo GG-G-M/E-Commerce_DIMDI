@@ -88,7 +88,7 @@
                 <div class="col-md-4">
                     <!-- Current Main Image -->
                     <div class="mb-3">
-                        <label class="form-label">Current Main Image</label>
+                        <label class="form-label">Current Image</label>
                         <div>
                             <img src="{{ $product->image_url }}" alt="Current image" class="img-thumbnail mb-2" style="max-height: 200px;">
                         </div>
@@ -96,7 +96,7 @@
 
                     <!-- New Main Image -->
                     <div class="mb-3">
-                        <label for="image" class="form-label">Change Main Image</label>
+                        <label for="image" class="form-label">Change Image</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
                                id="image" name="image" accept="image/*">
                         @error('image')
@@ -105,29 +105,9 @@
                         <div class="mt-2">
                             <img id="imagePreview" src="#" alt="Image preview" class="img-thumbnail d-none" style="max-height: 200px;">
                         </div>
-                    </div>
-
-                    <!-- Current Gallery Images -->
-                    @if($product->gallery_urls && count($product->gallery_urls) > 0)
-                    <div class="mb-3">
-                        <label class="form-label">Current Gallery Images</label>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach($product->gallery_urls as $galleryImage)
-                            <img src="{{ $galleryImage }}" alt="Gallery image" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
-
-                    <!-- New Gallery Images -->
-                    <div class="mb-3">
-                        <label for="gallery" class="form-label">Add Gallery Images</label>
-                        <input type="file" class="form-control @error('gallery.*') is-invalid @enderror" 
-                               id="gallery" name="gallery[]" multiple accept="image/*">
-                        @error('gallery.*')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror>
-                        <small class="form-text text-muted">Select multiple images to add to gallery</small>
+                        <small class="form-text text-muted">
+                            Leave empty to keep current image
+                        </small>
                     </div>
 
                     <!-- Checkboxes -->

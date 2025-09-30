@@ -30,9 +30,18 @@
                         <td>{{ $order->customer_email }}</td>
                         <td>${{ number_format($order->total_amount, 2) }}</td>
                         <td>
-                            <span class="badge bg-{{ $order->order_status == 'cancelled' ? 'danger' : ($order->order_status == 'completed' ? 'success' : ($order->order_status == 'processing' ? 'primary' : 'warning')) }}">
+                            <span class="badge bg-{{ $order->order_status == 'cancelled' ? 'danger' : ($order->order_status == 'completed' ? 'success' : ($order->order_status == 'processing' ? 'primary' : ($order->order_status == 'confirmed' ? 'secondary' : 'warning'))) }}"
+                                @if($order->order_status == 'cancelled' && $order->cancellation_reason)
+                                data-bs-toggle="tooltip" data-bs-placement="top" 
+                                title="Reason: {{ $order->cancellation_reason }}"
+                                @endif>
                                 {{ ucfirst($order->order_status) }}
                             </span>
+                            {{-- Cancelation Thing --}}
+                            {{-- @if($order->order_status == 'cancelled' && $order->cancellation_reason)
+                            <br>
+                            <small class="text-muted">Reason: {{ Str::limit($order->cancellation_reason, 30) }}</small>
+                            @endif --}}
                         </td>
                         <td>{{ $order->created_at->format('M d, Y') }}</td>
                         <td>
@@ -51,4 +60,16 @@
         </div>
     </div>
 </div>
+
+{{-- Tool Tip --}}
+@push('scripts')
+<script>
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+@endpush
+
 @endsection

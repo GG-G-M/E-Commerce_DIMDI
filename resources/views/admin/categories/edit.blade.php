@@ -33,15 +33,15 @@
                 </div>
 
                 <div class="col-md-4">
-                    <!-- Current Image -->
-                    @if($category->image)
-                    <div class="mb-3">
-                        <label class="form-label">Current Image</label>
-                        <div>
-                            <img src="{{ Storage::disk('public')->url($category->image) }}" alt="Current image" class="img-thumbnail mb-2" style="max-height: 200px;">
+                        <!-- Current Image -->
+                        @if($category->image)
+                        <div class="mb-3">
+                            <label class="form-label">Current Image</label>
+                            <div>
+                                <img src="{{ $category->image_url }}" alt="Current image" class="img-thumbnail mb-2" style="max-height: 200px;">
+                            </div>
                         </div>
-                    </div>
-                    @endif
+                        @endif
 
                     <!-- New Image -->
                     <div class="mb-3">

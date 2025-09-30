@@ -32,24 +32,26 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
         ]);
 
-        // Handle main image upload
+        // Handle main image upload - Store in public directory
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-        }
-
-        // Handle gallery images upload
-        $galleryPaths = [];
-        if ($request->hasFile('gallery')) {
-            foreach ($request->file('gallery') as $galleryImage) {
-                $galleryPaths[] = $galleryImage->store('products/gallery', 'public');
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
+            
+            // Create products directory if it doesn't exist
+            $directory = public_path('images/products');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
             }
+            
+            // Move image to public directory
+            $image->move($directory, $imageName);
+            $imagePath = 'images/products/' . $imageName;
         }
 
         $product = Product::create([
@@ -61,7 +63,7 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'sku' => 'SKU-' . strtoupper(Str::random(8)),
             'image' => $imagePath,
-            'gallery' => !empty($galleryPaths) ? json_encode($galleryPaths) : null,
+            'gallery' => null,
             'is_featured' => $request->has('is_featured'),
             'is_active' => $request->has('is_active'),
             'category_id' => $request->category_id,
@@ -85,8 +87,7 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jjpg,gif|max:2048',
-            'gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
         ]);
@@ -94,25 +95,23 @@ class ProductController extends Controller
         // Handle main image upload
         $imagePath = $product->image;
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $imagePath = $request->file('image')->store('products', 'public');
-        }
-
-        // Handle gallery images upload
-        $galleryPaths = $product->gallery ? json_decode($product->gallery, true) : [];
-        if ($request->hasFile('gallery')) {
-            // Delete old gallery images
-            foreach ($galleryPaths as $oldGalleryImage) {
-                Storage::disk('public')->delete($oldGalleryImage);
+            // Delete old image if it exists in public directory and is not a URL
+            if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL) && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
             }
             
-            $galleryPaths = [];
-            foreach ($request->file('gallery') as $galleryImage) {
-                $galleryPaths[] = $galleryImage->store('products/gallery', 'public');
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
+            
+            // Create products directory if it doesn't exist
+            $directory = public_path('images/products');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
             }
+            
+            // Move image to public directory
+            $image->move($directory, $imageName);
+            $imagePath = 'images/products/' . $imageName;
         }
 
         $product->update([
@@ -123,7 +122,7 @@ class ProductController extends Controller
             'sale_price' => $request->sale_price,
             'stock_quantity' => $request->stock_quantity,
             'image' => $imagePath,
-            'gallery' => !empty($galleryPaths) ? json_encode($galleryPaths) : null,
+            'gallery' => null,
             'is_featured' => $request->has('is_featured'),
             'is_active' => $request->has('is_active'),
             'category_id' => $request->category_id,
@@ -134,16 +133,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Delete images
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
-        
-        if ($product->gallery) {
-            $galleryPaths = json_decode($product->gallery, true);
-            foreach ($galleryPaths as $galleryImage) {
-                Storage::disk('public')->delete($galleryImage);
-            }
+        // Delete image only if it's stored locally (not a URL)
+        if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL) && file_exists(public_path($product->image))) {
+            unlink(public_path($product->image));
         }
 
         $product->delete();

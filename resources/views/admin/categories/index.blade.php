@@ -27,11 +27,11 @@
                     <tr>
                         <td>
                             @if($category->image)
-                                <img src="{{ Storage::disk('public')->url($category->image) }}" alt="{{ $category->name }}" 
-                                     class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}" 
+                                    class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                             @else
                                 <div class="bg-light d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px;">
+                                    style="width: 60px; height: 60px;">
                                     <i class="fas fa-tag text-muted"></i>
                                 </div>
                             @endif

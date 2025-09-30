@@ -31,7 +31,18 @@ class CategoryController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('categories', 'public');
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
+            
+            // Create categories directory if it doesn't exist
+            $directory = public_path('images/categories');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            
+            // Move image to public directory
+            $image->move($directory, $imageName);
+            $imagePath = 'images/categories/' . $imageName;
         }
 
         Category::create([
@@ -60,11 +71,23 @@ class CategoryController extends Controller
 
         $imagePath = $category->image;
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+            // Delete old image if it exists in public directory and is not a URL
+            if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL) && file_exists(public_path($category->image))) {
+                unlink(public_path($category->image));
             }
-            $imagePath = $request->file('image')->store('categories', 'public');
+            
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
+            
+            // Create categories directory if it doesn't exist
+            $directory = public_path('images/categories');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+            
+            // Move image to public directory
+            $image->move($directory, $imageName);
+            $imagePath = 'images/categories/' . $imageName;
         }
 
         $category->update([
@@ -80,8 +103,9 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
+        // Delete image only if it's stored locally (not a URL)
+        if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL) && file_exists(public_path($category->image))) {
+            unlink(public_path($category->image));
         }
 
         // Check if category has products

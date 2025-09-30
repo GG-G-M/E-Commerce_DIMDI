@@ -87,7 +87,7 @@
                 <div class="col-md-4">
                     <!-- Main Image -->
                     <div class="mb-3">
-                        <label for="image" class="form-label">Main Image *</label>
+                        <label for="image" class="form-label">Product Image *</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
                                id="image" name="image" accept="image/*" required>
                         @error('image')
@@ -96,16 +96,9 @@
                         <div class="mt-2">
                             <img id="imagePreview" src="#" alt="Image preview" class="img-thumbnail d-none" style="max-height: 200px;">
                         </div>
-                    </div>
-
-                    <!-- Gallery Images -->
-                    <div class="mb-3">
-                        <label for="gallery" class="form-label">Gallery Images</label>
-                        <input type="file" class="form-control @error('gallery.*') is-invalid @enderror" 
-                               id="gallery" name="gallery[]" multiple accept="image/*">
-                        @error('gallery.*')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">
+                            Supported formats: JPEG, PNG, JPG, GIF, WEBP. Max size: 2MB
+                        </small>
                     </div>
 
                     <!-- Checkboxes -->

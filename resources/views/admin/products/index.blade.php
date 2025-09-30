@@ -28,7 +28,7 @@
                     <tr>
                         <td>
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
-                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
+                                class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
                         </td>
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->category->name }}</td>
