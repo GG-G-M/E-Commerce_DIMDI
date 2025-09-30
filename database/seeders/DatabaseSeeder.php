@@ -197,11 +197,11 @@ class DatabaseSeeder extends Seeder
                 'sale_price' => $product['sale_price'],
                 'stock_quantity' => $product['stock_quantity'],
                 'sku' => $product['sku'],
-                'image' => 'https://via.placeholder.com/400x300',
+                'image' => 'https://picsum.photos/400/300?random=' . $product['sku'], // Using picsum for real images
                 'gallery' => json_encode([
-                    'https://via.placeholder.com/400x300',
-                    'https://via.placeholder.com/400x300',
-                    'https://via.placeholder.com/400x300'
+                    'https://picsum.photos/400/300?random=' . $product['sku'] . '_1',
+                    'https://picsum.photos/400/300?random=' . $product['sku'] . '_2',
+                    'https://picsum.photos/400/300?random=' . $product['sku'] . '_3'
                 ]),
                 'is_featured' => $product['is_featured'],
                 'is_active' => true,
