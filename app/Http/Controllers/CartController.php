@@ -5,30 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
-    private function getSessionId()
+    private function getCartIdentifier()
     {
-        $sessionId = session()->get('cart_session_id');
-        if (!$sessionId) {
-            $sessionId = Str::random(40);
-            session()->put('cart_session_id', $sessionId);
+        if (Auth::check()) {
+            return ['user_id' => Auth::id()];
+        } else {
+            $sessionId = session()->get('cart_session_id');
+            if (!$sessionId) {
+                $sessionId = Str::random(40);
+                session()->put('cart_session_id', $sessionId);
+            }
+            return ['session_id' => $sessionId];
         }
-        return $sessionId;
     }
 
     public function index()
     {
-        $sessionId = $this->getSessionId();
+        $cartIdentifier = $this->getCartIdentifier();
         $cartItems = Cart::with('product')
-            ->where('session_id', $sessionId)
+            ->where($cartIdentifier)
             ->get();
 
         $subtotal = $cartItems->sum('total_price');
-        $tax = $subtotal * 0.10; // 10% tax
-        $shipping = $subtotal > 100 ? 0 : 10; // Free shipping above $100
+        $tax = $subtotal * 0.10;
+        $shipping = $subtotal > 100 ? 0 : 10;
         $total = $subtotal + $tax + $shipping;
 
         return view('cart.index', compact('cartItems', 'subtotal', 'tax', 'shipping', 'total'));
@@ -47,9 +52,9 @@ class CartController extends Controller
             return redirect()->back()->with('error', 'Insufficient stock available.');
         }
 
-        $sessionId = $this->getSessionId();
+        $cartIdentifier = $this->getCartIdentifier();
 
-        $cartItem = Cart::where('session_id', $sessionId)
+        $cartItem = Cart::where($cartIdentifier)
             ->where('product_id', $request->product_id)
             ->first();
 
@@ -57,11 +62,10 @@ class CartController extends Controller
             $cartItem->quantity += $request->quantity;
             $cartItem->save();
         } else {
-            Cart::create([
-                'session_id' => $sessionId,
+            Cart::create(array_merge($cartIdentifier, [
                 'product_id' => $request->product_id,
                 'quantity' => $request->quantity
-            ]);
+            ]));
         }
 
         return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
@@ -69,6 +73,9 @@ class CartController extends Controller
 
     public function update(Request $request, Cart $cart)
     {
+        // Authorization check - ensure user owns this cart item
+        $this->authorizeCartItem($cart);
+
         $request->validate([
             'quantity' => 'required|integer|min:1'
         ]);
@@ -84,14 +91,31 @@ class CartController extends Controller
 
     public function destroy(Cart $cart)
     {
+        // Authorization check - ensure user owns this cart item
+        $this->authorizeCartItem($cart);
+
         $cart->delete();
         return redirect()->route('cart.index')->with('success', 'Item removed from cart successfully!');
     }
 
     public function getCartCount()
     {
-        $sessionId = $this->getSessionId();
-        $count = Cart::where('session_id', $sessionId)->sum('quantity');
+        $cartIdentifier = $this->getCartIdentifier();
+        $count = Cart::where($cartIdentifier)->sum('quantity');
         return response()->json(['count' => $count]);
+    }
+
+    private function authorizeCartItem(Cart $cart)
+    {
+        if (Auth::check()) {
+            if ($cart->user_id !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
+        } else {
+            $sessionId = session()->get('cart_session_id');
+            if ($cart->session_id !== $sessionId) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
     }
 }

@@ -10,6 +10,25 @@
         </ol>
     </nav>
 
+    <!-- Order Status Alert -->
+    @if($order->order_status == 'cancelled')
+    <div class="alert alert-danger">
+        <h5><i class="fas fa-times-circle me-2"></i>Order Cancelled</h5>
+        <p class="mb-0"><strong>Reason:</strong> {{ $order->cancellation_reason }}</p>
+        <small>Cancelled on: {{ $order->cancelled_at->format('M d, Y g:i A') }}</small>
+    </div>
+    @elseif($order->canBeCancelled())
+    <div class="alert alert-warning">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>You can cancel this order if needed.</span>
+            <button type="button" class="btn btn-sm btn-outline-danger" 
+                    data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
+                Cancel Order
+            </button>
+        </div>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
@@ -68,8 +87,18 @@
                     </div>
                     <div class="mb-3">
                         <strong>Status:</strong>
-                        <span class="float-end badge bg-{{ $order->order_status == 'completed' ? 'success' : 'warning' }}">
-                            {{ ucfirst($order->order_status) }}
+                        <span class="float-end">
+                            @if($order->order_status == 'cancelled')
+                                <span class="badge bg-danger">Cancelled</span>
+                            @elseif($order->order_status == 'completed')
+                                <span class="badge bg-success">Completed</span>
+                            @elseif($order->order_status == 'shipped')
+                                <span class="badge bg-info">Shipped</span>
+                            @elseif($order->order_status == 'processing')
+                                <span class="badge bg-primary">Processing</span>
+                            @else
+                                <span class="badge bg-warning">Pending</span>
+                            @endif
                         </span>
                     </div>
                     <hr>
@@ -128,4 +157,34 @@
         </div>
     </div>
 </div>
+
+<!-- Cancel Order Modal -->
+@if($order->canBeCancelled())
+<div class="modal fade" id="cancelOrderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('orders.cancel', $order) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel order <strong>{{ $order->order_number }}</strong>?</p>
+                    <div class="mb-3">
+                        <label for="cancellation_reason" class="form-label">Reason for cancellation:</label>
+                        <textarea class="form-control" id="cancellation_reason" 
+                                  name="cancellation_reason" rows="3" required 
+                                  placeholder="Please provide a reason for cancellation"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 @endsection
