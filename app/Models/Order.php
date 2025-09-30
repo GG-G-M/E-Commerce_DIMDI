@@ -23,6 +23,8 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'order_status',
+        'cancellation_reason',
+        'cancelled_at',
         'notes'
     ];
 
@@ -30,7 +32,8 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'tax_amount' => 'decimal:2',
-        'total_amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'cancelled_at' => 'datetime'
     ];
 
     public function user(): BelongsTo
@@ -41,6 +44,25 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function canBeCancelled()
+    {
+        return in_array($this->order_status, ['pending', 'confirmed']);
+    }
+
+    public function cancel($reason = null)
+    {
+        $this->update([
+            'order_status' => 'cancelled',
+            'cancellation_reason' => $reason,
+            'cancelled_at' => now()
+        ]);
+
+        // Restore product stock
+        foreach ($this->items as $item) {
+            $item->product->increment('stock_quantity', $item->quantity);
+        }
     }
 
     protected static function boot()

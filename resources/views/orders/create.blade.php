@@ -13,20 +13,32 @@
                 <div class="card-body">
                     <form action="{{ route('orders.store') }}" method="POST">
                         @csrf
+                        
+                        <!-- Pre-filled user information -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Your profile information will be used for this order. 
+                            <a href="{{ route('profile.show') }}" class="alert-link">Update profile</a> if needed.
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="customer_name" class="form-label">Full Name *</label>
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" value="{{ $user->name }}" readonly>
+                                <small class="form-text text-muted">From your profile</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="customer_email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="customer_email" name="customer_email" required>
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ $user->email }}" readonly>
+                                <small class="form-text text-muted">From your profile</small>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="customer_phone" class="form-label">Phone *</label>
-                                <input type="tel" class="form-control" id="customer_phone" name="customer_phone" required>
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" value="{{ $user->phone }}" readonly>
+                                <small class="form-text text-muted">From your profile</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="payment_method" class="form-label">Payment Method *</label>
@@ -37,22 +49,26 @@
                                 </select>
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="shipping_address" class="form-label">Shipping Address *</label>
-                            <textarea class="form-control" id="shipping_address" name="shipping_address" rows="3" required></textarea>
+                            <textarea class="form-control" id="shipping_address" name="shipping_address" rows="3" required>{{ old('shipping_address', $user->address) }}</textarea>
+                            <small class="form-text text-muted">We'll deliver to this address</small>
                         </div>
+
                         <div class="mb-3">
                             <label for="billing_address" class="form-label">Billing Address</label>
-                            <textarea class="form-control" id="billing_address" name="billing_address" rows="3"></textarea>
+                            <textarea class="form-control" id="billing_address" name="billing_address" rows="3">{{ old('billing_address', $user->address) }}</textarea>
                             <div class="form-text">Leave blank if same as shipping address</div>
                         </div>
+
                         <div class="mb-3">
                             <label for="notes" class="form-label">Order Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any special instructions..."></textarea>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any special instructions...">{{ old('notes') }}</textarea>
                         </div>
                 </div>
             </div>
-        </div>
+        </div>                      
 
         <div class="col-lg-4">
             <div class="card">
