@@ -16,8 +16,14 @@ class ProductController extends Controller
 
         // Search functionality
         if ($request->has('search') && $request->search != '') {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('category', function($categoryQuery) use ($searchTerm) {
+                      $categoryQuery->where('name', 'like', '%' . $searchTerm . '%');
+                  });
+            });
         }
 
         // Category filter
@@ -25,6 +31,14 @@ class ProductController extends Controller
             $query->whereHas('category', function($q) use ($request) {
                 $q->where('slug', $request->category);
             });
+        }
+
+        // Check if it's an AJAX request for search dropdown
+        if ($request->ajax() || $request->has('ajax_search')) {
+            $products = $query->limit(8)->get();
+            return response()->json([
+                'products' => $products
+            ]);
         }
 
         $products = $query->latest()->paginate(12);
