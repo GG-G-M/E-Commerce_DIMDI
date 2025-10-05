@@ -9,3 +9,30 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Category Slider Styles */
+.category-slider .nav-pills .nav-link {
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    margin: 0 4px;
+}
+
+.category-slider .nav-pills .nav-link.active {
+    background-color: white !important;
+    color: black !important;
+    font-weight: bold;
+    border-color: white;
+}
+
+.category-slider .nav-pills .nav-link:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white !important;
+}
+
+/* Make slider full width */
+.category-slider {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+}
