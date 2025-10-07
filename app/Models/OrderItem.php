@@ -13,7 +13,8 @@ class OrderItem extends Model
         'product_name',
         'unit_price',
         'quantity',
-        'total_price'
+        'total_price',
+        'selected_size' // Add this line
     ];
 
     protected $casts = [

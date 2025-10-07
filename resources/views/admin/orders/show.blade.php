@@ -182,46 +182,53 @@
 
 <div class="row">
     <div class="col-lg-8">
-        <!-- Order Items -->
-        <div class="card order-card">
-            <div class="card-header d-flex align-items-center">
-                <i class="fas fa-shopping-basket me-2"></i>
-                <h5 class="mb-0">Order Items</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($order->items as $item)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ $item->product->image_url }}" alt="{{ $item->product_name }}" 
-                                             class="product-image me-3">
-                                        <div>
-                                            <h6 class="mb-0">{{ $item->product_name }}</h6>
-                                            <small class="text-muted">SKU: {{ $item->product->sku }}</small>
-                                        </div>
+    <!-- Order Items -->
+    <div class="card order-card">
+        <div class="card-header d-flex align-items-center">
+            <i class="fas fa-shopping-basket me-2"></i>
+            <h5 class="mb-0">Order Items</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Size</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($order->items as $item)
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $item->product->image_url }}" alt="{{ $item->product_name }}" 
+                                        class="product-image me-3">
+                                    <div>
+                                        <h6 class="mb-0">{{ $item->product_name }}</h6>
+                                        <small class="text-muted">SKU: {{ $item->product->sku }}</small>
                                     </div>
-                                </td>
-                                <td class="fw-bold text-success">${{ number_format($item->unit_price, 2) }}</td>
-                                <td>
-                                    <span class="badge bg-light text-dark">{{ $item->quantity }}</span>
-                                </td>
-                                <td class="fw-bold">${{ number_format($item->total_price, 2) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-success">${{ number_format($item->unit_price, 2) }}</td>
+                            <td>
+                                @if($item->selected_size)
+                                <span class="badge bg-primary">{{ $item->selected_size }}</span>
+                                @else
+                                <span class="badge bg-secondary">One Size</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">{{ $item->quantity }}</span>
+                            </td>
+                            <td class="fw-bold">${{ number_format($item->total_price, 2) }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

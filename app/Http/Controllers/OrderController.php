@@ -116,7 +116,8 @@ class OrderController extends Controller
                 'product_name' => $cartItem->product->name,
                 'unit_price' => $cartItem->product->current_price,
                 'quantity' => $cartItem->quantity,
-                'total_price' => $cartItem->total_price
+                'total_price' => $cartItem->total_price,
+                'selected_size' => $cartItem->selected_size // Add this line
             ]);
 
             // Update product stock
