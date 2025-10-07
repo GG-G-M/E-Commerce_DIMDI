@@ -253,9 +253,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg shadow-sm" id="mainNavbar">
         <div class="container">
-            <!-- Brand with Logo on Left -->
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('images/logo.png') }}" alt="DIMDI Store" class="logo-img me-2">
+                <img src="{{ asset('images/DIMDI_LOGO.png') }}" alt="DIMDI Store" class="logo-img me-2">
                 <span class="d-none d-sm-inline">DIMDI Store</span>
             </a>
 
