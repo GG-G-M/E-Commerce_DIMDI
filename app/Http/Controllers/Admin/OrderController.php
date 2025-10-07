@@ -8,10 +8,45 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')->latest()->paginate(10);
-        return view('admin.orders.index', compact('orders'));
+        $search = $request->get('search');
+        $status = $request->get('status', 'active');
+        
+        $orders = Order::with('user')
+            ->when($search, function($query) use ($search) {
+                return $query->where(function($q) use ($search) {
+                    $q->where('order_number', 'like', "%{$search}%")
+                      ->orWhere('customer_name', 'like', "%{$search}%")
+                      ->orWhere('customer_email', 'like', "%{$search}%")
+                      ->orWhere('customer_phone', 'like', "%{$search}%");
+                });
+            })
+            ->when($status, function($query) use ($status) {
+                if ($status === 'active') {
+                    return $query->whereNotIn('order_status', ['cancelled', 'completed', 'delivered']);
+                } elseif ($status !== 'all') {
+                    return $query->where('order_status', $status);
+                }
+                return $query;
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends($request->all());
+
+        $statuses = [
+            'active' => 'Active Orders',
+            'pending' => 'Pending',
+            'confirmed' => 'Confirmed',
+            'processing' => 'Processing',
+            'shipped' => 'Shipped',
+            'delivered' => 'Delivered',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
+            'all' => 'All Orders'
+        ];
+
+        return view('admin.orders.index', compact('orders', 'statuses'));
     }
 
     public function show(Order $order)
@@ -22,13 +57,26 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
+        $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
+        
         $request->validate([
-            'order_status' => 'required|in:pending,confirmed,processing,shipped,delivered,cancelled'
+            'order_status' => 'required|in:' . implode(',', $validStatuses)
         ]);
 
         $oldStatus = $order->order_status;
-        $order->update(['order_status' => $request->order_status]);
+        $newStatus = $request->order_status;
 
-        return redirect()->back()->with('success', "Order status updated from {$oldStatus} to {$request->order_status} successfully!");
+        // If changing from cancelled to another status, clear cancellation fields
+        if ($oldStatus == 'cancelled' && $newStatus != 'cancelled') {
+            $order->update([
+                'order_status' => $newStatus,
+                'cancellation_reason' => null,
+                'cancelled_at' => null
+            ]);
+        } else {
+            $order->update(['order_status' => $newStatus]);
+        }
+
+        return redirect()->back()->with('success', "Order status updated from {$oldStatus} to {$newStatus} successfully!");
     }
 }

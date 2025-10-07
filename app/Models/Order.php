@@ -71,7 +71,9 @@ class Order extends Model
 
         static::creating(function ($order) {
             if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid());
+                $date = date('Ymd'); // Format: 20250930
+                $random = strtoupper(bin2hex(random_bytes(4))); // 8 characters like 68DBE9C6
+                $order->order_number = "ORD-{$date}-{$random}";
             }
         });
     }
