@@ -43,7 +43,8 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'selected_size' => 'required|string|max:50'
         ]);
 
         $product = Product::findOrFail($request->product_id);
@@ -54,8 +55,10 @@ class CartController extends Controller
 
         $cartIdentifier = $this->getCartIdentifier();
 
+        // Check if same product with same size already exists in cart
         $cartItem = Cart::where($cartIdentifier)
             ->where('product_id', $request->product_id)
+            ->where('selected_size', $request->selected_size)
             ->first();
 
         if ($cartItem) {
@@ -64,6 +67,7 @@ class CartController extends Controller
         } else {
             Cart::create(array_merge($cartIdentifier, [
                 'product_id' => $request->product_id,
+                'selected_size' => $request->selected_size,
                 'quantity' => $request->quantity
             ]));
         }
@@ -77,14 +81,39 @@ class CartController extends Controller
         $this->authorizeCartItem($cart);
 
         $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+            'selected_size' => 'required|string|max:50'
         ]);
 
         if ($cart->product->stock_quantity < $request->quantity) {
             return redirect()->back()->with('error', 'Insufficient stock available.');
         }
 
-        $cart->update(['quantity' => $request->quantity]);
+        $cartIdentifier = $this->getCartIdentifier();
+
+        // Check if changing to a size that already exists for this product
+        if ($cart->selected_size !== $request->selected_size) {
+            $existingCartItem = Cart::where($cartIdentifier)
+                ->where('product_id', $cart->product_id)
+                ->where('selected_size', $request->selected_size)
+                ->where('id', '!=', $cart->id) // Exclude current item
+                ->first();
+
+            if ($existingCartItem) {
+                // Merge with existing item
+                $existingCartItem->quantity += $request->quantity;
+                $existingCartItem->save();
+                $cart->delete();
+                
+                return redirect()->route('cart.index')->with('success', 'Item updated successfully!');
+            }
+        }
+
+        // Update the current cart item
+        $cart->update([
+            'quantity' => $request->quantity,
+            'selected_size' => $request->selected_size
+        ]);
 
         return redirect()->route('cart.index')->with('success', 'Cart updated successfully!');
     }

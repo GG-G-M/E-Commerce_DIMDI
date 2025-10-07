@@ -392,8 +392,8 @@
                 <!-- Products for this category -->
                 <div class="row category-products" data-category-id="{{ $categoryId }}">
                     @foreach($categoryProducts as $product)
-                    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 mb-4">
-                        <div class="card product-card h-100 shadow position-relative">
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card product-card h-100 shadow">
                             @if($product->has_discount)
                             <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
                             @endif
@@ -401,11 +401,24 @@
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ $product->name }}</h5>
                                 <p class="card-text text-muted small">{{ Str::limit($product->description, 80) }}</p>
+                                
+                                <!-- Display Available Sizes -->
+                                @if($product->available_sizes && count($product->available_sizes) > 0)
+                                <div class="mb-2">
+                                    <small class="text-muted">Available Sizes:</small>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        @foreach($product->available_sizes as $size)
+                                            <span class="badge bg-secondary">{{ $size }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                                
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         @if($product->has_discount)
                                         <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                                        <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
+                                        <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
                                         @else
                                         <span class="text-primary fw-bold">${{ $product->price }}</span>
                                         @endif
@@ -416,7 +429,8 @@
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn w-100">
+                                            <input type="hidden" name="selected_size" value="{{ $product->available_sizes[0] ?? 'One Size' }}">
+                                            <button type="submit" class="btn btn-primary w-100">
                                                 <i class="fas fa-cart-plus"></i>
                                             </button>
                                         </form>

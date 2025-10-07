@@ -13,33 +13,54 @@
                     <div class="row align-items-center mb-4 pb-4 border-bottom">
                         <div class="col-md-2">
                             <img src="{{ $item->product->image_url }}" 
-                                 alt="{{ $item->product->name }}" class="img-fluid rounded">
+                                 alt="{{ $item->product->name }}" class="img-fluid rounded" style="height: 80px; object-fit: cover;">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <h5 class="mb-1">{{ $item->product->name }}</h5>
                             <p class="text-muted mb-0">${{ $item->product->current_price }}</p>
                         </div>
                         <div class="col-md-3">
-                            <form action="{{ route('cart.update', $item) }}" method="POST" class="d-flex align-items-center">
+                            <form action="{{ route('cart.update', $item) }}" method="POST" class="d-flex align-items-center gap-2">
                                 @csrf
                                 @method('PUT')
-                                <input type="number" name="quantity" value="{{ $item->quantity }}" 
-                                       min="1" max="{{ $item->product->stock_quantity }}" 
-                                       class="form-control form-control-sm" style="width: 80px;">
-                                <button type="submit" class="btn btn-sm btn-outline-primary ms-2">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
+                                
+                                <!-- Size Selection Dropdown -->
+                                <div class="me-2">
+                                    <label class="form-label small mb-1">Size:</label>
+                                    <select name="selected_size" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        @foreach($item->product->available_sizes as $size)
+                                        <option value="{{ $size }}" {{ $item->selected_size == $size ? 'selected' : '' }}>
+                                            {{ $size }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                
+                                <!-- Quantity Input -->
+                                <div>
+                                    <label class="form-label small mb-1">Qty:</label>
+                                    <input type="number" name="quantity" value="{{ $item->quantity }}" 
+                                           min="1" max="{{ $item->product->stock_quantity }}" 
+                                           class="form-control form-control-sm" style="width: 70px;">
+                                </div>
+                                
+                                <!-- Update Button -->
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                         <div class="col-md-2">
                             <strong>${{ number_format($item->total_price, 2) }}</strong>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <form action="{{ route('cart.destroy', $item) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-trash"></i> Remove
                                 </button>
                             </form>
                         </div>

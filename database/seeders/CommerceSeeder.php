@@ -107,7 +107,7 @@ class CommerceSeeder extends Seeder
                 'sku' => 'BR-BED-005',
                 'category_id' => 2,
                 'is_featured' => true,
-                'sizes' => ['Queen']
+                'sizes' => ['One Size']
             ],
             [
                 'name' => 'Dresser with Mirror',

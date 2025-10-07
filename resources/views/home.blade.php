@@ -459,38 +459,58 @@
                 
                 <div class="row g-4">
                     @if(isset($featuredProducts) && count($featuredProducts) > 0)
-                        @foreach($featuredProducts as $product)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card product-card">
-                                <div class="product-img-container">
-                                    <img src="{{ $product->image_url ?? 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80' }}" class="product-img" alt="{{ $product->name }}">
-                                    @if($product->has_discount ?? false)
-                                    <span class="product-badge sale">Sale</span>
-                                    @endif
-                                    @if($product->is_new ?? false)
-                                    <span class="product-badge">New</span>
-                                    @endif
-                                </div>
-                                <div class="product-body">
-                                    <h5 class="product-title">{{ $product->name }}</h5>
-                                    <p class="product-description">{{ Str::limit($product->description ?? 'Premium quality product for your home', 70) }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="product-price">${{ ($product->has_discount ?? false) ? ($product->sale_price ?? $product->price) : $product->price }}</span>
-                                            @if($product->has_discount ?? false)
-                                            <span class="product-old-price">${{ $product->price }}</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <form action="{{ url('/cart/add') }}" method="POST" class="d-inline w-100">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                        <button type="submit" class="btn btn-add-cart"><i class="fas fa-shopping-cart me-2"></i>Add to Cart</button>
-                                    </form>
-                                </div>
-                            </div>
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Featured Products</h2>
+        <div class="row">
+            @foreach($featuredProducts as $product)
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card product-card h-100 shadow">
+                    @if($product->has_discount)
+                    <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
+                    @endif
+                    <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ $product->name }}</h5>
+                        <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                        
+                        <!-- Display Available Sizes -->
+                        @if($product->available_sizes && count($product->available_sizes) > 0)
+                        <div class="mb-2">
+                            <small class="text-muted">Sizes: 
+                                @foreach($product->available_sizes as $size)
+                                    <span class="badge bg-light text-dark border me-1">{{ $size }}</span>
+                                @endforeach
+                            </small>
                         </div>
-                        @endforeach
+                        @endif
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                @if($product->has_discount)
+                                <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                                <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
+                                @else
+                                <span class="text-primary fw-bold">${{ $product->price }}</span>
+                                @endif
+                            </div>
+                            <form action="{{ route('cart.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <input type="hidden" name="selected_size" value="{{ $product->available_sizes[0] ?? 'One Size' }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
                     @else
                         <!-- Fallback demo products when no featured products are available -->
                         @php
