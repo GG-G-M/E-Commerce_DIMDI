@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 
 class Category extends Model
 {
@@ -12,7 +11,6 @@ class Category extends Model
         'name',
         'slug',
         'description',
-        'image',
         'is_active'
     ];
 
@@ -25,20 +23,17 @@ class Category extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function getImageUrlAttribute()
+    public function scopeSearch($query, $search)
     {
-        // If image is already a full URL, return it
-        if ($this->image && filter_var($this->image, FILTER_VALIDATE_URL)) {
-            return $this->image;
-        }
-        
-        // If image is stored in public directory
-        if ($this->image && file_exists(public_path($this->image))) {
-            return asset($this->image);
-        }
-        
-        // Fallback to placeholder
-        return 'https://picsum.photos/400/300?random=' . uniqid();
+        return $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     public function getRouteKeyName()

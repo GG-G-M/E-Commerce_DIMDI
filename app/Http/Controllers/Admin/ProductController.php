@@ -11,16 +11,43 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
+        $status = $request->get('status', 'active');
+        
+        $products = Product::with('category')
+            ->when($search, function($query) use ($search) {
+                return $query->search($search);
+            })
+            ->when($categoryId, function($query) use ($categoryId) {
+                return $query->filterByCategory($categoryId);
+            })
+            ->when($status, function($query) use ($status) {
+                return $query->filterByStatus($status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends($request->all());
+
+        $categories = Category::active()->get();
+        $statuses = [
+            'active' => 'Active',
+            'inactive' => 'Inactive', 
+            'archived' => 'Archived',
+            'featured' => 'Featured',
+            'all' => 'All'
+        ];
+
+        return view('admin.products.index', compact('products', 'categories', 'statuses'));
     }
 
     public function create()
     {
-        $categories = Category::where('is_active', true)->get();
-        return view('admin.products.create', compact('categories'));
+        $categories = Category::active()->get();
+        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
+        return view('admin.products.create', compact('categories', 'sizes'));
     }
 
     public function store(Request $request)
@@ -32,6 +59,8 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'sizes' => 'required|array',
+            'sizes.*' => 'string|max:50',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -63,9 +92,10 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'sku' => 'SKU-' . strtoupper(Str::random(8)),
             'image' => $imagePath,
-            'gallery' => null,
+            'sizes' => json_encode($request->sizes),
             'is_featured' => $request->has('is_featured'),
             'is_active' => $request->has('is_active'),
+            'is_archived' => false,
             'category_id' => $request->category_id,
         ]);
 
@@ -74,8 +104,11 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $categories = Category::active()->get();
+        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
+        $selectedSizes = $product->available_sizes;
+        
+        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'selectedSizes'));
     }
 
     public function update(Request $request, Product $product)
@@ -87,6 +120,8 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'sizes' => 'required|array',
+            'sizes.*' => 'string|max:50',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -122,7 +157,7 @@ class ProductController extends Controller
             'sale_price' => $request->sale_price,
             'stock_quantity' => $request->stock_quantity,
             'image' => $imagePath,
-            'gallery' => null,
+            'sizes' => json_encode($request->sizes),
             'is_featured' => $request->has('is_featured'),
             'is_active' => $request->has('is_active'),
             'category_id' => $request->category_id,
@@ -131,15 +166,22 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
 
+    public function archive(Product $product)
+    {
+        $product->archive();
+        return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+    }
+
+    public function unarchive(Product $product)
+    {
+        $product->unarchive();
+        return redirect()->route('admin.products.index')->with('success', 'Product unarchived successfully!');
+    }
+
     public function destroy(Product $product)
     {
-        // Delete image only if it's stored locally (not a URL)
-        if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL) && file_exists(public_path($product->image))) {
-            unlink(public_path($product->image));
-        }
-
-        $product->delete();
-
-        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
+        // Instead of deleting, archive the product
+        $product->archive();
+        return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
     }
 }
