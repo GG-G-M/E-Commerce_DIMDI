@@ -390,57 +390,71 @@
                 </div>
                 
                 <!-- Products for this category -->
-                <div class="row category-products" data-category-id="{{ $categoryId }}">
-                    @foreach($categoryProducts as $product)
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="card product-card h-100 shadow">
-                            @if($product->has_discount)
-                            <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
-                            @endif
-                            <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ $product->name }}</h5>
-                                <p class="card-text text-muted small">{{ Str::limit($product->description, 80) }}</p>
-                                
-                                <!-- Display Available Sizes -->
-                                @if($product->available_sizes && count($product->available_sizes) > 0)
-                                <div class="mb-2">
-                                    <small class="text-muted">Available Sizes:</small>
-                                    <div class="d-flex flex-wrap gap-1 mt-1">
-                                        @foreach($product->available_sizes as $size)
-                                            <span class="badge bg-secondary">{{ $size }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
+                <div class="row">
+    @foreach($products as $product)
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card product-card h-100 shadow-sm">
+            @if($product->has_discount)
+            <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
+            @endif
+            
+            <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
+            
+            <div class="card-body d-flex flex-column">
+                <h6 class="card-title">{{ $product->name }}</h6>
+                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                
+                <!-- Display Available Sizes -->
+                @if($product->all_sizes && count($product->all_sizes) > 0)
+                <div class="mb-2">
+                    <small class="text-muted">Sizes: 
+                        @foreach($product->all_sizes as $size)
+                            <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
+                                {{ $size }}
+                                @if(!$product->isSizeInStock($size))
+                                (OOS)
                                 @endif
-                                
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        @if($product->has_discount)
-                                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                                        <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
-                                        @else
-                                        <span class="text-primary fw-bold">${{ $product->price }}</span>
-                                        @endif
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary flex-fill">View Details</a>
-                                        <form action="{{ route('cart.store') }}" method="POST" class="flex-fill">
-                                            @csrf
-                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                            <input type="hidden" name="quantity" value="1">
-                                            <input type="hidden" name="selected_size" value="{{ $product->available_sizes[0] ?? 'One Size' }}">
-                                            <button type="submit" class="btn btn-primary w-100">
-                                                <i class="fas fa-cart-plus"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
+                            </span>
+                        @endforeach
+                    </small>
                 </div>
+                @endif
+                
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        @if($product->has_discount)
+                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                        <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
+                        @else
+                        <span class="text-primary fw-bold">${{ $product->price }}</span>
+                        @endif
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                            View Details
+                        </a>
+                        
+                        @if($product->in_stock)
+                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form flex-fill">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
+                            <button type="submit" class="btn btn-primary btn-sm w-100" title="Add to Cart">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                        </form>
+                        @else
+                        <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
             @endforeach
         @else
             <!-- Show empty state with message -->

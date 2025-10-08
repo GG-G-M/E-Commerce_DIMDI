@@ -20,13 +20,27 @@ class Cart extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function user(): BelongsTo
+    public function variant()
     {
-        return $this->belongsTo(User::class);
+        return $this->product->getVariantBySize($this->selected_size);
     }
 
     public function getTotalPriceAttribute()
     {
+        $variant = $this->variant();
+        if ($variant && $variant->current_price) {
+            return $variant->current_price * $this->quantity;
+        }
         return $this->product->current_price * $this->quantity;
+    }
+
+    // Check if cart item is still available
+    public function getIsAvailableAttribute()
+    {
+        $variant = $this->variant();
+        if (!$variant) {
+            return false;
+        }
+        return $variant->stock_quantity >= $this->quantity;
     }
 }
