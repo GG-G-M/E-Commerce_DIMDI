@@ -86,6 +86,12 @@ class CartController extends Controller
         ]);
 
         if ($cart->product->stock_quantity < $request->quantity) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Insufficient stock available.'
+                ], 422);
+            }
             return redirect()->back()->with('error', 'Insufficient stock available.');
         }
 
@@ -96,7 +102,7 @@ class CartController extends Controller
             $existingCartItem = Cart::where($cartIdentifier)
                 ->where('product_id', $cart->product_id)
                 ->where('selected_size', $request->selected_size)
-                ->where('id', '!=', $cart->id) // Exclude current item
+                ->where('id', '!=', $cart->id)
                 ->first();
 
             if ($existingCartItem) {
@@ -105,6 +111,13 @@ class CartController extends Controller
                 $existingCartItem->save();
                 $cart->delete();
                 
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Item updated successfully!',
+                        'redirect' => true
+                    ]);
+                }
                 return redirect()->route('cart.index')->with('success', 'Item updated successfully!');
             }
         }
@@ -114,6 +127,32 @@ class CartController extends Controller
             'quantity' => $request->quantity,
             'selected_size' => $request->selected_size
         ]);
+
+        // Reload the cart item with fresh data
+        $cart->load('product');
+
+        if ($request->ajax()) {
+            // Calculate updated totals
+            $cartIdentifier = $this->getCartIdentifier();
+            $cartItems = Cart::with('product')->where($cartIdentifier)->get();
+            
+            $subtotal = $cartItems->sum('total_price');
+            $tax = $subtotal * 0.10;
+            $shipping = $subtotal > 100 ? 0 : 10;
+            $total = $subtotal + $tax + $shipping;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated successfully!',
+                'item_total' => number_format($cart->total_price, 2),
+                'summary' => [
+                    'subtotal' => number_format($subtotal, 2),
+                    'tax' => number_format($tax, 2),
+                    'shipping' => number_format($shipping, 2),
+                    'total' => number_format($total, 2)
+                ]
+            ]);
+        }
 
         return redirect()->route('cart.index')->with('success', 'Cart updated successfully!');
     }

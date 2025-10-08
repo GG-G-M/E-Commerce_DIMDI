@@ -43,8 +43,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="payment_method" class="form-label">Payment Method *</label>
                                 <select class="form-select" id="payment_method" name="payment_method" required>
-                                    <option value="cash">Cash on Delivery</option>
-                                    <option value="card">Credit Card</option>
+                                    <option value="card">Credit</option>
                                     <option value="bank_transfer">Bank Transfer</option>
                                 </select>
                             </div>
@@ -81,6 +80,10 @@
                         <div>
                             <h6 class="mb-0">{{ $item->product->name }}</h6>
                             <small class="text-muted">Qty: {{ $item->quantity }} × ${{ $item->product->current_price }}</small>
+                            @if($item->selected_size)
+                            <br>
+                            <small class="text-muted">Size: {{ $item->selected_size }}</small>
+                            @endif
                         </div>
                         <span>${{ number_format($item->total_price, 2) }}</span>
                     </div>
