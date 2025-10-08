@@ -2,12 +2,15 @@
 
 @section('content')
 <div class="container py-4">
-    <h1 class="mb-4">Shopping Cart</h1>
+    <h1 class="mb-4 text-success fw-bold" style="color: #2C8F0C;">Shopping Cart</h1>
 
     @if($cartItems->count() > 0)
     <div class="row">
         <div class="col-lg-8">
-            <div class="card">
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white fw-bold" style="background-color: #2C8F0C;">
+                    <i class="fas fa-shopping-cart me-2"></i> Your Cart Items
+                </div>
                 <div class="card-body">
                     @foreach($cartItems as $item)
                     <div class="row align-items-center mb-4 pb-4 border-bottom">
@@ -26,8 +29,8 @@
                                 
                                 <!-- Size Selection Dropdown -->
                                 <div class="me-2">
-                                    <label class="form-label small mb-1">Size:</label>
-                                    <select name="selected_size" class="form-select form-select-sm auto-submit">
+                                    <label class="form-label small mb-1 text-success fw-semibold">Size:</label>
+                                    <select name="selected_size" class="form-select form-select-sm auto-submit border-success">
                                         @foreach($item->product->available_sizes as $size)
                                         <option value="{{ $size }}" {{ $item->selected_size == $size ? 'selected' : '' }}>
                                             {{ $size }}
@@ -38,33 +41,33 @@
                                 
                                 <!-- Quantity Input -->
                                 <div>
-                                    <label class="form-label small mb-1">Qty:</label>
+                                    <label class="form-label small mb-1 text-success fw-semibold">Qty:</label>
                                     <div class="quantity-control" style="width: 100px;">
                                         <div class="input-group input-group-sm">
-                                            <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="decrease">
+                                            <button class="btn btn-outline-success quantity-btn" type="button" data-action="decrease">
                                                 <i class="fas fa-minus"></i>
                                             </button>
                                             <input type="number" name="quantity" value="{{ $item->quantity }}" 
                                                 min="1" max="{{ $item->product->stock_quantity }}" 
-                                                class="form-control text-center auto-submit" readonly
+                                                class="form-control text-center auto-submit border-success" readonly
                                                 style="border-left: 0; border-right: 0;">
-                                            <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="increase">
+                                            <button class="btn btn-outline-success quantity-btn" type="button" data-action="increase">
                                                 <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Loading Spinner (hidden by default) -->
+                                <!-- Loading Spinner -->
                                 <div class="mt-3 loading-spinner" style="display: none;">
-                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <div class="spinner-border spinner-border-sm text-success" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </div>
                             </form>
                         </div>
                         <div class="col-md-2">
-                            <strong>$<span id="item-total-{{ $item->id }}">{{ number_format($item->total_price, 2) }}</span></strong>
+                            <strong class="text-success">$<span id="item-total-{{ $item->id }}">{{ number_format($item->total_price, 2) }}</span></strong>
                         </div>
                         <div class="col-md-2">
                             <form action="{{ route('cart.destroy', $item) }}" method="POST" class="d-inline">
@@ -82,32 +85,32 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Order Summary</h5>
+            <div class="card shadow-sm border-0">
+                <div class="card-header text-white fw-bold" style="background-color: #2C8F0C;">
+                    <i class="fas fa-receipt me-2"></i> Order Summary
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
-                        <span>$<span id="summary-subtotal">{{ number_format($subtotal, 2) }}</span></span>
+                        <span class="text-success">$<span id="summary-subtotal">{{ number_format($subtotal, 2) }}</span></span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
-                        <span>$<span id="summary-tax">{{ number_format($tax, 2) }}</span></span>
+                        <span class="text-success">$<span id="summary-tax">{{ number_format($tax, 2) }}</span></span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
-                        <span>$<span id="summary-shipping">{{ number_format($shipping, 2) }}</span></span>
+                        <span class="text-success">$<span id="summary-shipping">{{ number_format($shipping, 2) }}</span></span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong>$<span id="summary-total">{{ number_format($total, 2) }}</span></strong>
+                        <strong class="text-success">$<span id="summary-total">{{ number_format($total, 2) }}</span></strong>
                     </div>
-                    <a href="{{ route('orders.create') }}" class="btn btn-primary w-100 btn-lg">
+                    <a href="{{ route('orders.create') }}" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;">
                         Proceed to Checkout
                     </a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-secondary w-100 mt-2">
+                    <a href="{{ route('products.index') }}" class="btn btn-outline-success w-100 mt-2">
                         Continue Shopping
                     </a>
                 </div>
@@ -117,9 +120,9 @@
     @else
     <div class="text-center py-5">
         <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
-        <h3>Your cart is empty</h3>
+        <h3 class="text-success">Your cart is empty</h3>
         <p class="text-muted mb-4">Start shopping to add items to your cart</p>
-        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Start Shopping</a>
+        <a href="{{ route('products.index') }}" class="btn text-white btn-lg" style="background-color: #2C8F0C;">Start Shopping</a>
     </div>
     @endif
 </div>
@@ -154,7 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit functionality for quantity and size changes
     const autoSubmitElements = document.querySelectorAll('.auto-submit');
     
     autoSubmitElements.forEach(element => {
@@ -163,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitForm(form);
         });
         
-        // For quantity input, also trigger on input (for real-time updates)
         if (element.type === 'number') {
             let timeout;
             element.addEventListener('input', function() {
@@ -171,17 +172,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 timeout = setTimeout(() => {
                     const form = this.closest('form');
                     submitForm(form);
-                }, 500); // Delay to avoid too many requests
+                }, 500);
             });
         }
     });
     
     function submitForm(form) {
         const formData = new FormData(form);
-        const itemId = form.id.split('-')[2]; // Extract item ID from form ID
+        const itemId = form.id.split('-')[2];
         const loadingSpinner = form.querySelector('.loading-spinner');
         
-        // Show loading spinner
         if (loadingSpinner) {
             loadingSpinner.style.display = 'block';
         }
@@ -202,16 +202,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                // Update individual item total
                 const itemTotalElement = document.getElementById(`item-total-${itemId}`);
                 if (itemTotalElement && data.item_total) {
                     itemTotalElement.textContent = data.item_total;
                 }
                 
-                // Update summary totals
                 updateSummaryTotals(data.summary);
-                
-                // Show success message
                 showFlashMessage('Cart updated successfully!', 'success');
             } else {
                 throw new Error(data.message || 'Update failed');
@@ -220,13 +216,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             showFlashMessage('Error updating cart. Please try again.', 'error');
-            // Reload the page to sync with server state
             setTimeout(() => {
                 window.location.reload();
             }, 2000);
         })
         .finally(() => {
-            // Hide loading spinner
             if (loadingSpinner) {
                 loadingSpinner.style.display = 'none';
             }
@@ -249,11 +243,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function showFlashMessage(message, type) {
-        // Remove existing flash messages
         const existingMessages = document.querySelectorAll('.flash-message');
         existingMessages.forEach(msg => msg.remove());
         
-        // Create new flash message
         const flashMessage = document.createElement('div');
         flashMessage.className = `alert alert-${type === 'error' ? 'danger' : 'success'} flash-message position-fixed`;
         flashMessage.style.cssText = `
@@ -266,7 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(flashMessage);
         
-        // Auto-remove after 3 seconds
         setTimeout(() => {
             flashMessage.remove();
         }, 3000);
@@ -276,8 +267,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
 .auto-submit:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    border-color: #2C8F0C;
+    box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
 }
 
 .loading-spinner {
@@ -299,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 
-/* Improve number input styling */
 input[type="number"] {
     -moz-appearance: textfield;
 }

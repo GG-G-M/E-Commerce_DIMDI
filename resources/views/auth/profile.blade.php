@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header text-white" style="background-color: #2C8F0C; color: white;">
                     <h4 class="mb-0">My Profile</h4>
                 </div>
                 <div class="card-body p-4">
@@ -134,7 +134,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn" style="background-color: #2C8F0C; color: white;">
                                 Update Profile
                             </button>
                         </div>
@@ -145,9 +145,9 @@
                         @csrf
                         @method('PUT')
 
-                        <h5 class="mb-3">Change Password</h5>
+                        <h5 class="mb-3">Change Password</h5 style="background-color: #2C8F0C; color: white;">
                         
-                        <div class="mb-3">
+                        <div class="mb-3"  >
                             <label for="current_password" class="form-label">Current Password *</label>
                             <input id="current_password" type="password" class="form-control @error('current_password') is-invalid @enderror" 
                                    name="current_password" required>
@@ -178,7 +178,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-outline-primary">
+                            <button type="submit" class="btn " style="background-color: #2C8F0C; color: white;">
                                 Update Password
                             </button>
                         </div>
