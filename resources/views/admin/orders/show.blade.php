@@ -358,6 +358,10 @@
                     <span class="info-label">Payment Method:</span>
                     <span class="info-value text-capitalize">{{ str_replace('_', ' ', $order->payment_method) }}</span>
                 </div>
+                                <div class="info-item">
+                    <span class="info-label">Notes:</span>
+                    <span class="info-value">{{ $order->notes ?? 'N/A' }}</span>
+                </div>
             </div>
         </div>
 
