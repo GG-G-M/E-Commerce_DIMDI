@@ -48,9 +48,14 @@ class CartController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
+        $variant = $product->getVariantBySize($request->selected_size);
 
-        if ($product->stock_quantity < $request->quantity) {
-            return redirect()->back()->with('error', 'Insufficient stock available.');
+        if (!$variant) {
+            return redirect()->back()->with('error', 'Selected size is not available for this product.');
+        }
+
+        if ($variant->stock_quantity < $request->quantity) {
+            return redirect()->back()->with('error', "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available.");
         }
 
         $cartIdentifier = $this->getCartIdentifier();
@@ -62,7 +67,11 @@ class CartController extends Controller
             ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += $request->quantity;
+            $newQuantity = $cartItem->quantity + $request->quantity;
+            if ($variant->stock_quantity < $newQuantity) {
+                return redirect()->back()->with('error', "Cannot add more items. Only {$variant->stock_quantity} available for {$request->selected_size} size.");
+            }
+            $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
             Cart::create(array_merge($cartIdentifier, [
@@ -85,14 +94,26 @@ class CartController extends Controller
             'selected_size' => 'required|string|max:50'
         ]);
 
-        if ($cart->product->stock_quantity < $request->quantity) {
+        $variant = $cart->product->getVariantBySize($request->selected_size);
+        
+        if (!$variant) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Insufficient stock available.'
+                    'message' => 'Selected size is not available for this product.'
                 ], 422);
             }
-            return redirect()->back()->with('error', 'Insufficient stock available.');
+            return redirect()->back()->with('error', 'Selected size is not available for this product.');
+        }
+
+        if ($variant->stock_quantity < $request->quantity) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available."
+                ], 422);
+            }
+            return redirect()->back()->with('error', "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available.");
         }
 
         $cartIdentifier = $this->getCartIdentifier();
@@ -106,8 +127,19 @@ class CartController extends Controller
                 ->first();
 
             if ($existingCartItem) {
+                $newQuantity = $existingCartItem->quantity + $request->quantity;
+                if ($variant->stock_quantity < $newQuantity) {
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Cannot merge items. Only {$variant->stock_quantity} available for {$request->selected_size} size."
+                        ], 422);
+                    }
+                    return redirect()->back()->with('error', "Cannot merge items. Only {$variant->stock_quantity} available for {$request->selected_size} size.");
+                }
+                
                 // Merge with existing item
-                $existingCartItem->quantity += $request->quantity;
+                $existingCartItem->quantity = $newQuantity;
                 $existingCartItem->save();
                 $cart->delete();
                 

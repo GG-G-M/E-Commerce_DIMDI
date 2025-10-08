@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -46,9 +47,6 @@ class CommerceSeeder extends Seeder
         
         $this->command->info('Categories Created'); 
 
-        // Available sizes
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
-
         // Create Products for Homegrown Appliance & Furniture Retailer
         $products = [
             // Living Room Furniture
@@ -61,7 +59,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'LR-SOFA-001',
                 'category_id' => 1,
                 'is_featured' => true,
-                'sizes' => ['L', 'XL']
+                'sizes' => ['L', 'XL'],
+                'size_stock' => ['L' => 8, 'XL' => 7] // Specific stock per size
             ],
             [
                 'name' => 'Coffee Table Set',
@@ -72,7 +71,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'LR-TABLE-002',
                 'category_id' => 1,
                 'is_featured' => true,
-                'sizes' => ['M', 'L']
+                'sizes' => ['M', 'L'],
+                'size_stock' => ['M' => 15, 'L' => 10]
             ],
             [
                 'name' => 'TV Entertainment Center',
@@ -83,7 +83,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'LR-ENT-003',
                 'category_id' => 1,
                 'is_featured' => false,
-                'sizes' => ['XL']
+                'sizes' => ['XL'],
+                'size_stock' => ['XL' => 12]
             ],
             [
                 'name' => 'Accent Chair',
@@ -94,7 +95,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'LR-CHAIR-004',
                 'category_id' => 1,
                 'is_featured' => false,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 30]
             ],
 
             // Bedroom Furniture
@@ -107,7 +109,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'BR-BED-005',
                 'category_id' => 2,
                 'is_featured' => true,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 18]
             ],
             [
                 'name' => 'Dresser with Mirror',
@@ -118,7 +121,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'BR-DRESS-006',
                 'category_id' => 2,
                 'is_featured' => true,
-                'sizes' => ['L']
+                'sizes' => ['L'],
+                'size_stock' => ['L' => 22]
             ],
             [
                 'name' => 'Nightstand Set',
@@ -129,7 +133,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'BR-NIGHT-007',
                 'category_id' => 2,
                 'is_featured' => false,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 35]
             ],
             [
                 'name' => 'Wardrobe Cabinet',
@@ -140,7 +145,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'BR-WARD-008',
                 'category_id' => 2,
                 'is_featured' => false,
-                'sizes' => ['XL']
+                'sizes' => ['XL'],
+                'size_stock' => ['XL' => 10]
             ],
 
             // Kitchen Appliances
@@ -153,7 +159,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'KA-FRIDGE-009',
                 'category_id' => 3,
                 'is_featured' => true,
-                'sizes' => ['XL']
+                'sizes' => ['XL'],
+                'size_stock' => ['XL' => 8]
             ],
             [
                 'name' => 'Professional Stand Mixer',
@@ -164,7 +171,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'KA-MIXER-010',
                 'category_id' => 3,
                 'is_featured' => true,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 25]
             ],
             [
                 'name' => 'Air Fryer Oven',
@@ -175,7 +183,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'KA-AIRFRY-011',
                 'category_id' => 3,
                 'is_featured' => false,
-                'sizes' => ['M']
+                'sizes' => ['M'],
+                'size_stock' => ['M' => 40]
             ],
             [
                 'name' => 'Coffee Maker Machine',
@@ -186,7 +195,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'KA-COFFEE-012',
                 'category_id' => 3,
                 'is_featured' => false,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 30]
             ],
 
             // Home Appliances
@@ -199,7 +209,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HA-VACUUM-013',
                 'category_id' => 4,
                 'is_featured' => true,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 20]
             ],
             [
                 'name' => 'Air Purifier',
@@ -210,7 +221,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HA-PURIFIER-014',
                 'category_id' => 4,
                 'is_featured' => false,
-                'sizes' => ['M']
+                'sizes' => ['M'],
+                'size_stock' => ['M' => 35]
             ],
             [
                 'name' => 'Garment Steamer',
@@ -221,7 +233,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HA-STEAMER-015',
                 'category_id' => 4,
                 'is_featured' => false,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 50]
             ],
 
             // Home Decor
@@ -234,7 +247,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HD-PILLOWS-016',
                 'category_id' => 5,
                 'is_featured' => true,
-                'sizes' => ['S', 'M', 'L']
+                'sizes' => ['S', 'M', 'L'],
+                'size_stock' => ['S' => 20, 'M' => 25, 'L' => 15]
             ],
             [
                 'name' => 'Wall Art Canvas Set',
@@ -245,7 +259,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HD-ART-017',
                 'category_id' => 5,
                 'is_featured' => true,
-                'sizes' => ['M', 'L']
+                'sizes' => ['M', 'L'],
+                'size_stock' => ['M' => 10, 'L' => 15]
             ],
             [
                 'name' => 'Area Rug',
@@ -256,7 +271,8 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HD-RUG-018',
                 'category_id' => 5,
                 'is_featured' => false,
-                'sizes' => ['S', 'M', 'L', 'XL']
+                'sizes' => ['S', 'M', 'L', 'XL'],
+                'size_stock' => ['S' => 5, 'M' => 5, 'L' => 5, 'XL' => 3]
             ],
             [
                 'name' => 'Table Lamp Set',
@@ -267,28 +283,40 @@ class CommerceSeeder extends Seeder
                 'sku' => 'HD-LAMPS-019',
                 'category_id' => 5,
                 'is_featured' => false,
-                'sizes' => ['One Size']
+                'sizes' => ['One Size'],
+                'size_stock' => ['One Size' => 30]
             ]
         ];
 
-        foreach ($products as $product) {
-            Product::create([
-                'name' => $product['name'],
-                'slug' => Str::slug($product['name']),
-                'description' => $product['description'],
-                'price' => $product['price'],
-                'sale_price' => $product['sale_price'],
-                'stock_quantity' => $product['stock_quantity'],
-                'sku' => $product['sku'],
-                'image' => 'https://picsum.photos/400/300?random=' . $product['sku'],
-                'sizes' => json_encode($product['sizes']),
-                'is_featured' => $product['is_featured'],
+        foreach ($products as $productData) {
+            $product = Product::create([
+                'name' => $productData['name'],
+                'slug' => Str::slug($productData['name']),
+                'description' => $productData['description'],
+                'price' => $productData['price'],
+                'sale_price' => $productData['sale_price'],
+                'stock_quantity' => $productData['stock_quantity'],
+                'sku' => $productData['sku'],
+                'image' => 'https://picsum.photos/400/300?random=' . $productData['sku'],
+                'sizes' => json_encode($productData['sizes']),
+                'is_featured' => $productData['is_featured'],
                 'is_active' => true,
                 'is_archived' => false,
-                'category_id' => $product['category_id']
+                'category_id' => $productData['category_id']
             ]);
+
+            // Create product variants for each size
+            foreach ($productData['sizes'] as $size) {
+                ProductVariant::create([
+                    'product_id' => $product->id,
+                    'size' => $size,
+                    'stock_quantity' => $productData['size_stock'][$size],
+                    'price' => $productData['price'],
+                    'sale_price' => $productData['sale_price'],
+                ]);
+            }
         }
         
-        $this->command->info('Products Created'); 
+        $this->command->info('Products and Variants Created Successfully!'); 
     }
 }

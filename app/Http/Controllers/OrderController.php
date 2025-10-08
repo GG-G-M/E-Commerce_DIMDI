@@ -72,7 +72,7 @@ class OrderController extends Controller
 
         $request->validate([
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:cash,card,bank_transfer'
+            'payment_method' => 'required|in:card,bank_transfer'
         ]);
 
         $cartItems = Cart::with('product')
@@ -81,6 +81,14 @@ class OrderController extends Controller
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
+        }
+
+        // Validate stock before creating order
+        foreach ($cartItems as $cartItem) {
+            $variant = $cartItem->product->getVariantBySize($cartItem->selected_size);
+            if (!$variant || $variant->stock_quantity < $cartItem->quantity) {
+                return redirect()->route('cart.index')->with('error', "Sorry, {$cartItem->product->name} in size {$cartItem->selected_size} is no longer available in the requested quantity.");
+            }
         }
 
         // Calculate totals
@@ -108,8 +116,10 @@ class OrderController extends Controller
             'notes' => $request->notes
         ]);
 
-        // Create order items and update product stock
+        // Create order items and update product variant stock
         foreach ($cartItems as $cartItem) {
+            $variant = $cartItem->product->getVariantBySize($cartItem->selected_size);
+            
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $cartItem->product_id,
@@ -117,11 +127,11 @@ class OrderController extends Controller
                 'unit_price' => $cartItem->product->current_price,
                 'quantity' => $cartItem->quantity,
                 'total_price' => $cartItem->total_price,
-                'selected_size' => $cartItem->selected_size // Add this line
+                'selected_size' => $cartItem->selected_size
             ]);
 
-            // Update product stock
-            $cartItem->product->decrement('stock_quantity', $cartItem->quantity);
+            // Update product variant stock
+            $variant->decrement('stock_quantity', $cartItem->quantity);
         }
 
         // Clear cart
