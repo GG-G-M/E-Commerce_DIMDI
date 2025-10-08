@@ -12,7 +12,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
         'email',
         'password',
         'role',
@@ -37,6 +39,20 @@ class User extends Authenticatable
         ];
     }
 
+    // Add accessor for full name
+    public function getNameAttribute()
+    {
+        $names = [$this->first_name];
+        
+        if ($this->middle_name) {
+            $names[] = $this->middle_name;
+        }
+        
+        $names[] = $this->last_name;
+        
+        return implode(' ', $names);
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
@@ -47,7 +63,7 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
-        public function isAdmin()
+    public function isAdmin()
     {
         return $this->role === 'admin';
     }
