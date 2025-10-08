@@ -1,11 +1,117 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Add New Product</h1>
+<style>
+    /* Page Header */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
+    /* Card Styling */
+    .card-custom {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        font-weight: 600;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    .btn-secondary {
+        background-color: #A5D6A7;
+        border: none;
+        color: #2C8F0C;
+    }
+
+    .btn-secondary:hover {
+        background-color: #81C784;
+        color: white;
+    }
+
+    /* Form Styles */
+    .form-label {
+        font-weight: 600;
+        color: #2C8F0C;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #C8E6C9;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
+    }
+
+    .form-check-label {
+        color: #2C8F0C;
+    }
+
+    .form-check-input:checked {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+    }
+
+    /* Image Preview */
+    #imagePreview {
+        border: 2px solid #C8E6C9;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    #imagePreview:hover {
+        transform: scale(1.02);
+    }
+
+    body {
+        background-color: #F5FFF7;
+    }
+</style>
+
+<!-- Header -->
+<div class="page-header">
+    <h1 class="h3 mb-1">Add New Product</h1>
+    <p class="text-muted mb-0">Fill out the form to add a new product to your store.</p>
 </div>
 
-<div class="card">
+<!-- Product Form -->
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <i class="fas fa-box me-2"></i> Product Information
+    </div>
+
     <div class="card-body">
         <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
@@ -67,7 +173,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="category_id" class="form-label">Category *</label>
-                                <select class="form-control @error('category_id') is-invalid @enderror" 
+                                <select class="form-select @error('category_id') is-invalid @enderror" 
                                         id="category_id" name="category_id" required>
                                     <option value="">Select Category</option>
                                     @foreach($categories as $category)
@@ -83,7 +189,7 @@
                         </div>
                     </div>
 
-                    <!-- Sizes Selection -->
+                    <!-- Sizes -->
                     <div class="mb-3">
                         <label class="form-label">Available Sizes *</label>
                         <div class="row">
@@ -110,7 +216,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <!-- Main Image -->
+                    <!-- Image -->
                     <div class="mb-3">
                         <label for="image" class="form-label">Product Image *</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
@@ -121,12 +227,10 @@
                         <div class="mt-2">
                             <img id="imagePreview" src="#" alt="Image preview" class="img-thumbnail d-none" style="max-height: 200px;">
                         </div>
-                        <small class="form-text text-muted">
-                            Supported formats: JPEG, PNG, JPG, GIF, WEBP. Max size: 2MB
-                        </small>
+                        <small class="form-text text-muted">Supported formats: JPEG, PNG, JPG, GIF, WEBP. Max size: 2MB</small>
                     </div>
 
-                    <!-- Checkboxes -->
+                    <!-- Status -->
                     <div class="mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
@@ -140,7 +244,7 @@
                 </div>
             </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                 <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-md-2">Cancel</a>
                 <button type="submit" class="btn btn-primary">Create Product</button>
             </div>
