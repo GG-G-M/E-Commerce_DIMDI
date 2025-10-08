@@ -508,7 +508,7 @@
                                     </select>
                                 </div>
                                 @else
-                                {{-- <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}"> --}}
+                                <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
                                 @endif
                                 
                                 <button type="submit" class="btn btn-primary w-100">

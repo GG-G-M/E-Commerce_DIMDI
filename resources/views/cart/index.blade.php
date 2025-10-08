@@ -70,7 +70,12 @@
                             <strong class="text-success">$<span id="item-total-{{ $item->id }}">{{ number_format($item->total_price, 2) }}</span></strong>
                         </div>
                         <div class="col-md-2">
-                            <form action="{{ route('cart.destroy', $item) }}" method="POST" class="d-inline">
+                            <form 
+                                action="{{ route('cart.destroy', $item) }}" 
+                                method="POST" 
+                                class="d-inline"
+                                onsubmit="return confirm('Are you sure you want to remove this item from your cart?');"
+                            >
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
