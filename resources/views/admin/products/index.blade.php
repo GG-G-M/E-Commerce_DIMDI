@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    /* === Green Theme and Card Styling === */
+  
     .page-header {
         background: white;
         border-radius: 12px;
