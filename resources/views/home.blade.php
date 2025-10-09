@@ -1,14 +1,5 @@
 @extends('layouts.app') 
 @section('content')
-{{-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIMDI - Premium Appliances & Furniture</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> --}}
     <style>
         :root {
             --primary-green: #2C8F0C;
@@ -233,7 +224,7 @@
             transform: translateY(-2px);
         }
         
-        /* Why Choose Us Section */
+        /* Why Choose Us Section - Updated to About DIMDI */
         .why-section {
             padding: 5rem 0;
         }
@@ -362,7 +353,26 @@
             font-size: 1.2rem;
         }
         
+        /* Button styling for consistent green theme */
+        .btn-primary {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
         
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
         
         /* Responsive Adjustments */
         @media (max-width: 991.98px) {
@@ -389,9 +399,6 @@
             }
         }
     </style>
-{{-- </head>
-<body> --}}
-    <!-- Your existing navbar will remain here -->
 
     <!-- Main Content -->
     <main>
@@ -402,7 +409,7 @@
                     <div class="col-lg-6">
                         <h1 class="hero-title">Transform Your Living Space with DIMDI</h1>
                         <p class="hero-subtitle">Premium appliances and furniture designed to elevate your home experience with style, comfort, and innovation.</p>
-                        
+
                     </div>
                     <div class="col-lg-6 text-center">
                         <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Modern Living Room" class="img-fluid rounded-3 shadow-lg">
@@ -447,85 +454,88 @@
             </div>
         </section>
 
-<!-- Featured Products -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Featured Products</h2>
-        <div class="row">
-            @foreach($featuredProducts as $product)
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card product-card h-100 shadow">
-                    @if($product->has_discount)
-                    <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
-                    @endif
-                    <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                        
-                        <!-- Display Available Sizes -->
-                        @if($product->all_sizes && count($product->all_sizes) > 0)
-                        <div class="mb-2">
-                            <small class="text-muted">Sizes: 
-                                @foreach($product->all_sizes as $size)
-                                    <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
-                                        {{ $size }}
-                                        @if(!$product->isSizeInStock($size))
-                                        (OOS)
-                                        @endif
-                                    </span>
-                                @endforeach
-                            </small>
-                        </div>
-                        @endif
-                        
-                        <div class="mt-auto">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                @if($product->has_discount)
-                                <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                                <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
-                                @else
-                                <span class="text-primary fw-bold">${{ $product->price }}</span>
-                                @endif
-                            </div>
-                            
-                            @if($product->in_stock)
-                            <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <input type="hidden" name="quantity" value="1">
-                                
-                                <!-- Size Selection for Home Page -->
-                                @if($product->all_sizes && count($product->all_sizes) > 1)
-                                <div class="mb-2">
-                                    <select name="selected_size" class="form-select form-select-sm" required>
-                                        <option value="">Select Size</option>
-                                        @foreach($product->all_sizes as $size)
-                                        <option value="{{ $size }}" {{ $product->isSizeInStock($size) ? '' : 'disabled' }}>
-                                            {{ $size }} {{ !$product->isSizeInStock($size) ? '(Out of Stock)' : '' }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @else
-                                <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
-                                @endif
-                                
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
-                                </button>
-                            </form>
-                            @else
-                            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
-                            @endif
-                        </div>
+        <!-- Featured Products -->
+        <section class="featured-section">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-12 text-center">
+                        <h2 class="section-title">Featured Products</h2>
+                        <p class="lead text-muted">Discover our handpicked selection of premium home solutions</p>
                     </div>
                 </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
+                
+                <div class="row">
+                    @foreach($featuredProducts as $product)
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card product-card h-100">
+                            @if($product->has_discount)
+                            <span class="product-badge sale">{{ $product->discount_percentage }}% OFF</span>
+                            @endif
+                            <div class="product-img-container">
+                                <img src="{{ $product->image_url }}" class="product-img" alt="{{ $product->name }}">
+                            </div>
+                            <div class="product-body">
+                                <h5 class="product-title">{{ $product->name }}</h5>
+                                <p class="product-description">{{ Str::limit($product->description, 60) }}</p>
+                                
+                                <!-- Display Available Sizes -->
+                                @if($product->all_sizes && count($product->all_sizes) > 0)
+                                <div class="mb-2">
+                                    <small class="text-muted">Sizes: 
+                                        @foreach($product->all_sizes as $size)
+                                            <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
+                                                {{ $size }}
+                                                @if(!$product->isSizeInStock($size))
+                                                (OOS)
+                                                @endif
+                                            </span>
+                                        @endforeach
+                                    </small>
+                                </div>
+                                @endif
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    @if($product->has_discount)
+                                    <span class="product-price">${{ $product->sale_price }}</span>
+                                    <span class="product-old-price">${{ $product->price }}</span>
+                                    @else
+                                    <span class="product-price">${{ $product->price }}</span>
+                                    @endif
+                                </div>
+                                
+                                @if($product->in_stock)
+                                <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    
+                                    <!-- Size Selection for Home Page -->
+                                    @if($product->all_sizes && count($product->all_sizes) > 1)
+                                    <div class="mb-2">
+                                        <select name="selected_size" class="form-select form-select-sm" required>
+                                            <option value="">Select Size</option>
+                                            @foreach($product->all_sizes as $size)
+                                            <option value="{{ $size }}" {{ $product->isSizeInStock($size) ? '' : 'disabled' }}>
+                                                {{ $size }} {{ !$product->isSizeInStock($size) ? '(Out of Stock)' : '' }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @else
+                                    <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
+                                    @endif
+                                    
+                                    <button type="submit" class="btn btn-add-cart">
+                                        <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                                    </button>
+                                </form>
+                                @else
+                                <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
                 
                 <div class="row mt-5">
@@ -536,13 +546,13 @@
             </div>
         </section>
 
-        <!-- Why Choose Us Section -->
+        <!-- About DIMDI Section (formerly Why Choose Us) -->
         <section class="why-section">
             <div class="container">
                 <div class="row mb-5">
                     <div class="col-12 text-center">
-                        <h2 class="section-title">Why Choose DIMDI</h2>
-                        <p class="lead text-muted">We're committed to providing the best home solutions</p>
+                        <h2 class="section-title">Why DIMDI</h2>
+                        <p class="lead text-muted">Our commitment to excellence in home solutions</p>
                     </div>
                 </div>
                 
@@ -587,56 +597,7 @@
             </div>
         </section>
 
-        <!-- Testimonials Section -->
-        <section class="testimonials-section">
-            <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="section-title">What Our Customers Say</h2>
-                        <p class="lead text-muted">Hear from homeowners who transformed their spaces with DIMDI</p>
-                    </div>
-                </div>
-                
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"The quality of furniture from DIMDI exceeded my expectations. Our living room has never looked better, and the delivery team was professional and careful with installation."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Sarah Johnson" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Sarah Johnson</h5>
-                                    <p>Homeowner</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"I was hesitant to buy appliances online, but DIMDI made the process seamless. The refrigerator and oven we purchased have been working perfectly for over a year now."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Michael Chen" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Michael Chen</h5>
-                                    <p>Interior Designer</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"The bedroom set we bought from DIMDI completely transformed our space. The quality is exceptional, and the customer service was outstanding throughout the process."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Emily Rodriguez" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Emily Rodriguez</h5>
-                                    <p>Home Stager</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    
 
         <!-- Contact Section -->
         <section class="contact-section">
@@ -706,7 +667,7 @@
                                         <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
                                     </div>
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-primary w-100" style="background-color: var(--primary-green); border-color: var(--primary-green); padding: 0.8rem;">Send Message</button>
+                                        <button type="submit" class="btn btn-primary w-100" style="padding: 0.8rem;">Send Message</button>
                                     </div>
                                 </div>
                             </form>
@@ -746,5 +707,3 @@
         });
     </script>
 @endsection
-{{-- </body>
-</html> --}}

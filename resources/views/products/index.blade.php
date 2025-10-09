@@ -65,6 +65,55 @@
         color: white !important;
     }
 
+    /* Hide scrollbar but keep functionality */
+    .scrollbar-hidden {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+        scroll-behavior: smooth;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari and Opera */
+    }
+
+    /* Category slider improvements */
+    .categories-container {
+        padding: 0 50px; /* Space for scroll buttons */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE 10+ */
+    }
+
+    .categories-container::-webkit-scrollbar {
+        display: none; /* WebKit */
+    }
+
+    /* Scroll buttons styling */
+    .scroll-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        background: rgba(255,255,255,0.2) !important;
+        color: white !important;
+        border: none !important;
+        z-index: 10;
+    }
+
+    .scroll-btn:hover {
+        background: rgba(255,255,255,0.3) !important;
+        transform: scale(1.1);
+    }
+
+    /* Ensure nav links don't wrap and are properly spaced */
+    .category-slider-full .nav-link {
+        white-space: nowrap;
+        margin: 0 4px;
+        flex-shrink: 0;
+    }
+
     .discount-badge {
         position: absolute;
         top: 10px;
@@ -348,20 +397,31 @@
     <!-- Category Slider - Full Width -->
     <div class="category-slider-full py-3 mb-4">
         <div class="container-fluid px-0">
-            <div class="nav nav-pills justify-content-center flex-nowrap overflow-auto">
-                <!-- All Categories -->
-                <a href="{{ route('products.index') }}" 
-                   class="nav-link text-white fw-bold px-4 py-2 {{ request('category') ? '' : 'active' }}">
-                    All
-                </a>
-
-                <!-- Dynamic Categories -->
-                @foreach($categories as $category)
-                    <a href="{{ route('products.index', ['category' => $category->slug]) }}" 
-                       class="nav-link text-white px-4 py-2 {{ request('category') == $category->slug ? 'active' : '' }}">
-                        {{ $category->name }}
+            <div class="nav nav-pills justify-content-center flex-nowrap overflow-hidden position-relative">
+                <!-- Scroll Buttons -->
+                <button class="btn btn-sm scroll-btn scroll-left position-absolute start-0 top-50 translate-middle-y d-none d-md-flex" style="visibility: hidden;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-sm scroll-btn scroll-right position-absolute end-0 top-50 translate-middle-y d-none d-md-flex">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <!-- Categories Container -->
+                <div class="categories-container d-flex flex-nowrap overflow-auto scrollbar-hidden">
+                    <!-- All Categories -->
+                    <a href="{{ route('products.index') }}" 
+                       class="nav-link text-white fw-bold px-4 py-2 flex-shrink-0 {{ request('category') ? '' : 'active' }}">
+                        All
                     </a>
-                @endforeach
+
+                    <!-- Dynamic Categories -->
+                    @foreach($categories as $category)
+                        <a href="{{ route('products.index', ['category' => $category->slug]) }}" 
+                           class="nav-link text-white px-4 py-2 flex-shrink-0 {{ request('category') == $category->slug ? 'active' : '' }}">
+                            {{ $category->name }}
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
@@ -390,71 +450,57 @@
                 </div>
                 
                 <!-- Products for this category -->
-                <div class="row">
-    @foreach($products as $product)
-    <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card product-card h-100 shadow-sm">
-            @if($product->has_discount)
-            <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
-            @endif
-            
-            <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-            
-            <div class="card-body d-flex flex-column">
-                <h6 class="card-title">{{ $product->name }}</h6>
-                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                
-                <!-- Display Available Sizes -->
-                @if($product->all_sizes && count($product->all_sizes) > 0)
-                <div class="mb-2">
-                    <small class="text-muted">Sizes: 
-                        @foreach($product->all_sizes as $size)
-                            <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
-                                {{ $size }}
-                                @if(!$product->isSizeInStock($size))
-                                (OOS)
+                <div class="row category-products" data-category-id="{{ $categoryId }}">
+                    @foreach($categoryProducts as $product)
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card product-card h-100 shadow">
+                            @if($product->has_discount)
+                            <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
+                            @endif
+                            <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ $product->name }}</h5>
+                                <p class="card-text text-muted small">{{ Str::limit($product->description, 80) }}</p>
+                                
+                                <!-- Display Available Sizes -->
+                                @if($product->available_sizes && count($product->available_sizes) > 0)
+                                <div class="mb-2">
+                                    <small class="text-muted">Available Sizes:</small>
+                                    <div class="d-flex flex-wrap gap-1 mt-1">
+                                        @foreach($product->available_sizes as $size)
+                                            <span class="badge bg-secondary">{{ $size }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
                                 @endif
-                            </span>
-                        @endforeach
-                    </small>
-                </div>
-                @endif
-                
-                <div class="mt-auto">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        @if($product->has_discount)
-                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                        <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
-                        @else
-                        <span class="text-primary fw-bold">${{ $product->price }}</span>
-                        @endif
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        @if($product->has_discount)
+                                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                                        <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
+                                        @else
+                                        <span class="text-primary fw-bold">${{ $product->price }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary flex-fill">View Details</a>
+                                        <form action="{{ route('cart.store') }}" method="POST" class="flex-fill">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <input type="hidden" name="selected_size" value="{{ $product->available_sizes[0] ?? 'One Size' }}">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
-                            View Details
-                        </a>
-                        
-                        @if($product->in_stock)
-                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form flex-fill">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <input type="hidden" name="quantity" value="1">
-                            <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
-                            <button type="submit" class="btn btn-primary btn-sm w-100" title="Add to Cart">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                        </form>
-                        @else
-                        <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
-                        @endif
-                    </div>
+                    @endforeach
                 </div>
-            </div>
-        </div>
-    </div>
-    @endforeach
-</div>
             @endforeach
         @else
             <!-- Show empty state with message -->
@@ -500,6 +546,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const noProductsModal = new bootstrap.Modal(document.getElementById('noProductsModal'));
         noProductsModal.show();
     @endif
+    
+    // Category slider scrolling functionality
+    function initCategorySlider() {
+        const container = document.querySelector('.categories-container');
+        const scrollLeftBtn = document.querySelector('.scroll-left');
+        const scrollRightBtn = document.querySelector('.scroll-right');
+        
+        if (!container || !scrollLeftBtn || !scrollRightBtn) return;
+        
+        // Update button visibility based on scroll position
+        function updateScrollButtons() {
+            const hasOverflow = container.scrollWidth > container.clientWidth;
+            const isAtStart = container.scrollLeft <= 0;
+            const isAtEnd = container.scrollLeft >= (container.scrollWidth - container.clientWidth - 1);
+            
+            scrollLeftBtn.style.visibility = hasOverflow && !isAtStart ? 'visible' : 'hidden';
+            scrollRightBtn.style.visibility = hasOverflow && !isAtEnd ? 'visible' : 'hidden';
+        }
+        
+        // Scroll left
+        scrollLeftBtn.addEventListener('click', () => {
+            container.scrollBy({ left: -200, behavior: 'smooth' });
+        });
+        
+        // Scroll right
+        scrollRightBtn.addEventListener('click', () => {
+            container.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+        
+        // Update button visibility on scroll
+        container.addEventListener('scroll', updateScrollButtons);
+        
+        // Check on load and resize
+        updateScrollButtons();
+        window.addEventListener('resize', updateScrollButtons);
+        
+        // Hide buttons if no overflow
+        setTimeout(updateScrollButtons, 100);
+    }
+
+    // Initialize the category slider
+    initCategorySlider();
     
     const hasProducts = {{ $products->count() > 0 ? 'true' : 'false' }};
     
