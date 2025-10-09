@@ -1,21 +1,125 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Add New Category</h1>
+<style>
+    /* 🌿 Green Theme — Consistent with Category Management */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
+    .card-custom {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        font-weight: 600;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    .btn-outline-success {
+        border: 2px solid #2C8F0C;
+        color: #2C8F0C;
+        font-weight: 500;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+
+    .form-label {
+        color: #2C8F0C;
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #E0E0E0;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.2);
+    }
+
+    .form-check-input:checked {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+    }
+
+    .tips-box {
+        background-color: #F8FDF8;
+        border-left: 4px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: #2C8F0C;
+    }
+
+    .tips-box i {
+        color: #2C8F0C;
+        margin-right: 5px;
+    }
+</style>
+
+<!-- Header -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">Add Category</h1>
+        <p class="text-muted mb-0">Create and manage product categories efficiently.</p>
+    </div>
+    <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-success">
+        <i class="fas fa-arrow-left me-1"></i> Back to Categories
+    </a>
 </div>
 
-<div class="card">
+<!-- Add Category Form -->
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <i class="fas fa-plus me-2"></i> Create New Category
+    </div>
     <div class="card-body">
-        <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.categories.store') }}" method="POST">
             @csrf
-            
-            <div class="row">
+            <div class="row g-4">
+                <!-- Left Side -->
                 <div class="col-md-8">
                     <div class="mb-3">
                         <label for="name" class="form-label">Category Name *</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name') }}" required>
+                        <input type="text" id="name" name="name"
+                            class="form-control @error('name') is-invalid @enderror"
+                            placeholder="Enter category name" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -23,64 +127,46 @@
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" 
-                                  id="description" name="description" rows="4">{{ old('description') }}</textarea>
+                        <textarea id="description" name="description" rows="4"
+                            class="form-control @error('description') is-invalid @enderror"
+                            placeholder="Write a short description">{{ old('description') }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
+                <!-- Right Side -->
                 <div class="col-md-4">
-                    <!-- Category Image -->
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Category Image</label>
-                        <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                               id="image" name="image" accept="image/*">
-                        @error('image')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <div class="mt-2">
-                            <img id="imagePreview" src="#" alt="Image preview" class="img-thumbnail d-none" style="max-height: 200px;">
-                        </div>
-                    </div>
+                    <div class="p-3 border rounded bg-light">
+                        <h6 class="fw-bold text-success mb-3">Status</h6>
 
-                    <!-- Active Checkbox -->
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">Active</label>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="is_active" name="is_active" class="form-check-input"
+                                   value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                            <label for="is_active" class="form-check-label">Active Category</label>
+                        </div>
+
+                        <hr>
+
+                        <div class="tips-box mb-4">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tips:</strong> Keep category names simple and clear. Use descriptions to help users
+                            identify what products belong here.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-success w-50">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary w-50">
+                                <i class="fas fa-save"></i> Create
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary me-md-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create Category</button>
             </div>
         </form>
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    // Image preview
-    document.getElementById('image').addEventListener('change', function(e) {
-        const preview = document.getElementById('imagePreview');
-        const file = e.target.files[0];
-        
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-            }
-            reader.readAsDataURL(file);
-        } else {
-            preview.classList.add('d-none');
-        }
-    });
-</script>
-@endpush

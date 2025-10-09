@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-8 mx-auto">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header text-white" style="background-color: #2C8F0C; color: white;">
                     <h4 class="mb-0">My Profile</h4>
                 </div>
                 <div class="card-body p-4">
@@ -17,17 +17,42 @@
                         <h5 class="mb-3">Personal Information</h5>
                         
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name *</label>
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" 
-                                       name="name" value="{{ old('name', $user->name) }}" required>
-                                @error('name')
+                            <div class="col-md-4 mb-3">
+                                <label for="first_name" class="form-label">First Name *</label>
+                                <input id="first_name" type="text" class="form-control @error('first_name') is-invalid @enderror" 
+                                       name="first_name" value="{{ old('first_name', $user->first_name) }}" required>
+                                @error('first_name')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                             </div>
 
+                            <div class="col-md-4 mb-3">
+                                <label for="middle_name" class="form-label">Middle Name</label>
+                                <input id="middle_name" type="text" class="form-control @error('middle_name') is-invalid @enderror" 
+                                       name="middle_name" value="{{ old('middle_name', $user->middle_name) }}">
+                                @error('middle_name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                                <small class="form-text text-muted">Optional</small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="last_name" class="form-label">Last Name *</label>
+                                <input id="last_name" type="text" class="form-control @error('last_name') is-invalid @enderror" 
+                                       name="last_name" value="{{ old('last_name', $user->last_name) }}" required>
+                                @error('last_name')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email Address *</label>
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" 
@@ -38,17 +63,17 @@
                                     </span>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number *</label>
-                            <input id="phone" type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                   name="phone" value="{{ old('phone', $user->phone) }}" required>
-                            @error('phone')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input id="phone" type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                       name="phone" value="{{ old('phone', $user->phone) }}" required>
+                                @error('phone')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -109,7 +134,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn" style="background-color: #2C8F0C; color: white;">
                                 Update Profile
                             </button>
                         </div>
@@ -120,9 +145,9 @@
                         @csrf
                         @method('PUT')
 
-                        <h5 class="mb-3">Change Password</h5>
+                        <h5 class="mb-3">Change Password</h5 style="background-color: #2C8F0C; color: white;">
                         
-                        <div class="mb-3">
+                        <div class="mb-3"  >
                             <label for="current_password" class="form-label">Current Password *</label>
                             <input id="current_password" type="password" class="form-control @error('current_password') is-invalid @enderror" 
                                    name="current_password" required>
@@ -153,7 +178,7 @@
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-outline-primary">
+                            <button type="submit" class="btn " style="background-color: #2C8F0C; color: white;">
                                 Update Password
                             </button>
                         </div>

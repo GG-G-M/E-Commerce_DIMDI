@@ -71,8 +71,20 @@ class Order extends Model
 
         static::creating(function ($order) {
             if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . date('Ymd') . '-' . strtoupper(uniqid());
+                $date = date('Ymd'); // Format: 20250930
+                $random = strtoupper(bin2hex(random_bytes(4))); // 8 characters like 68DBE9C6
+                $order->order_number = "ORD-{$date}-{$random}";
             }
         });
+    }
+
+    // Add this method to calculate order totals
+    public function calculateTotals()
+    {
+        $this->subtotal = $this->items->sum('total_price');
+        $this->tax_amount = $this->subtotal * 0.10;
+        $this->shipping_cost = $this->subtotal > 100 ? 0 : 10;
+        $this->total_amount = $this->subtotal + $this->tax_amount + $this->shipping_cost;
+        $this->save();
     }
 }

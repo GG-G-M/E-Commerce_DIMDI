@@ -7,24 +7,77 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-green: #2C8F0C;
+            --dark-green: #1E6A08;
+            --light-green: #E8F5E6;
+            --accent-green: #4CAF50;
+            --sidebar-green: #2c3e50;
+        }
+        
         .sidebar {
             min-height: 100vh;
-            background: #2c3e50;
+            background: linear-gradient(180deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
         }
-        .sidebar .nav-link {
-            color: #ecf0f1;
-            padding: 1rem 1.5rem;
+        
+        .sidebar .position-sticky {
+            padding-top: 1rem;
         }
-        .sidebar .nav-link:hover {
-            background: #34495e;
-            color: #3498db;
-        }
-        .sidebar .nav-link.active {
-            background: #3498db;
+        
+        .sidebar h4 {
             color: white;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        .navbar-brand {
-            font-weight: bold;
+        
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.9);
+            padding: 0.85rem 1.5rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .sidebar .btn-link {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            padding: 0.85rem 1.5rem;
+            text-align: left;
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-weight: 500;
+        }
+        
+        .sidebar .btn-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .bg-white {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
     </style>
 </head>
@@ -32,9 +85,9 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-dark">
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
                 <div class="position-sticky pt-3">
-                    <h4 class="text-white text-center mb-4">
+                    <h4 class="text-center mb-4">
                         <i class="fas fa-cogs me-2"></i>DIMDI Admin
                     </h4>
                     <ul class="nav flex-column">
@@ -95,13 +148,6 @@
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="{{ route('profile.show') }}">My Profile</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form method="POST" action="{{ route('logout') }}">
-                                                @csrf
-                                                <button type="submit" class="dropdown-item">Logout</button>
-                                            </form>
-                                        </li>
                                     </ul>
                                 </li>
                             </ul>

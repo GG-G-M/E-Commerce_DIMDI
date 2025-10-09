@@ -20,18 +20,21 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'zip_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
         ]);
 
         $user->update($request->only([
-            'name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'country'
+            'first_name', 'middle_name', 'last_name', 'email', 'phone', 
+            'address', 'city', 'state', 'zip_code', 'country'
         ]));
 
         return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');

@@ -1,6 +1,6 @@
 @extends('layouts.app') 
 @section('content')
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <title>DIMDI - Premium Appliances & Furniture</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> --}}
     <style>
         :root {
             --primary-green: #2C8F0C;
@@ -389,8 +389,8 @@
             }
         }
     </style>
-</head>
-<body>
+{{-- </head>
+<body> --}}
     <!-- Your existing navbar will remain here -->
 
     <!-- Main Content -->
@@ -447,89 +447,85 @@
             </div>
         </section>
 
-        <!-- Featured Products Section -->
-        <section class="featured-section">
-            <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="section-title">Featured Products</h2>
-                        <p class="lead text-muted">Discover our handpicked selection of premium products</p>
+<!-- Featured Products -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Featured Products</h2>
+        <div class="row">
+            @foreach($featuredProducts as $product)
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="card product-card h-100 shadow">
+                    @if($product->has_discount)
+                    <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
+                    @endif
+                    <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ $product->name }}</h5>
+                        <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                        
+                        <!-- Display Available Sizes -->
+                        @if($product->all_sizes && count($product->all_sizes) > 0)
+                        <div class="mb-2">
+                            <small class="text-muted">Sizes: 
+                                @foreach($product->all_sizes as $size)
+                                    <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
+                                        {{ $size }}
+                                        @if(!$product->isSizeInStock($size))
+                                        (OOS)
+                                        @endif
+                                    </span>
+                                @endforeach
+                            </small>
+                        </div>
+                        @endif
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                @if($product->has_discount)
+                                <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                                <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
+                                @else
+                                <span class="text-primary fw-bold">${{ $product->price }}</span>
+                                @endif
+                            </div>
+                            
+                            @if($product->in_stock)
+                            <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                
+                                <!-- Size Selection for Home Page -->
+                                @if($product->all_sizes && count($product->all_sizes) > 1)
+                                <div class="mb-2">
+                                    <select name="selected_size" class="form-select form-select-sm" required>
+                                        <option value="">Select Size</option>
+                                        @foreach($product->all_sizes as $size)
+                                        <option value="{{ $size }}" {{ $product->isSizeInStock($size) ? '' : 'disabled' }}>
+                                            {{ $size }} {{ !$product->isSizeInStock($size) ? '(Out of Stock)' : '' }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @else
+                                <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
+                                @endif
+                                
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                                </button>
+                            </form>
+                            @else
+                            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                            @endif
+                        </div>
                     </div>
                 </div>
-                
-                <div class="row g-4">
-                    @if(isset($featuredProducts) && count($featuredProducts) > 0)
-                        @foreach($featuredProducts as $product)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card product-card">
-                                <div class="product-img-container">
-                                    <img src="{{ $product->image_url ?? 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80' }}" class="product-img" alt="{{ $product->name }}">
-                                    @if($product->has_discount ?? false)
-                                    <span class="product-badge sale">Sale</span>
-                                    @endif
-                                    @if($product->is_new ?? false)
-                                    <span class="product-badge">New</span>
-                                    @endif
-                                </div>
-                                <div class="product-body">
-                                    <h5 class="product-title">{{ $product->name }}</h5>
-                                    <p class="product-description">{{ Str::limit($product->description ?? 'Premium quality product for your home', 70) }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="product-price">${{ ($product->has_discount ?? false) ? ($product->sale_price ?? $product->price) : $product->price }}</span>
-                                            @if($product->has_discount ?? false)
-                                            <span class="product-old-price">${{ $product->price }}</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <form action="{{ url('/cart/add') }}" method="POST" class="d-inline w-100">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                        <button type="submit" class="btn btn-add-cart"><i class="fas fa-shopping-cart me-2"></i>Add to Cart</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    @else
-                        <!-- Fallback demo products when no featured products are available -->
-                        @php
-                            $demoProducts = [
-                                ['name' => 'Smart Refrigerator', 'price' => 1299, 'sale_price' => 1099, 'has_discount' => true, 'image' => 'https://images.unsplash.com/photo-1594223274512-ad4803739b7c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80', 'description' => 'Energy efficient smart refrigerator with advanced cooling technology'],
-                                ['name' => 'Leather Sofa Set', 'price' => 2499, 'sale_price' => null, 'has_discount' => false, 'image' => 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1158&q=80', 'description' => 'Premium leather sofa set with comfortable seating for your living room'],
-                                ['name' => '65" 4K Smart TV', 'price' => 899, 'sale_price' => null, 'has_discount' => false, 'is_new' => true, 'image' => 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80', 'description' => 'Crystal clear 4K display with smart features and sleek design'],
-                                ['name' => 'Modern Dining Table', 'price' => 1199, 'sale_price' => 999, 'has_discount' => true, 'image' => 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80', 'description' => 'Elegant dining table that seats 6 people, perfect for family gatherings']
-                            ];
-                        @endphp
-                        @foreach($demoProducts as $product)
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card product-card">
-                                <div class="product-img-container">
-                                    <img src="{{ $product['image'] }}" class="product-img" alt="{{ $product['name'] }}">
-                                    @if($product['has_discount'])
-                                    <span class="product-badge sale">Sale</span>
-                                    @endif
-                                    @if($product['is_new'] ?? false)
-                                    <span class="product-badge">New</span>
-                                    @endif
-                                </div>
-                                <div class="product-body">
-                                    <h5 class="product-title">{{ $product['name'] }}</h5>
-                                    <p class="product-description">{{ $product['description'] }}</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="product-price">${{ $product['has_discount'] ? $product['sale_price'] : $product['price'] }}</span>
-                                            @if($product['has_discount'])
-                                            <span class="product-old-price">${{ $product['price'] }}</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-add-cart"><i class="fas fa-shopping-cart me-2"></i>Add to Cart</button>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
                 </div>
                 
                 <div class="row mt-5">
@@ -721,8 +717,6 @@
         </section>
     </main>
 
-   
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Add subtle animations to elements when they come into view
         document.addEventListener('DOMContentLoaded', function() {
@@ -751,5 +745,6 @@
             });
         });
     </script>
-</body>
-</html>
+@endsection
+{{-- </body>
+</html> --}}

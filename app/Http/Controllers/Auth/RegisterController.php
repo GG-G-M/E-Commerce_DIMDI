@@ -20,7 +20,9 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string|max:20',
@@ -31,8 +33,18 @@ class RegisterController extends Controller
             'country' => 'required|string|max:100',
         ]);
 
+        // Build full name from separated fields
+        $fullName = $request->first_name;
+        if ($request->middle_name) {
+            $fullName .= ' ' . $request->middle_name;
+        }
+        $fullName .= ' ' . $request->last_name;
+
         $user = User::create([
-            'name' => $request->name,
+            'name' => $fullName, // Keep the old name field
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
@@ -41,6 +53,7 @@ class RegisterController extends Controller
             'state' => $request->state,
             'zip_code' => $request->zip_code,
             'country' => $request->country,
+            'role' => 'customer',
         ]);
 
         // Transfer guest cart to user
@@ -51,7 +64,7 @@ class RegisterController extends Controller
         return redirect()->intended('/')->with('success', 'Registration successful! Welcome to DIMDI Store.');
     }
 
-    private function transferGuestCartToUser(User $user) // Fixed type hint
+    private function transferGuestCartToUser(User $user)
     {
         $sessionId = session()->get('cart_session_id');
         
