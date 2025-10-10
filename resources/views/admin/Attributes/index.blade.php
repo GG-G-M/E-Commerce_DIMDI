@@ -81,7 +81,11 @@
         <h1 class="h3 mb-1">Attributes Management</h1>
         <p class="text-muted mb-0">Manage and organize your product attributes easily.</p>
     </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAttributeModal">
+    <button type="button" class="btn btn-primary" 
+            data-bs-toggle="modal" 
+            data-bs-target="#attributeModal" 
+            data-mode="create" 
+            data-action="{{ route('admin.attributes.store') }}">
         <i class="fas fa-plus me-1"></i> Add Attribute
     </button>
 </div>
@@ -131,8 +135,13 @@
                     <tr>
                         <td class="fw-semibold">{{ $attribute->name }}</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-outline-success me-1" data-bs-toggle="modal"
-                                data-bs-target="#editAttributeModal{{ $attribute->id }}">
+                            <button class="btn btn-sm btn-outline-success me-1" 
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#attributeModal"
+                                    data-mode="edit"
+                                    data-id="{{ $attribute->id }}"
+                                    data-name="{{ $attribute->name }}"
+                                    data-action="{{ route('admin.attributes.update', $attribute) }}">
                                 <i class="fas fa-edit"></i>
                             </button>
 
@@ -146,32 +155,6 @@
                             </form>
                         </td>
                     </tr>
-
-                    <!-- Edit Attribute Modal -->
-                    <div class="modal fade" id="editAttributeModal{{ $attribute->id }}" tabindex="-1" aria-labelledby="editAttributeLabel{{ $attribute->id }}" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <form action="{{ route('admin.attributes.update', $attribute) }}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="editAttributeLabel{{ $attribute->id }}">Edit Attribute</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label for="name{{ $attribute->id }}" class="form-label fw-bold">Name</label>
-                                            <input type="text" class="form-control" id="name{{ $attribute->id }}" name="name" value="{{ $attribute->name }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                     @endforeach
                 </tbody>
             </table>
@@ -189,28 +172,75 @@
     </div>
 </div>
 
-<!-- Create Attribute Modal -->
-<div class="modal fade" id="createAttributeModal" tabindex="-1" aria-labelledby="createAttributeLabel" aria-hidden="true">
+<!-- Single Attribute Modal (Create/Edit) -->
+<div class="modal fade" id="attributeModal" tabindex="-1" aria-labelledby="attributeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="{{ route('admin.attributes.store') }}" method="POST">
+        <form id="attributeForm" method="POST">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createAttributeLabel">Add New Attribute</h5>
+                    <h5 class="modal-title" id="attributeModalLabel">Add New Attribute</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="name" class="form-label fw-bold">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter attribute name" required>
+                        <label for="attributeName" class="form-label fw-bold">Name</label>
+                        <input type="text" class="form-control" id="attributeName" name="name" placeholder="Enter attribute name" required>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Attribute</button>
+                    <button type="submit" class="btn btn-primary" id="attributeSubmitButton">Add Attribute</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+<!-- Modal JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const attributeModal = document.getElementById('attributeModal');
+    const modalTitle = document.getElementById('attributeModalLabel');
+    const modalForm = document.getElementById('attributeForm');
+    const modalNameInput = document.getElementById('attributeName');
+    const submitButton = document.getElementById('attributeSubmitButton');
+
+    attributeModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const mode = button.dataset.mode;
+
+        if (mode === 'create') {
+            modalTitle.textContent = 'Add New Attribute';
+            submitButton.textContent = 'Add Attribute';
+            modalForm.action = button.dataset.action;
+            modalForm.method = 'POST';
+            modalNameInput.value = '';
+            const methodInput = modalForm.querySelector('input[name="_method"]');
+            if (methodInput) methodInput.remove();
+        } else if (mode === 'edit') {
+            modalTitle.textContent = 'Edit Attribute';
+            submitButton.textContent = 'Save Changes';
+            modalForm.action = button.dataset.action;
+            modalForm.method = 'POST';
+            modalNameInput.value = button.dataset.name;
+
+            let methodInput = modalForm.querySelector('input[name="_method"]');
+            if (!methodInput) {
+                methodInput = document.createElement('input');
+                methodInput.type = 'hidden';
+                methodInput.name = '_method';
+                modalForm.appendChild(methodInput);
+            }
+            methodInput.value = 'PUT';
+        }
+    });
+});
+</script>
+
+
+
 @endsection
+
+
+
