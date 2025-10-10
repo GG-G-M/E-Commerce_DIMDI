@@ -135,6 +135,13 @@
                     <tr>
                         <td class="fw-semibold">{{ $attribute->name }}</td>
                         <td class="text-center">
+
+                            <button class="btn btn-sm btn-outline-primary me-1 view-values-btn"
+                                data-attribute-id="{{ $attribute->id }}"
+                                data-attribute-name="{{ $attribute->name }}">
+                                <i class="fas fa-list"></i>
+                            </button>
+
                             <button class="btn btn-sm btn-outline-success me-1" 
                                     data-bs-toggle="modal"
                                     data-bs-target="#attributeModal"
@@ -197,6 +204,33 @@
     </div>
 </div>
 
+<!-- Attribute Values Modal -->
+<div class="modal fade" id="attributeValuesModal" tabindex="-1" aria-labelledby="attributeValuesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attributeValuesLabel">Attribute Values</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="valuesContainer">
+                    <p class="text-muted">Loading values...</p>
+                </div>
+
+                <form id="addValueForm" class="mt-3">
+                    @csrf
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="newValueInput" placeholder="Enter new value" required>
+                        <button class="btn btn-primary" type="submit">Add Value</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Modal JS -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -237,6 +271,98 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const attributeValuesModal = new bootstrap.Modal(document.getElementById('attributeValuesModal'));
+    const valuesContainer = document.getElementById('valuesContainer');
+    const addValueForm = document.getElementById('addValueForm');
+    const newValueInput = document.getElementById('newValueInput');
+    let currentAttributeId = null;
+
+    // ✅ Function to load values dynamically
+    function loadAttributeValues() {
+        valuesContainer.innerHTML = `<p class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading values...</p>`;
+
+        fetch(`/admin/attributes/${currentAttributeId}/values`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    valuesContainer.innerHTML = `<p class="text-muted">No values found.</p>`;
+                } else {
+                    let html = '<ul class="list-group">';
+                    data.forEach(v => {
+                        html += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${v.value}
+                                <button class="btn btn-sm btn-outline-danger delete-value-btn" data-value-id="${v.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </li>`;
+                    });
+                    html += '</ul>';
+                    valuesContainer.innerHTML = html;
+                }
+            })
+            .catch(() => {
+                valuesContainer.innerHTML = `<p class="text-danger">Failed to load values. Try again.</p>`;
+            });
+    }
+
+    // ✅ Handle "View Values" click
+    document.querySelectorAll('.view-values-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            currentAttributeId = this.dataset.attributeId;
+            const name = this.dataset.attributeName;
+            document.getElementById('attributeValuesLabel').textContent = `${name} - Values`;
+
+            attributeValuesModal.show();
+            loadAttributeValues();
+        });
+    });
+
+    // ✅ Handle Add Value
+    addValueForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        fetch(`/admin/attributes/${currentAttributeId}/values`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+            },
+            body: JSON.stringify({ value: newValueInput.value })
+        })
+        .then(res => res.json())
+        .then(() => {
+            newValueInput.value = '';
+            loadAttributeValues(); // 🔄 Re-fetch list after adding
+        })
+        .catch(() => alert('Failed to add value. Please try again.'));
+    });
+
+    // ✅ Handle Delete Value
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.delete-value-btn')) {
+            const btn = e.target.closest('.delete-value-btn');
+            const valueId = btn.dataset.valueId;
+
+            if (confirm('Delete this value?')) {
+                fetch(`/admin/attribute-values/${valueId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+                    }
+                })
+                .then(() => loadAttributeValues()) // 🔄 Re-fetch after delete
+                .catch(() => alert('Failed to delete value.'));
+            }
+        }
+    });
+});
+</script>
+
+
 
 
 

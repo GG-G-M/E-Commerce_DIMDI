@@ -115,11 +115,11 @@
                                 <i class="fas fa-tags me-2"></i>Categories
                             </a>
                         </li>
-
+                        
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.attributes.*') ? 'active' : '' }}" 
                                href="{{ route('admin.attributes.index') }}">
-                                <i class="fas fa-tags me-2"></i>Attributes
+                                <i class="fas fa-cube me-2"></i>Attributes
                             </a>
                         </li>
 
