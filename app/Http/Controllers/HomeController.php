@@ -13,13 +13,15 @@ class HomeController extends Controller
         $featuredProducts = Product::with('category')
             ->where('is_featured', true)
             ->where('is_active', true)
-            ->where('stock_quantity', '>', 0)
+            // ->where('stock_quantity', '>', 0)
             ->latest()
             ->take(8)
             ->get();
 
         $categories = Category::with(['products' => function($query) {
-            $query->where('is_active', true)->where('stock_quantity', '>', 0);
+            $query->where('is_active', true)
+            // ->where('stock_quantity', '>', 0)
+            ;
         }])
         ->where('is_active', true)
         ->get();

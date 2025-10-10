@@ -9,6 +9,10 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
+use App\Models\VariantAttribute;
+
 
 class ProductController extends Controller
 {
@@ -47,39 +51,32 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::active()->get();
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
-        return view('admin.products.create', compact('categories', 'sizes'));
+        $attributes = Attribute::with('values')->get(); // Load attributes with values
+        return view('admin.products.create', compact('categories', 'attributes'));
     }
+
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'sizes' => 'required|array',
-            'sizes.*' => 'string|max:50',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'variants' => 'required|array', // array of attributes -> values
+            'variants.*' => 'array',
+            'variants.*.*' => 'exists:attribute_values,id'
         ]);
 
-        // Handle main image upload - Store in public directory
+        // Handle image upload
         $imagePath = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
-            
-            // Create products directory if it doesn't exist
             $directory = public_path('images/products');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-            
-            // Move image to public directory
+            if (!file_exists($directory)) mkdir($directory, 0755, true);
             $image->move($directory, $imageName);
             $imagePath = 'images/products/' . $imageName;
         }
@@ -88,20 +85,32 @@ class ProductController extends Controller
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
-            'price' => $request->price,
-            'sale_price' => $request->sale_price,
-            'stock_quantity' => $request->stock_quantity,
-            'sku' => 'SKU-' . strtoupper(Str::random(8)),
-            'image' => $imagePath,
-            'sizes' => json_encode($request->sizes),
-            'is_featured' => $request->has('is_featured'),
-            'is_active' => $request->has('is_active'),
-            'is_archived' => false,
             'category_id' => $request->category_id,
+            'is_active' => $request->boolean('is_active'),
+            'is_featured' => $request->boolean('is_featured'),
+            'image' => $imagePath,
         ]);
+
+        // Create product variants for each selected combination
+        foreach ($request->variants as $attributeId => $valueIds) {
+            foreach ($valueIds as $valueId) {
+                $variant = ProductVariant::create([
+                    'product_id' => $product->id,
+                    'sku' => 'SKU-' . strtoupper(Str::random(8)),
+                    'price' => null, // Optional, can add field in request if needed
+                    'stock' => 0,
+                ]);
+
+                VariantAttribute::create([
+                    'variant_id' => $variant->id,
+                    'value_id' => $valueId,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
     }
+
 
     public function edit(Product $product)
     {

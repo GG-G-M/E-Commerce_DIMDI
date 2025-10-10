@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\AttributeController as AdminAttributeController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -77,4 +78,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Attributes
+    Route::get('/attributes', [AdminAttributeController::class, 'index'])->name('attributes.index');
+    Route::post('/attributes', [AdminAttributeController::class, 'store'])->name('attributes.store');
+    Route::put('/attributes/{attribute}', [AdminAttributeController::class, 'update'])->name('attributes.update'); 
+    Route::delete('/attributes/{attribute}', [AdminAttributeController::class, 'destroy'])->name('attributes.destroy'); 
 });

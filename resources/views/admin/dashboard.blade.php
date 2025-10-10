@@ -137,7 +137,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="stats-label">TOTAL PRODUCTS</div>
-                        <div class="stats-number">{{ $stats['total_products'] }}</div>
+                        <div class="stats-number">123</div>
                         <small>Active in catalog</small>
                     </div>
                     <div class="col-auto">
@@ -154,7 +154,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="stats-label">TOTAL ORDERS</div>
-                        <div class="stats-number">{{ $stats['total_orders'] }}</div>
+                        <div class="stats-number">456</div>
                         <small>All time orders</small>
                     </div>
                     <div class="col-auto">
@@ -171,7 +171,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="stats-label">TOTAL CUSTOMERS</div>
-                        <div class="stats-number">{{ $stats['total_customers'] }}</div>
+                        <div class="stats-number">789</div>
                         <small>Registered users</small>
                     </div>
                     <div class="col-auto">
@@ -188,7 +188,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="stats-label">TOTAL REVENUE</div>
-                        <div class="stats-number">${{ number_format($stats['revenue'], 2) }}</div>
+                        <div class="stats-number">$12,345.67</div>
                         <small>Lifetime sales</small>
                     </div>
                     <div class="col-auto">
@@ -199,6 +199,8 @@
         </div>
     </div>
 </div>
+
+
 
 <div class="row">
     <!-- Recent Orders -->
@@ -259,7 +261,7 @@
         </div>
     </div>
 
-    <div class="col-lg-4">
+    {{-- <div class="col-lg-4">
         <div class="card section-card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h6 class="m-0 font-weight-bold text-danger">
@@ -292,7 +294,7 @@
                     </div>
                 @endif
             </div>
-        </div>
+        </div> --}}
 
         <div class="card section-card mt-4">
             <div class="card-header">
