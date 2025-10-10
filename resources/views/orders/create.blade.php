@@ -11,7 +11,7 @@
                     <i class="fas fa-user me-2"></i> Customer Information
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('orders.store') }}" method="POST">
+                    <form action="{{ route('orders.store') }}" method="POST" id="checkout-form">
                         @csrf
                         
                         <!-- Info Notice -->
@@ -43,9 +43,52 @@
                             <div class="col-md-6 mb-3">
                                 <label for="payment_method" class="form-label text-success fw-semibold">Payment Method *</label>
                                 <select class="form-select border-success" id="payment_method" name="payment_method" required>
-                                    <option value="card">Credit</option>
+                                    <option value="card">Credit/Debit Card (PayMongo)</option>
+                                    <option value="gcash">GCash (PayMongo)</option>
+                                    <option value="grab_pay">GrabPay (PayMongo)</option>
                                     <option value="bank_transfer">Bank Transfer</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        <!-- PayMongo Payment Section -->
+                        <div id="paymongo-section" class="mb-4" style="display: none;">
+                            <div class="card border-success">
+                                <div class="card-header bg-success bg-opacity-10 text-success fw-bold">
+                                    <i class="fas fa-credit-card me-2"></i> PayMongo Payment
+                                </div>
+                                <div class="card-body">
+                                    <!-- Card Payment Form -->
+                                    <div id="card-payment" class="payment-method">
+                                        <div id="paymongo-card-form"></div>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>We accept:</span>
+                                                <div>
+                                                    <i class="fab fa-cc-visa fa-2x text-primary me-2"></i>
+                                                    <i class="fab fa-cc-mastercard fa-2x text-danger me-2"></i>
+                                                    <i class="fab fa-cc-amex fa-2x text-info"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- GCash Payment -->
+                                    <div id="gcash-payment" class="payment-method" style="display: none;">
+                                        <div class="text-center">
+                                            <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+                                            <p>You will be redirected to GCash to complete your payment after placing the order.</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- GrabPay Payment -->
+                                    <div id="grabpay-payment" class="payment-method" style="display: none;">
+                                        <div class="text-center">
+                                            <i class="fas fa-car fa-3x text-success mb-3"></i>
+                                            <p>You will be redirected to GrabPay to complete your payment after placing the order.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -65,6 +108,11 @@
                             <label for="notes" class="form-label text-success fw-semibold">Order Notes</label>
                             <textarea class="form-control border-success" id="notes" name="notes" rows="3" placeholder="Any special instructions...">{{ old('notes') }}</textarea>
                         </div>
+
+                        <!-- Hidden fields for PayMongo -->
+                        <input type="hidden" id="payment_intent_id" name="payment_intent_id">
+                        <input type="hidden" id="payment_method_id" name="payment_method_id">
+                        <input type="hidden" id="payment_status" name="payment_status" value="pending">
                 </div>
             </div>
         </div>                      
@@ -108,8 +156,8 @@
                         <strong class="text-success">${{ number_format($total, 2) }}</strong>
                     </div>
                     
-                    <button type="submit" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;">
-                        Place Order
+                    <button type="submit" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;" id="place-order-btn">
+                        <i class="fas fa-lock me-2"></i>Place Order
                     </button>
                     </form>
                     
@@ -121,6 +169,45 @@
         </div>
     </div>
 </div>
+
+<!-- PayMongo Script -->
+<script src="https://js.paymongo.com/v1/paymongo.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethodSelect = document.getElementById('payment_method');
+    const paymongoSection = document.getElementById('paymongo-section');
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    
+    // Show/hide PayMongo section based on payment method
+    function updatePaymentDisplay() {
+        const selectedMethod = paymentMethodSelect.value;
+        
+        paymentMethods.forEach(method => method.style.display = 'none');
+        paymongoSection.style.display = 'none';
+        
+        if (['card', 'gcash', 'grab_pay'].includes(selectedMethod)) {
+            paymongoSection.style.display = 'block';
+            
+            if (selectedMethod === 'card') {
+                document.getElementById('card-payment').style.display = 'block';
+            } else if (selectedMethod === 'gcash') {
+                document.getElementById('gcash-payment').style.display = 'block';
+            } else if (selectedMethod === 'grab_pay') {
+                document.getElementById('grabpay-payment').style.display = 'block';
+            }
+        }
+    }
+
+    // Handle payment method change
+    paymentMethodSelect.addEventListener('change', updatePaymentDisplay);
+
+    // Initialize on page load
+    updatePaymentDisplay();
+
+    // No need for custom form handling - let the form submit normally
+    // The backend will handle the redirects for GCash/GrabPay
+});
+</script>
 
 <style>
 .form-control:focus, .form-select:focus {
@@ -134,6 +221,9 @@
 .btn-outline-success:hover {
     background-color: #2C8F0C;
     color: #fff !important;
+}
+.payment-method {
+    min-height: 100px;
 }
 </style>
 @endsection

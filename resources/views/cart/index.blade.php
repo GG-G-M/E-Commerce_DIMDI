@@ -131,140 +131,198 @@
 <script>
 // Handle custom quantity buttons
 document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.quantity-btn')) {
-            const button = e.target.closest('.quantity-btn');
-            const action = button.getAttribute('data-action');
-            const input = button.closest('.input-group').querySelector('input[name="quantity"]');
-            const currentValue = parseInt(input.value);
-            const min = parseInt(input.getAttribute('min'));
-            const max = parseInt(input.getAttribute('max'));
+    const paymentMethodSelect = document.getElementById('payment_method');
+    const paymongoSection = document.getElementById('paymongo-section');
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    const checkoutForm = document.getElementById('checkout-form');
+    
+    let cardForm;
+    let paymentIntentId;
+
+    // Show/hide PayMongo section based on payment method
+    function updatePaymentDisplay() {
+        const selectedMethod = paymentMethodSelect.value;
+        
+        // Hide all payment methods first
+        paymentMethods.forEach(method => method.style.display = 'none');
+        paymongoSection.style.display = 'none';
+        
+        // Show PayMongo section for PayMongo payment methods
+        if (['card', 'gcash', 'grab_pay'].includes(selectedMethod)) {
+            paymongoSection.style.display = 'block';
             
-            let newValue = currentValue;
-            
-            if (action === 'increase' && currentValue < max) {
-                newValue = currentValue + 1;
-            } else if (action === 'decrease' && currentValue > min) {
-                newValue = currentValue - 1;
-            }
-            
-            if (newValue !== currentValue) {
-                input.value = newValue;
-                input.dispatchEvent(new Event('change', { bubbles: true }));
+            if (selectedMethod === 'card') {
+                document.getElementById('card-payment').style.display = 'block';
+                initializeCardPayment();
+            } else if (selectedMethod === 'gcash') {
+                document.getElementById('gcash-payment').style.display = 'block';
+            } else if (selectedMethod === 'grab_pay') {
+                document.getElementById('grabpay-payment').style.display = 'block';
             }
         }
-    });
-});
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const autoSubmitElements = document.querySelectorAll('.auto-submit');
-    
-    autoSubmitElements.forEach(element => {
-        element.addEventListener('change', function() {
-            const form = this.closest('form');
-            submitForm(form);
-        });
-        
-        if (element.type === 'number') {
-            let timeout;
-            element.addEventListener('input', function() {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    const form = this.closest('form');
-                    submitForm(form);
-                }, 500);
+    // Initialize card payment
+    async function initializeCardPayment() {
+        try {
+            if (!paymentIntentId) {
+                await createPaymentIntent();
+            }
+            
+            if (paymentIntentId && !cardForm) {
+                cardForm = paymongo.elements.create('cardForm', {
+                    intent: {
+                        id: paymentIntentId,
+                        clientKey: '{{ config("services.paymongo.public_key") }}'
+                    },
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#2C8F0C',
+                            '::placeholder': {
+                                color: '#aab7c4'
+                            }
+                        }
+                    }
+                });
+
+                cardForm.mount('#paymongo-card-form');
+            }
+        } catch (error) {
+            console.error('Error initializing card payment:', error);
+        }
+    }
+
+    // Create payment intent via AJAX
+    async function createPaymentIntent() {
+        try {
+            const response = await fetch('{{ route("payment.create-intent") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    amount: Math.round({{ $total }} * 100), // Convert to cents
+                    currency: 'PHP'
+                })
             });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to create payment intent');
+            }
+
+            if (!data.intent || !data.intent.id) {
+                throw new Error('Invalid payment intent response');
+            }
+
+            paymentIntentId = data.intent.id;
+            document.getElementById('payment_intent_id').value = paymentIntentId;
+            
+            return data.intent;
+            
+        } catch (error) {
+            console.error('Payment intent creation failed:', error);
+            alert('Failed to initialize payment: ' + error.message);
+            throw error;
+        }
+    }
+
+    // Create source for e-wallet payments
+    async function createSource(type) {
+        try {
+            const response = await fetch('{{ route("payment.create-source") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    type: type,
+                    amount: Math.round({{ $total }} * 100),
+                    currency: 'PHP'
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to create payment source');
+            }
+
+            if (!data.source || !data.source.id) {
+                throw new Error('Invalid payment source response');
+            }
+
+            return data;
+            
+        } catch (error) {
+            console.error('Source creation failed:', error);
+            throw error;
+        }
+    }
+
+    // Handle payment method change
+    paymentMethodSelect.addEventListener('change', updatePaymentDisplay);
+
+    // Initialize on page load
+    updatePaymentDisplay();
+
+    // Handle form submission
+    checkoutForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const paymentMethod = paymentMethodSelect.value;
+        placeOrderBtn.disabled = true;
+        placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+        try {
+            // For PayMongo payments
+            if (['card', 'gcash', 'grab_pay'].includes(paymentMethod)) {
+                
+                if (!paymentIntentId) {
+                    await createPaymentIntent();
+                }
+
+                if (paymentMethod === 'card') {
+                    // Handle card payment
+                    const result = await cardForm.confirmPayment();
+                    
+                    if (result.error) {
+                        throw new Error(result.error.message);
+                    }
+
+                    document.getElementById('payment_method_id').value = result.paymentIntent.id;
+                    document.getElementById('payment_status').value = result.paymentIntent.status;
+                    
+                } else {
+                    // Handle e-wallet payments (GCash, GrabPay)
+                    const sourceResponse = await createSource(paymentMethod);
+                    document.getElementById('payment_method_id').value = sourceResponse.source.id;
+                    
+                    // Redirect to payment page
+                    if (sourceResponse.source.attributes.redirect && 
+                        sourceResponse.source.attributes.redirect.checkout_url) {
+                        window.location.href = sourceResponse.source.attributes.redirect.checkout_url;
+                        return; // Stop further execution
+                    }
+                }
+            }
+
+            // For bank transfer or if redirection didn't happen
+            checkoutForm.submit();
+
+        } catch (error) {
+            console.error('Payment error:', error);
+            alert('Payment failed: ' + error.message);
+            placeOrderBtn.disabled = false;
+            placeOrderBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order';
         }
     });
-    
-    function submitForm(form) {
-        const formData = new FormData(form);
-        const itemId = form.id.split('-')[2];
-        const loadingSpinner = form.querySelector('.loading-spinner');
-        
-        if (loadingSpinner) {
-            loadingSpinner.style.display = 'block';
-        }
-        
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const itemTotalElement = document.getElementById(`item-total-${itemId}`);
-                if (itemTotalElement && data.item_total) {
-                    itemTotalElement.textContent = data.item_total;
-                }
-                
-                updateSummaryTotals(data.summary);
-                showFlashMessage('Cart updated successfully!', 'success');
-            } else {
-                throw new Error(data.message || 'Update failed');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showFlashMessage('Error updating cart. Please try again.', 'error');
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        })
-        .finally(() => {
-            if (loadingSpinner) {
-                loadingSpinner.style.display = 'none';
-            }
-        });
-    }
-    
-    function updateSummaryTotals(summary) {
-        if (summary.subtotal) {
-            document.getElementById('summary-subtotal').textContent = summary.subtotal;
-        }
-        if (summary.tax) {
-            document.getElementById('summary-tax').textContent = summary.tax;
-        }
-        if (summary.shipping) {
-            document.getElementById('summary-shipping').textContent = summary.shipping;
-        }
-        if (summary.total) {
-            document.getElementById('summary-total').textContent = summary.total;
-        }
-    }
-    
-    function showFlashMessage(message, type) {
-        const existingMessages = document.querySelectorAll('.flash-message');
-        existingMessages.forEach(msg => msg.remove());
-        
-        const flashMessage = document.createElement('div');
-        flashMessage.className = `alert alert-${type === 'error' ? 'danger' : 'success'} flash-message position-fixed`;
-        flashMessage.style.cssText = `
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-            min-width: 300px;
-        `;
-        flashMessage.textContent = message;
-        
-        document.body.appendChild(flashMessage);
-        
-        setTimeout(() => {
-            flashMessage.remove();
-        }, 3000);
-    }
 });
-</script>
-
 <style>
 .auto-submit:focus {
     border-color: #2C8F0C;

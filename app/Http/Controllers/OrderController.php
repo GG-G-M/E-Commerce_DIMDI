@@ -28,18 +28,13 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        // Authorization check
         $this->authorizeOrderView($order);
-
-        // Reload the order with fresh data
         $order->load('items.product');
-
         return view('orders.show', compact('order'));
     }
 
     public function create()
     {
-        // Redirect to login if not authenticated
         if (!Auth::check()) {
             session(['url.intended' => route('orders.create')]);
             return redirect()->route('login')->with('info', 'Please login or register to complete your order.');
@@ -58,7 +53,6 @@ class OrderController extends Controller
         $shipping = $subtotal > 100 ? 0 : 10;
         $total = $subtotal + $tax + $shipping;
 
-        // Pre-fill with user data
         $user = Auth::user();
 
         return view('orders.create', compact('cartItems', 'subtotal', 'tax', 'shipping', 'total', 'user'));
@@ -72,7 +66,7 @@ class OrderController extends Controller
 
         $request->validate([
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:card,bank_transfer'
+            'payment_method' => 'required|in:card,bank_transfer,gcash,grab_pay'
         ]);
 
         $cartItems = Cart::with('product')
@@ -83,15 +77,16 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
         }
 
-        // Validate stock before creating order
+        // ✅ Validate stock (without variant)
         foreach ($cartItems as $cartItem) {
-            $variant = $cartItem->product->getVariantBySize($cartItem->selected_size);
-            if (!$variant || $variant->stock_quantity < $cartItem->quantity) {
-                return redirect()->route('cart.index')->with('error', "Sorry, {$cartItem->product->name} in size {$cartItem->selected_size} is no longer available in the requested quantity.");
+            $product = $cartItem->product;
+            if (!$product || $product->stock_quantity < $cartItem->quantity) {
+                return redirect()->route('cart.index')
+                    ->with('error', "Sorry, {$product->name} is no longer available in the requested quantity.");
             }
         }
 
-        // Calculate totals
+        // ✅ Calculate totals
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10;
         $shipping = $subtotal > 100 ? 0 : 10;
@@ -99,7 +94,7 @@ class OrderController extends Controller
 
         $user = Auth::user();
 
-        // Create order
+        // ✅ Create Order
         $order = Order::create([
             'user_id' => $user->id,
             'customer_name' => $user->name,
@@ -112,38 +107,61 @@ class OrderController extends Controller
             'shipping_cost' => $shipping,
             'total_amount' => $total,
             'payment_method' => $request->payment_method,
+            'payment_status' => $request->payment_status ?? 'pending',
             'order_status' => 'pending',
             'notes' => $request->notes
         ]);
 
-        // Create order items and update product variant stock
+        // ✅ Create Order Items & Deduct Stock
         foreach ($cartItems as $cartItem) {
-            $variant = $cartItem->product->getVariantBySize($cartItem->selected_size);
-            
+            $product = $cartItem->product;
+
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => $cartItem->product_id,
-                'product_name' => $cartItem->product->name,
-                'unit_price' => $cartItem->product->current_price,
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'unit_price' => $product->current_price,
                 'quantity' => $cartItem->quantity,
                 'total_price' => $cartItem->total_price,
-                'selected_size' => $cartItem->selected_size
             ]);
 
-            // Update product variant stock
-            $variant->decrement('stock_quantity', $cartItem->quantity);
+            // Deduct stock
+            $product->decrement('stock_quantity', $cartItem->quantity);
         }
 
-        // Clear cart
+        // ✅ Clear cart
         Cart::where('user_id', Auth::id())->delete();
 
+        session(['last_order_id' => $order->id]);
+
+        // ✅ Payment redirection
+        if (in_array($request->payment_method, ['gcash', 'grab_pay'])) {
+            try {
+                $paymentController = new PaymentController();
+                $sourceResponse = $paymentController->createSourceForOrder($order);
+
+                if (isset($sourceResponse['data']['attributes']['redirect']['checkout_url'])) {
+                    $checkoutUrl = $sourceResponse['data']['attributes']['redirect']['checkout_url'];
+                    session(['last_order_id' => $order->id]);
+                    return redirect()->away($checkoutUrl);
+                }
+
+                return redirect()->route('orders.show', $order)
+                    ->with('error', 'Failed to retrieve PayMongo checkout URL.');
+
+            } catch (\Exception $e) {
+                return redirect()->route('orders.show', $order)
+                    ->with('error', 'Order created but payment initialization failed: ' . $e->getMessage());
+            }
+        }
+
+        // ✅ Default redirect
         return redirect()->route('orders.show', $order)
             ->with('success', 'Order placed successfully! Your order number is: ' . $order->order_number);
     }
 
     public function cancel(Request $request, Order $order)
     {
-        // Authorization check
         $this->authorizeOrderView($order);
 
         if (!$order->canBeCancelled()) {
