@@ -60,13 +60,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
-    Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
+    Route::get('/products/manage/create', [AdminProductController::class, 'create'])->name('products.create');
     Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
+    Route::get('/products/manage/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
     Route::post('/products/{product}/unarchive', [AdminProductController::class, 'unarchive'])->name('products.unarchive');
+
+    // 🔹 NEW: Manage Product Attributes
+    Route::get('/products/{product}/attributes', [AdminProductController::class, 'getAttributes'])->name('products.attributes');
+    Route::post('/products/{product}/attributes', [AdminProductController::class, 'storeAttributes'])->name('products.attributes.store');
+
+    // 🔹 NEW: Manage Product Variants
+    Route::get('/products/{product}/variants', [AdminProductController::class, 'getVariants'])->name('products.variants');
+    Route::post('/products/{product}/variants', [AdminProductController::class, 'storeVariants'])->name('products.variants.store');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

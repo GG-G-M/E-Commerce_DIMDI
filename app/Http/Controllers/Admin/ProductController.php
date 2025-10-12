@@ -48,182 +48,80 @@ class ProductController extends Controller
         return view('admin.products.index', compact('products', 'categories', 'statuses'));
     }
 
-    public function create()
-    {
-        $categories = Category::active()->get();
-        $attributes = Attribute::with('values')->get(); // Load attributes with values
-        return view('admin.products.create', compact('categories', 'attributes'));
+public function create()
+{
+    return redirect()->route('admin.products.index');
+}
+
+public function edit(Product $product)
+{
+    return redirect()->route('admin.products.index');
+}
+
+
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'category_id' => 'required|exists:categories,id',
+        'is_featured' => 'nullable|boolean',
+        'is_active' => 'nullable|boolean',
+    ]);
+
+    
+    // if (!array_key_exists('slug', $validated) || empty($validated['slug'])) {
+    //     $validated['slug'] = Str::slug($validated['name']);
+    // }
+
+    // ✅ Convert feature/active flags to proper boolean
+    $validated['is_featured'] = $request->boolean('is_featured');
+    $validated['is_active'] = $request->boolean('is_active');
+
+    // ✅ Ensure all required columns are present
+    Product::create([
+        'name' => $validated['name'],
+        // 'slug' => $validated['slug'],
+        'description' => $validated['description'] ?? null,
+        'category_id' => $validated['category_id'],
+        'is_featured' => $validated['is_featured'],
+        'is_active' => $validated['is_active'],
+    ]);
+
+    if ($request->ajax()) {
+        return response()->json(['success' => true, 'message' => 'Product saved successfully!']);
     }
 
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-            'is_active' => 'boolean',
-            'is_featured' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'variants' => 'required|array', // array of attributes -> values
-            'variants.*' => 'array',
-            'variants.*.*' => 'exists:attribute_values,id'
-        ]);
-
-        // Handle image upload
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
-            $directory = public_path('images/products');
-            if (!file_exists($directory)) mkdir($directory, 0755, true);
-            $image->move($directory, $imageName);
-            $imagePath = 'images/products/' . $imageName;
-        }
-
-        $product = Product::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'is_active' => $request->boolean('is_active'),
-            'is_featured' => $request->boolean('is_featured'),
-            'image' => $imagePath,
-        ]);
-
-        // Create product variants for each selected combination
-        foreach ($request->variants as $attributeId => $valueIds) {
-            foreach ($valueIds as $valueId) {
-                $variant = ProductVariant::create([
-                    'product_id' => $product->id,
-                    'sku' => 'SKU-' . strtoupper(Str::random(8)),
-                    'price' => null, // Optional, can add field in request if needed
-                    'stock' => 0,
-                ]);
-
-                VariantAttribute::create([
-                    'variant_id' => $variant->id,
-                    'value_id' => $valueId,
-                ]);
-            }
-        }
-
-        return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
-    }
+    return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
+}
 
 
-    public function edit(Product $product)
-    {
-        $categories = Category::active()->get();
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
-        $selectedSizes = $product->available_sizes;
-        
-        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'selectedSizes'));
-    }
 
-    public function update(Request $request, Product $product)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'sale_price' => 'nullable|numeric|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'is_featured' => 'boolean',
-            'is_active' => 'boolean',
-            'selected_sizes' => 'required|array|min:1',
-            'selected_sizes.*' => 'string',
-            'stock' => 'required|array',
-            'stock.*' => 'required|integer|min:0',
-            'size_price' => 'nullable|array',
-            'size_price.*' => 'nullable|numeric|min:0',
-            'size_sale_price' => 'nullable|array',
-            'size_sale_price.*' => 'nullable|numeric|min:0',
-        ], [
-            'selected_sizes.required' => 'Please select at least one size.',
-            'stock.*.required' => 'Stock quantity is required for all selected sizes.',
-            'stock.*.min' => 'Stock quantity cannot be negative.',
-        ]);
 
-        // Custom validation for sale price being lower than price
-        if ($validated['sale_price'] && $validated['sale_price'] >= $validated['price']) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['sale_price' => 'Sale price must be lower than regular price.']);
-        }
 
-        // Validate size-specific prices
-        foreach ($validated['selected_sizes'] as $size) {
-            $sizePrice = $validated['size_price'][$size] ?? null;
-            $sizeSalePrice = $validated['size_sale_price'][$size] ?? null;
-            
-            if ($sizeSalePrice && $sizePrice && $sizeSalePrice >= $sizePrice) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(["size_sale_price.{$size}" => "Sale price for {$size} must be lower than regular price."]);
-            }
-            
-            if ($sizeSalePrice && !$sizePrice) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(["size_price.{$size}" => "Regular price is required for {$size} if sale price is set."]);
-            }
-        }
+public function update(Request $request, Product $product)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        // 'slug' => 'nullable|string|max:255|unique:products,slug,' . $product->id,
+        'description' => 'nullable|string',
+        'category_id' => 'required|exists:categories,id',
+        'is_featured' => 'boolean',
+        'is_active' => 'boolean',
+    ]);
 
-        // Update basic product info
-        $product->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'sale_price' => $validated['sale_price'],
-            'category_id' => $validated['category_id'],
-            'is_featured' => $request->boolean('is_featured'),
-            'is_active' => $request->boolean('is_active'),
-            'sizes' => $validated['selected_sizes'],
-        ]);
+    // $validated['slug'] = $validated['slug'] ?: Str::slug($validated['name']);
+    $validated['is_featured'] = $request->boolean('is_featured');
+    $validated['is_active'] = $request->boolean('is_active');
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            // Your existing image upload logic
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->update(['image' => $imagePath]);
-        }
+    $product->update($validated);
 
-        // Update or create variants for each selected size
-        foreach ($validated['selected_sizes'] as $size) {
-            $variantData = [
-                'stock_quantity' => $validated['stock'][$size] ?? 0,
-                'price' => $validated['size_price'][$size] ?? $validated['price'], // Use base price if not set
-            ];
+    if ($request->ajax()) {
+    return response()->json(['success' => true, 'message' => 'Product saved successfully!']);
+}
 
-            // Only set sale price if provided, otherwise use base sale price or null
-            if (isset($validated['size_sale_price'][$size])) {
-                $variantData['sale_price'] = $validated['size_sale_price'][$size];
-            } else {
-                $variantData['sale_price'] = $validated['sale_price'];
-            }
+}
 
-            ProductVariant::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'size' => $size,
-                ],
-                $variantData
-            );
-        }
-
-        // Remove variants for sizes that are no longer selected
-        ProductVariant::where('product_id', $product->id)
-            ->whereNotIn('size', $validated['selected_sizes'])
-            ->delete();
-
-        // Update total stock for backward compatibility
-        $product->updateTotalStock();
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully!');
-    }
 
     public function archive(Product $product)
     {

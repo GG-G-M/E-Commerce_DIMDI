@@ -68,62 +68,68 @@
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Product Management</h1>
-        <p class="text-muted mb-0">Manage your products, categories, and inventory here.</p>
+        <p class="text-muted mb-0">Manage your products and organize them by category.</p>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+    <button type="button" class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#productModal"
+        data-mode="create"
+        data-action="{{ route('admin.products.store') }}">
         <i class="fas fa-plus me-1"></i> Add Product
-    </a>
+    </button>
 </div>
 
 <!-- Filters and Search -->
 <div class="card card-custom mb-4">
     <div class="card-header card-header-custom">
-        <i class="fas fa-filter me-2"></i> Product Filters
+        <i class="fas fa-filter me-2"></i> Filters
     </div>
     <div class="card-body">
         <form method="GET" action="{{ route('admin.products.index') }}">
             <div class="row">
+                <!-- Search -->
                 <div class="col-md-4">
                     <div class="mb-3">
                         <label for="search" class="form-label fw-bold">Search Products</label>
                         <input type="text" class="form-control" id="search" name="search" 
-                            value="{{ request('search') }}" placeholder="Search by name, description, or SKU...">
+                            value="{{ request('search') }}" placeholder="Search by name">
                     </div>
                 </div>
-                <div class="col-md-3">
+
+                <!-- Category Filter -->
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label for="category_id" class="form-label fw-bold">Filter by Category</label>
                         <select class="form-select" id="category_id" name="category_id">
                             <option value="">All Categories</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" 
+                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
                 </div>
+
+                <!-- Status Filter -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
-                            @foreach($statuses as $key => $label)
-                                <option value="{{ $key }}" {{ request('status', 'active') == $key ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
+                            <option value="">All Status</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check me-1"></i> Apply
-                            </button>
-                        </div>
-                    </div>
+
+                <!-- Search Button -->
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>
+                    </button>
                 </div>
             </div>
         </form>
@@ -136,83 +142,66 @@
         <i class="fas fa-boxes me-2"></i> Product List
     </div>
     <div class="card-body">
+        @if($products->count())
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th>Image</th>
                         <th>Name</th>
+                        {{-- <th>Slug</th> --}}
                         <th>Category</th>
-                        <th>Sizes</th>
-                        <th>Price</th>
-                        <th>Stock</th>
+                        <th>Featured</th>
                         <th>Status</th>
+                        <th>Archived</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($products as $product)
                     <tr>
+                        <td><strong>{{ $product->name }}</strong></td>
+                        {{-- <td>{{ $product->slug }}</td> --}}
+                        <td>{{ $product->category->name ?? '—' }}</td>
                         <td>
-                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
-                                 class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
-                        </td>
-                        <td>
-                            <strong>{{ $product->name }}</strong><br>
-                            <small class="text-muted">SKU: {{ $product->sku }}</small>
-                        </td>
-                        <td>
-                            {{ $product->category->name }}
-                            @if(!$product->category->is_active)
-                                <span class="badge bg-warning ms-1">Inactive</span>
+                            @if($product->is_featured)
+                                <span class="badge bg-info">Yes</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
                             @endif
                         </td>
                         <td>
-                            @foreach($product->available_sizes as $size)
-                                <span class="badge bg-secondary me-1">{{ $size }}</span>
-                            @endforeach
-                        </td>
-                        <td>${{ number_format($product->price, 2) }}</td>
-                        <td>
-                            <span class="badge bg-{{ $product->stock_quantity > 10 ? 'success' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
-                                {{ $product->stock_quantity }}
-                            </span>
+                            @if($product->is_active)
+                                <span class="badge bg-success">Active</span>
+                            @else
+                                <span class="badge bg-danger">Inactive</span>
+                            @endif
                         </td>
                         <td>
                             @if($product->is_archived)
                                 <span class="badge bg-dark">Archived</span>
                             @else
-                                @if($product->is_effectively_inactive)
-                                    <span class="badge bg-danger">Inactive</span>
-                                @else
-                                    <span class="badge bg-success">Active</span>
-                                @endif
-                                @if($product->is_featured)
-                                    <span class="badge bg-info mt-1">Featured</span>
-                                @endif
+                                <span class="badge bg-light text-muted">—</span>
                             @endif
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-success me-1">
+                            <button type="button"
+                                class="btn btn-sm btn-outline-success"
+                                data-bs-toggle="modal"
+                                data-bs-target="#productModal"
+                                data-mode="edit"
+                                data-action="{{ route('admin.products.update', $product->id) }}"
+                                data-product='@json($product)'>
                                 <i class="fas fa-edit"></i>
-                            </a>
-                            @if($product->is_archived)
-                                <form action="{{ route('admin.products.unarchive', $product) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-success"
-                                            onclick="return confirm('Are you sure you want to unarchive this product?')">
-                                        <i class="fas fa-box-open"></i>
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('admin.products.archive', $product) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-warning"
-                                            onclick="return confirm('Are you sure you want to archive this product?')">
-                                        <i class="fas fa-archive"></i>
-                                    </button>
-                                </form>
-                            @endif
+                            </button>
+
+                            <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Are you sure you want to delete this product?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach
@@ -223,6 +212,132 @@
         <div class="d-flex justify-content-center mt-3">
             {{ $products->links() }}
         </div>
+        @else
+        <div class="text-center py-5">
+            <i class="fas fa-box-open fa-3x text-success mb-3"></i>
+            <p class="text-muted mb-0">No products found. Try adding one!</p>
+        </div>
+        @endif
     </div>
 </div>
+
+<!-- Single Modal for Create/Edit -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="productForm" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        {{-- <div class="col-md-6">
+                            <label class="form-label fw-bold">Slug</label>
+                            <input type="text" class="form-control" id="slug" name="slug">
+                        </div> --}}
+
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Category</label>
+                            <select class="form-select" id="category_id" name="category_id" required>
+                                <option value="">Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Featured</label>
+                            <select class="form-select" id="is_featured" name="is_featured">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Active</label>
+                            <select class="form-select" id="is_active" name="is_active">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveProductBtn">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const productModal = document.getElementById('productModal');
+    const form = document.getElementById('productForm');
+    const modalTitle = document.getElementById('productModalLabel');
+    const saveBtn = document.getElementById('saveProductBtn');
+
+    productModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const mode = button.dataset.mode;
+
+        // Reset form before showing modal
+        form.reset();
+        const existingMethod = form.querySelector('input[name="_method"]');
+        if (existingMethod) existingMethod.remove();
+
+        if (mode === 'create') {
+            modalTitle.textContent = 'Add Product';
+            saveBtn.textContent = 'Save';
+            form.action = button.dataset.action;
+            form.method = 'POST';
+        } else if (mode === 'edit') {
+            const product = JSON.parse(button.dataset.product);
+            modalTitle.textContent = 'Edit Product';
+            saveBtn.textContent = 'Update';
+            form.action = button.dataset.action;
+            form.method = 'POST';
+
+            // Add PUT method
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'PUT';
+            form.appendChild(methodInput);
+
+            // Fill inputs
+            document.getElementById('name').value = product.name;
+            // document.getElementById('slug').value = product.slug;
+            document.getElementById('description').value = product.description ?? '';
+            document.getElementById('category_id').value = product.category_id ?? '';
+            document.getElementById('is_featured').value = product.is_featured ? 1 : 0;
+            document.getElementById('is_active').value = product.is_active ? 1 : 0;
+        }
+    });
+});
+</script>
+@endpush
+
+
+
+
 @endsection
+
+
