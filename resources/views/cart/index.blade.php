@@ -90,12 +90,16 @@
             @if($cartItems->count() > 0)
                 @foreach($cartItems as $item)
                 @php
+                // Check if product has variants
+                $hasVariants = $item->product->has_variants && $item->product->variants->count() > 0;
+                
+                if ($hasVariants) {
                     // Get the actual variant for this cart item
                     $currentVariant = $item->product->variants->first(function($variant) use ($item) {
                         return ($variant->size === $item->selected_size) || ($variant->variant_name === $item->selected_size);
                     });
                     
-                    $currentStock = $currentVariant ? $currentVariant->stock_quantity : $item->product->stock_quantity;
+                    $currentStock = $currentVariant ? $currentVariant->stock_quantity : 0;
                     $variantName = $currentVariant ? ($currentVariant->size ?? $currentVariant->variant_name) : $item->selected_size;
                     $isVariantAvailable = $currentVariant && $currentStock > 0;
                     $maxQuantity = $currentStock;
@@ -105,8 +109,19 @@
                     
                     // Calculate price based on actual variant
                     $unitPrice = $currentVariant ? $currentVariant->current_price : $item->product->current_price;
-                    $itemTotalPrice = $unitPrice * $item->quantity;
-                @endphp
+                } else {
+                    // For products without variants, use product's own stock and price
+                    $currentVariant = null;
+                    $currentStock = $item->product->stock_quantity;
+                    $variantName = 'Standard';
+                    $isVariantAvailable = $currentStock > 0;
+                    $maxQuantity = $currentStock;
+                    $displayImage = $item->product->image_url;
+                    $unitPrice = $item->product->current_price;
+                }
+                
+                $itemTotalPrice = $unitPrice * $item->quantity;
+            @endphp
                 
                 <div class="cart-item position-relative" id="cart-item-{{ $item->id }}">
                     <div class="loading-spinner" id="loading-{{ $item->id }}">
@@ -154,19 +169,26 @@
                                 </select>
                             </form>
                             @else
-                            <span class="badge bg-light text-dark">Option: {{ $variantName }}</span>
+                            <span class="badge bg-light text-dark">{{ $variantName }}</span>
                             @endif
                             
                             <!-- Stock Warning -->
                             @if(!$isVariantAvailable)
                             <div class="alert alert-warning py-1 mt-2 small" role="alert">
                                 <i class="fas fa-exclamation-triangle me-1"></i>
+                                @if($hasVariants)
                                 Selected option is out of stock
+                                @else
+                                This product is out of stock
+                                @endif
                             </div>
                             @elseif($currentStock < $item->quantity)
                             <div class="alert alert-warning py-1 mt-2 small" role="alert">
                                 <i class="fas fa-exclamation-triangle me-1"></i>
-                                Only {{ $currentStock }} available in this option
+                                Only {{ $currentStock }} available
+                                @if($hasVariants)
+                                in this option
+                                @endif
                             </div>
                             @endif
                         </div>
@@ -278,10 +300,18 @@
                 <!-- Check if any items are out of stock -->
                 @php
                     $outOfStockItems = $cartItems->filter(function($item) {
-                        $variant = $item->product->variants->first(function($v) use ($item) {
-                            return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
-                        });
-                        return !$variant || ($variant->stock_quantity ?? 0) <= 0;
+                        $hasVariants = $item->product->has_variants && $item->product->variants->count() > 0;
+                        
+                        if ($hasVariants) {
+                            // For products with variants, check the selected variant's stock
+                            $variant = $item->product->variants->first(function($v) use ($item) {
+                                return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
+                            });
+                            return !$variant || ($variant->stock_quantity ?? 0) <= 0;
+                        } else {
+                            // For products without variants, check the product's stock
+                            return ($item->product->stock_quantity ?? 0) <= 0;
+                        }
                     });
                 @endphp
 

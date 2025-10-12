@@ -291,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update selected variant value
                 variantInput.value = this.value;
                 
+                
                 // Update image with smooth transition
                 if (variantImage && variantImage !== mainImage.src) {
                     mainImage.classList.add('image-loading');
@@ -310,21 +311,31 @@ document.addEventListener('DOMContentLoaded', function() {
                         productOriginalPrice.style.display = 'inline';
                     }
                     
-                    // Update or create discount badge
-                    let discountBadge = document.querySelector('.badge.bg-danger');
-                    if (!discountBadge) {
-                        discountBadge = document.createElement('span');
-                        discountBadge.className = 'badge bg-danger ms-2';
-                        productPrice.parentNode.appendChild(discountBadge);
+                // Update image discount badge (the one in position-absolute)
+                let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                if (hasDiscount) {
+                    if (!imageDiscountBadge) {
+                        imageDiscountBadge = document.createElement('span');
+                        imageDiscountBadge.className = 'badge bg-danger fs-6';
+                        document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
                     }
-                    discountBadge.textContent = discountPercent + '% OFF';
-                } else {
-                    productPrice.textContent = '$' + parseFloat(variantPrice).toFixed(2);
-                    productPrice.className = 'h3 text-success fw-bold';
-                    
-                    if (productOriginalPrice) {
-                        productOriginalPrice.style.display = 'none';
+                    imageDiscountBadge.textContent = discountPercent + '% OFF';
+                } else if (imageDiscountBadge) {
+                    imageDiscountBadge.remove();
+                }
+
+                // Update price discount badge (the one next to price)
+                let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                if (hasDiscount) {
+                    if (!priceDiscountBadge) {
+                        priceDiscountBadge = document.createElement('span');
+                        priceDiscountBadge.className = 'badge bg-danger ms-2';
+                        productPrice.parentNode.appendChild(priceDiscountBadge);
                     }
+                    priceDiscountBadge.textContent = discountPercent + '% OFF';
+                } else if (priceDiscountBadge) {
+                    priceDiscountBadge.remove();
+                }
                     
                     // Remove discount badge if exists
                     const discountBadge = document.querySelector('.badge.bg-danger');
@@ -332,6 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         discountBadge.remove();
                     }
                 }
+                
                 
                 // Update selected style
                 document.querySelectorAll('.variant-option').forEach(option => {
@@ -341,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update add to cart button state
                 updateAddToCartButton();
+                
             }
         });
     });
@@ -387,11 +400,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const submitBtn = this.querySelector('.add-to-cart-btn');
             const originalText = submitBtn.innerHTML;
             
-            // Validate variant selection
-            const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-            if (!selectedVariant || selectedVariant.disabled) {
-                showToast('Please select an available option before adding to cart.', 'warning');
-                return;
+            // Validate variant selection only if product has variants
+            if (variantRadios.length > 0) {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                if (!selectedVariant || selectedVariant.disabled) {
+                    showToast('Please select an available option before adding to cart.', 'warning');
+                    return;
+                }
             }
             
             // Show loading state

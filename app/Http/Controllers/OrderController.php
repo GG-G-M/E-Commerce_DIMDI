@@ -191,55 +191,53 @@ class OrderController extends Controller
         }
     }
 
-    public function cancel(Request $request, Order $order)
+    public function cancel(Order $order, Request $request)
     {
-        // Authorization check
-        $this->authorizeOrderView($order);
+        // Authorization - ensure customer can only cancel their own orders
+        if ($order->user_id !== auth()->id()) {
+            return redirect()->back()->with('error', 'Unauthorized action.');
+        }
 
-        if (!$order->canBeCancelled()) {
-            return redirect()->back()->with('error', 'This order cannot be cancelled.');
+        // Check if order can be cancelled
+        if (!in_array($order->order_status, ['pending', 'confirmed', 'processing'])) {
+            return redirect()->back()->with('error', 'Order cannot be cancelled at this stage.');
         }
 
         $request->validate([
-            'cancellation_reason' => 'required|string|max:500'
+            'cancellation_reason' => 'required|string|min:5|max:500'
         ]);
 
-        $order->update([
-            'order_status' => 'cancelled',
-            'cancellation_reason' => $request->cancellation_reason,
-            'cancelled_at' => now()
-        ]);
+        // Use the same updateStatus method that admin uses
+        $order->updateStatus('cancelled', $request->cancellation_reason);
 
-        // Restore product stock - FIXED VERSION
+        // Eager load items with product and variants relationships
+        $order->load(['items.product.variants']);
+
+        // Restore stock quantities
         foreach ($order->items as $item) {
-            $product = $item->product;
-            
-            if ($product) {
-                // Check if product has variants
-                if ($product->has_variants && $item->selected_size) {
-                    // Find the specific variant that was ordered
-                    $variant = $product->variants->first(function($v) use ($item) {
-                        return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
-                    });
+            if ($item->product) {
+                if ($item->product->has_variants && $item->selected_size) {
+                    // Find and update variant stock
+                    $variant = $item->product->variants
+                        ->where('size', $item->selected_size)
+                        ->orWhere('variant_name', $item->selected_size)
+                        ->first();
                     
                     if ($variant) {
-                        // Restore variant stock
-                        $variant->increment('stock_quantity', $item->quantity);
-                    } else {
-                        // Fallback: restore main product stock if variant not found
-                        $product->increment('stock_quantity', $item->quantity);
+                        $variant->stock_quantity += $item->quantity;
+                        $variant->save();
                     }
                 } else {
-                    // For products without variants, restore main product stock
-                    $product->increment('stock_quantity', $item->quantity);
+                    // Update product stock
+                    $item->product->stock_quantity += $item->quantity;
+                    $item->product->save();
                 }
             }
         }
 
-        return redirect()->route('orders.show', $order)
-            ->with('success', 'Order has been cancelled successfully.');
+        return redirect()->back()->with('success', 'Order has been cancelled successfully.');
     }
-
+    
     private function authorizeOrderView(Order $order)
     {
         if (Auth::check()) {

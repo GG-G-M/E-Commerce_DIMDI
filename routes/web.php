@@ -49,8 +49,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    Route::post('/orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status')->middleware('auth');
-
 });
 
 // Admin Routes
