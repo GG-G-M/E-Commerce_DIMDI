@@ -9,15 +9,15 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('cancellation_reason')->nullable()->after('order_status');
-            $table->timestamp('cancelled_at')->nullable()->after('cancellation_reason');
+            $table->timestamp('delivered_at')->nullable()->after('cancelled_at');
+            $table->json('status_history')->nullable()->after('notes');
         });
     }
 
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['cancellation_reason', 'cancelled_at']);
+            $table->dropColumn(['delivered_at', 'status_history']);
         });
     }
 };

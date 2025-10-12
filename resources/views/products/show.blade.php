@@ -50,19 +50,34 @@
     .product-image {
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        transition: opacity 0.3s ease;
     }
-    .form-check-label.btn {
+    .variant-option {
         border-radius: 8px;
-        border: 1px solid #2C8F0C;
-        color: #2C8F0C;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        margin: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-    .form-check-input:checked + .form-check-label {
-        background-color: #2C8F0C;
-        color: white;
+    .variant-option:hover {
+        border-color: #2C8F0C;
+    }
+    .variant-option.selected {
+        border-color: #2C8F0C;
+        background-color: #E8F5E6;
+    }
+    .variant-option.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: #f8f9fa;
     }
     .breadcrumb-item.active {
         color: #25750A;
         font-weight: 600;
+    }
+    .image-loading {
+        opacity: 0.7;
     }
 </style>
 
@@ -77,7 +92,18 @@
 
     <div class="row">
         <div class="col-lg-6 mb-4">
-            <img src="{{ $product->image_url }}" class="img-fluid rounded shadow-sm" alt="{{ $product->name }}">
+            <div class="position-relative">
+                <img src="{{ $product->image_url }}" 
+                     class="img-fluid rounded shadow-sm product-main-image" 
+                     alt="{{ $product->name }}"
+                     id="product-main-image"
+                     style="width: 100%; height: 400px; object-fit: cover;">
+                <div class="position-absolute top-0 start-0 mt-2 ms-2">
+                    @if($product->has_discount)
+                    <span class="badge bg-danger fs-6">{{ $product->discount_percentage }}% OFF</span>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-6">
@@ -86,35 +112,63 @@
             
             <div class="mb-3">
                 @if($product->has_discount)
-                    <span class="h3 text-danger me-2">${{ $product->sale_price }}</span>
-                    <span class="h5 text-muted text-decoration-line-through">${{ $product->price }}</span>
+                    <span class="h3 text-danger me-2" id="product-price">${{ number_format($product->sale_price, 2) }}</span>
+                    <span class="h5 text-muted text-decoration-line-through" id="product-original-price">${{ number_format($product->price, 2) }}</span>
                     <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
                 @else
-                    <span class="h3 text-success fw-bold">${{ $product->price }}</span>
+                    <span class="h3 text-success fw-bold" id="product-price">${{ number_format($product->price, 2) }}</span>
                 @endif
             </div>
 
             <p class="mb-4">{{ $product->description }}</p>
 
-            <!-- Size Selection -->
-            @if($product->all_sizes && count($product->all_sizes) > 0)
+            <!-- Variant Selection -->
+            @if($product->has_variants && $product->variants->count() > 0)
             <div class="mb-4">
-                <label class="form-label fw-bold text-success">Select Size:</label>
+                <label class="form-label fw-bold text-success">Select Option:</label>
                 <div class="d-flex flex-wrap gap-2">
-                    @foreach($product->all_sizes as $size)
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="selected_size" id="size_{{ $size }}" value="{{ $size }}" 
-                               {{ $loop->first && $product->isSizeInStock($size) ? 'checked' : '' }}
-                               {{ !$product->isSizeInStock($size) ? 'disabled' : '' }}>
-                        <label class="form-check-label btn" for="size_{{ $size }}">
-                            {{ $size }}
-                            @if(!$product->isSizeInStock($size))
-                            <small class="d-block text-muted">(Out of Stock)</small>
-                            @elseif($product->getStockForSize($size) < 10)
-                            <small class="d-block text-warning">(Only {{ $product->getStockForSize($size) }} left)</small>
-                            @endif
-                        </label>
-                    </div>
+                    @foreach($product->variants as $variant)
+                        @php
+                            $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                            $variantPrice = $variant->current_price;
+                            $variantStock = $variant->stock_quantity ?? 0;
+                            $isInStock = $variantStock > 0;
+                            $isFirstInStock = $loop->first && $isInStock;
+                            $hasVariantDiscount = !is_null($variant->sale_price) && $variant->sale_price < $variant->price;
+                            $variantDiscountPercent = $hasVariantDiscount ? round((($variant->price - $variant->sale_price) / $variant->price) * 100) : 0;
+                        @endphp
+                        <div class="form-check p-0">
+                            <input class="form-check-input d-none" type="radio" name="selected_variant" 
+                                   id="variant_{{ $loop->index }}" value="{{ $variantName }}"
+                                   data-variant-id="{{ $variant->id }}"
+                                   data-variant-image="{{ $variant->image_url }}"
+                                   data-variant-price="{{ $variantPrice }}"
+                                   data-variant-original-price="{{ $variant->price }}"
+                                   data-variant-has-discount="{{ $hasVariantDiscount ? 'true' : 'false' }}"
+                                   data-variant-discount-percent="{{ $variantDiscountPercent }}"
+                                   {{ $isFirstInStock ? 'checked' : '' }}
+                                   {{ !$isInStock ? 'disabled' : '' }}>
+                            <label class="form-check-label variant-option {{ $isFirstInStock ? 'selected' : '' }} {{ !$isInStock ? 'disabled' : '' }}" 
+                                   for="variant_{{ $loop->index }}">
+                                <div class="text-center">
+                                    <div class="fw-semibold">{{ $variantName }}</div>
+                                    
+                                    @if($hasVariantDiscount)
+                                        <div class="text-danger fw-bold">${{ number_format($variant->sale_price, 2) }}</div>
+                                        <div class="text-muted text-decoration-line-through small">${{ number_format($variant->price, 2) }}</div>
+                                        <span class="badge bg-danger small">{{ $variantDiscountPercent }}% OFF</span>
+                                    @else
+                                        <div class="text-success fw-bold">${{ number_format($variant->price, 2) }}</div>
+                                    @endif
+                                    
+                                    @if(!$isInStock)
+                                    <small class="text-danger">Out of Stock</small>
+                                    @else
+                                    <small class="text-muted">{{ $variantStock }} available</small>
+                                    @endif
+                                </div>
+                            </label>
+                        </div>
                     @endforeach
                 </div>
             </div>
@@ -131,10 +185,12 @@
             <form action="{{ route('cart.store') }}" method="POST" class="mb-4" id="add-to-cart-form">
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="quantity" value="1">
-                <input type="hidden" name="selected_size" id="selected_size_input" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
+                <input type="hidden" name="quantity" value="1" id="quantity-input">
+                <input type="hidden" name="selected_size" id="selected_variant_input" 
+                       value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
+
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-primary btn-lg add-to-cart-btn" id="add-to-cart-btn">
                         <i class="fas fa-cart-plus me-2"></i>Add to Cart
                     </button>
                 </div>
@@ -150,12 +206,16 @@
                         <li><strong>SKU:</strong> {{ $product->sku }}</li>
                         <li><strong>Category:</strong> {{ $product->category->name }}</li>
                         <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
-                        @if($product->all_sizes && count($product->all_sizes) > 0)
-                        <li><strong>Available Sizes:</strong> 
-                            @foreach($product->all_sizes as $size)
-                            <span class="badge bg-{{ $product->isSizeInStock($size) ? 'primary' : 'secondary' }}">
-                                {{ $size }} ({{ $product->getStockForSize($size) }})
-                            </span>
+                        @if($product->has_variants && $product->variants->count() > 0)
+                        <li><strong>Available Options:</strong> 
+                            @foreach($product->variants as $variant)
+                                @php
+                                    $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                    $variantStock = $variant->stock_quantity ?? 0;
+                                @endphp
+                                <span class="badge bg-{{ $variantStock > 0 ? 'primary' : 'secondary' }} me-1">
+                                    {{ $variantName }} ({{ $variantStock }})
+                                </span>
                             @endforeach
                         </li>
                         @endif
@@ -177,12 +237,17 @@
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
                         
-                        @if($relatedProduct->all_sizes && count($relatedProduct->all_sizes) > 0)
+                        <!-- Display Available Variants -->
+                        @if($relatedProduct->has_variants && $relatedProduct->variants->count() > 0)
                         <div class="mb-2">
-                            <small class="text-muted">Sizes: 
-                                @foreach($relatedProduct->all_sizes as $size)
-                                    <span class="badge bg-light text-dark border me-1 {{ !$relatedProduct->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
-                                        {{ $size }}
+                            <small class="text-muted">Options: 
+                                @foreach($relatedProduct->variants as $variant)
+                                    @php
+                                        $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                        $variantStock = $variant->stock_quantity ?? 0;
+                                    @endphp
+                                    <span class="badge bg-light text-dark border me-1 {{ $variantStock <= 0 ? 'text-decoration-line-through text-muted' : '' }}">
+                                        {{ $variantName }}
                                     </span>
                                 @endforeach
                             </small>
@@ -207,33 +272,245 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.add-to-cart-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const sizeSelect = this.querySelector('select[name="selected_size"]');
-            const sizeInput = this.querySelector('input[name="selected_size"]');
-            if (sizeSelect && !sizeSelect.value) {
-                e.preventDefault();
-                alert('Please select a size before adding to cart.');
-                sizeSelect.focus();
-                return;
+    const mainImage = document.getElementById('product-main-image');
+    const productPrice = document.getElementById('product-price');
+    const productOriginalPrice = document.getElementById('product-original-price');
+    const variantInput = document.getElementById('selected_variant_input');
+    const variantRadios = document.querySelectorAll('input[name="selected_variant"]');
+    
+    // Update selected variant when user clicks on a variant option
+    variantRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (!this.disabled) {
+                const variantImage = this.getAttribute('data-variant-image');
+                const variantPrice = this.getAttribute('data-variant-price');
+                const variantOriginalPrice = this.getAttribute('data-variant-original-price');
+                const hasDiscount = this.getAttribute('data-variant-has-discount') === 'true';
+                const discountPercent = this.getAttribute('data-variant-discount-percent');
+                
+                // Update selected variant value
+                variantInput.value = this.value;
+                
+                
+                // Update image with smooth transition
+                if (variantImage && variantImage !== mainImage.src) {
+                    mainImage.classList.add('image-loading');
+                    setTimeout(() => {
+                        mainImage.src = variantImage;
+                        mainImage.classList.remove('image-loading');
+                    }, 150);
+                }
+                
+                // Update price display
+                if (hasDiscount) {
+                    productPrice.textContent = '$' + parseFloat(variantPrice).toFixed(2);
+                    productPrice.className = 'h3 text-danger me-2';
+                    
+                    if (productOriginalPrice) {
+                        productOriginalPrice.textContent = '$' + parseFloat(variantOriginalPrice).toFixed(2);
+                        productOriginalPrice.style.display = 'inline';
+                    }
+                    
+                // Update image discount badge (the one in position-absolute)
+                let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                if (hasDiscount) {
+                    if (!imageDiscountBadge) {
+                        imageDiscountBadge = document.createElement('span');
+                        imageDiscountBadge.className = 'badge bg-danger fs-6';
+                        document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
+                    }
+                    imageDiscountBadge.textContent = discountPercent + '% OFF';
+                } else if (imageDiscountBadge) {
+                    imageDiscountBadge.remove();
+                }
+
+                // Update price discount badge (the one next to price)
+                let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                if (hasDiscount) {
+                    if (!priceDiscountBadge) {
+                        priceDiscountBadge = document.createElement('span');
+                        priceDiscountBadge.className = 'badge bg-danger ms-2';
+                        productPrice.parentNode.appendChild(priceDiscountBadge);
+                    }
+                    priceDiscountBadge.textContent = discountPercent + '% OFF';
+                } else if (priceDiscountBadge) {
+                    priceDiscountBadge.remove();
+                }
+                    
+                    // Remove discount badge if exists
+                    const discountBadge = document.querySelector('.badge.bg-danger');
+                    if (discountBadge && !discountBadge.closest('.position-absolute')) {
+                        discountBadge.remove();
+                    }
+                }
+                
+                
+                // Update selected style
+                document.querySelectorAll('.variant-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                this.closest('.form-check').querySelector('.variant-option').classList.add('selected');
+                
+                // Update add to cart button state
+                updateAddToCartButton();
+                
             }
-            if (!sizeInput && !sizeSelect) {
-                const selectedSize = document.querySelector('input[name="selected_size"]:checked');
-                if (!selectedSize || selectedSize.disabled) {
-                    e.preventDefault();
-                    alert('Please select an available size.');
+        });
+    });
+
+    // Add click handler for variant options
+    document.querySelectorAll('.variant-option:not(.disabled)').forEach(option => {
+        option.addEventListener('click', function() {
+            const radio = this.closest('.form-check').querySelector('input[type="radio"]');
+            if (!radio.disabled) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+
+    function updateAddToCartButton() {
+        const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        
+        if (selectedVariant && selectedVariant.disabled) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerHTML = '<i class="fas fa-times me-2"></i>Out of Stock';
+            addToCartBtn.classList.remove('btn-primary');
+            addToCartBtn.classList.add('btn-secondary');
+        } else {
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
+            addToCartBtn.classList.remove('btn-secondary');
+            addToCartBtn.classList.add('btn-primary');
+        }
+    }
+
+    // Initialize button state
+    updateAddToCartButton();
+
+    // Add to cart form handling
+    const addToCartForm = document.getElementById('add-to-cart-form');
+    
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('.add-to-cart-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validate variant selection only if product has variants
+            if (variantRadios.length > 0) {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                if (!selectedVariant || selectedVariant.disabled) {
+                    showToast('Please select an available option before adding to cart.', 'warning');
                     return;
                 }
             }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding to Cart...';
+            
+            // Submit via AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast('Product added to cart successfully! 🎉', 'success');
+                    if (data.cart_count !== undefined) {
+                        updateCartCount(data.cart_count);
+                    }
+                } else {
+                    showToast(data.message || 'Error adding product to cart.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                showToast('Unable to add product to cart. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
         });
-    });
-    document.querySelectorAll('input[name="selected_size"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (!this.disabled) {
-                document.getElementById('selected_size_input').value = this.value;
+    }
+    
+    // Upper middle toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
             }
+        }, 3000);
+    }
+    
+    // Update cart count
+    function updateCartCount(count) {
+        const cartCountElements = document.querySelectorAll('.cart-count, .cart-badge');
+        cartCountElements.forEach(element => {
+            element.textContent = count;
+            element.style.display = count > 0 ? 'inline-block' : 'none';
         });
-    });
+    }
 });
 </script>
 @endpush

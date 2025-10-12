@@ -1,14 +1,5 @@
 @extends('layouts.app') 
 @section('content')
-{{-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIMDI - Premium Appliances & Furniture</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> --}}
     <style>
         :root {
             --primary-green: #2C8F0C;
@@ -454,7 +445,7 @@
         <div class="row">
             @foreach($featuredProducts as $product)
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card product-card h-100 shadow">
+                <div class="card product-card h-100">
                     @if($product->has_discount)
                     <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
                     @endif
@@ -462,22 +453,6 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                        
-                        <!-- Display Available Sizes -->
-                        @if($product->all_sizes && count($product->all_sizes) > 0)
-                        <div class="mb-2">
-                            <small class="text-muted">Sizes: 
-                                @foreach($product->all_sizes as $size)
-                                    <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
-                                        {{ $size }}
-                                        @if(!$product->isSizeInStock($size))
-                                        (OOS)
-                                        @endif
-                                    </span>
-                                @endforeach
-                            </small>
-                        </div>
-                        @endif
                         
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -495,23 +470,34 @@
                                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                                 <input type="hidden" name="quantity" value="1">
                                 
-                                <!-- Size Selection for Home Page -->
-                                @if($product->all_sizes && count($product->all_sizes) > 1)
+                                <!-- Variant Selection -->
+                                @if($product->has_variants && $product->variants->count() > 0)
                                 <div class="mb-2">
                                     <select name="selected_size" class="form-select form-select-sm" required>
-                                        <option value="">Select Size</option>
-                                        @foreach($product->all_sizes as $size)
-                                        <option value="{{ $size }}" {{ $product->isSizeInStock($size) ? '' : 'disabled' }}>
-                                            {{ $size }} {{ !$product->isSizeInStock($size) ? '(Out of Stock)' : '' }}
-                                        </option>
+                                        <option value="">Select Option</option>
+                                        @foreach($product->variants as $variant)
+                                            @php
+                                                $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                                $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
+                                                $variantStock = $variant->stock_quantity ?? 0;
+                                                $isInStock = $variantStock > 0;
+                                            @endphp
+                                            <option value="{{ $variantName }}" {{ !$isInStock ? 'disabled' : '' }}>
+                                                {{ $variantName }} 
+                                                @if(!$isInStock)
+                                                (Out of Stock)
+                                                @else
+                                                - ${{ number_format($variantPrice, 2) }}
+                                                @endif
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 @else
-                                <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
+                                <input type="hidden" name="selected_size" value="Standard">
                                 @endif
                                 
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button type="submit" class="btn btn-primary w-100 add-to-cart-btn">
                                     <i class="fas fa-cart-plus me-2"></i>Add to Cart
                                 </button>
                             </form>
@@ -717,34 +703,135 @@
         </section>
     </main>
 
-    <script>
-        // Add subtle animations to elements when they come into view
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate elements on scroll
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart form handling
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('.add-to-cart-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validate variant selection
+            const sizeSelect = this.querySelector('select[name="selected_size"]');
+            if (sizeSelect && !sizeSelect.value) {
+                showToast('Please select an option before adding to cart.', 'warning');
+                sizeSelect.focus();
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+            
+            // Submit via AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast('Product added to cart successfully! ', 'success');
+                    if (data.cart_count !== undefined) {
+                        updateCartCount(data.cart_count);
                     }
-                });
-            }, observerOptions);
-            
-            // Observe elements to animate
-            const elementsToAnimate = document.querySelectorAll('.product-card, .feature-card, .testimonial-card');
-            elementsToAnimate.forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
-                el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                observer.observe(el);
+                } else {
+                    showToast(data.message || 'Error adding product to cart.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                showToast('Unable to add product to cart. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             });
         });
-    </script>
+    });
+    
+    // Upper middle toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                // Add fade out animation
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+    
+    // Update cart count
+    function updateCartCount(count) {
+        const cartCountElements = document.querySelectorAll('.cart-count, .cart-badge');
+        cartCountElements.forEach(element => {
+            element.textContent = count;
+            element.style.display = count > 0 ? 'inline-block' : 'none';
+        });
+    }
+});
+</script>
 @endsection
-{{-- </body>
-</html> --}}

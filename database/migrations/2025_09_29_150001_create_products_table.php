@@ -19,8 +19,10 @@ return new class extends Migration
             $table->string('sku')->unique();
             $table->string('image')->nullable();
             $table->json('gallery')->nullable();
+            $table->json('sizes')->nullable();
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_archived')->default(false);
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

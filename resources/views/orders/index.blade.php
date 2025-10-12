@@ -27,20 +27,12 @@
                             <td>{{ $order->customer_name }}</td>
                             <td>${{ number_format($order->total_amount, 2) }}</td>
                             <td>
-                                @if($order->order_status == 'cancelled')
-                                    <span class="badge bg-danger">Cancelled</span>
-                                @elseif($order->order_status == 'completed')
-                                    <span class="badge bg-success">Completed</span>
-                                @elseif($order->order_status == 'delivered')
-                                    <span class="badge bg-success">Delivered</span>
-                                @elseif($order->order_status == 'shipped')
-                                    <span class="badge bg-info">Shipped</span>
-                                @elseif($order->order_status == 'processing')
-                                    <span class="badge bg-primary">Processing</span>
-                                @elseif($order->order_status == 'confirmed')
-                                    <span class="badge bg-secondary">Confirmed</span>
-                                @else
-                                    <span class="badge bg-warning">Pending</span>
+                                <span class="badge bg-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'cancelled' ? 'danger' : ($order->order_status === 'shipped' ? 'primary' : 'warning')) }}">
+                                    {{ ucfirst($order->order_status) }}
+                                </span>
+                                @if($order->is_delivered)
+                                <br>
+                                <small class="text-muted">Delivered: {{ $order->delivered_at->format('M j, Y') }}</small>
                                 @endif
                             </td>
                             <td>

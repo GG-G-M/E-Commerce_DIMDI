@@ -143,7 +143,7 @@
                         <th>Image</th>
                         <th>Name</th>
                         <th>Category</th>
-                        <th>Sizes</th>
+                        <th>Variants</th>
                         <th>Price</th>
                         <th>Stock</th>
                         <th>Status</th>
@@ -153,6 +153,7 @@
                 <tbody>
                     @foreach($products as $product)
                     <tr>
+                        
                         <td>
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
                                  class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
@@ -168,9 +169,18 @@
                             @endif
                         </td>
                         <td>
-                            @foreach($product->available_sizes as $size)
-                                <span class="badge bg-secondary me-1">{{ $size }}</span>
-                            @endforeach
+                            @if($product->has_variants && $product->variants && $product->variants->count() > 0)
+                                @foreach($product->variants->take(3) as $variant)
+                                    <span class="badge bg-secondary me-1 mb-1" title="{{ $variant->variant_description }}">
+                                        {{ $variant->variant_name }}
+                                    </span>
+                                @endforeach
+                                @if($product->variants->count() > 3)
+                                    <span class="badge bg-light text-dark">+{{ $product->variants->count() - 3 }} more</span>
+                                @endif
+                            @else
+                                <span class="badge bg-secondary">No Variants</span>
+                            @endif
                         </td>
                         <td>${{ number_format($product->price, 2) }}</td>
                         <td>
