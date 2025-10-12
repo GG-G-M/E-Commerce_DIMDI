@@ -243,8 +243,7 @@
 </style>
 
 <!-- No Products Found Modal -->
-<div class="modal fade no-products-modal" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal fade no-products-modal" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel" aria-hidden="true">    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="noProductsModalLabel">
@@ -393,66 +392,90 @@
                 <div class="row">
     @foreach($products as $product)
     <div class="col-lg-3 col-md-6 mb-4">
-        <div class="card product-card h-100 shadow-sm">
-            @if($product->has_discount)
-            <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
+    <div class="card product-card h-100 shadow-sm">
+        @if($product->has_discount)
+        <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
+        @endif
+        
+        <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+        
+        <div class="card-body d-flex flex-column">
+            <h6 class="card-title">{{ $product->name }}</h6>
+            <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+            
+            <!-- Display Available Variants (View Only) -->
+            @if($product->has_variants && $product->variants->count() > 0)
+            <div class="mb-2">
+                <small class="text-muted">Available Options:</small>
+                <div class="mt-1">
+                    @foreach($product->variants as $variant)
+                        @php
+                            $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                            $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
+                            $variantStock = $variant->stock_quantity ?? 0;
+                            $isInStock = $variantStock > 0;
+                        @endphp
+                        <span class="badge {{ $isInStock ? 'bg-light text-dark border' : 'bg-secondary' }} me-1 mb-1 small">
+                            {{ $variantName }}
+                            @if(!$isInStock)
+                            <small class="text-muted">(OOS)</small>
+                            @endif
+                        </span>
+                    @endforeach
+                </div>
+            </div>
             @endif
             
-            <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-            
-            <div class="card-body d-flex flex-column">
-                <h6 class="card-title">{{ $product->name }}</h6>
-                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                
-                <!-- Display Available Sizes -->
-                @if($product->all_sizes && count($product->all_sizes) > 0)
-                <div class="mb-2">
-                    <small class="text-muted">Sizes: 
-                        @foreach($product->all_sizes as $size)
-                            <span class="badge bg-light text-dark border me-1 {{ !$product->isSizeInStock($size) ? 'text-decoration-line-through text-muted' : '' }}">
-                                {{ $size }}
-                                @if(!$product->isSizeInStock($size))
-                                (OOS)
-                                @endif
-                            </span>
-                        @endforeach
-                    </small>
+            <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    @if($product->has_discount)
+                    <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                    <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
+                    @else
+                    <span class="text-primary fw-bold">${{ $product->price }}</span>
+                    @endif
                 </div>
-                @endif
                 
-                <div class="mt-auto">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        @if($product->has_discount)
-                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                        <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
-                        @else
-                        <span class="text-primary fw-bold">${{ $product->price }}</span>
-                        @endif
-                    </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                        View Details
+                    </a>
                     
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
-                            View Details
-                        </a>
+                    @if($product->in_stock)
+                    <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1">
                         
-                        @if($product->in_stock)
-                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form flex-fill">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <input type="hidden" name="quantity" value="1">
-                            <input type="hidden" name="selected_size" value="{{ $product->all_sizes[0] ?? 'One Size' }}">
-                            <button type="submit" class="btn btn-primary btn-sm w-100" title="Add to Cart">
-                                <i class="fas fa-cart-plus"></i>
-                            </button>
-                        </form>
+                        @if($product->has_variants && $product->variants->count() > 0)
+                            @php
+                                // Get the first IN STOCK variant, not just the first variant
+                                $firstInStockVariant = $product->variants->where('stock_quantity', '>', 0)->first();
+                            @endphp
+                            @if($firstInStockVariant)
+                                <input type="hidden" name="selected_size" value="{{ $firstInStockVariant->size ?? $firstInStockVariant->variant_name ?? 'Standard' }}">
+                            @else
+                                {{-- If no variants are in stock, don't show add to cart --}}
+                                <input type="hidden" name="selected_size" value="">
+                            @endif
                         @else
-                        <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
+                            <input type="hidden" name="selected_size" value="Standard">
                         @endif
-                    </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-sm w-100 add-to-cart-btn" 
+                                {{ $product->has_variants && !$firstInStockVariant ? 'disabled' : '' }}
+                                title="{{ $product->has_variants && !$firstInStockVariant ? 'No variants in stock' : 'Add to Cart' }}">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </form>
+                    @else
+                    <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
     @endforeach
 </div>
             @endforeach

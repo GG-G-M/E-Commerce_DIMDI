@@ -9,7 +9,10 @@ class ProductVariant extends Model
 {
     protected $fillable = [
         'product_id',
-        'size',
+        'variant_name',
+        'variant_description',
+        'image',
+        'sku',
         'stock_quantity',
         'price',
         'sale_price'
@@ -25,23 +28,51 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
+            
+            if (file_exists(public_path($this->image))) {
+                return asset($this->image);
+            }
+        }
+        
+        // Fallback to product image
+        return $this->product->image_url;
+    }
+
     public function getCurrentPriceAttribute()
     {
-        return $this->sale_price ?? $this->price ?? $this->product->current_price;
+        return $this->sale_price && $this->sale_price < $this->price ? $this->sale_price : $this->price;
     }
 
     public function getHasDiscountAttribute()
     {
-        return !is_null($this->sale_price) && $this->sale_price < ($this->price ?? $this->product->price);
+        return !is_null($this->sale_price) && $this->sale_price < $this->price;
     }
 
-    // Check if variant is in stock
+        public function getDiscountPercentageAttribute()
+    {
+        if (!$this->has_discount || $this->price <= 0) {
+            return 0;
+        }
+        
+        return round((($this->price - $this->sale_price) / $this->price) * 100);
+    }
+
+        public function getDisplayNameAttribute()
+    {
+        return $this->size ?? $this->variant_name ?? 'Standard';
+    }
+
     public function getInStockAttribute()
     {
         return $this->stock_quantity > 0;
     }
 
-    // Get available quantity for display
     public function getAvailableQuantityAttribute()
     {
         if ($this->stock_quantity > 10) {

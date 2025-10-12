@@ -27,7 +27,7 @@ class CartController extends Controller
     public function index()
     {
         $cartIdentifier = $this->getCartIdentifier();
-        $cartItems = Cart::with('product')
+        $cartItems = Cart::with(['product.variants'])
             ->where($cartIdentifier)
             ->get();
 
@@ -38,7 +38,7 @@ class CartController extends Controller
 
         return view('cart.index', compact('cartItems', 'subtotal', 'tax', 'shipping', 'total'));
     }
-
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -47,15 +47,60 @@ class CartController extends Controller
             'selected_size' => 'required|string|max:50'
         ]);
 
-        $product = Product::findOrFail($request->product_id);
-        $variant = $product->getVariantBySize($request->selected_size);
-
-        if (!$variant) {
-            return redirect()->back()->with('error', 'Selected size is not available for this product.');
+        // Check if selected_size is empty (from index page when no variants in stock)
+        if (empty($request->selected_size)) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No available variants in stock.'
+                ], 422);
+            }
+            return redirect()->back()->with('error', 'No available variants in stock.');
         }
 
-        if ($variant->stock_quantity < $request->quantity) {
-            return redirect()->back()->with('error', "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available.");
+        $product = Product::with('variants')->findOrFail($request->product_id);
+        
+        // Check if product has variants/sizes
+        if ($product->has_variants) {
+            $variant = $product->variants->first(function($v) use ($request) {
+                return ($v->size === $request->selected_size) || ($v->variant_name === $request->selected_size);
+            });
+            
+            if (!$variant) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected variant is not available.'
+                    ], 422);
+                }
+                return redirect()->back()->with('error', 'Selected variant is not available.');
+            }
+            
+            // Check if variant is in stock
+            if ($variant->stock_quantity <= 0) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected variant is out of stock.'
+                    ], 422);
+                }
+                return redirect()->back()->with('error', 'Selected variant is out of stock.');
+            }
+            
+            $stock = $variant->stock_quantity;
+        } else {
+            // For products without variants
+            if ($product->stock_quantity <= 0) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Product is out of stock.'
+                    ], 422);
+                }
+                return redirect()->back()->with('error', 'Product is out of stock.');
+            }
+            
+            $stock = $product->stock_quantity;
         }
 
         $cartIdentifier = $this->getCartIdentifier();
@@ -68,12 +113,53 @@ class CartController extends Controller
 
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $request->quantity;
-            if ($variant->stock_quantity < $newQuantity) {
-                return redirect()->back()->with('error', "Cannot add more items. Only {$variant->stock_quantity} available for {$request->selected_size} size.");
+            
+            // Check stock again for updated quantity - THIS IS THE KEY FIX
+            if ($newQuantity > $stock) {
+                $maxCanAdd = $stock - $cartItem->quantity;
+                
+                if ($maxCanAdd <= 0) {
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Cannot add more items. Only {$stock} available total and you already have {$cartItem->quantity} in cart."
+                        ], 422);
+                    }
+                    return redirect()->back()->with('error', "Cannot add more items. Only {$stock} available total and you already have {$cartItem->quantity} in cart.");
+                }
+                
+                // Limit the quantity to what's actually available
+                $newQuantity = $stock;
+                $cartItem->quantity = $newQuantity;
+                $cartItem->save();
+                
+                if ($request->ajax()) {
+                    $cartCount = Cart::where($cartIdentifier)->sum('quantity');
+                    return response()->json([
+                        'success' => true,
+                        'message' => "Limited to available stock. Quantity updated to {$newQuantity}.",
+                        'cart_count' => $cartCount,
+                        'limited' => true
+                    ]);
+                }
+                return redirect()->route('cart.index')->with('warning', "Limited to available stock. Quantity updated to {$newQuantity}.");
             }
+            
+            // If we have enough stock, update normally
             $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
+            // For new cart items, also check stock
+            if ($request->quantity > $stock) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Cannot add {$request->quantity} items. Only {$stock} available."
+                    ], 422);
+                }
+                return redirect()->back()->with('error', "Cannot add {$request->quantity} items. Only {$stock} available.");
+            }
+            
             Cart::create(array_merge($cartIdentifier, [
                 'product_id' => $request->product_id,
                 'selected_size' => $request->selected_size,
@@ -81,12 +167,22 @@ class CartController extends Controller
             ]));
         }
 
+        $cartCount = Cart::where($cartIdentifier)->sum('quantity');
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart successfully!',
+                'cart_count' => $cartCount
+            ]);
+        }
+
         return redirect()->route('cart.index')->with('success', 'Product added to cart successfully!');
     }
 
     public function update(Request $request, Cart $cart)
     {
-        // Authorization check - ensure user owns this cart item
+        // Authorization check
         $this->authorizeCartItem($cart);
 
         $request->validate([
@@ -94,31 +190,56 @@ class CartController extends Controller
             'selected_size' => 'required|string|max:50'
         ]);
 
-        $variant = $cart->product->getVariantBySize($request->selected_size);
+        $product = $cart->product;
         
-        if (!$variant) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Selected size is not available for this product.'
-                ], 422);
+        // Find the selected variant
+        $selectedVariant = null;
+        if ($product->has_variants) {
+            $selectedVariant = $product->variants->first(function($v) use ($request) {
+                return ($v->size === $request->selected_size) || ($v->variant_name === $request->selected_size);
+            });
+            
+            if (!$selectedVariant) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Selected option is not available.'
+                    ], 422);
+                }
+                return redirect()->back()->with('error', 'Selected option is not available.');
             }
-            return redirect()->back()->with('error', 'Selected size is not available for this product.');
+            
+            $stock = $selectedVariant->stock_quantity;
+        } else {
+            $stock = $product->stock_quantity;
         }
 
-        if ($variant->stock_quantity < $request->quantity) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available."
-                ], 422);
+        // If changing variant, adjust quantity to new variant's stock
+        $newQuantity = $request->quantity;
+        if ($cart->selected_size !== $request->selected_size) {
+            // When changing variant, limit quantity to new variant's stock
+            $newQuantity = min($request->quantity, $stock);
+            
+            // If current quantity exceeds new variant's stock, reduce it
+            if ($request->quantity > $stock) {
+                $newQuantity = $stock;
             }
-            return redirect()->back()->with('error', "Insufficient stock for {$request->selected_size} size. Only {$variant->stock_quantity} available.");
+        } else {
+            // When just updating quantity, check stock
+            if ($newQuantity > $stock) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Insufficient stock. Only {$stock} available."
+                    ], 422);
+                }
+                return redirect()->back()->with('error', "Insufficient stock. Only {$stock} available.");
+            }
         }
 
         $cartIdentifier = $this->getCartIdentifier();
 
-        // Check if changing to a size that already exists for this product
+        // Check if changing to a variant that already exists for this product
         if ($cart->selected_size !== $request->selected_size) {
             $existingCartItem = Cart::where($cartIdentifier)
                 ->where('product_id', $cart->product_id)
@@ -127,56 +248,87 @@ class CartController extends Controller
                 ->first();
 
             if ($existingCartItem) {
-                $newQuantity = $existingCartItem->quantity + $request->quantity;
-                if ($variant->stock_quantity < $newQuantity) {
+                $mergedQuantity = $existingCartItem->quantity + $newQuantity;
+                
+                // Check stock for merged quantity
+                if ($mergedQuantity > $stock) {
                     if ($request->ajax()) {
                         return response()->json([
                             'success' => false,
-                            'message' => "Cannot merge items. Only {$variant->stock_quantity} available for {$request->selected_size} size."
+                            'message' => "Cannot merge items. Only {$stock} available for {$request->selected_size}."
                         ], 422);
                     }
-                    return redirect()->back()->with('error', "Cannot merge items. Only {$variant->stock_quantity} available for {$request->selected_size} size.");
+                    return redirect()->back()->with('error', "Cannot merge items. Only {$stock} available for {$request->selected_size}.");
                 }
                 
                 // Merge with existing item
-                $existingCartItem->quantity = $newQuantity;
+                $existingCartItem->quantity = $mergedQuantity;
                 $existingCartItem->save();
                 $cart->delete();
                 
                 if ($request->ajax()) {
+                    // Calculate updated totals with fresh data
+                    $cartItems = Cart::with(['product.variants'])->where($cartIdentifier)->get();
+                    
+                    $subtotal = $cartItems->sum('total_price');
+                    $tax = $subtotal * 0.10;
+                    $shipping = $subtotal > 100 ? 0 : 10;
+                    $total = $subtotal + $tax + $shipping;
+
                     return response()->json([
                         'success' => true,
-                        'message' => 'Item updated successfully!',
-                        'redirect' => true
+                        'message' => 'Cart updated successfully!',
+                        'item_removed' => true,
+                        'item_merged' => true,
+                        'new_quantity' => $mergedQuantity,
+                        'summary' => [
+                            'subtotal' => number_format($subtotal, 2),
+                            'tax' => number_format($tax, 2),
+                            'shipping' => number_format($shipping, 2),
+                            'total' => number_format($total, 2)
+                        ]
                     ]);
                 }
-                return redirect()->route('cart.index')->with('success', 'Item updated successfully!');
+                return redirect()->route('cart.index')->with('success', 'Cart updated successfully!');
             }
         }
 
         // Update the current cart item
         $cart->update([
-            'quantity' => $request->quantity,
+            'quantity' => $newQuantity,
             'selected_size' => $request->selected_size
         ]);
 
-        // Reload the cart item with fresh data
-        $cart->load('product');
+        // Reload the cart item with fresh data to get updated price
+        $cart->load(['product.variants']);
 
         if ($request->ajax()) {
             // Calculate updated totals
-            $cartIdentifier = $this->getCartIdentifier();
-            $cartItems = Cart::with('product')->where($cartIdentifier)->get();
+            $cartItems = Cart::with(['product.variants'])->where($cartIdentifier)->get();
             
             $subtotal = $cartItems->sum('total_price');
             $tax = $subtotal * 0.10;
             $shipping = $subtotal > 100 ? 0 : 10;
             $total = $subtotal + $tax + $shipping;
 
+            // Get the current variant price for display
+            $currentVariantPrice = 0;
+            if ($cart->product->has_variants) {
+                $currentVariant = $cart->product->variants->first(function($v) use ($cart) {
+                    return ($v->size === $cart->selected_size) || ($v->variant_name === $cart->selected_size);
+                });
+                $currentVariantPrice = $currentVariant ? ($currentVariant->current_price ?? $currentVariant->price ?? 0) : 0;
+            } else {
+                $currentVariantPrice = $cart->product->current_price;
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Cart updated successfully!',
                 'item_total' => number_format($cart->total_price, 2),
+                'item_quantity' => $cart->quantity,
+                'unit_price' => number_format($currentVariantPrice, 2),
+                'max_quantity' => $stock,
                 'summary' => [
                     'subtotal' => number_format($subtotal, 2),
                     'tax' => number_format($tax, 2),
@@ -191,10 +343,18 @@ class CartController extends Controller
 
     public function destroy(Cart $cart)
     {
-        // Authorization check - ensure user owns this cart item
+        // Authorization check
         $this->authorizeCartItem($cart);
 
         $cart->delete();
+        
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Item removed from cart successfully!'
+            ]);
+        }
+        
         return redirect()->route('cart.index')->with('success', 'Item removed from cart successfully!');
     }
 
@@ -203,6 +363,22 @@ class CartController extends Controller
         $cartIdentifier = $this->getCartIdentifier();
         $count = Cart::where($cartIdentifier)->sum('quantity');
         return response()->json(['count' => $count]);
+    }
+
+    public function clear()
+    {
+        $cartIdentifier = $this->getCartIdentifier();
+        Cart::where($cartIdentifier)->delete();
+        
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart cleared successfully!',
+                'cart_count' => 0
+            ]);
+        }
+        
+        return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
     }
 
     private function authorizeCartItem(Cart $cart)

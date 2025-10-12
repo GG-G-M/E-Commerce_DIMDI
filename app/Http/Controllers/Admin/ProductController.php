@@ -13,42 +13,41 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     public function index(Request $request)
-    {
-        $search = $request->get('search');
-        $categoryId = $request->get('category_id');
-        $status = $request->get('status', 'active');
-        
-        $products = Product::with('category')
-            ->when($search, function($query) use ($search) {
-                return $query->search($search);
-            })
-            ->when($categoryId, function($query) use ($categoryId) {
-                return $query->filterByCategory($categoryId);
-            })
-            ->when($status, function($query) use ($status) {
-                return $query->filterByStatus($status);
-            })
-            ->latest()
-            ->paginate(10)
-            ->appends($request->all());
+{
+    $search = $request->get('search');
+    $categoryId = $request->get('category_id');
+    $status = $request->get('status', 'active');
+    
+    $products = Product::with(['category', 'variants']) // Add 'variants' here
+        ->when($search, function($query) use ($search) {
+            return $query->search($search);
+        })
+        ->when($categoryId, function($query) use ($categoryId) {
+            return $query->filterByCategory($categoryId);
+        })
+        ->when($status, function($query) use ($status) {
+            return $query->filterByStatus($status);
+        })
+        ->latest()
+        ->paginate(10)
+        ->appends($request->all());
 
-        $categories = Category::active()->get();
-        $statuses = [
-            'active' => 'Active',
-            'inactive' => 'Inactive', 
-            'archived' => 'Archived',
-            'featured' => 'Featured',
-            'all' => 'All'
-        ];
+    $categories = Category::active()->get();
+    $statuses = [
+        'active' => 'Active',
+        'inactive' => 'Inactive', 
+        'archived' => 'Archived',
+        'featured' => 'Featured',
+        'all' => 'All'
+    ];
 
-        return view('admin.products.index', compact('products', 'categories', 'statuses'));
-    }
+    return view('admin.products.index', compact('products', 'categories', 'statuses'));
+}
 
     public function create()
     {
         $categories = Category::active()->get();
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
-        return view('admin.products.create', compact('categories', 'sizes'));
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -60,30 +59,35 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'sizes' => 'required|array',
-            'sizes.*' => 'string|max:50',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'has_variants' => 'boolean',
+            'variants' => 'required_if:has_variants,1|array',
+            'variants.*.variant_name' => 'required_if:has_variants,1|string|max:255',
+            'variants.*.variant_description' => 'nullable|string',
+            'variants.*.stock' => 'required_if:has_variants,1|integer|min:0',
+            'variants.*.price' => 'required_if:has_variants,1|numeric|min:0',
+            'variants.*.sale_price' => 'nullable|numeric|min:0',
+            'variants.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        // Handle main image upload - Store in public directory
+        // Handle main image upload
         $imagePath = null;
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
             
-            // Create products directory if it doesn't exist
             $directory = public_path('images/products');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
             
-            // Move image to public directory
             $image->move($directory, $imageName);
             $imagePath = 'images/products/' . $imageName;
         }
 
+        // Create product
         $product = Product::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
@@ -93,12 +97,41 @@ class ProductController extends Controller
             'stock_quantity' => $request->stock_quantity,
             'sku' => 'SKU-' . strtoupper(Str::random(8)),
             'image' => $imagePath,
-            'sizes' => json_encode($request->sizes),
             'is_featured' => $request->has('is_featured'),
             'is_active' => $request->has('is_active'),
             'is_archived' => false,
             'category_id' => $request->category_id,
         ]);
+
+        // Create variants if enabled
+        if ($request->has('has_variants') && $request->has_variants && $request->variants) {
+            foreach ($request->variants as $variantData) {
+                $variantImagePath = null;
+                
+                // Handle variant image upload
+                if (isset($variantData['image']) && $variantData['image']) {
+                    $variantImage = $variantData['image'];
+                    $variantImageName = time() . '_' . Str::slug($product->name . '-' . $variantData['variant_name']) . '.' . $variantImage->getClientOriginalExtension();
+                    
+                    $variantImage->move($directory, $variantImageName);
+                    $variantImagePath = 'images/products/' . $variantImageName;
+                }
+
+                ProductVariant::create([
+                    'product_id' => $product->id,
+                    'variant_name' => $variantData['variant_name'],
+                    'variant_description' => $variantData['variant_description'] ?? null,
+                    'image' => $variantImagePath,
+                    'sku' => $product->generateVariantSku($variantData['variant_name']),
+                    'stock_quantity' => $variantData['stock'],
+                    'price' => $variantData['price'],
+                    'sale_price' => $variantData['sale_price'] ?? null,
+                ]);
+            }
+            
+            // Update product stock to sum of variants
+            $product->updateTotalStock();
+        }
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
     }
@@ -106,10 +139,9 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::active()->get();
-        $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size'];
-        $selectedSizes = $product->available_sizes;
+        $variants = $product->variants;
         
-        return view('admin.products.edit', compact('product', 'categories', 'sizes', 'selectedSizes'));
+        return view('admin.products.edit', compact('product', 'categories', 'variants'));
     }
 
     public function update(Request $request, Product $product)
@@ -123,47 +155,21 @@ class ProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
-            'selected_sizes' => 'required|array|min:1',
-            'selected_sizes.*' => 'string',
-            'stock' => 'required|array',
-            'stock.*' => 'required|integer|min:0',
-            'size_price' => 'nullable|array',
-            'size_price.*' => 'nullable|numeric|min:0',
-            'size_sale_price' => 'nullable|array',
-            'size_sale_price.*' => 'nullable|numeric|min:0',
-        ], [
-            'selected_sizes.required' => 'Please select at least one size.',
-            'stock.*.required' => 'Stock quantity is required for all selected sizes.',
-            'stock.*.min' => 'Stock quantity cannot be negative.',
+            'has_variants' => 'boolean',
+            'stock_quantity' => 'required_if:has_variants,0|integer|min:0',
+            'variants' => 'required_if:has_variants,1|array',
+            'variants.*.id' => 'nullable|exists:product_variants,id',
+            'variants.*.variant_name' => 'required_if:has_variants,1|string|max:255',
+            'variants.*.variant_description' => 'nullable|string',
+            'variants.*.stock' => 'required_if:has_variants,1|integer|min:0',
+            'variants.*.price' => 'required_if:has_variants,1|numeric|min:0',
+            'variants.*.sale_price' => 'nullable|numeric|min:0',
+            'variants.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'variants.*.remove_image' => 'boolean',
         ]);
 
-        // Custom validation for sale price being lower than price
-        if ($validated['sale_price'] && $validated['sale_price'] >= $validated['price']) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['sale_price' => 'Sale price must be lower than regular price.']);
-        }
-
-        // Validate size-specific prices
-        foreach ($validated['selected_sizes'] as $size) {
-            $sizePrice = $validated['size_price'][$size] ?? null;
-            $sizeSalePrice = $validated['size_sale_price'][$size] ?? null;
-            
-            if ($sizeSalePrice && $sizePrice && $sizeSalePrice >= $sizePrice) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(["size_sale_price.{$size}" => "Sale price for {$size} must be lower than regular price."]);
-            }
-            
-            if ($sizeSalePrice && !$sizePrice) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(["size_price.{$size}" => "Regular price is required for {$size} if sale price is set."]);
-            }
-        }
-
         // Update basic product info
-        $product->update([
+        $productData = [
             'name' => $validated['name'],
             'description' => $validated['description'],
             'price' => $validated['price'],
@@ -171,49 +177,84 @@ class ProductController extends Controller
             'category_id' => $validated['category_id'],
             'is_featured' => $request->boolean('is_featured'),
             'is_active' => $request->boolean('is_active'),
-            'sizes' => $validated['selected_sizes'],
-        ]);
+        ];
 
-        // Handle image upload
+        // Handle main image upload
         if ($request->hasFile('image')) {
-            // Your existing image upload logic
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->update(['image' => $imagePath]);
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->name) . '.' . $image->getClientOriginalExtension();
+            
+            $directory = public_path('images/products');
+            $image->move($directory, $imageName);
+            $productData['image'] = 'images/products/' . $imageName;
         }
 
-        // Update or create variants for each selected size
-        foreach ($validated['selected_sizes'] as $size) {
-            $variantData = [
-                'stock_quantity' => $validated['stock'][$size] ?? 0,
-                'price' => $validated['size_price'][$size] ?? $validated['price'], // Use base price if not set
-            ];
+        $product->update($productData);
 
-            // Only set sale price if provided, otherwise use base sale price or null
-            if (isset($validated['size_sale_price'][$size])) {
-                $variantData['sale_price'] = $validated['size_sale_price'][$size];
-            } else {
-                $variantData['sale_price'] = $validated['sale_price'];
-            }
-
-            ProductVariant::updateOrCreate(
-                [
-                    'product_id' => $product->id,
-                    'size' => $size,
-                ],
-                $variantData
-            );
+        // Handle variants
+        if ($request->has('has_variants') && $request->has_variants) {
+            $this->updateVariants($product, $request->variants ?? []);
+            $product->update(['stock_quantity' => $product->variants->sum('stock_quantity')]);
+        } else {
+            // No variants, use product stock
+            $product->variants()->delete();
+            $product->update(['stock_quantity' => $validated['stock_quantity']]);
         }
-
-        // Remove variants for sizes that are no longer selected
-        ProductVariant::where('product_id', $product->id)
-            ->whereNotIn('size', $validated['selected_sizes'])
-            ->delete();
-
-        // Update total stock for backward compatibility
-        $product->updateTotalStock();
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully!');
+    }
+
+    private function updateVariants(Product $product, array $variantsData)
+    {
+        $existingVariantIds = [];
+        $directory = public_path('images/products');
+
+        foreach ($variantsData as $variantData) {
+            $variantImagePath = null;
+
+            // Handle variant image
+            if (isset($variantData['image']) && $variantData['image']) {
+                $variantImage = $variantData['image'];
+                $variantImageName = time() . '_' . Str::slug($product->name . '-' . $variantData['variant_name']) . '.' . $variantImage->getClientOriginalExtension();
+                $variantImage->move($directory, $variantImageName);
+                $variantImagePath = 'images/products/' . $variantImageName;
+            } elseif (isset($variantData['id']) && !isset($variantData['remove_image'])) {
+                // Keep existing image if not removing
+                $existingVariant = ProductVariant::find($variantData['id']);
+                $variantImagePath = $existingVariant->image ?? null;
+            }
+
+            $variantDataToSave = [
+                'product_id' => $product->id,
+                'variant_name' => $variantData['variant_name'],
+                'variant_description' => $variantData['variant_description'] ?? null,
+                'stock_quantity' => $variantData['stock'],
+                'price' => $variantData['price'],
+                'sale_price' => $variantData['sale_price'] ?? null,
+                'image' => $variantImagePath,
+            ];
+
+            // Generate SKU for new variants
+            if (!isset($variantData['id'])) {
+                $variantDataToSave['sku'] = $product->generateVariantSku($variantData['variant_name']);
+            }
+
+            if (isset($variantData['id'])) {
+                // Update existing variant
+                ProductVariant::where('id', $variantData['id'])->update($variantDataToSave);
+                $existingVariantIds[] = $variantData['id'];
+            } else {
+                // Create new variant
+                $newVariant = ProductVariant::create($variantDataToSave);
+                $existingVariantIds[] = $newVariant->id;
+            }
+        }
+
+        // Remove variants that weren't in the submitted data
+        ProductVariant::where('product_id', $product->id)
+            ->whereNotIn('id', $existingVariantIds)
+            ->delete();
     }
 
     public function archive(Product $product)

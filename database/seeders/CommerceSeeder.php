@@ -12,27 +12,27 @@ class CommerceSeeder extends Seeder
 {
     public function run()
     {
-        // Create Categories for Homegrown Appliance & Furniture Retailer
+        // Create Categories for Appliance Store
         $categories = [
-            [
-                'name' => 'Living Room Furniture',
-                'description' => 'Comfortable and stylish furniture for your living space'
-            ],
-            [
-                'name' => 'Bedroom Furniture',
-                'description' => 'Beautiful bedroom sets and accessories for restful nights'
-            ],
             [
                 'name' => 'Kitchen Appliances',
                 'description' => 'Essential appliances for modern kitchen efficiency'
             ],
             [
-                'name' => 'Home Appliances',
-                'description' => 'Appliances to make household tasks easier'
+                'name' => 'Laundry Appliances',
+                'description' => 'Washers, dryers, and laundry care solutions'
             ],
             [
-                'name' => 'Home Decor',
-                'description' => 'Decorative items to personalize your space'
+                'name' => 'Climate Control',
+                'description' => 'Heating, cooling, and air quality appliances'
+            ],
+            [
+                'name' => 'Cleaning Appliances',
+                'description' => 'Vacuum cleaners and home cleaning solutions'
+            ],
+            [
+                'name' => 'Small Appliances',
+                'description' => 'Countertop and portable appliances'
             ]
         ];
 
@@ -47,108 +47,8 @@ class CommerceSeeder extends Seeder
         
         $this->command->info('Categories Created'); 
 
-        // Create Products for Homegrown Appliance & Furniture Retailer
+        // Create Products for Appliance Store
         $products = [
-            // Living Room Furniture
-            [
-                'name' => 'Modern Leather Sofa',
-                'description' => 'Premium genuine leather sofa with comfortable cushioning and modern design. Perfect for contemporary living rooms.',
-                'price' => 1299.99,
-                'sale_price' => 1099.99,
-                'stock_quantity' => 15,
-                'sku' => 'LR-SOFA-001',
-                'category_id' => 1,
-                'is_featured' => true,
-                'sizes' => ['L', 'XL'],
-                'size_stock' => ['L' => 8, 'XL' => 7] // Specific stock per size
-            ],
-            [
-                'name' => 'Coffee Table Set',
-                'description' => 'Elegant wooden coffee table with matching side tables. Solid oak construction with protective finish.',
-                'price' => 299.99,
-                'sale_price' => 249.99,
-                'stock_quantity' => 25,
-                'sku' => 'LR-TABLE-002',
-                'category_id' => 1,
-                'is_featured' => true,
-                'sizes' => ['M', 'L'],
-                'size_stock' => ['M' => 15, 'L' => 10]
-            ],
-            [
-                'name' => 'TV Entertainment Center',
-                'description' => 'Spacious entertainment center with adjustable shelves and cable management system. Fits up to 65-inch TVs.',
-                'price' => 599.99,
-                'sale_price' => null,
-                'stock_quantity' => 12,
-                'sku' => 'LR-ENT-003',
-                'category_id' => 1,
-                'is_featured' => false,
-                'sizes' => ['XL'],
-                'size_stock' => ['XL' => 12]
-            ],
-            [
-                'name' => 'Accent Chair',
-                'description' => 'Comfortable accent chair with premium fabric and wooden legs. Perfect for reading corners.',
-                'price' => 199.99,
-                'sale_price' => 179.99,
-                'stock_quantity' => 30,
-                'sku' => 'LR-CHAIR-004',
-                'category_id' => 1,
-                'is_featured' => false,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 30]
-            ],
-
-            // Bedroom Furniture
-            [
-                'name' => 'Queen Size Bed Frame',
-                'description' => 'Solid wood queen size bed frame with built-in storage and comfortable headboard.',
-                'price' => 899.99,
-                'sale_price' => 799.99,
-                'stock_quantity' => 18,
-                'sku' => 'BR-BED-005',
-                'category_id' => 2,
-                'is_featured' => true,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 18]
-            ],
-            [
-                'name' => 'Dresser with Mirror',
-                'description' => '6-drawer dresser with attached mirror. Ample storage space with smooth-gliding drawers.',
-                'price' => 459.99,
-                'sale_price' => null,
-                'stock_quantity' => 22,
-                'sku' => 'BR-DRESS-006',
-                'category_id' => 2,
-                'is_featured' => true,
-                'sizes' => ['L'],
-                'size_stock' => ['L' => 22]
-            ],
-            [
-                'name' => 'Nightstand Set',
-                'description' => 'Matching pair of nightstands with drawer storage and built-in USB ports.',
-                'price' => 199.99,
-                'sale_price' => 169.99,
-                'stock_quantity' => 35,
-                'sku' => 'BR-NIGHT-007',
-                'category_id' => 2,
-                'is_featured' => false,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 35]
-            ],
-            [
-                'name' => 'Wardrobe Cabinet',
-                'description' => 'Spacious wardrobe with hanging space, shelves, and mirror. Perfect for bedroom organization.',
-                'price' => 699.99,
-                'sale_price' => 649.99,
-                'stock_quantity' => 10,
-                'sku' => 'BR-WARD-008',
-                'category_id' => 2,
-                'is_featured' => false,
-                'sizes' => ['XL'],
-                'size_stock' => ['XL' => 10]
-            ],
-
             // Kitchen Appliances
             [
                 'name' => 'Stainless Steel Refrigerator',
@@ -156,11 +56,26 @@ class CommerceSeeder extends Seeder
                 'price' => 1899.99,
                 'sale_price' => 1699.99,
                 'stock_quantity' => 8,
-                'sku' => 'KA-FRIDGE-009',
-                'category_id' => 3,
+                'sku' => 'KA-FRIDGE-001',
+                'category_id' => 1,
                 'is_featured' => true,
-                'sizes' => ['XL'],
-                'size_stock' => ['XL' => 8]
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Standard Edition',
+                        'variant_description' => 'Basic model with essential features',
+                        'stock' => 5,
+                        'price' => 1899.99,
+                        'sale_price' => 1699.99,
+                    ],
+                    [
+                        'variant_name' => 'Smart Edition',
+                        'variant_description' => 'WiFi enabled with smart home integration',
+                        'stock' => 3,
+                        'price' => 2299.99,
+                        'sale_price' => 1999.99,
+                    ]
+                ]
             ],
             [
                 'name' => 'Professional Stand Mixer',
@@ -168,11 +83,26 @@ class CommerceSeeder extends Seeder
                 'price' => 349.99,
                 'sale_price' => 299.99,
                 'stock_quantity' => 25,
-                'sku' => 'KA-MIXER-010',
-                'category_id' => 3,
+                'sku' => 'KA-MIXER-002',
+                'category_id' => 1,
                 'is_featured' => true,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 25]
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Classic Model',
+                        'variant_description' => '5-quart capacity with 3 attachments',
+                        'stock' => 15,
+                        'price' => 349.99,
+                        'sale_price' => 299.99,
+                    ],
+                    [
+                        'variant_name' => 'Pro Model',
+                        'variant_description' => '7-quart capacity with 6 attachments',
+                        'stock' => 10,
+                        'price' => 499.99,
+                        'sale_price' => 449.99,
+                    ]
+                ]
             ],
             [
                 'name' => 'Air Fryer Oven',
@@ -180,11 +110,26 @@ class CommerceSeeder extends Seeder
                 'price' => 129.99,
                 'sale_price' => 99.99,
                 'stock_quantity' => 40,
-                'sku' => 'KA-AIRFRY-011',
-                'category_id' => 3,
+                'sku' => 'KA-AIRFRY-003',
+                'category_id' => 1,
                 'is_featured' => false,
-                'sizes' => ['M'],
-                'size_stock' => ['M' => 40]
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Compact Model',
+                        'variant_description' => 'Perfect for small kitchens',
+                        'stock' => 25,
+                        'price' => 99.99,
+                        'sale_price' => 79.99,
+                    ],
+                    [
+                        'variant_name' => 'Family Model',
+                        'variant_description' => 'Larger capacity for families',
+                        'stock' => 15,
+                        'price' => 129.99,
+                        'sale_price' => 99.99,
+                    ]
+                ]
             ],
             [
                 'name' => 'Coffee Maker Machine',
@@ -192,99 +137,235 @@ class CommerceSeeder extends Seeder
                 'price' => 199.99,
                 'sale_price' => null,
                 'stock_quantity' => 30,
-                'sku' => 'KA-COFFEE-012',
-                'category_id' => 3,
+                'sku' => 'KA-COFFEE-004',
+                'category_id' => 1,
                 'is_featured' => false,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 30]
+                'has_variants' => false,
+                'variants' => []
             ],
 
-            // Home Appliances
+            // Laundry Appliances
+            [
+                'name' => 'Front Load Washer',
+                'description' => 'Energy-efficient front load washing machine with multiple wash cycles and steam function.',
+                'price' => 899.99,
+                'sale_price' => 799.99,
+                'stock_quantity' => 12,
+                'sku' => 'LA-WASHER-005',
+                'category_id' => 2,
+                'is_featured' => true,
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Standard Capacity',
+                        'variant_description' => '4.5 cu.ft capacity',
+                        'stock' => 8,
+                        'price' => 899.99,
+                        'sale_price' => 799.99,
+                    ],
+                    [
+                        'variant_name' => 'Large Capacity',
+                        'variant_description' => '5.2 cu.ft capacity with steam',
+                        'stock' => 4,
+                        'price' => 1199.99,
+                        'sale_price' => 999.99,
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Electric Dryer',
+                'description' => 'Electric dryer with moisture sensor and multiple drying cycles.',
+                'price' => 699.99,
+                'sale_price' => 649.99,
+                'stock_quantity' => 15,
+                'sku' => 'LA-DRYER-006',
+                'category_id' => 2,
+                'is_featured' => true,
+                'has_variants' => false,
+                'variants' => []
+            ],
+            [
+                'name' => 'Washer Dryer Combo',
+                'description' => 'All-in-one washer and dryer unit perfect for small spaces.',
+                'price' => 1299.99,
+                'sale_price' => 1199.99,
+                'stock_quantity' => 8,
+                'sku' => 'LA-COMBO-007',
+                'category_id' => 2,
+                'is_featured' => false,
+                'has_variants' => false,
+                'variants' => []
+            ],
+
+            // Climate Control
+            [
+                'name' => 'Smart Air Conditioner',
+                'description' => 'WiFi-enabled air conditioner with smart temperature control and energy monitoring.',
+                'price' => 499.99,
+                'sale_price' => 449.99,
+                'stock_quantity' => 20,
+                'sku' => 'CC-AC-008',
+                'category_id' => 3,
+                'is_featured' => true,
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => '8000 BTU',
+                        'variant_description' => 'Perfect for small rooms up to 350 sq.ft',
+                        'stock' => 12,
+                        'price' => 499.99,
+                        'sale_price' => 449.99,
+                    ],
+                    [
+                        'variant_name' => '12000 BTU',
+                        'variant_description' => 'Ideal for medium rooms up to 550 sq.ft',
+                        'stock' => 8,
+                        'price' => 699.99,
+                        'sale_price' => 599.99,
+                    ]
+                ]
+            ],
+            [
+                'name' => 'HEPA Air Purifier',
+                'description' => 'HEPA air purifier with 3-stage filtration system for clean and fresh indoor air.',
+                'price' => 179.99,
+                'sale_price' => 149.99,
+                'stock_quantity' => 35,
+                'sku' => 'CC-PURIFIER-009',
+                'category_id' => 3,
+                'is_featured' => false,
+                'has_variants' => false,
+                'variants' => []
+            ],
+            [
+                'name' => 'Space Heater',
+                'description' => 'Energy-efficient ceramic space heater with thermostat and safety features.',
+                'price' => 89.99,
+                'sale_price' => 69.99,
+                'stock_quantity' => 50,
+                'sku' => 'CC-HEATER-010',
+                'category_id' => 3,
+                'is_featured' => false,
+                'has_variants' => false,
+                'variants' => []
+            ],
+
+            // Cleaning Appliances
             [
                 'name' => 'Robot Vacuum Cleaner',
                 'description' => 'Smart robot vacuum with mapping technology and app control for automated cleaning.',
                 'price' => 299.99,
                 'sale_price' => 249.99,
                 'stock_quantity' => 20,
-                'sku' => 'HA-VACUUM-013',
+                'sku' => 'CL-VACUUM-011',
                 'category_id' => 4,
                 'is_featured' => true,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 20]
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Basic Model',
+                        'variant_description' => 'Standard cleaning with basic navigation',
+                        'stock' => 12,
+                        'price' => 199.99,
+                        'sale_price' => 179.99,
+                    ],
+                    [
+                        'variant_name' => 'Pro Model',
+                        'variant_description' => 'Advanced mapping and self-emptying base',
+                        'stock' => 8,
+                        'price' => 399.99,
+                        'sale_price' => 349.99,
+                    ]
+                ]
             ],
             [
-                'name' => 'Air Purifier',
-                'description' => 'HEPA air purifier with 3-stage filtration system for clean and fresh indoor air.',
-                'price' => 179.99,
-                'sale_price' => 149.99,
-                'stock_quantity' => 35,
-                'sku' => 'HA-PURIFIER-014',
+                'name' => 'Upright Vacuum Cleaner',
+                'description' => 'Powerful upright vacuum with HEPA filtration and multiple attachments.',
+                'price' => 199.99,
+                'sale_price' => 179.99,
+                'stock_quantity' => 25,
+                'sku' => 'CL-UPRIGHT-012',
                 'category_id' => 4,
                 'is_featured' => false,
-                'sizes' => ['M'],
-                'size_stock' => ['M' => 35]
+                'has_variants' => false,
+                'variants' => []
             ],
             [
-                'name' => 'Garment Steamer',
-                'description' => 'Powerful garment steamer with continuous steam output for wrinkle-free clothes.',
-                'price' => 89.99,
-                'sale_price' => 69.99,
-                'stock_quantity' => 50,
-                'sku' => 'HA-STEAMER-015',
-                'category_id' => 4,
-                'is_featured' => false,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 50]
-            ],
-
-            // Home Decor
-            [
-                'name' => 'Decorative Throw Pillows',
-                'description' => 'Set of 4 premium decorative throw pillows with various patterns and textures.',
+                'name' => 'Steam Mop',
+                'description' => 'Multi-surface steam mop with adjustable steam settings and washable pads.',
                 'price' => 79.99,
                 'sale_price' => 59.99,
-                'stock_quantity' => 60,
-                'sku' => 'HD-PILLOWS-016',
-                'category_id' => 5,
-                'is_featured' => true,
-                'sizes' => ['S', 'M', 'L'],
-                'size_stock' => ['S' => 20, 'M' => 25, 'L' => 15]
+                'stock_quantity' => 40,
+                'sku' => 'CL-MOP-013',
+                'category_id' => 4,
+                'is_featured' => false,
+                'has_variants' => false,
+                'variants' => []
             ],
+
+            // Small Appliances
             [
-                'name' => 'Wall Art Canvas Set',
-                'description' => 'Set of 3 modern abstract canvas wall art pieces to enhance your home decor.',
+                'name' => 'Blender Pro',
+                'description' => 'High-performance blender with multiple speed settings and durable glass jar.',
                 'price' => 129.99,
                 'sale_price' => 99.99,
-                'stock_quantity' => 25,
-                'sku' => 'HD-ART-017',
+                'stock_quantity' => 30,
+                'sku' => 'SA-BLENDER-014',
                 'category_id' => 5,
                 'is_featured' => true,
-                'sizes' => ['M', 'L'],
-                'size_stock' => ['M' => 10, 'L' => 15]
+                'has_variants' => true,
+                'variants' => [
+                    [
+                        'variant_name' => 'Standard Model',
+                        'variant_description' => '6-speed settings with 48oz jar',
+                        'stock' => 20,
+                        'price' => 129.99,
+                        'sale_price' => 99.99,
+                    ],
+                    [
+                        'variant_name' => 'Professional Model',
+                        'variant_description' => '10-speed settings with 64oz jar',
+                        'stock' => 10,
+                        'price' => 199.99,
+                        'sale_price' => 169.99,
+                    ]
+                ]
             ],
             [
-                'name' => 'Area Rug',
-                'description' => 'Soft and durable area rug with non-slip backing. Available in multiple sizes.',
-                'price' => 199.99,
-                'sale_price' => 159.99,
-                'stock_quantity' => 18,
-                'sku' => 'HD-RUG-018',
+                'name' => 'Toaster Oven',
+                'description' => 'Versatile toaster oven with convection baking and multiple cooking functions.',
+                'price' => 89.99,
+                'sale_price' => 79.99,
+                'stock_quantity' => 35,
+                'sku' => 'SA-TOASTER-015',
                 'category_id' => 5,
                 'is_featured' => false,
-                'sizes' => ['S', 'M', 'L', 'XL'],
-                'size_stock' => ['S' => 5, 'M' => 5, 'L' => 5, 'XL' => 3]
+                'has_variants' => false,
+                'variants' => []
             ],
             [
-                'name' => 'Table Lamp Set',
-                'description' => 'Pair of elegant table lamps with fabric shades and touch dimmer controls.',
+                'name' => 'Electric Kettle',
+                'description' => 'Fast-boiling electric kettle with temperature control and keep-warm function.',
+                'price' => 49.99,
+                'sale_price' => 39.99,
+                'stock_quantity' => 60,
+                'sku' => 'SA-KETTLE-016',
+                'category_id' => 5,
+                'is_featured' => false,
+                'has_variants' => false,
+                'variants' => []
+            ],
+            [
+                'name' => 'Food Processor',
+                'description' => 'Multi-functional food processor with multiple blades and attachments.',
                 'price' => 149.99,
-                'sale_price' => null,
-                'stock_quantity' => 30,
-                'sku' => 'HD-LAMPS-019',
+                'sale_price' => 129.99,
+                'stock_quantity' => 20,
+                'sku' => 'SA-PROCESSOR-017',
                 'category_id' => 5,
                 'is_featured' => false,
-                'sizes' => ['One Size'],
-                'size_stock' => ['One Size' => 30]
+                'has_variants' => false,
+                'variants' => []
             ]
         ];
 
@@ -298,25 +379,31 @@ class CommerceSeeder extends Seeder
                 'stock_quantity' => $productData['stock_quantity'],
                 'sku' => $productData['sku'],
                 'image' => 'https://picsum.photos/400/300?random=' . $productData['sku'],
-                'sizes' => json_encode($productData['sizes']),
                 'is_featured' => $productData['is_featured'],
                 'is_active' => true,
                 'is_archived' => false,
                 'category_id' => $productData['category_id']
             ]);
 
-            // Create product variants for each size
-            foreach ($productData['sizes'] as $size) {
-                ProductVariant::create([
-                    'product_id' => $product->id,
-                    'size' => $size,
-                    'stock_quantity' => $productData['size_stock'][$size],
-                    'price' => $productData['price'],
-                    'sale_price' => $productData['sale_price'],
-                ]);
+            // Create product variants if the product has variants
+            if ($productData['has_variants'] && !empty($productData['variants'])) {
+                foreach ($productData['variants'] as $variantData) {
+                    ProductVariant::create([
+                        'product_id' => $product->id,
+                        'variant_name' => $variantData['variant_name'],
+                        'variant_description' => $variantData['variant_description'],
+                        'sku' => $product->generateVariantSku($variantData['variant_name']),
+                        'stock_quantity' => $variantData['stock'],
+                        'price' => $variantData['price'],
+                        'sale_price' => $variantData['sale_price'],
+                    ]);
+                }
+                
+                // Update product stock to sum of variants
+                $product->updateTotalStock();
             }
         }
         
-        $this->command->info('Products and Variants Created Successfully!'); 
+        $this->command->info('Appliances and Variants Created Successfully!'); 
     }
 }

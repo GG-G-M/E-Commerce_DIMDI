@@ -1,309 +1,480 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h1 class="mb-4 text-success fw-bold" style="color: #2C8F0C;">Shopping Cart</h1>
+<style>
+    .cart-item {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: white;
+    }
+    .cart-item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .quantity-btn {
+        width: 35px;
+        height: 35px;
+        border: 1px solid #2C8F0C;
+        background: white;
+        color: #2C8F0C;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 5px;
+    }
+    .btn-primary {
+        background-color: #2C8F0C !important;
+        border-color: #2C8F0C !important;
+    }
+    .btn-outline-primary {
+        color: #2C8F0C !important;
+        border-color: #2C8F0C !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: #2C8F0C !important;
+        color: white !important;
+    }
+    .summary-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 25px;
+        position: sticky;
+        top: 20px;
+    }
+    .variant-select {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 5px 10px;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+    .stock-warning {
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    .loading-spinner {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+</style>
 
-    @if($cartItems->count() > 0)
+<div class="container py-4">
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header text-white fw-bold" style="background-color: #2C8F0C;">
-                    <i class="fas fa-shopping-cart me-2"></i> Your Cart Items
-                </div>
-                <div class="card-body">
-                    @foreach($cartItems as $item)
-                    <div class="row align-items-center mb-4 pb-4 border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Shopping Cart</h2>
+                <span class="text-muted">{{ $cartItems->count() }} items</span>
+            </div>
+
+            @if($cartItems->count() > 0)
+                @foreach($cartItems as $item)
+                @php
+                    // Get the actual variant for this cart item
+                    $currentVariant = $item->product->variants->first(function($variant) use ($item) {
+                        return ($variant->size === $item->selected_size) || ($variant->variant_name === $item->selected_size);
+                    });
+                    
+                    $currentStock = $currentVariant ? $currentVariant->stock_quantity : $item->product->stock_quantity;
+                    $variantName = $currentVariant ? ($currentVariant->size ?? $currentVariant->variant_name) : $item->selected_size;
+                    $isVariantAvailable = $currentVariant && $currentStock > 0;
+                    $maxQuantity = $currentStock;
+                    
+                    // Get variant-specific image or fallback to product image
+                    $displayImage = $currentVariant && $currentVariant->image_url ? $currentVariant->image_url : $item->product->image_url;
+                    
+                    // Calculate price based on actual variant
+                    $unitPrice = $currentVariant ? $currentVariant->current_price : $item->product->current_price;
+                    $itemTotalPrice = $unitPrice * $item->quantity;
+                @endphp
+                
+                <div class="cart-item position-relative" id="cart-item-{{ $item->id }}">
+                    <div class="loading-spinner" id="loading-{{ $item->id }}">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row align-items-center">
                         <div class="col-md-2">
-                            <img src="{{ $item->product->image_url }}" 
-                                 alt="{{ $item->product->name }}" class="img-fluid rounded" style="height: 80px; object-fit: cover;">
+                            <img src="{{ $displayImage }}" alt="{{ $item->product->name }}" class="cart-item-image" id="item-image-{{ $item->id }}">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <h5 class="mb-1">{{ $item->product->name }}</h5>
-                            <p class="text-muted mb-0">${{ $item->product->current_price }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <form action="{{ route('cart.update', $item) }}" method="POST" class="d-flex align-items-center gap-2" id="cart-form-{{ $item->id }}">
+                            <p class="text-muted mb-1 small">{{ Str::limit($item->product->description, 50) }}</p>
+                            
+                            <!-- Variant Selection -->
+                            @if($item->product->has_variants && $item->product->variants->count() > 0)
+                            <form action="{{ route('cart.update', $item) }}" method="POST" class="mb-2 variant-form" id="variant-form-{{ $item->id }}">
                                 @csrf
                                 @method('PUT')
-                                
-                                <!-- Size Selection Dropdown -->
-                                <div class="me-2">
-                                    <label class="form-label small mb-1 text-success fw-semibold">Size:</label>
-                                    <select name="selected_size" class="form-select form-select-sm auto-submit border-success">
-                                        @foreach($item->product->available_sizes as $size)
-                                        <option value="{{ $size }}" {{ $item->selected_size == $size ? 'selected' : '' }}>
-                                            {{ $size }}
+                                <input type="hidden" name="quantity" value="{{ $item->quantity }}" id="quantity-{{ $item->id }}">
+                                <select name="selected_size" class="variant-select" data-item-id="{{ $item->id }}">
+                                    @foreach($item->product->variants as $variant)
+                                        @php
+                                            $variantNameOption = $variant->size ?? $variant->variant_name ?? 'Option';
+                                            $variantStock = $variant->stock_quantity ?? 0;
+                                            $variantPrice = $variant->current_price ?? $variant->price ?? 0;
+                                            $variantImage = $variant->image_url;
+                                        @endphp
+                                        <option value="{{ $variantNameOption }}" 
+                                            data-price="{{ $variantPrice }}"
+                                            data-image="{{ $variantImage }}"
+                                            data-stock="{{ $variantStock }}"
+                                            {{ $item->selected_size == $variantNameOption ? 'selected' : '' }}
+                                            {{ $variantStock <= 0 ? 'disabled' : '' }}>
+                                            {{ $variantNameOption }} 
+                                            @if($variantStock <= 0)
+                                            (Out of Stock)
+                                            @else
+                                            - ${{ number_format($variantPrice, 2) }} ({{ $variantStock }} available)
+                                            @endif
                                         </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <!-- Quantity Input -->
-                                <div>
-                                    <label class="form-label small mb-1 text-success fw-semibold">Qty:</label>
-                                    <div class="quantity-control" style="width: 100px;">
-                                        <div class="input-group input-group-sm">
-                                            <button class="btn btn-outline-success quantity-btn" type="button" data-action="decrease">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" name="quantity" value="{{ $item->quantity }}" 
-                                                min="1" max="{{ $item->product->stock_quantity }}" 
-                                                class="form-control text-center auto-submit border-success" readonly
-                                                style="border-left: 0; border-right: 0;">
-                                            <button class="btn btn-outline-success quantity-btn" type="button" data-action="increase">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Loading Spinner -->
-                                <div class="mt-3 loading-spinner" style="display: none;">
-                                    <div class="spinner-border spinner-border-sm text-success" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
+                                    @endforeach
+                                </select>
                             </form>
+                            @else
+                            <span class="badge bg-light text-dark">Option: {{ $variantName }}</span>
+                            @endif
+                            
+                            <!-- Stock Warning -->
+                            @if(!$isVariantAvailable)
+                            <div class="alert alert-warning py-1 mt-2 small" role="alert">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Selected option is out of stock
+                            </div>
+                            @elseif($currentStock < $item->quantity)
+                            <div class="alert alert-warning py-1 mt-2 small" role="alert">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                Only {{ $currentStock }} available in this option
+                            </div>
+                            @endif
                         </div>
-                        <div class="col-md-2">
-                            <strong class="text-success">$<span id="item-total-{{ $item->id }}">{{ number_format($item->total_price, 2) }}</span></strong>
+                        <div class="col-md-3">
+                            <div class="quantity-control">
+                                <form action="{{ route('cart.update', $item) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="selected_size" value="{{ $item->selected_size }}">
+                                    <button type="submit" name="quantity" value="{{ $item->quantity - 1 }}" 
+                                            class="quantity-btn" 
+                                            {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
+                                </form>
+                                
+                                <span class="quantity-input">{{ $item->quantity }}</span>
+                                
+                                <form action="{{ route('cart.update', $item) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="selected_size" value="{{ $item->selected_size }}">
+                                    <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" 
+                                            class="quantity-btn" 
+                                            {{ !$isVariantAvailable || $item->quantity >= $maxQuantity ? 'disabled' : '' }}>+</button>
+                                </form>
+                            </div>
+                            @if($isVariantAvailable && $maxQuantity)
+                            <small class="text-muted stock-warning">Max: {{ $maxQuantity }}</small>
+                            @endif
                         </div>
-                        <div class="col-md-2">
-                            <form 
-                                action="{{ route('cart.destroy', $item) }}" 
-                                method="POST" 
-                                class="d-inline"
-                                onsubmit="return confirm('Are you sure you want to remove this item from your cart?');"
-                            >
+                        <div class="col-md-2 text-center">
+                            <strong class="text-success item-total" id="item-total-{{ $item->id }}">${{ number_format($itemTotalPrice, 2) }}</strong>
+                            @if($item->product->has_variants)
+                            <br>
+                            <small class="text-muted item-unit-price" id="item-unit-{{ $item->id }}">${{ number_format($unitPrice, 2) }} each</small>
+                            @endif
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <form action="{{ route('cart.destroy', $item) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash"></i> Remove
+                                <button type="submit" class="btn btn-link text-danger p-0" title="Remove item">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </div>
                     </div>
-                    @endforeach
                 </div>
-            </div>
+                @endforeach
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                    <form action="{{ route('cart.clear') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-2"></i>Clear Cart
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                    <h3 class="text-muted">Your cart is empty</h3>
+                    <p class="text-muted mb-4">Start shopping to add items to your cart</p>
+                    <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                    </a>
+                </div>
+            @endif
         </div>
 
+        @if($cartItems->count() > 0)
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header text-white fw-bold" style="background-color: #2C8F0C;">
-                    <i class="fas fa-receipt me-2"></i> Order Summary
+            <div class="summary-card">
+                <h4 class="mb-4">Order Summary</h4>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal ({{ $cartItems->sum('quantity') }} items):</span>
+                    <span>${{ number_format($subtotal, 2) }}</span>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span class="text-success">$<span id="summary-subtotal">{{ number_format($subtotal, 2) }}</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Tax (10%):</span>
-                        <span class="text-success">$<span id="summary-tax">{{ number_format($tax, 2) }}</span></span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Shipping:</span>
-                        <span class="text-success">$<span id="summary-shipping">{{ number_format($shipping, 2) }}</span></span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <strong>Total:</strong>
-                        <strong class="text-success">$<span id="summary-total">{{ number_format($total, 2) }}</span></strong>
-                    </div>
-                    <a href="{{ route('orders.create') }}" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;">
-                        Proceed to Checkout
-                    </a>
-                    <a href="{{ route('products.index') }}" class="btn btn-outline-success w-100 mt-2">
-                        Continue Shopping
-                    </a>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Tax (10%):</span>
+                    <span>${{ number_format($tax, 2) }}</span>
                 </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Shipping:</span>
+                    <span>{{ $shipping == 0 ? 'FREE' : '$' . number_format($shipping, 2) }}</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-4">
+                    <strong>Total:</strong>
+                    <strong class="text-success">${{ number_format($total, 2) }}</strong>
+                </div>
+
+                @if($subtotal < 100)
+                <div class="alert alert-info">
+                    <small>
+                        <i class="fas fa-info-circle me-2"></i>
+                        Add ${{ number_format(100 - $subtotal, 2) }} more for free shipping!
+                    </small>
+                </div>
+                @endif
+
+                <!-- Check if any items are out of stock -->
+                @php
+                    $outOfStockItems = $cartItems->filter(function($item) {
+                        $variant = $item->product->variants->first(function($v) use ($item) {
+                            return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
+                        });
+                        return !$variant || ($variant->stock_quantity ?? 0) <= 0;
+                    });
+                @endphp
+
+                @if($outOfStockItems->count() > 0)
+                <div class="alert alert-warning">
+                    <small>
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ $outOfStockItems->count() }} item(s) in your cart are out of stock. Please update your cart before checkout.
+                    </small>
+                </div>
+                <button class="btn btn-secondary w-100 btn-lg" disabled>
+                    <i class="fas fa-lock me-2"></i>Update Cart to Checkout
+                </button>
+                @else
+                <a href="{{ route('orders.create') }}" class="btn btn-primary w-100 btn-lg">
+                    <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                </a>
+                @endif
             </div>
         </div>
+        @endif
     </div>
-    @else
-    <div class="text-center py-5">
-        <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
-        <h3 class="text-success">Your cart is empty</h3>
-        <p class="text-muted mb-4">Start shopping to add items to your cart</p>
-        <a href="{{ route('products.index') }}" class="btn text-white btn-lg" style="background-color: #2C8F0C;">Start Shopping</a>
-    </div>
-    @endif
 </div>
 
-@push('scripts')
 <script>
-// Handle custom quantity buttons
 document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.quantity-btn')) {
-            const button = e.target.closest('.quantity-btn');
-            const action = button.getAttribute('data-action');
-            const input = button.closest('.input-group').querySelector('input[name="quantity"]');
-            const currentValue = parseInt(input.value);
-            const min = parseInt(input.getAttribute('min'));
-            const max = parseInt(input.getAttribute('max'));
-            
-            let newValue = currentValue;
-            
-            if (action === 'increase' && currentValue < max) {
-                newValue = currentValue + 1;
-            } else if (action === 'decrease' && currentValue > min) {
-                newValue = currentValue - 1;
-            }
-            
-            if (newValue !== currentValue) {
-                input.value = newValue;
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+    // Add confirmation for clear cart
+    document.querySelector('form[action*="cart.clear"]')?.addEventListener('submit', function(e) {
+        if (!confirm('Are you sure you want to clear your entire cart?')) {
+            e.preventDefault();
         }
     });
-});
 
-document.addEventListener('DOMContentLoaded', function() {
-    const autoSubmitElements = document.querySelectorAll('.auto-submit');
-    
-    autoSubmitElements.forEach(element => {
-        element.addEventListener('change', function() {
-            const form = this.closest('form');
-            submitForm(form);
+    // Add confirmation for remove item
+    document.querySelectorAll('form[action*="cart.destroy"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Are you sure you want to remove this item from your cart?')) {
+                e.preventDefault();
+            }
         });
-        
-        if (element.type === 'number') {
-            let timeout;
-            element.addEventListener('input', function() {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    const form = this.closest('form');
-                    submitForm(form);
-                }, 500);
-            });
-        }
     });
-    
-    function submitForm(form) {
-        const formData = new FormData(form);
-        const itemId = form.id.split('-')[2];
-        const loadingSpinner = form.querySelector('.loading-spinner');
-        
-        if (loadingSpinner) {
-            loadingSpinner.style.display = 'block';
-        }
-        
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
+
+    // Handle variant selection with AJAX
+    document.querySelectorAll('.variant-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const selectedOption = this.options[this.selectedIndex];
+            
+            // Don't proceed if option is disabled (out of stock)
+            if (selectedOption.disabled) {
+                this.value = this.querySelector('option[selected]').value;
+                return;
             }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+            
+            const variantPrice = parseFloat(selectedOption.getAttribute('data-price'));
+            const variantImage = selectedOption.getAttribute('data-image');
+            const variantStock = parseInt(selectedOption.getAttribute('data-stock'));
+            
+            // Get current quantity
+            const quantityElement = document.querySelector(`#cart-item-${itemId} .quantity-input`);
+            const quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
+            
+            // Update price display immediately
+            const itemTotal = variantPrice * quantity;
+            document.getElementById(`item-total-${itemId}`).textContent = `$${itemTotal.toFixed(2)}`;
+            
+            const unitPriceElement = document.getElementById(`item-unit-${itemId}`);
+            if (unitPriceElement) {
+                unitPriceElement.textContent = `$${variantPrice.toFixed(2)} each`;
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const itemTotalElement = document.getElementById(`item-total-${itemId}`);
-                if (itemTotalElement && data.item_total) {
-                    itemTotalElement.textContent = data.item_total;
-                }
-                
-                updateSummaryTotals(data.summary);
-                showFlashMessage('Cart updated successfully!', 'success');
-            } else {
-                throw new Error(data.message || 'Update failed');
+            
+            // Update image immediately if variant has specific image
+            const itemImage = document.getElementById(`item-image-${itemId}`);
+            if (variantImage && variantImage !== 'null' && itemImage) {
+                itemImage.src = variantImage;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showFlashMessage('Error updating cart. Please try again.', 'error');
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
-        })
-        .finally(() => {
+            
+            // Show loading spinner
+            const loadingSpinner = document.getElementById(`loading-${itemId}`);
             if (loadingSpinner) {
-                loadingSpinner.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+            }
+            
+            // Submit the form via AJAX to avoid page reload
+            const form = document.getElementById(`variant-form-${itemId}`);
+            if (form) {
+                const formData = new FormData(form);
+                
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update cart count if provided
+                        if (data.cart_count !== undefined) {
+                            // Update cart count in header if you have one
+                            const cartCountElements = document.querySelectorAll('.cart-count');
+                            cartCountElements.forEach(el => {
+                                el.textContent = data.cart_count;
+                            });
+                        }
+                        
+                        // Show success message
+                        if (data.message) {
+                            showToast('success', data.message);
+                        }
+                    } else {
+                        // Show error message
+                        if (data.message) {
+                            showToast('error', data.message);
+                            // Revert the selection on error
+                            location.reload();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'An error occurred while updating the cart');
+                    location.reload();
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                    
+                    // Reload the page to get updated totals and stock information
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                });
             }
         });
-    }
-    
-    function updateSummaryTotals(summary) {
-        if (summary.subtotal) {
-            document.getElementById('summary-subtotal').textContent = summary.subtotal;
+    });
+
+    // Show loading when changing quantity
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const form = this.closest('form');
+            const cartItem = form.closest('.cart-item');
+            if (cartItem) {
+                const itemId = cartItem.id.replace('cart-item-', '');
+                const loadingSpinner = document.getElementById(`loading-${itemId}`);
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'block';
+                }
+            }
+        });
+    });
+
+    // Toast notification function
+    function showToast(type, message) {
+        // Create toast container if it doesn't exist
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            toastContainer.className = 'position-fixed top-0 end-0 p-3';
+            toastContainer.style.zIndex = '9999';
+            document.body.appendChild(toastContainer);
         }
-        if (summary.tax) {
-            document.getElementById('summary-tax').textContent = summary.tax;
-        }
-        if (summary.shipping) {
-            document.getElementById('summary-shipping').textContent = summary.shipping;
-        }
-        if (summary.total) {
-            document.getElementById('summary-total').textContent = summary.total;
-        }
-    }
-    
-    function showFlashMessage(message, type) {
-        const existingMessages = document.querySelectorAll('.flash-message');
-        existingMessages.forEach(msg => msg.remove());
+
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
         
-        const flashMessage = document.createElement('div');
-        flashMessage.className = `alert alert-${type === 'error' ? 'danger' : 'success'} flash-message position-fixed`;
-        flashMessage.style.cssText = `
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-            min-width: 300px;
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
         `;
-        flashMessage.textContent = message;
+
+        toastContainer.appendChild(toast);
         
-        document.body.appendChild(flashMessage);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
         
-        setTimeout(() => {
-            flashMessage.remove();
-        }, 3000);
+        // Remove toast from DOM after it's hidden
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
     }
 });
 </script>
-
-<style>
-.auto-submit:focus {
-    border-color: #2C8F0C;
-    box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
-}
-
-.loading-spinner {
-    margin-left: 10px;
-}
-
-.flash-message {
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-</style>
-@endpush
 @endsection

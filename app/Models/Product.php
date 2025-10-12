@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class Product extends Model
 {
@@ -18,7 +20,7 @@ class Product extends Model
         'stock_quantity',
         'sku',
         'image',
-        'sizes',
+        'gallery',
         'is_featured',
         'is_active',
         'is_archived',
@@ -26,7 +28,7 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'sizes' => 'array',
+        'gallery' => 'array',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
         'is_archived' => 'boolean',
@@ -44,82 +46,120 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    // Check if product has variants
+    public function getHasVariantsAttribute()
+    {
+        return $this->variants()->exists();
+    }
+
     public function getCurrentPriceAttribute()
     {
+        if ($this->has_variants) {
+            // Return null or minimum price if has variants
+            $minPrice = $this->variants->min('current_price');
+            return $minPrice ?: $this->price;
+        }
         return $this->sale_price ?? $this->price;
+    }
+    
+    /**
+     * Check if a specific size is in stock
+     */
+    public function isSizeInStock($size)
+    {
+        // If product has variants, check variant stock
+        if ($this->has_variants) {
+            $variant = $this->variants->where('size', $size)->first();
+            return $variant && $variant->stock_quantity > 0;
+        }
+
+        // For products without variants, check general stock
+        return $this->stock_quantity > 0;
+    }
+
+    /**
+     * Get stock quantity for a specific size
+     */
+    public function getStockForSize($size)
+    {
+        // If product has variants, get variant stock
+        if ($this->has_variants) {
+            $variant = $this->variants->where('size', $size)->first();
+            return $variant ? $variant->stock_quantity : 0;
+        }
+
+        // For products without variants, return general stock
+        return $this->stock_quantity;
+    }
+
+    /**
+     * Get all available sizes from variants
+     */
+    public function getAllSizesAttribute()
+    {
+        if ($this->has_variants) {
+            return $this->variants->pluck('size')->filter()->toArray();
+        }
+        
+        return ['One Size'];
     }
 
     public function getHasDiscountAttribute()
     {
+        if ($this->has_variants) {
+            return $this->variants->contains('has_discount', true);
+        }
         return !is_null($this->sale_price) && $this->sale_price < $this->price;
     }
 
+    /**
+     * Calculate discount percentage for products with variants
+     */
     public function getDiscountPercentageAttribute()
     {
         if (!$this->has_discount) {
             return 0;
         }
         
-        return round((($this->price - $this->sale_price) / $this->price) * 100);
+        if ($this->has_variants) {
+            // For products with variants, calculate based on variant prices
+            $discounts = $this->variants->filter(function($variant) {
+                return !is_null($variant->sale_price) && $variant->sale_price < $variant->price;
+            })->map(function($variant) {
+                if ($variant->price > 0) {
+                    return round((($variant->price - $variant->sale_price) / $variant->price) * 100);
+                }
+                return 0;
+            });
+            
+            return $discounts->isNotEmpty() ? $discounts->max() : 0;
+        }
+        
+        // For products without variants
+        if ($this->price > 0 && $this->sale_price < $this->price) {
+            return round((($this->price - $this->sale_price) / $this->price) * 100);
+        }
+        
+        return 0;
     }
 
     public function getImageUrlAttribute()
     {
-        // If image is already a full URL (from seeder), return it
         if ($this->image && filter_var($this->image, FILTER_VALIDATE_URL)) {
             return $this->image;
         }
         
-        // If image is stored in public directory
         if ($this->image && file_exists(public_path($this->image))) {
             return asset($this->image);
         }
         
-        // Fallback to placeholder
         return 'https://picsum.photos/400/300?random=' . uniqid();
-    }
-
-    // Get available sizes with stock (from variants)
-    public function getAvailableSizesAttribute()
-    {
-        if ($this->variants()->exists()) {
-            return $this->variants()
-                ->where('stock_quantity', '>', 0)
-                ->pluck('size')
-                ->toArray();
-        }
-        
-        // Fallback to old sizes field if no variants exist
-        if (!$this->sizes) {
-            return ['One Size'];
-        }
-        
-        $sizes = json_decode($this->sizes, true) ?: [];
-        return !empty($sizes) ? $sizes : ['One Size'];
-    }
-
-    // Get all sizes including out of stock (from variants)
-    public function getAllSizesAttribute()
-    {
-        if ($this->variants()->exists()) {
-            return $this->variants()
-                ->pluck('size')
-                ->toArray();
-        }
-        
-        // Fallback to old sizes field if no variants exist
-        if (!$this->sizes) {
-            return ['One Size'];
-        }
-        
-        $sizes = json_decode($this->sizes, true) ?: [];
-        return !empty($sizes) ? $sizes : ['One Size'];
     }
 
     // Get total stock across all variants
     public function getTotalStockAttribute()
     {
-        if ($this->variants()->exists()) {
+        if ($this->has_variants) {
             return $this->variants->sum('stock_quantity');
         }
         
@@ -132,26 +172,46 @@ class Product extends Model
         return $this->total_stock > 0;
     }
 
-    // Get variant by size
-    public function getVariantBySize($size)
+    // Get variant names for display
+    public function getVariantNamesAttribute()
     {
-        return $this->variants()->where('size', $size)->first();
+        if ($this->has_variants) {
+            return $this->variants->pluck('variant_name')->toArray();
+        }
+        
+        return [];
     }
 
-    // Get stock quantity for specific size
-    public function getStockForSize($size)
+    /**
+     * Get sale price for display
+     */
+    public function getSalePriceAttribute($value)
     {
-        $variant = $this->getVariantBySize($size);
-        return $variant ? $variant->stock_quantity : 0;
+        if ($this->has_variants) {
+            $minSalePrice = $this->variants->min('sale_price');
+            $minPrice = $this->variants->min('price');
+            
+            // If there's a sale price lower than regular price, return it
+            if ($minSalePrice && $minSalePrice < $minPrice) {
+                return $minSalePrice;
+            }
+            return $value;
+        }
+        return $value;
     }
 
-    // Check if specific size is in stock
-    public function isSizeInStock($size, $quantity = 1)
+    /**
+     * Get price for display
+     */
+    public function getPriceAttribute($value)
     {
-        $variant = $this->getVariantBySize($size);
-        return $variant && $variant->stock_quantity >= $quantity;
+        if ($this->has_variants) {
+            return $this->variants->min('price') ?: $value;
+        }
+        return $value;
     }
 
+    // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
@@ -166,17 +226,16 @@ class Product extends Model
         return $query->where('is_archived', true);
     }
 
-    public function scopeNotArchived($query)
-    {
-        return $query->where('is_archived', false);
-    }
-
     public function scopeSearch($query, $search)
     {
         return $query->where(function($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
               ->orWhere('description', 'like', "%{$search}%")
-              ->orWhere('sku', 'like', "%{$search}%");
+              ->orWhere('sku', 'like', "%{$search}%")
+              ->orWhereHas('variants', function($q) use ($search) {
+                  $q->where('variant_name', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+              });
         });
     }
 
@@ -213,13 +272,12 @@ class Product extends Model
                                 $q->where('is_active', true);
                             });
             case 'all':
-                return $query; // Show all products including archived
+                return $query;
             default:
                 return $query->where('is_archived', false);
         }
     }
 
-    // Check if product is effectively inactive (either product inactive or category inactive)
     public function getIsEffectivelyInactiveAttribute()
     {
         return !$this->is_active || !$this->category->is_active;
@@ -232,7 +290,7 @@ class Product extends Model
 
     public function unarchive()
     {
-        $this->update(['is_archived' => false]);
+        $this->update(['is_archived', false]);
     }
 
     public function getRouteKeyName()
@@ -240,41 +298,42 @@ class Product extends Model
         return 'slug';
     }
 
-    // Create variants from sizes array
-    public function createVariantsFromSizes()
-    {
-        if (!$this->sizes || empty($this->sizes)) {
-            // Create default variant if no sizes specified
-            ProductVariant::create([
-                'product_id' => $this->id,
-                'size' => 'One Size',
-                'stock_quantity' => $this->stock_quantity,
-                'price' => $this->price,
-                'sale_price' => $this->sale_price,
-            ]);
-            return;
-        }
-
-        $sizes = is_array($this->sizes) ? $this->sizes : json_decode($this->sizes, true);
-        
-        foreach ($sizes as $size) {
-            ProductVariant::create([
-                'product_id' => $this->id,
-                'size' => $size,
-                'stock_quantity' => $this->stock_quantity, // Distribute total stock evenly
-                'price' => $this->price,
-                'sale_price' => $this->sale_price,
-            ]);
-        }
-    }
-
     // Update total stock based on variants (for backward compatibility)
     public function updateTotalStock()
     {
-        if ($this->variants()->exists()) {
+        if ($this->has_variants) {
             $this->update([
                 'stock_quantity' => $this->variants->sum('stock_quantity')
             ]);
         }
+    }
+
+    // Generate SKU for variants
+    public function generateVariantSku($variantName)
+    {
+        $baseSku = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $this->name), 0, 6));
+        $variantCode = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $variantName), 0, 3));
+        return "{$baseSku}-{$variantCode}-" . strtoupper(Str::random(4));
+    }
+
+    /**
+     * Get total price for cart items (used in cart relationships)
+     */
+    public function getTotalPriceAttribute()
+    {
+        return $this->current_price * ($this->pivot->quantity ?? 1);
+    }
+
+    /**
+     * Get available sizes as string for display
+     */
+    public function getAvailableSizesAttribute()
+    {
+        if ($this->has_variants) {
+            $sizes = $this->variants->pluck('size')->filter()->toArray();
+            return $sizes ? implode(', ', $sizes) : 'One Size';
+        }
+
+        return 'One Size';
     }
 }

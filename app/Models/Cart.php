@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Cart extends Model
 {
     protected $fillable = [
-        'session_id',
         'user_id',
+        'session_id', 
         'product_id',
-        'selected_size',
-        'quantity'
+        'quantity',
+        'selected_size'
     ];
 
     public function product(): BelongsTo
@@ -20,27 +20,69 @@ class Cart extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function variant()
+    public function user(): BelongsTo
     {
-        return $this->product->getVariantBySize($this->selected_size);
+        return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get total price for this cart item
+     */
     public function getTotalPriceAttribute()
     {
-        $variant = $this->variant();
-        if ($variant && $variant->current_price) {
-            return $variant->current_price * $this->quantity;
+        if ($this->product) {
+            // For products with variants, get the price for the selected size
+            if ($this->product->has_variants) {
+                $variant = $this->product->variants->first(function($v) {
+                    return ($v->size === $this->selected_size) || ($v->variant_name === $this->selected_size);
+                });
+                
+                if ($variant) {
+                    return $variant->current_price * $this->quantity;
+                }
+            }
+            
+            // For products without variants, use the product's current price
+            return $this->product->current_price * $this->quantity;
         }
-        return $this->product->current_price * $this->quantity;
+        
+        return 0;
     }
 
-    // Check if cart item is still available
-    public function getIsAvailableAttribute()
+    /**
+     * Check if the selected size is still available
+     */
+    public function getIsSizeAvailableAttribute()
     {
-        $variant = $this->variant();
-        if (!$variant) {
+        if (!$this->product) {
             return false;
         }
-        return $variant->stock_quantity >= $this->quantity;
+
+        return $this->product->isSizeInStock($this->selected_size);
+    }
+
+    /**
+     * Get available stock for the selected size
+     */
+    public function getAvailableStockAttribute()
+    {
+        if (!$this->product) {
+            return 0;
+        }
+
+        return $this->product->getStockForSize($this->selected_size);
+    }
+
+    /**
+     * Check if cart item can be updated (has enough stock)
+     */
+    public function canUpdateQuantity($newQuantity)
+    {
+        if (!$this->product) {
+            return false;
+        }
+
+        $availableStock = $this->getAvailableStockAttribute();
+        return $availableStock >= $newQuantity;
     }
 }

@@ -60,23 +60,17 @@ class OrderController extends Controller
         $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
         
         $request->validate([
-            'order_status' => 'required|in:' . implode(',', $validStatuses)
+            'order_status' => 'required|in:' . implode(',', $validStatuses),
+            'status_notes' => 'nullable|string|max:500'
         ]);
 
         $oldStatus = $order->order_status;
         $newStatus = $request->order_status;
+        $notes = $request->status_notes;
 
-        // If changing from cancelled to another status, clear cancellation fields
-        if ($oldStatus == 'cancelled' && $newStatus != 'cancelled') {
-            $order->update([
-                'order_status' => $newStatus,
-                'cancellation_reason' => null,
-                'cancelled_at' => null
-            ]);
-        } else {
-            $order->update(['order_status' => $newStatus]);
-        }
+        // Use the new updateStatus method from Order model
+        $order->updateStatus($newStatus, $notes);
 
-        return redirect()->back()->with('success', "Order status updated from {$oldStatus} to {$newStatus} successfully!");
+        return redirect()->back()->with('success', "Order status updated from " . ucfirst($oldStatus) . " to " . ucfirst($newStatus) . " successfully!");
     }
 }
