@@ -217,11 +217,11 @@ class OrderController extends Controller
         foreach ($order->items as $item) {
             if ($item->product) {
                 if ($item->product->has_variants && $item->selected_size) {
-                    // Find and update variant stock
-                    $variant = $item->product->variants
-                        ->where('size', $item->selected_size)
-                        ->orWhere('variant_name', $item->selected_size)
-                        ->first();
+                    // Find and update variant stock - FIXED
+                    $variant = $item->product->variants->first(function($variant) use ($item) {
+                        return ($variant->size === $item->selected_size) || 
+                            ($variant->variant_name === $item->selected_size);
+                    });
                     
                     if ($variant) {
                         $variant->stock_quantity += $item->quantity;

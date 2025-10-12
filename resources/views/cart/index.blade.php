@@ -226,7 +226,7 @@
                             @endif
                         </div>
                         <div class="col-md-1 text-end">
-                            <form action="{{ route('cart.destroy', $item) }}" method="POST">
+                            <form action="{{ route('cart.destroy', $item) }}" method="POST" onsubmit = "return confirm('Are you sure you want to remove this item from the cart?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-link text-danger p-0" title="Remove item">
@@ -242,7 +242,7 @@
                     <a href="{{ route('products.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left me-2"></i>Continue Shopping
                     </a>
-                    <form action="{{ route('cart.clear') }}" method="POST">
+                    <form action="{{ route('cart.clear') }}" method="POST" onsubmit = "return confirm('Are you sure you want to clear this cart? This action cannot be undone.');">
                         @csrf
                         <button type="submit" class="btn btn-outline-danger">
                             <i class="fas fa-trash me-2"></i>Clear Cart
@@ -337,22 +337,9 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add confirmation for clear cart
-    document.querySelector('form[action*="cart.clear"]')?.addEventListener('submit', function(e) {
-        if (!confirm('Are you sure you want to clear your entire cart?')) {
-            e.preventDefault();
-        }
-    });
-
-    // Add confirmation for remove item
-    document.querySelectorAll('form[action*="cart.destroy"]').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!confirm('Are you sure you want to remove this item from your cart?')) {
-                e.preventDefault();
-            }
-        });
-    });
+function confirmClear() {
+    return confirm('Are you sure you want to clear this cart? This action cannot be undone.');
+}
 
     // Handle variant selection with AJAX
     document.querySelectorAll('.variant-select').forEach(select => {
