@@ -60,6 +60,9 @@ class CartController extends Controller
 
         $product = Product::with('variants')->findOrFail($request->product_id);
         
+        // Get the correct price based on variant or product
+        $unitPrice = $product->current_price;
+        
         // Check if product has variants/sizes
         if ($product->has_variants) {
             $variant = $product->variants->first(function($v) use ($request) {
@@ -88,6 +91,8 @@ class CartController extends Controller
             }
             
             $stock = $variant->stock_quantity;
+            // Use variant price if available, otherwise use product price
+            $unitPrice = $variant->current_price ?? $variant->price ?? $product->current_price;
         } else {
             // For products without variants
             if ($product->stock_quantity <= 0) {
@@ -114,7 +119,7 @@ class CartController extends Controller
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + $request->quantity;
             
-            // Check stock again for updated quantity - THIS IS THE KEY FIX
+            // Check stock again for updated quantity
             if ($newQuantity > $stock) {
                 $maxCanAdd = $stock - $cartItem->quantity;
                 
@@ -130,8 +135,10 @@ class CartController extends Controller
                 
                 // Limit the quantity to what's actually available
                 $newQuantity = $stock;
-                $cartItem->quantity = $newQuantity;
-                $cartItem->save();
+                $cartItem->update([
+                    'quantity' => $newQuantity,
+                    'total_price' => $newQuantity * $cartItem->unit_price
+                ]);
                 
                 if ($request->ajax()) {
                     $cartCount = Cart::where($cartIdentifier)->sum('quantity');
@@ -146,8 +153,10 @@ class CartController extends Controller
             }
             
             // If we have enough stock, update normally
-            $cartItem->quantity = $newQuantity;
-            $cartItem->save();
+            $cartItem->update([
+                'quantity' => $newQuantity,
+                'total_price' => $newQuantity * $cartItem->unit_price
+            ]);
         } else {
             // For new cart items, also check stock
             if ($request->quantity > $stock) {
@@ -160,10 +169,13 @@ class CartController extends Controller
                 return redirect()->back()->with('error', "Cannot add {$request->quantity} items. Only {$stock} available.");
             }
             
+            // FIXED: Include unit_price and total_price when creating cart item
             Cart::create(array_merge($cartIdentifier, [
                 'product_id' => $request->product_id,
                 'selected_size' => $request->selected_size,
-                'quantity' => $request->quantity
+                'quantity' => $request->quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $request->quantity * $unitPrice
             ]));
         }
 
@@ -192,6 +204,9 @@ class CartController extends Controller
 
         $product = $cart->product;
         
+        // Get the correct price based on variant or product
+        $unitPrice = $product->current_price;
+        
         // Find the selected variant
         $selectedVariant = null;
         if ($product->has_variants) {
@@ -210,6 +225,8 @@ class CartController extends Controller
             }
             
             $stock = $selectedVariant->stock_quantity;
+            // Use variant price if available
+            $unitPrice = $selectedVariant->current_price ?? $selectedVariant->price ?? $product->current_price;
         } else {
             $stock = $product->stock_quantity;
         }
@@ -262,8 +279,10 @@ class CartController extends Controller
                 }
                 
                 // Merge with existing item
-                $existingCartItem->quantity = $mergedQuantity;
-                $existingCartItem->save();
+                $existingCartItem->update([
+                    'quantity' => $mergedQuantity,
+                    'total_price' => $mergedQuantity * $existingCartItem->unit_price
+                ]);
                 $cart->delete();
                 
                 if ($request->ajax()) {
@@ -293,10 +312,12 @@ class CartController extends Controller
             }
         }
 
-        // Update the current cart item
+        // Update the current cart item with correct pricing
         $cart->update([
             'quantity' => $newQuantity,
-            'selected_size' => $request->selected_size
+            'selected_size' => $request->selected_size,
+            'unit_price' => $unitPrice,
+            'total_price' => $newQuantity * $unitPrice
         ]);
 
         // Reload the cart item with fresh data to get updated price

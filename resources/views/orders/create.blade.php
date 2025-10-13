@@ -43,6 +43,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="payment_method" class="form-label text-success fw-semibold">Payment Method *</label>
                                 <select class="form-select border-success" id="payment_method" name="payment_method" required>
+                                    <option value="">Select Payment Method</option>
                                     <option value="card">Credit/Debit Card (PayMongo)</option>
                                     <option value="gcash">GCash (PayMongo)</option>
                                     <option value="grab_pay">GrabPay (PayMongo)</option>
@@ -94,15 +95,21 @@
 
                         <div class="mb-3">
                             <label for="shipping_address" class="form-label text-success fw-semibold">Shipping Address *</label>
-                            <textarea class="form-control border-success" id="shipping_address" name="shipping_address" rows="3" required>{{ old('shipping_address', $user->address) }}</textarea>
+                            <textarea class="form-control border-success" id="shipping_address" name="shipping_address" rows="3" required placeholder="Enter your complete shipping address">{{ old('shipping_address', $user->address) }}</textarea>
                             <small class="form-text text-muted">We'll deliver to this address</small>
                         </div>
 
                         <div class="mb-3">
                             <label for="billing_address" class="form-label text-success fw-semibold">Billing Address</label>
-                            <textarea class="form-control border-success" id="billing_address" name="billing_address" rows="3">{{ old('billing_address', $user->address) }}</textarea>
+                            <textarea class="form-control border-success" id="billing_address" name="billing_address" rows="3" placeholder="Enter your billing address (optional)">{{ old('billing_address', $user->address) }}</textarea>
                             <div class="form-text">Leave blank if same as shipping address</div>
                         </div>
+
+                        <div class="mb-3">
+    <label for="customer_phone" class="form-label text-success fw-semibold">Contact Phone *</label>
+    <input type="text" class="form-control border-success" id="customer_phone" name="customer_phone" value="{{ old('customer_phone', $user->phone) }}" required placeholder="Enter your contact phone number">
+    <small class="form-text text-muted">For delivery updates</small>
+</div>
 
                         <div class="mb-3">
                             <label for="notes" class="form-label text-success fw-semibold">Order Notes</label>
@@ -127,39 +134,38 @@
                     <div class="d-flex justify-content-between mb-2">
                         <div>
                             <h6 class="mb-0">{{ $item->product->name }}</h6>
-                            <small class="text-muted">Qty: {{ $item->quantity }} × ${{ $item->product->current_price }}</small>
+                            <small class="text-muted">Qty: {{ $item->quantity }} × ₱{{ number_format($item->unit_price, 2) }}</small>
                             @if($item->selected_size)
                             <br>
                             <small class="text-muted">Size: {{ $item->selected_size }}</small>
                             @endif
                         </div>
-                        <span class="text-success">${{ number_format($item->total_price, 2) }}</span>
+                        <span class="text-success">₱{{ number_format($item->total_price, 2) }}</span>
                     </div>
                     @endforeach
                     
                     <hr>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
-                        <span class="text-success">${{ number_format($subtotal, 2) }}</span>
+                        <span class="text-success">₱{{ number_format($subtotal, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax:</span>
-                        <span class="text-success">${{ number_format($tax, 2) }}</span>
+                        <span class="text-success">₱{{ number_format($tax, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
-                        <span class="text-success">${{ number_format($shipping, 2) }}</span>
+                        <span class="text-success">₱{{ number_format($shipping, 2) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong class="text-success">${{ number_format($total, 2) }}</strong>
+                        <strong class="text-success">₱{{ number_format($total, 2) }}</strong>
                     </div>
                     
                     <button type="submit" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;" id="place-order-btn">
                         <i class="fas fa-lock me-2"></i>Place Order
                     </button>
-                    </form>
                     
                     <a href="{{ route('cart.index') }}" class="btn btn-outline-success w-100 mt-2">
                         Back to Cart
@@ -168,6 +174,7 @@
             </div>
         </div>
     </div>
+    </form> <!-- MOVED THE CLOSING FORM TAG HERE -->
 </div>
 
 <!-- PayMongo Script -->
@@ -176,30 +183,65 @@
 document.addEventListener('DOMContentLoaded', function() {
     const checkoutForm = document.getElementById('checkout-form');
     const placeOrderBtn = document.getElementById('place-order-btn');
+    const paymentMethodSelect = document.getElementById('payment_method');
     
-    checkoutForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Validate form before submission
+    checkoutForm.addEventListener('submit', function(e) {
+        // Basic validation
+        const shippingAddress = document.getElementById('shipping_address').value.trim();
+        const customerPhone = document.getElementById('customer_phone').value.trim();
+        const paymentMethod = paymentMethodSelect.value;
         
-        const paymentMethod = document.getElementById('payment_method').value;
+        if (!shippingAddress) {
+            e.preventDefault();
+            alert('Please enter your shipping address.');
+            return;
+        }
+        
+        if (shippingAddress.length < 10) {
+            e.preventDefault();
+            alert('Please enter a complete shipping address (at least 10 characters).');
+            return;
+        }
+        
+        if (!customerPhone) {
+            e.preventDefault();
+            alert('Please enter your contact phone number.');
+            return;
+        }
+        
+        if (!paymentMethod) {
+            e.preventDefault();
+            alert('Please select a payment method.');
+            return;
+        }
         
         // Show loading state
         placeOrderBtn.disabled = true;
         placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
         
-        try {
-            // Submit the form normally for all payment methods
-            // The backend will handle the redirects for GCash/GrabPay
-            checkoutForm.submit();
+        // Form will submit normally
+    });
+    
+    // Payment method change handler
+    paymentMethodSelect.addEventListener('change', function() {
+        const method = this.value;
+        const paymongoSection = document.getElementById('paymongo-section');
+        
+        if (method === 'card' || method === 'gcash' || method === 'grab_pay') {
+            paymongoSection.style.display = 'block';
             
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error: ' + error.message);
-            
-            // Reset button
-            placeOrderBtn.disabled = false;
-            placeOrderBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Place Order';
+            // Show/hide specific payment methods
+            document.getElementById('card-payment').style.display = method === 'card' ? 'block' : 'none';
+            document.getElementById('gcash-payment').style.display = method === 'gcash' ? 'block' : 'none';
+            document.getElementById('grabpay-payment').style.display = method === 'grab_pay' ? 'block' : 'none';
+        } else {
+            paymongoSection.style.display = 'none';
         }
     });
+    
+    // Trigger change event on page load to set initial state
+    paymentMethodSelect.dispatchEvent(new Event('change'));
 });
 </script>
 
