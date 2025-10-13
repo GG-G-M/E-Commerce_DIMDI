@@ -7,8 +7,8 @@
                     url('{{ asset('images/background-pattern.jpg') }}');
         background-size: cover;
         background-position: center;
-        padding: 40px 0;
-        margin-bottom: 40px;
+        padding: 20px 0;
+        margin-bottom: 30px;
     }
     
     .carousel-card {
@@ -17,22 +17,35 @@
         box-shadow: 0 10px 30px hsla(0, 0%, 0%, 0.20);
         max-width: 1200px;
         margin: 0 auto;
+        height: 300px; /* Fixed height for consistency */
     }
     
     .carousel-image {
-        height: auto;
-        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensures image covers the container without distortion */
+        object-position: center;
     }
     
     .carousel-caption-card {
         background: rgba(0, 0, 0, 0.7) !important;
         border-radius: 10px;
-        padding: 20px !important;
-        bottom: 30px !important;
+        padding: 15px !important;
+        bottom: 20px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 90% !important;
         max-width: 500px;
+    }
+
+    .carousel-caption-card h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 5px;
+    }
+
+    .carousel-caption-card p {
+        font-size: 0.9rem !important;
+        margin-bottom: 0;
     }
 
     .category-slider-full {
@@ -240,6 +253,42 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
     }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+        .carousel-card {
+            height: 200px; /* Even smaller on mobile */
+        }
+        
+        .carousel-caption-card {
+            padding: 10px !important;
+            bottom: 15px !important;
+        }
+        
+        .carousel-caption-card h1 {
+            font-size: 1.2rem !important;
+        }
+        
+        .carousel-caption-card p {
+            font-size: 0.8rem !important;
+        }
+        
+        .hero-carousel-container {
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .carousel-card {
+            height: 180px;
+        }
+        
+        .carousel-caption-card {
+            width: 95% !important;
+            max-width: 300px;
+        }
+    }
 </style>
 
 <!-- No Products Found Modal -->
@@ -301,6 +350,7 @@
     </div>
 </div>
 
+<!-- Smaller Hero Banner -->
 <div class="hero-carousel-container">
     <div id="heroCarousel" class="carousel slide carousel-card" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -309,23 +359,23 @@
             <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
         </div>
 
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{ asset('images/banner1.png') }}" class="d-block w-100 carousel-image" alt="Banner 1">
+        <div class="carousel-inner h-100">
+            <div class="carousel-item active h-100">
+                <img src="{{ asset('images/banner1.png') }}" class="d-block w-100 carousel-image" alt="Big Sale">
                 <div class="carousel-caption carousel-caption-card">
                     <h1 class="fw-bold">🔥 Big Sale!</h1>
                     <p class="fs-5">Up to 50% off on selected products.</p>
                 </div>
             </div>
-            <div class="carousel-item">
-                <img src="{{ asset('images/NW.png') }}" class="d-block w-100 carousel-image" alt="Banner 2">
+            <div class="carousel-item h-100">
+                <img src="{{ asset('images/NW.png') }}" class="d-block w-100 carousel-image" alt="New Arrivals">
                 <div class="carousel-caption carousel-caption-card">
                     <h1 class="fw-bold">✨ New Arrivals</h1>
                     <p class="fs-5">Check out our latest collections.</p>
                 </div>
             </div>
-            <div class="carousel-item">
-                <img src="{{ asset('images/GO.jpeg') }}" class="d-block w-100 carousel-image" alt="Banner 3">
+            <div class="carousel-item h-100">
+                <img src="{{ asset('images/GO.jpeg') }}" class="d-block w-100 carousel-image" alt="Exclusive Deals">
                 <div class="carousel-caption carousel-caption-card">
                     <h1 class="fw-bold">💎 Exclusive Deals</h1>
                     <p class="fs-5">Shop now before the offers end!</p>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\PaymentController; // Add this line
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -35,6 +36,13 @@ Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update
 Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear'); // Add this line
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+
+// Payment Routes - Add these new routes
+Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
+Route::post('/payment/create-source', [PaymentController::class, 'createSource'])->name('payment.create-source');
+Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+
 
 // Authenticated User Routes
 Route::middleware('auth')->group(function () {

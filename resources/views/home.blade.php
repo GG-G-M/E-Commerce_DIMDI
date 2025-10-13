@@ -227,6 +227,7 @@
         /* Why Choose Us Section */
         .why-section {
             padding: 5rem 0;
+            background: linear-gradient(to bottom, #ffffff 0%, var(--light-green) 100%);
         }
         
         .feature-card {
@@ -237,6 +238,7 @@
             height: 100%;
             background: white;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary-green);
         }
         
         .feature-card:hover {
@@ -353,7 +355,28 @@
             font-size: 1.2rem;
         }
         
+        /* Stats Section */
+        .stats-section {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            text-align: center;
+        }
         
+        .stat-item {
+            padding: 1.5rem;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
         
         /* Responsive Adjustments */
         @media (max-width: 991.98px) {
@@ -380,9 +403,6 @@
             }
         }
     </style>
-{{-- </head>
-<body> --}}
-    <!-- Your existing navbar will remain here -->
 
     <!-- Main Content -->
     <main>
@@ -393,10 +413,42 @@
                     <div class="col-lg-6">
                         <h1 class="hero-title">Transform Your Living Space with DIMDI</h1>
                         <p class="hero-subtitle">Premium appliances and furniture designed to elevate your home experience with style, comfort, and innovation.</p>
-                        
+                        <a href="{{ url('/products') }}" class="btn btn-hero">Shop Now <i class="fas fa-arrow-right ms-2"></i></a>
                     </div>
                     <div class="col-lg-6 text-center">
                         <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Modern Living Room" class="img-fluid rounded-3 shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number">15+</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number">10K+</div>
+                            <div class="stat-label">Happy Customers</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Products</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="stat-item">
+                            <div class="stat-number">25+</div>
+                            <div class="stat-label">Store Locations</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -438,85 +490,88 @@
             </div>
         </section>
 
-<!-- Featured Products -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-5">Featured Products</h2>
-        <div class="row">
-            @foreach($featuredProducts as $product)
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="card product-card h-100">
-                    @if($product->has_discount)
-                    <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
-                    @endif
-                    <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-                        
-                        <div class="mt-auto">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                @if($product->has_discount)
-                                <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                                <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
-                                @else
-                                <span class="text-primary fw-bold">${{ $product->price }}</span>
-                                @endif
-                            </div>
-                            
-                            @if($product->in_stock)
-                            <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <input type="hidden" name="quantity" value="1">
-                                
-                                <!-- Variant Selection -->
-                                @if($product->has_variants && $product->variants->count() > 0)
-                                <div class="mb-2">
-                                    <select name="selected_size" class="form-select form-select-sm" required>
-                                        <option value="">Select Option</option>
-                                        @foreach($product->variants as $variant)
-                                            @php
-                                                $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
-                                                $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
-                                                $variantStock = $variant->stock_quantity ?? 0;
-                                                $isInStock = $variantStock > 0;
-                                            @endphp
-                                            <option value="{{ $variantName }}" {{ !$isInStock ? 'disabled' : '' }}>
-                                                {{ $variantName }} 
-                                                @if(!$isInStock)
-                                                (Out of Stock)
-                                                @else
-                                                - ${{ number_format($variantPrice, 2) }}
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @else
-                                <input type="hidden" name="selected_size" value="Standard">
-                                @endif
-                                
-                                <button type="submit" class="btn btn-primary w-100 add-to-cart-btn">
-                                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
-                                </button>
-                            </form>
-                            @else
-                            <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
-                            @endif
-                        </div>
+        <!-- Featured Products -->
+        <section class="featured-section">
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-12 text-center">
+                        <h2 class="section-title">Featured Products</h2>
+                        <p class="lead text-muted">Discover our handpicked selection of premium home solutions</p>
                     </div>
                 </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</section>
+                
+                <div class="row">
+                    @foreach($featuredProducts as $product)
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card product-card h-100">
+                            @if($product->has_discount)
+                            <span class="discount-badge badge bg-danger">{{ $product->discount_percentage }}% OFF</span>
+                            @endif
+                            <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ $product->name }}</h5>
+                                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        @if($product->has_discount)
+                                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
+                                        <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
+                                        @else
+                                        <span class="text-primary fw-bold">${{ $product->price }}</span>
+                                        @endif
+                                    </div>
+                                    
+                                    @if($product->in_stock)
+                                    <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        
+                                        <!-- Variant Selection -->
+                                        @if($product->has_variants && $product->variants->count() > 0)
+                                        <div class="mb-2">
+                                            <select name="selected_size" class="form-select form-select-sm" required>
+                                                <option value="">Select Option</option>
+                                                @foreach($product->variants as $variant)
+                                                    @php
+                                                        $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                                        $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
+                                                        $variantStock = $variant->stock_quantity ?? 0;
+                                                        $isInStock = $variantStock > 0;
+                                                    @endphp
+                                                    <option value="{{ $variantName }}" {{ !$isInStock ? 'disabled' : '' }}>
+                                                        {{ $variantName }} 
+                                                        @if(!$isInStock)
+                                                        (Out of Stock)
+                                                        @else
+                                                        - ${{ number_format($variantPrice, 2) }}
+                                                        @endif
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @else
+                                        <input type="hidden" name="selected_size" value="Standard">
+                                        @endif
+                                        
+                                        <button type="submit" class="btn btn-add-cart add-to-cart-btn">
+                                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                                        </button>
+                                    </form>
+                                    @else
+                                    <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
                 
                 <div class="row mt-5">
                     <div class="col-12 text-center">
-                        <a href="{{ url('/products') }}" class="btn btn-outline-primary btn-lg">View All Products <i class="fas fa-arrow-right ms-2"></i></a>
+                        <a href="{{ url('/products') }}" class="btn btn-outline-primary btn-lg" style="border-color: var(--primary-green); color: var(--primary-green);">View All Products <i class="fas fa-arrow-right ms-2"></i></a>
                     </div>
                 </div>
             </div>
@@ -528,45 +583,63 @@
                 <div class="row mb-5">
                     <div class="col-12 text-center">
                         <h2 class="section-title">Why Choose DIMDI</h2>
-                        <p class="lead text-muted">We're committed to providing the best home solutions</p>
+                        <p class="lead text-muted">With over 15 years of excellence in home solutions, we've built our reputation on quality and customer satisfaction</p>
                     </div>
                 </div>
                 
                 <div class="row g-4">
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
-                            <h4 class="feature-title">5-Year Warranty</h4>
-                            <p class="feature-text">All our products come with extensive warranty coverage for your peace of mind.</p>
+                            <h4 class="feature-title">Extended Warranty Protection</h4>
+                            <p class="feature-text">All our products come with industry-leading warranty coverage, giving you peace of mind for years to come.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-truck"></i>
                             </div>
-                            <h4 class="feature-title">Free Delivery</h4>
-                            <p class="feature-text">We offer free delivery and professional installation services for all orders.</p>
+                            <h4 class="feature-title">Free Delivery & Installation</h4>
+                            <p class="feature-text">We offer complimentary delivery and professional installation services for all orders over $500.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-headset"></i>
                             </div>
-                            <h4 class="feature-title">24/7 Support</h4>
-                            <p class="feature-text">Our customer support team is available around the clock to assist you.</p>
+                            <h4 class="feature-title">24/7 Customer Support</h4>
+                            <p class="feature-text">Our dedicated customer support team is available around the clock to assist with any questions or concerns.</p>
                         </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h4 class="feature-title">Premium Quality Products</h4>
+                            <p class="feature-text">We carefully select each item in our collection for durability, functionality, and aesthetic appeal.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <h4 class="feature-title">Nationwide Store Network</h4>
+                            <p class="feature-text">With 25+ locations across the country, we're never far away when you need us.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
                         <div class="feature-card">
                             <div class="feature-icon">
                                 <i class="fas fa-recycle"></i>
                             </div>
-                            <h4 class="feature-title">Easy Returns</h4>
-                            <p class="feature-text">Not satisfied? We offer hassle-free returns within 30 days of purchase.</p>
+                            <h4 class="feature-title">Hassle-Free Returns</h4>
+                            <p class="feature-text">Not completely satisfied? We offer straightforward returns within 30 days of purchase.</p>
                         </div>
                     </div>
                 </div>
