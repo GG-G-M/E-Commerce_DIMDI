@@ -230,9 +230,6 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-center mt-3">
-            {{ $products->links() }}
-        </div>
     </div>
 </div>
 @endsection

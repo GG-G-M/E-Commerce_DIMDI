@@ -82,18 +82,28 @@
         color: #fff;
     }
 
-    .pagination .page-item.active .page-link {
-        background-color: #2C8F0C;
-        border-color: #2C8F0C;
+    .pagination .page-item .page-link {
+        color: var(--green-primary);
+        border-radius: 50px;
+        margin: 0 4px;
+        border: 1px solid var(--green-primary);
+        transition: all 0.25s ease;
+        font-weight: 500;
     }
 
-    .pagination .page-link {
-        color: #2C8F0C;
+    .pagination .page-item.active .page-link {
+        background: var(--green-gradient);
+        border-color: var(--green-primary);
+        color: #000000ff;
+        box-shadow: 0 3px 8px rgba(44, 143, 12, 0.3);
     }
 
     .pagination .page-link:hover {
-        background-color: #E8F5E6;
+        background: var(--green-gradient);
+        color: #fff;
+        transform: scale(1.05);
     }
+
 </style>
 
 <!-- 🌿 Page Header -->
@@ -194,10 +204,9 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="d-flex justify-content-center mt-3">
-            {{ $orders->links() }}
-        </div>
+        <div class="d-flex justify-content-center mt-4">
+        {{ $orders->links('pagination::bootstrap-5') }}
+    </div>
     </div>
 </div>
 @endsection

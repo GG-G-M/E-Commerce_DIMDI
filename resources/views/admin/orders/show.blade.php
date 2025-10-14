@@ -209,6 +209,7 @@
     .timeline-item:last-child .timeline-content {
         border-left-color: transparent;
     }
+    
 
     .timeline-marker.bg-pending { background-color: #ffc107 !important; }
     .timeline-marker.bg-confirmed { background-color: #17a2b8 !important; }

@@ -73,6 +73,7 @@
         background-color: #F8FDF8;
         transition: background-color 0.2s ease;
     }
+    
 </style>
 
 <!-- Header -->
