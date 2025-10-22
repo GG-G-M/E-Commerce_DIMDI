@@ -220,4 +220,32 @@ class Order extends Model
         $this->total_amount = $this->subtotal + $this->tax_amount + $this->shipping_cost;
         $this->save();
     }
+
+    public function reduceStock()
+{
+    foreach ($this->items as $item) {
+        $product = $item->product;
+        
+        if ($product) {
+            // Check if product has variants
+            if ($product->has_variants && $item->selected_size) {
+                // Find the specific variant that was ordered
+                $variant = $product->variants->first(function($v) use ($item) {
+                    return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
+                });
+                
+                if ($variant) {
+                    // Reduce variant stock
+                    $variant->decrement('stock_quantity', $item->quantity);
+                } else {
+                    // Fallback: reduce main product stock if variant not found
+                    $product->decrement('stock_quantity', $item->quantity);
+                }
+            } else {
+                // For products without variants, reduce main product stock
+                $product->decrement('stock_quantity', $item->quantity);
+            }
+        }
+    }
+}
 }

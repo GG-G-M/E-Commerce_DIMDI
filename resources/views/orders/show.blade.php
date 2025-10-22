@@ -12,19 +12,20 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Order Items</h5>
-                    <span class="badge bg-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'cancelled' ? 'danger' : ($order->order_status === 'shipped' ? 'primary' : ($order->order_status === 'confirmed' ? 'info' : 'warning'))) }}">
-                        {{ ucfirst($order->order_status) }}
-                    </span>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-white" style="background: #2C8F0C;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Order Items</h5>
+                        <span class="badge bg-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'cancelled' ? 'danger' : ($order->order_status === 'shipped' ? 'primary' : ($order->order_status === 'confirmed' ? 'info' : 'warning'))) }}">
+                            {{ ucfirst($order->order_status) }}
+                        </span>
+                    </div>
                 </div>
                 <div class="card-body">
                     @foreach($order->items as $item)
                     <div class="row align-items-center mb-3 pb-3 border-bottom">
                         <div class="col-md-2">
                             @php
-                                // Try to get variant image if available
                                 $itemImage = $item->product->image_url;
                                 if ($item->selected_size && $item->selected_size !== 'Standard') {
                                     $variant = $item->product->variants->first(function($v) use ($item) {
@@ -41,7 +42,7 @@
                         </div>
                         <div class="col-md-4">
                             <h6 class="mb-1">{{ $item->product_name }}</h6>
-                            <p class="text-muted mb-0">${{ number_format($item->unit_price, 2) }}</p>
+                            <p class="text-muted mb-0">₱{{ number_format($item->unit_price, 2) }}</p>
                             @if($item->selected_size && $item->selected_size !== 'Standard')
                             <p class="text-muted mb-0">
                                 <strong>Variant:</strong> {{ $item->selected_size }}
@@ -52,7 +53,7 @@
                             <p class="mb-0">Quantity: {{ $item->quantity }}</p>
                         </div>
                         <div class="col-md-3 text-end">
-                            <strong>${{ number_format($item->total_price, 2) }}</strong>
+                            <strong>₱{{ number_format($item->total_price, 2) }}</strong>
                         </div>
                     </div>
                     @endforeach
@@ -60,8 +61,8 @@
             </div>
 
             <!-- Status History Timeline -->
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-sm">
+                <div class="card-header text-white" style="background: #2C8F0C;">
                     <h5 class="mb-0">Order Status Timeline</h5>
                 </div>
                 <div class="card-body">
@@ -107,33 +108,33 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header text-white" style="background: #2C8F0C;">
                     <h5 class="mb-0">Order Summary</h5>
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
-                        <span>${{ number_format($order->subtotal, 2) }}</span>
+                        <span>₱{{ number_format($order->subtotal, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
-                        <span>${{ number_format($order->tax_amount, 2) }}</span>
+                        <span>₱{{ number_format($order->tax_amount, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
-                        <span>${{ number_format($order->shipping_cost, 2) }}</span>
+                        <span>₱{{ number_format($order->shipping_cost, 2) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong>${{ number_format($order->total_amount, 2) }}</strong>
+                        <strong>₱{{ number_format($order->total_amount, 2) }}</strong>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-sm">
+                <div class="card-header text-white" style="background: #2C8F0C;">
                     <h5 class="mb-0">Order Information</h5>
                 </div>
                 <div class="card-body">
@@ -176,7 +177,6 @@
                     </div>
                     @endif
 
-                    <!-- Customer Action Buttons -->
                     <div class="mt-4">
                         @if($order->canBeCancelled())
                         <button type="button" class="btn btn-outline-danger w-100 mb-2" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">
@@ -194,14 +194,13 @@
     </div>
 </div>
 
-<!-- Cancel Order Modal (Customer Only) -->
 @if($order->canBeCancelled())
 <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-white" style="background: #2C8F0C;">
                 <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('orders.cancel', $order) }}" method="POST">
                 @csrf
@@ -229,19 +228,16 @@
     position: relative;
     padding-left: 30px;
 }
-
 .timeline-item {
     position: relative;
     margin-bottom: 25px;
 }
-
 .timeline-item.current .timeline-marker {
     border: 3px solid #fff;
     box-shadow: 0 0 0 3px #2C8F0C;
     transform: scale(1.3);
     animation: pulse 2s infinite;
 }
-
 .timeline-marker {
     position: absolute;
     left: -30px;
@@ -253,7 +249,6 @@
     transition: all 0.3s ease;
     z-index: 2;
 }
-
 .timeline-content {
     padding-bottom: 15px;
     border-left: 2px solid #e9ecef;
@@ -262,15 +257,12 @@
     position: relative;
     z-index: 1;
 }
-
 .timeline-item:last-child .timeline-content {
     border-left-color: transparent;
 }
-
 .timeline-item:hover .timeline-marker {
     transform: scale(1.4);
 }
-
 .timeline-item:hover .timeline-content {
     border-left-color: #2C8F0C;
     background-color: #f8f9fa;
@@ -278,7 +270,6 @@
     padding: 10px 15px;
     margin-left: -5px;
 }
-
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
