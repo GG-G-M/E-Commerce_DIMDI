@@ -112,11 +112,11 @@
             
             <div class="mb-3">
                 @if($product->has_discount)
-                    <span class="h3 text-danger me-2" id="product-price">${{ number_format($product->sale_price, 2) }}</span>
-                    <span class="h5 text-muted text-decoration-line-through" id="product-original-price">${{ number_format($product->price, 2) }}</span>
+                    <span class="h3 text-danger me-2" id="product-price">₱{{ number_format($product->sale_price, 2) }}</span>
+                    <span class="h5 text-muted text-decoration-line-through" id="product-original-price">₱{{ number_format($product->price, 2) }}</span>
                     <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
                 @else
-                    <span class="h3 text-success fw-bold" id="product-price">${{ number_format($product->price, 2) }}</span>
+                    <span class="h3 text-success fw-bold" id="product-price">₱{{ number_format($product->price, 2) }}</span>
                 @endif
             </div>
 
@@ -154,11 +154,11 @@
                                     <div class="fw-semibold">{{ $variantName }}</div>
                                     
                                     @if($hasVariantDiscount)
-                                        <div class="text-danger fw-bold">${{ number_format($variant->sale_price, 2) }}</div>
-                                        <div class="text-muted text-decoration-line-through small">${{ number_format($variant->price, 2) }}</div>
+                                        <div class="text-danger fw-bold">₱{{ number_format($variant->sale_price, 2) }}</div>
+                                        <div class="text-muted text-decoration-line-through small">₱{{ number_format($variant->price, 2) }}</div>
                                         <span class="badge bg-danger small">{{ $variantDiscountPercent }}% OFF</span>
                                     @else
-                                        <div class="text-success fw-bold">${{ number_format($variant->price, 2) }}</div>
+                                        <div class="text-success fw-bold">₱{{ number_format($variant->price, 2) }}</div>
                                     @endif
                                     
                                     @if(!$isInStock)
@@ -256,7 +256,7 @@
                         
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-success fw-bold">${{ $relatedProduct->current_price }}</span>
+                                <span class="text-success fw-bold">₱{{ $relatedProduct->current_price }}</span>
                             </div>
                             <a href="{{ route('products.show', $relatedProduct) }}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
                         </div>

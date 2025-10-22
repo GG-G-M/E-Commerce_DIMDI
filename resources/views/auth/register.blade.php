@@ -209,7 +209,7 @@
                             </div>
 
                             <div class="col-md-4 mb-3">
-                                <label for="state" class="form-label">State *</label>
+                                <label for="state" class="form-label">Province *</label>
                                 <input id="state" type="text" 
                                        class="form-control @error('state') is-invalid @enderror" 
                                        name="state" value="{{ old('state') }}" required autocomplete="address-level1">

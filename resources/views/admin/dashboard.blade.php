@@ -188,7 +188,7 @@
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="stats-label">TOTAL REVENUE</div>
-                        <div class="stats-number">${{ number_format($stats['revenue'], 2) }}</div>
+                        <div class="stats-number">₱{{ number_format($stats['revenue'], 2) }}</div>
                         <small>Lifetime sales</small>
                     </div>
                     <div class="col-auto">
@@ -233,7 +233,7 @@
                                     </a>
                                 </td>
                                 <td>{{ $order->customer_name }}</td>
-                                <td class="fw-bold">${{ number_format($order->total_amount, 2) }}</td>
+                                <td class="fw-bold">₱{{ number_format($order->total_amount, 2) }}</td>
                                 <td>
                                     @php
                                         $statusClass = [

@@ -42,7 +42,7 @@
                         </div>
                         <div class="col-md-4">
                             <h6 class="mb-1">{{ $item->product_name }}</h6>
-                            <p class="text-muted mb-0">${{ number_format($item->unit_price, 2) }}</p>
+                            <p class="text-muted mb-0">₱{{ number_format($item->unit_price, 2) }}</p>
                             @if($item->selected_size && $item->selected_size !== 'Standard')
                             <p class="text-muted mb-0">
                                 <strong>Variant:</strong> {{ $item->selected_size }}
@@ -53,7 +53,7 @@
                             <p class="mb-0">Quantity: {{ $item->quantity }}</p>
                         </div>
                         <div class="col-md-3 text-end">
-                            <strong>${{ number_format($item->total_price, 2) }}</strong>
+                            <strong>₱{{ number_format($item->total_price, 2) }}</strong>
                         </div>
                     </div>
                     @endforeach
@@ -115,20 +115,20 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
-                        <span>${{ number_format($order->subtotal, 2) }}</span>
+                        <span>₱{{ number_format($order->subtotal, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
-                        <span>${{ number_format($order->tax_amount, 2) }}</span>
+                        <span>₱{{ number_format($order->tax_amount, 2) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
-                        <span>${{ number_format($order->shipping_cost, 2) }}</span>
+                        <span>₱{{ number_format($order->shipping_cost, 2) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong>${{ number_format($order->total_amount, 2) }}</strong>
+                        <strong>₱{{ number_format($order->total_amount, 2) }}</strong>
                     </div>
                 </div>
             </div>

@@ -515,10 +515,10 @@
                                 <div class="mt-auto">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         @if($product->has_discount)
-                                        <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                                        <span class="text-muted text-decoration-line-through">${{ $product->price }}</span>
+                                        <span class="text-danger fw-bold">₱{{ $product->sale_price }}</span>
+                                        <span class="text-muted text-decoration-line-through">₱{{ $product->price }}</span>
                                         @else
-                                        <span class="text-primary fw-bold">${{ $product->price }}</span>
+                                        <span class="text-primary fw-bold">₱{{ $product->price }}</span>
                                         @endif
                                     </div>
                                     
@@ -545,7 +545,7 @@
                                                         @if(!$isInStock)
                                                         (Out of Stock)
                                                         @else
-                                                        - ${{ number_format($variantPrice, 2) }}
+                                                        - ₱{{ number_format($variantPrice, 2) }}
                                                         @endif
                                                     </option>
                                                 @endforeach
