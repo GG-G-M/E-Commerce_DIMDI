@@ -336,4 +336,34 @@ class Product extends Model
 
         return 'One Size';
     }
+        // Rating relationships and methods
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->ratings()->avg('rating') ?: 0;
+    }
+
+    public function getTotalRatingsAttribute()
+    {
+        return $this->ratings()->count();
+    }
+
+    // Check if user has purchased this product
+    public function purchasedBy(User $user)
+    {
+        return OrderItem::whereHas('order', function($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->where('order_status', 'delivered');
+        })->where('product_id', $this->id)->exists();
+    }
+
+    // Check if user has already rated this product
+    public function ratedBy(User $user)
+    {
+        return $this->ratings()->where('user_id', $user->id)->exists();
+    }
 }

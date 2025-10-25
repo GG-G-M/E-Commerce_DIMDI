@@ -248,4 +248,15 @@ class Order extends Model
         }
     }
 }
+    // Rating relationship
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    // Check if order is delivered
+    public function isDelivered()
+    {
+        return $this->order_status === 'delivered';
+    }
 }
