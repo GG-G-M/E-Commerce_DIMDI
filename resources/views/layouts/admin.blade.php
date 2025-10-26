@@ -98,6 +98,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.customers.index') }}">
+                                <i class="fas fa-users me-2"></i>Customers
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" 
                                href="{{ route('admin.products.index') }}">
                                 <i class="fas fa-box me-2"></i>Products
