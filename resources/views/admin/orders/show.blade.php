@@ -287,7 +287,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="fw-bold text-success">${{ number_format($item->unit_price, 2) }}</td>
+                                <td class="fw-bold text-success">₱{{ number_format($item->unit_price, 2) }}</td>
                                 <td>
                                     @if($item->selected_size)
                                     <span class="badge bg-primary">{{ $item->selected_size }}</span>
@@ -298,7 +298,7 @@
                                 <td>
                                     <span class="badge bg-light text-dark">{{ $item->quantity }}</span>
                                 </td>
-                                <td class="fw-bold">${{ number_format($item->total_price, 2) }}</td>
+                                <td class="fw-bold">₱{{ number_format($item->total_price, 2) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -387,22 +387,22 @@
                 
                 <div class="info-item">
                     <span class="info-label">Subtotal:</span>
-                    <span class="info-value">${{ number_format($order->subtotal, 2) }}</span>
+                    <span class="info-value">₱{{ number_format($order->subtotal, 2) }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Tax:</span>
-                    <span class="info-value">${{ number_format($order->tax_amount, 2) }}</span>
+                    <span class="info-value">₱{{ number_format($order->tax_amount, 2) }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Shipping:</span>
-                    <span class="info-value">${{ number_format($order->shipping_cost, 2) }}</span>
+                    <span class="info-value">₱{{ number_format($order->shipping_cost, 2) }}</span>
                 </div>
                 
                 <hr>
                 
                 <div class="info-item">
                     <span class="info-label total-amount">Total:</span>
-                    <span class="info-value total-amount">${{ number_format($order->total_amount, 2) }}</span>
+                    <span class="info-value total-amount">₱{{ number_format($order->total_amount, 2) }}</span>
                 </div>
             </div>
         </div>

@@ -79,6 +79,42 @@
     .image-loading {
         opacity: 0.7;
     }
+        .star-rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .star-rating-input input {
+        display: none;
+    }
+
+    .star-rating-input label {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #ddd;
+        transition: color 0.2s;
+        margin-right: 5px;
+    }
+
+    .star-rating-input input:checked ~ label,
+    .star-rating-input label:hover,
+    .star-rating-input label:hover ~ label {
+        color: #ffc107;
+    }
+
+    .star-rating-input input:checked + label {
+        color: #ffc107;
+    }
+
+    .star-rating {
+        font-size: 1rem;
+    }
+
+    .star-rating .fas,
+    .star-rating .far {
+        color: #ffc107;
+    }
 </style>
 
 <div class="container py-4">
@@ -112,11 +148,11 @@
             
             <div class="mb-3">
                 @if($product->has_discount)
-                    <span class="h3 text-danger me-2" id="product-price">${{ number_format($product->sale_price, 2) }}</span>
-                    <span class="h5 text-muted text-decoration-line-through" id="product-original-price">${{ number_format($product->price, 2) }}</span>
+                    <span class="h3 text-danger me-2" id="product-price">₱{{ number_format($product->sale_price, 2) }}</span>
+                    <span class="h5 text-muted text-decoration-line-through" id="product-original-price">₱{{ number_format($product->price, 2) }}</span>
                     <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
                 @else
-                    <span class="h3 text-success fw-bold" id="product-price">${{ number_format($product->price, 2) }}</span>
+                    <span class="h3 text-success fw-bold" id="product-price">₱{{ number_format($product->price, 2) }}</span>
                 @endif
             </div>
 
@@ -154,11 +190,11 @@
                                     <div class="fw-semibold">{{ $variantName }}</div>
                                     
                                     @if($hasVariantDiscount)
-                                        <div class="text-danger fw-bold">${{ number_format($variant->sale_price, 2) }}</div>
-                                        <div class="text-muted text-decoration-line-through small">${{ number_format($variant->price, 2) }}</div>
+                                        <div class="text-danger fw-bold">₱{{ number_format($variant->sale_price, 2) }}</div>
+                                        <div class="text-muted text-decoration-line-through small">₱{{ number_format($variant->price, 2) }}</div>
                                         <span class="badge bg-danger small">{{ $variantDiscountPercent }}% OFF</span>
                                     @else
-                                        <div class="text-success fw-bold">${{ number_format($variant->price, 2) }}</div>
+                                        <div class="text-success fw-bold">₱{{ number_format($variant->price, 2) }}</div>
                                     @endif
                                     
                                     @if(!$isInStock)
@@ -256,7 +292,7 @@
                         
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-success fw-bold">${{ $relatedProduct->current_price }}</span>
+                                <span class="text-success fw-bold">₱{{ $relatedProduct->current_price }}</span>
                             </div>
                             <a href="{{ route('products.show', $relatedProduct) }}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
                         </div>
@@ -268,6 +304,117 @@
     </section>
     @endif
 </div>
+    <!-- Rating Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Product Reviews & Ratings</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Average Rating Display -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="display-4 text-success fw-bold">{{ number_format($product->average_rating, 1) }}</div>
+                            <div class="star-rating mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($product->average_rating))
+                                        <i class="fas fa-star text-warning"></i>
+                                    @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-warning"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="text-muted">Based on {{ $product->total_ratings }} reviews</p>
+                        </div>
+                        <div class="col-md-8">
+                            <!-- User Rating Form (if purchased and not rated) -->
+                            @auth
+                                @if($product->purchasedBy(auth()->user()) && !$product->ratedBy(auth()->user()))
+                                    <div class="user-rating-form">
+                                        <h5 class="text-success">Rate this product</h5>
+                                        <p class="text-muted">Share your experience with this product</p>
+                                        <form action="{{ route('ratings.store', $product) }}" method="POST">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Your Rating</label>
+                                                <div class="star-rating-input">
+                                                    @for($i = 5; $i >= 1; $i--)
+                                                        <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" required>
+                                                        <label for="star{{ $i }}"><i class="far fa-star"></i></label>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="review" class="form-label fw-semibold">Review (Optional)</label>
+                                                <textarea name="review" id="review" class="form-control" rows="3" placeholder="Share your experience with this product..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-paper-plane me-2"></i>Submit Rating
+                                            </button>
+                                        </form>
+                                    </div>
+                                @elseif($product->ratedBy(auth()->user()))
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>You have already rated this product. Thank you!
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-info-circle me-2"></i>You can rate this product after purchase and delivery.
+                                    </div>
+                                @endif
+                            @else
+                                <div class="alert alert-info">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <a href="{{ route('login') }}" class="alert-link">Login</a> to rate this product if you've purchased it.
+                                </div>
+                            @endauth
+                        </div>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div class="reviews-list">
+                        <h5 class="text-success mb-4">Customer Reviews</h5>
+                        @if($product->ratings->count() > 0)
+                            @foreach($product->ratings()->with('user')->latest()->get() as $rating)
+                                <div class="review-item border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong class="text-success">{{ $rating->user->name }}</strong>
+                                            <div class="star-rating mt-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= $rating->rating)
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    @else
+                                                        <i class="far fa-star text-warning"></i>
+                                                    @endif
+                                                @endfor
+                                                <span class="ms-2 text-muted">{{ $rating->rating }}/5</span>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ $rating->created_at->format('M d, Y') }}</small>
+                                    </div>
+                                    @if($rating->review)
+                                        <p class="mt-2 mb-0">{{ $rating->review }}</p>
+                                    @else
+                                        <p class="mt-2 mb-0 text-muted"><em>No review text provided</em></p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @push('scripts')
 <script>
@@ -511,6 +658,16 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.display = count > 0 ? 'inline-block' : 'none';
         });
     }
+        // Star rating interaction
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star-rating-input input');
+        stars.forEach(star => {
+            star.addEventListener('change', function() {
+                const rating = this.value;
+                // You can add any additional logic here
+            });
+        });
+    });
 });
 </script>
 @endpush

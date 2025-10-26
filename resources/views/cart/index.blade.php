@@ -162,7 +162,7 @@
                                             @if($variantStock <= 0)
                                             (Out of Stock)
                                             @else
-                                            - ${{ number_format($variantPrice, 2) }} ({{ $variantStock }} available)
+                                            - ₱{{ number_format($variantPrice, 2) }} ({{ $variantStock }} available)
                                             @endif
                                         </option>
                                     @endforeach
@@ -219,10 +219,10 @@
                             @endif
                         </div>
                         <div class="col-md-2 text-center">
-                            <strong class="text-success item-total" id="item-total-{{ $item->id }}">${{ number_format($itemTotalPrice, 2) }}</strong>
+                            <strong class="text-success item-total" id="item-total-{{ $item->id }}">₱{{ number_format($itemTotalPrice, 2) }}</strong>
                             @if($item->product->has_variants)
                             <br>
-                            <small class="text-muted item-unit-price" id="item-unit-{{ $item->id }}">${{ number_format($unitPrice, 2) }} each</small>
+                            <small class="text-muted item-unit-price" id="item-unit-{{ $item->id }}">₱{{ number_format($unitPrice, 2) }} each</small>
                             @endif
                         </div>
                         <div class="col-md-1 text-end">
@@ -268,12 +268,12 @@
                 
                 <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal ({{ $cartItems->sum('quantity') }} items):</span>
-                    <span>${{ number_format($subtotal, 2) }}</span>
+                    <span>₱{{ number_format($subtotal, 2) }}</span>
                 </div>
                 
                 <div class="d-flex justify-content-between mb-2">
                     <span>Tax (10%):</span>
-                    <span>${{ number_format($tax, 2) }}</span>
+                    <span>₱{{ number_format($tax, 2) }}</span>
                 </div>
                 
                 <div class="d-flex justify-content-between mb-2">
@@ -285,14 +285,14 @@
                 
                 <div class="d-flex justify-content-between mb-4">
                     <strong>Total:</strong>
-                    <strong class="text-success">${{ number_format($total, 2) }}</strong>
+                    <strong class="text-success">₱{{ number_format($total, 2) }}</strong>
                 </div>
 
                 @if($subtotal < 100)
                 <div class="alert alert-info">
                     <small>
                         <i class="fas fa-info-circle me-2"></i>
-                        Add ${{ number_format(100 - $subtotal, 2) }} more for free shipping!
+                        Add ₱{{ number_format(100 - $subtotal, 2) }} more for free shipping!
                     </small>
                 </div>
                 @endif

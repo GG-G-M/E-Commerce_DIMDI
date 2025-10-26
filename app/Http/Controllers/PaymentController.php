@@ -106,29 +106,35 @@ class PaymentController extends Controller
     }
 
     public function success(Request $request)
-    {
-        $orderId = $request->query('order') ?? session('last_order_id');
-        
-        if ($orderId) {
-            $order = Order::find($orderId);
-            if ($order) {
-                $order->update([
-                    'payment_status' => 'paid',
-                    'order_status' => 'confirmed'
-                ]);
+{
+    $orderId = $request->query('order') ?? session('last_order_id');
+    
+    if ($orderId) {
+        $order = Order::find($orderId);
+        if ($order && $order->payment_status === 'pending') {
+            // Update payment status
+            $order->update([
+                'payment_status' => 'paid'
+            ]);
+            
+            // Use the Order model's updateStatus method to properly update status and timeline
+            $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
+            
+            // Reduce stock for confirmed orders
+            $order->reduceStock();
+            
+            // Clear cart
+            Cart::where('user_id', $order->user_id)->delete();
+            session()->forget('last_order_id');
 
-                // Clear cart
-                Cart::where('user_id', auth()->id())->delete();
-                session()->forget('last_order_id');
-
-                return redirect()->route('orders.show', $order)
-                    ->with('success', 'Payment completed successfully! Your order is now confirmed.');
-            }
+            return redirect()->route('orders.show', $order)
+                ->with('success', 'Payment completed successfully! Your order is now confirmed.');
         }
-
-        return redirect()->route('orders.index')
-            ->with('info', 'Payment completed successfully!');
     }
+
+    return redirect()->route('orders.index')
+        ->with('info', 'Payment completed successfully!');
+}
 
     public function failed(Request $request)
     {

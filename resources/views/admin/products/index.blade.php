@@ -182,7 +182,7 @@
                                 <span class="badge bg-secondary">No Variants</span>
                             @endif
                         </td>
-                        <td>${{ number_format($product->price, 2) }}</td>
+                        <td>₱{{ number_format($product->price, 2) }}</td>
                         <td>
                             <span class="badge bg-{{ $product->stock_quantity > 10 ? 'success' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
                                 {{ $product->stock_quantity }}

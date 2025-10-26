@@ -254,6 +254,20 @@
         box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
     }
 
+    /* Star rating styles */
+    .star-rating {
+        font-size: 0.7rem;
+    }
+
+    .star-rating .fas,
+    .star-rating .far {
+        color: #ffc107;
+    }
+
+    .product-rating {
+        margin-bottom: 8px;
+    }
+
     /* Responsive adjustments for smaller screens */
     @media (max-width: 768px) {
         .carousel-card {
@@ -440,94 +454,116 @@
                 
                 <!-- Products for this category -->
                 <div class="row">
-    @foreach($products as $product)
-    <div class="col-lg-3 col-md-6 mb-4">
-    <div class="card product-card h-100 shadow-sm">
-        @if($product->has_discount)
-        <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
-        @endif
-        
-        <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
-        
-        <div class="card-body d-flex flex-column">
-            <h6 class="card-title">{{ $product->name }}</h6>
-            <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
-            
-            <!-- Display Available Variants (View Only) -->
-            @if($product->has_variants && $product->variants->count() > 0)
-            <div class="mb-2">
-                <small class="text-muted">Available Options:</small>
-                <div class="mt-1">
-                    @foreach($product->variants as $variant)
-                        @php
-                            $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
-                            $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
-                            $variantStock = $variant->stock_quantity ?? 0;
-                            $isInStock = $variantStock > 0;
-                        @endphp
-                        <span class="badge {{ $isInStock ? 'bg-light text-dark border' : 'bg-secondary' }} me-1 mb-1 small">
-                            {{ $variantName }}
-                            @if(!$isInStock)
-                            <small class="text-muted">(OOS)</small>
+                    @foreach($categoryProducts as $product)
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card product-card h-100 shadow-sm">
+                            @if($product->has_discount)
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
                             @endif
-                        </span>
+                            
+                            <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title">{{ $product->name }}</h6>
+                                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                                
+                                <!-- Display Available Variants (View Only) -->
+                                @if($product->has_variants && $product->variants->count() > 0)
+                                <div class="mb-2">
+                                    <small class="text-muted">Available Options:</small>
+                                    <div class="mt-1">
+                                        @foreach($product->variants as $variant)
+                                            @php
+                                                $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                                $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
+                                                $variantStock = $variant->stock_quantity ?? 0;
+                                                $isInStock = $variantStock > 0;
+                                            @endphp
+                                            <span class="badge {{ $isInStock ? 'bg-light text-dark border' : 'bg-secondary' }} me-1 mb-1 small">
+                                                {{ $variantName }}
+                                                @if(!$isInStock)
+                                                <small class="text-muted">(OOS)</small>
+                                                @endif
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                                
+                                <div class="mt-auto">
+                                    <!-- Price Display -->
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        @if($product->has_discount)
+                                        <span class="text-danger fw-bold">₱{{ $product->sale_price }}</span>
+                                        <span class="text-muted text-decoration-line-through small">₱{{ $product->price }}</span>
+                                        @else
+                                        <span class="text-primary fw-bold">₱{{ $product->price }}</span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Rating Display -->
+                                    <div class="product-rating mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="star-rating me-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= floor($product->average_rating))
+                                                        <i class="fas fa-star text-warning" style="font-size: 0.7rem;"></i>
+                                                    @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
+                                                        <i class="fas fa-star-half-alt text-warning" style="font-size: 0.7rem;"></i>
+                                                    @else
+                                                        <i class="far fa-star text-warning" style="font-size: 0.7rem;"></i>
+                                                    @endif
+                                                @endfor
+                                            </div>
+                                            <small class="text-muted">
+                                                ({{ $product->total_ratings }})
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                            View Details
+                                        </a>
+                                        
+                                        @if($product->in_stock)
+                                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            
+                                            @if($product->has_variants && $product->variants->count() > 0)
+                                                @php
+                                                    // Get the first IN STOCK variant, not just the first variant
+                                                    $firstInStockVariant = $product->variants->where('stock_quantity', '>', 0)->first();
+                                                @endphp
+                                                @if($firstInStockVariant)
+                                                    <input type="hidden" name="selected_size" value="{{ $firstInStockVariant->size ?? $firstInStockVariant->variant_name ?? 'Standard' }}">
+                                                @else
+                                                    {{-- If no variants are in stock, don't show add to cart --}}
+                                                    <input type="hidden" name="selected_size" value="">
+                                                @endif
+                                            @else
+                                                <input type="hidden" name="selected_size" value="Standard">
+                                            @endif
+                                            
+                                            <button type="submit" class="btn btn-primary btn-sm w-100 add-to-cart-btn" 
+                                                    {{ $product->has_variants && !$firstInStockVariant ? 'disabled' : '' }}
+                                                    title="{{ $product->has_variants && !$firstInStockVariant ? 'No variants in stock' : 'Add to Cart' }}">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                        @else
+                                        <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endforeach
                 </div>
-            </div>
-            @endif
-            
-            <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    @if($product->has_discount)
-                    <span class="text-danger fw-bold">${{ $product->sale_price }}</span>
-                    <span class="text-muted text-decoration-line-through small">${{ $product->price }}</span>
-                    @else
-                    <span class="text-primary fw-bold">${{ $product->price }}</span>
-                    @endif
-                </div>
-                
-                <div class="d-flex gap-2">
-                    <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
-                        View Details
-                    </a>
-                    
-                    @if($product->in_stock)
-                    <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="quantity" value="1">
-                        
-                        @if($product->has_variants && $product->variants->count() > 0)
-                            @php
-                                // Get the first IN STOCK variant, not just the first variant
-                                $firstInStockVariant = $product->variants->where('stock_quantity', '>', 0)->first();
-                            @endphp
-                            @if($firstInStockVariant)
-                                <input type="hidden" name="selected_size" value="{{ $firstInStockVariant->size ?? $firstInStockVariant->variant_name ?? 'Standard' }}">
-                            @else
-                                {{-- If no variants are in stock, don't show add to cart --}}
-                                <input type="hidden" name="selected_size" value="">
-                            @endif
-                        @else
-                            <input type="hidden" name="selected_size" value="Standard">
-                        @endif
-                        
-                        <button type="submit" class="btn btn-primary btn-sm w-100 add-to-cart-btn" 
-                                {{ $product->has_variants && !$firstInStockVariant ? 'disabled' : '' }}
-                                title="{{ $product->has_variants && !$firstInStockVariant ? 'No variants in stock' : 'Add to Cart' }}">
-                            <i class="fas fa-cart-plus"></i>
-                        </button>
-                    </form>
-                    @else
-                    <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-    @endforeach
-</div>
             @endforeach
         @else
             <!-- Show empty state with message -->
