@@ -57,11 +57,6 @@
         background-color: #F8FDF8;
         transition: background-color 0.2s ease;
     }
-
-    .badge-success { background-color: #2C8F0C; }
-    .badge-danger { background-color: #C62828; }
-    .badge-warning { background-color: #FBC02D; }
-    .badge-info { background-color: #0288D1; }
 </style>
 
 <!-- Header -->
@@ -165,7 +160,7 @@
                         <td>
                             {{ $product->category->name }}
                             @if(!$product->category->is_active)
-                                <span class="badge bg-warning ms-1">Inactive</span>
+                                <span class="">Inactive</span>
                             @endif
                         </td>
                         <td>
@@ -184,7 +179,7 @@
                         </td>
                         <td>₱{{ number_format($product->price, 2) }}</td>
                         <td>
-                            <span class="badge bg-{{ $product->stock_quantity > 10 ? 'success' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
+                            <span class="-{{ $product->stock_quantity > 10 ? '' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
                                 {{ $product->stock_quantity }}
                             </span>
                         </td>

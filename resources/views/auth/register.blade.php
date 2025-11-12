@@ -22,26 +22,34 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
-        .register-container {
+        .register-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 950px;
             display: flex;
-            min-height: 100vh;
+            min-height: 600px;
         }
         
         .register-form-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 2rem;
-            background: white;
+            padding: 2.5rem;
             position: relative;
-            max-width: 500px;
         }
         
         .register-image-section {
-            flex: 1.5;
+            flex: 1;
             background-image: url('https://i.pinimg.com/736x/5e/28/09/5e28091833c771377cba21cfa0838998.jpg');
             background-size: cover;
             background-position: center;
@@ -91,7 +99,7 @@
         
         /* Form Styles - Compact */
         .register-form {
-            max-width: 450px;
+            max-width: 100%;
             margin: 0 auto;
         }
         
@@ -233,9 +241,8 @@
                 display: none;
             }
             
-            .register-form-section {
-                max-width: 100%;
-                margin: 0 auto;
+            .register-card {
+                max-width: 600px;
             }
         }
         
@@ -278,6 +285,10 @@
         }
         
         @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
             .register-form-section {
                 padding: 1rem;
             }
@@ -313,7 +324,7 @@
     </style>
 </head>
 <body>
-    <div class="register-container">
+    <div class="register-card">
         <div class="register-form-section">
             <!-- Home/Back Button -->
             <a href="{{ url('/') }}" class="home-btn" title="Back to Home">
@@ -412,9 +423,7 @@
                                        class="form-control @error('password') is-invalid @enderror" 
                                        name="password" required autocomplete="new-password"
                                        placeholder="Create password">
-                                <button type="button" class="password-toggle" id="togglePassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                
                                 @error('password')
                                     <div class="invalid-feedback" style="font-size: 0.8rem;">
                                         {{ $message }}
@@ -428,9 +437,7 @@
                                        class="form-control" 
                                        name="password_confirmation" required autocomplete="new-password"
                                        placeholder="Confirm password">
-                                <button type="button" class="password-toggle" id="togglePasswordConfirm">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                
                             </div>
                         </div>
 

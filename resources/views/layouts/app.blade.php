@@ -59,6 +59,17 @@
             margin: 0 1rem;
             flex: 1;
         }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+            z-index: 2;
+            font-size: 0.9rem;
+        }
+
         .search-input {
             border-radius: 20px;
             border: 2px solid rgba(255,255,255,0.3);
@@ -69,12 +80,18 @@
             width: 100%;
             font-size: 0.9rem;
         }
+
         .search-input::placeholder {
             color: rgba(255,255,255,0.7);
             font-size: 0.9rem;
         }
+
+        .search-input:focus {
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.15);
+        }
         
-        /* FIXED: Added search results styling */
+        /* Search results styling */
         .search-results {
             position: absolute;
             top: 100%;
@@ -120,33 +137,34 @@
             color: #6c757d;
         }
 
-        .nav-icon-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.3rem 0.8rem;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-            min-width: 65px;
+        /* Updated nav styling - text only */
+        .nav-item {
+            margin: 0 0.3rem;
         }
         
-        .nav-icon-container:hover {
+        .nav-link {
+            padding: 0.5rem 0.8rem !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateY(-1px);
         }
         
-        .nav-icon {
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
+        /* Cart icon styling - icon only */
+        .cart-container {
+            position: relative;
+            padding: 0.5rem 0.8rem !important;
+            border-radius: 6px;
             transition: all 0.3s ease;
         }
         
-        .nav-icon-label {
-            font-size: 0.65rem;
-            font-weight: 500;
-            text-align: center;
-            line-height: 1.1;
+        .cart-container:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
         }
         
         .cart-badge {
@@ -165,6 +183,7 @@
             height: 35px;
         }
         
+        /* Mobile navigation - text only */
         .mobile-nav-icons {
             display: none;
             justify-content: space-around;
@@ -289,40 +308,37 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             
-            <!-- Desktop Navigation with Icons -->
+            <!-- Desktop Navigation with Text Only -->
             <div class="collapse navbar-collapse desktop-nav" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('home') }}">
-                            <i class="fas fa-home nav-icon"></i>
-                            <span class="nav-icon-label">Home</span>
+                        <a class="nav-link" href="{{ route('home') }}">
+                            Home
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('products.index') }}">
-                            <i class="fas fa-box nav-icon"></i>
-                            <span class="nav-icon-label">Products</span>
+                        <a class="nav-link" href="{{ route('products.index') }}">
+                            Products
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('about') }}">
-                            <i class="fas fa-info-circle nav-icon"></i>
-                            <span class="nav-icon-label">About Us</span>
+                        <a class="nav-link" href="{{ route('about') }}">
+                            About Us
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('contact') }}">
-                            <i class="fas fa-envelope nav-icon"></i>
-                            <span class="nav-icon-label">Contact</span>
+                        <a class="nav-link" href="{{ route('contact') }}">
+                            Contact
                         </a>
                     </li>
                 </ul>
 
                 <!-- Search Bar -->
                 <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
                     <input type="text" 
                            class="form-control search-input" 
-                           placeholder="🔎 Search products or categories..." 
+                           placeholder="Search products or categories..." 
                            id="searchInput"
                            autocomplete="off">
                     <div class="search-results" id="searchResults"></div>
@@ -333,29 +349,27 @@
                     @auth
                         @if(Auth::user()->isAdmin())
                         <li class="nav-item">
-                            <a class="nav-link nav-icon-container" href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-cog nav-icon"></i>
-                                <span class="nav-icon-label">Admin</span>
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                Admin
                             </a>
                         </li>
                         @endif
                     @endauth
 
+                    <!-- Cart - Icon Only -->
                     <li class="nav-item">
-                        <a class="nav-link position-relative nav-icon-container" href="{{ route('cart.index') }}">
-                            <i class="fas fa-shopping-cart nav-icon"></i>
+                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
                             <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
-                            <span class="nav-icon-label">Cart</span>
                         </a>
                     </li>
                     
                     <!-- User Dropdown -->
                     @auth
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle nav-icon-container" href="#" id="navbarDropdown" role="button" 
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                         data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.9rem;">
-                            <i class="fas fa-user nav-icon"></i>
-                            <span class="nav-icon-label">Account</span>
+                            Account
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li>
@@ -381,15 +395,13 @@
                     </li>
                     @else
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('login') }}">
-                            <i class="fas fa-sign-in-alt nav-icon"></i>
-                            <span class="nav-icon-label">Login</span>
+                        <a class="nav-link" href="{{ route('login') }}">
+                            Login
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-icon-container" href="{{ route('register') }}">
-                            <i class="fas fa-user-plus nav-icon"></i>
-                            <span class="nav-icon-label">Register</span>
+                        <a class="nav-link" href="{{ route('register') }}">
+                            Register
                         </a>
                     </li>
                     @endauth
@@ -494,7 +506,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // FIXED: Search functionality
+
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
@@ -502,10 +514,9 @@
         searchInput.addEventListener('input', function(e) {
             const query = e.target.value.trim();
             
-            // Clear previous timeout
+        
             clearTimeout(searchTimeout);
             
-            // Hide results if query is empty
             if (query.length === 0) {
                 searchResults.style.display = 'none';
                 return;
@@ -528,10 +539,9 @@
             }
         });
 
-        // FIXED: Perform search with proper error handling
+        // Perform search with proper error handling
         function performSearch(query) {
-            // For demo purposes - replace with your actual API endpoint
-            // Using a mock implementation since we don't have a real backend
+        
             setTimeout(() => {
                 const mockResults = [
                     { type: 'Product', name: 'Modern Refrigerator', price: '$899.99', slug: 'modern-refrigerator' },
@@ -568,7 +578,7 @@
             */
         }
 
-        // FIXED: Display search results
+        // Display search results
         function displaySearchResults(results) {
             if (!results || results.length === 0) {
                 searchResults.innerHTML = '<div class="no-results">No products found</div>';
@@ -590,7 +600,7 @@
             searchResults.innerHTML = html;
         }
 
-        // FIXED: Handle result selection
+        // Handle result selection
         function selectResult(slug, type) {
             if (type === 'Product') {
                 window.location.href = `/products/${slug}`;
