@@ -128,6 +128,17 @@
                                 </button>
                             </form>
                         </li>
+                        {{-- Add to your admin sidebar navigation --}}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.messages.index') }}">
+                                <i class="fas fa-comments me-2"></i>
+                                Messages
+                                @php($unreadCount = auth()->user()->getUnreadMessagesCount())
+                                @if($unreadCount > 0)
+                                    <span class="badge bg-danger float-end">{{ $unreadCount }}</span>
+                                @endif
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>

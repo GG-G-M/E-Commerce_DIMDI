@@ -413,7 +413,7 @@
                     <div class="col-lg-6">
                         <h1 class="hero-title">Transform Your Living Space with DIMDI</h1>
                         <p class="hero-subtitle">Premium appliances and furniture designed to elevate your home experience with style, comfort, and innovation.</p>
-                        <a href="{{ url('/products') }}" class="btn btn-hero">Shop Now <i class="fas fa-arrow-right ms-2"></i></a>
+                        <a href="{{ url('/products.index') }}" class="btn btn-hero">Shop Now <i class="fas fa-arrow-right ms-2"></i></a>
                     </div>
                     <div class="col-lg-6 text-center">
                         <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Modern Living Room" class="img-fluid rounded-3 shadow-lg">

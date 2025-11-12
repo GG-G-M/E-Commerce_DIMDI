@@ -218,7 +218,7 @@
             </div>
 
             @if($product->in_stock)
-            <form action="{{ route('cart.store') }}" method="POST" class="mb-4" id="add-to-cart-form">
+            <form action="{{ route('cart.store') }}" method="POST" class="mb-3" id="add-to-cart-form">
                 @csrf
                 <input type="hidden" name="product_id" value="{{ $product->id }}">
                 <input type="hidden" name="quantity" value="1" id="quantity-input">
@@ -231,8 +231,28 @@
                     </button>
                 </div>
             </form>
+
+            <!-- Message Button -->
+<!-- Message Button -->
+<div class="d-grid mb-4">
+    @auth
+        @php
+            $adminUser = App\Models\User::where('role', 'admin')->first();
+        @endphp
+        @if(auth()->user()->id != $adminUser->id)
+            <a href="{{ route('messages.show', ['product' => $product->id, 'user' => $adminUser->id]) }}" 
+               class="btn btn-outline-success btn-lg">
+                <i class="fas fa-comment-dots me-2"></i>Message Seller
+            </a>
+        @endif
+    @else
+        <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg">
+            <i class="fas fa-comment-dots me-2"></i>Login to Message Seller
+        </a>
+    @endauth
+</div>
             @else
-            <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
+            <button class="btn btn-secondary btn-lg w-100 mb-3" disabled>Out of Stock</button>
             @endif
 
             <div class="card mt-4">
@@ -303,7 +323,7 @@
         </div>
     </section>
     @endif
-</div>
+
     <!-- Rating Section -->
     <div class="row mt-5">
         <div class="col-12">
@@ -415,6 +435,7 @@
             </div>
         </div>
     </div>
+</div>
 
 @push('scripts')
 <script>
