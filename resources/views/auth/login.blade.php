@@ -419,9 +419,7 @@
                                    class="form-control @error('password') is-invalid @enderror" 
                                    name="password" required autocomplete="current-password"
                                    placeholder="Enter your password">
-                            <button type="button" class="password-toggle" id="togglePassword">
-                                <i class="bi bi-eye"></i>
-                            </button>
+            
                             @error('password')
                                 <div class="invalid-feedback" style="font-size: 0.8rem;">
                                     {{ $message }}
