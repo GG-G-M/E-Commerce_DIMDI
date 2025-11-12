@@ -712,7 +712,7 @@
                                 </div>
                                 <div>
                                     <h5>Our Location</h5>
-                                    <p class="text-muted">123 Home Design District, Furniture Street, Cityville 12345</p>
+                                    <p class="text-muted">San Pedro Street, Davao City, Philippines</p>
                                 </div>
                             </div>
                             
@@ -722,7 +722,7 @@
                                 </div>
                                 <div>
                                     <h5>Call Us</h5>
-                                    <p class="text-muted">+1 (555) 123-4567</p>
+                                    <p class="text-muted">0928 503 6033</p>
                                 </div>
                             </div>
                             
@@ -732,7 +732,7 @@
                                 </div>
                                 <div>
                                     <h5>Email Us</h5>
-                                    <p class="text-muted">info@dimdistore.com</p>
+                                    <p class="text-muted">dimdisales@gmail.com</p>
                                 </div>
                             </div>
                             
@@ -742,7 +742,7 @@
                                 </div>
                                 <div>
                                     <h5>Store Hours</h5>
-                                    <p class="text-muted">Mon-Sat: 9AM-8PM, Sun: 11AM-6PM</p>
+                                    <p class="text-muted">Mon-Sat: 9AM-6PM/p>
                                 </div>
                             </div>
                         </div>
