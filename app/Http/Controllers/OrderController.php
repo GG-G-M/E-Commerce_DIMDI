@@ -79,7 +79,7 @@ class OrderController extends Controller
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10;
         $shipping = $subtotal > 100 ? 0 : 10;
-        $total = $subtotal + $tax + $shipping;
+        $total = $subtotal + $shipping;
 
         $user = Auth::user();
 
@@ -134,7 +134,7 @@ class OrderController extends Controller
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10;
         $shipping = $subtotal > 100 ? 0 : 10;
-        $total = $subtotal + $tax + $shipping;
+        $total = $subtotal + $shipping;
 
         $user = Auth::user();
 
@@ -149,7 +149,7 @@ class OrderController extends Controller
                 'shipping_address' => $request->shipping_address,
                 'billing_address' => $request->billing_address,
                 'subtotal' => $subtotal,
-                'tax_amount' => $tax,
+                // 'tax_amount' => $tax,
                 'shipping_cost' => $shipping,
                 'total_amount' => $total,
                 'payment_method' => $request->payment_method,

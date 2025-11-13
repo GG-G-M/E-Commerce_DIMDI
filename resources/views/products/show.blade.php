@@ -242,7 +242,7 @@
                 </div>
             </form>
 
-            <!-- Message Button -->
+            {{-- <!-- Message Button -->
             <div class="d-grid mb-4">
                 @auth
                     @php
@@ -259,7 +259,7 @@
                         <i class="fas fa-comment-dots me-2"></i>Login to Message Seller
                     </a>
                 @endauth
-            </div>
+            </div> --}}
             @else
             <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
             @endif
