@@ -166,15 +166,15 @@
                         <td>
                             @if($product->has_variants && $product->variants && $product->variants->count() > 0)
                                 @foreach($product->variants->take(3) as $variant)
-                                    <span class="badge bg-secondary me-1 mb-1" title="{{ $variant->variant_description }}">
+                                    <span class="" title="{{ $variant->variant_description }}">
                                         {{ $variant->variant_name }}
                                     </span>
                                 @endforeach
                                 @if($product->variants->count() > 3)
-                                    <span class="badge bg-light text-dark">+{{ $product->variants->count() - 3 }} more</span>
+                                    <span class="">+{{ $product->variants->count() - 3 }} more</span>
                                 @endif
                             @else
-                                <span class="badge bg-secondary">No Variants</span>
+                                <span class="">No Variants</span>
                             @endif
                         </td>
                         <td>₱{{ number_format($product->price, 2) }}</td>
@@ -185,15 +185,15 @@
                         </td>
                         <td>
                             @if($product->is_archived)
-                                <span class="badge bg-dark">Archived</span>
+                                <span class="">Archived</span>
                             @else
                                 @if($product->is_effectively_inactive)
-                                    <span class="badge bg-danger">Inactive</span>
+                                    <span class="">Inactive</span>
                                 @else
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="">Active</span>
                                 @endif
                                 @if($product->is_featured)
-                                    <span class="badge bg-info mt-1">Featured</span>
+                                    <span class="">Featured</span>
                                 @endif
                             @endif
                         </td>
