@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\StockInController;
+use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\PaymentController; // Add this line
 use App\Http\Controllers\RatingController; // Add this line
@@ -106,6 +107,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
+
+    // Stock-Outs
+    Route::get('/stock-outs', [StockOutController::class, 'index'])->name('stock_out.index');
+    Route::post('/stock-outs', [StockOutController::class, 'store'])->name('stock_out.store');
+    Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
+    Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
+
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

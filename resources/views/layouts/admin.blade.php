@@ -130,6 +130,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.stock_out.*') ? 'active' : '' }}"
+                                href="{{ route('admin.stock_out.index') }}">
+                                <i class="fas fa-box-open me-2"></i>Stock-Out
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
                                 href="{{ route('admin.orders.index') }}">
                                 <i class="fas fa-shopping-cart me-2"></i>Orders
