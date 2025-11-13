@@ -25,7 +25,7 @@ class Product extends Model
     'is_active',
     'is_archived',
     'category_id',
-    'brand',
+    'brand_id',
 ];
 
     protected $casts = [

@@ -114,4 +114,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    
+    // Brand Routes - ADDED NEW
+    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+    Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
+
 });

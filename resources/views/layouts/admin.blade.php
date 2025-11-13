@@ -104,6 +104,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.brands.index') }}">
+                                <i class="fas fa-tag me-2"></i>Brands
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" 
                                href="{{ route('admin.orders.index') }}">
                                 <i class="fas fa-shopping-cart me-2"></i>Orders
@@ -113,6 +119,17 @@
                             <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
                                href="{{ route('admin.categories.index') }}">
                                 <i class="fas fa-tags me-2"></i>Categories
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.messages.*') ? 'active' : '' }}" 
+                               href="{{ route('admin.messages.index') }}">
+                                <i class="fas fa-comments me-2"></i>
+                                Messages
+                                @php($unreadCount = auth()->user()->getUnreadMessagesCount())
+                                @if($unreadCount > 0)
+                                    <span class="badge bg-danger float-end">{{ $unreadCount }}</span>
+                                @endif
                             </a>
                         </li>
                         <li class="nav-item mt-4">
@@ -127,17 +144,6 @@
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout
                                 </button>
                             </form>
-                        </li>
-                        {{-- Add to your admin sidebar navigation --}}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.messages.index') }}">
-                                <i class="fas fa-comments me-2"></i>
-                                Messages
-                                @php($unreadCount = auth()->user()->getUnreadMessagesCount())
-                                @if($unreadCount > 0)
-                                    <span class="badge bg-danger float-end">{{ $unreadCount }}</span>
-                                @endif
-                            </a>
                         </li>
                     </ul>
                 </div>
