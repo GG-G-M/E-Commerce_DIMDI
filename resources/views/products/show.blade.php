@@ -79,7 +79,7 @@
     .image-loading {
         opacity: 0.7;
     }
-        .star-rating-input {
+    .star-rating-input {
         display: flex;
         flex-direction: row-reverse;
         justify-content: flex-end;
@@ -145,11 +145,11 @@
         <div class="col-lg-6">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
             
-            <!-- Display Brand -->
-            @if($product->brand)
+            <!-- Display Brand - FIXED -->
+            @if($product->brand_id && $product->brand)
                 <div class="mb-2">
                     <span class="badge bg-light text-dark border px-3 py-2">
-                        <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand }}
+                        <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand->name }}
                     </span>
                 </div>
             @endif
@@ -241,6 +241,25 @@
                     </button>
                 </div>
             </form>
+
+            <!-- Message Button -->
+            <div class="d-grid mb-4">
+                @auth
+                    @php
+                        $adminUser = App\Models\User::where('role', 'admin')->first();
+                    @endphp
+                    @if(auth()->user()->id != $adminUser->id)
+                        <a href="{{ route('messages.show', ['product' => $product->id, 'user' => $adminUser->id]) }}" 
+                           class="btn btn-outline-success btn-lg">
+                            <i class="fas fa-comment-dots me-2"></i>Message Seller
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg">
+                        <i class="fas fa-comment-dots me-2"></i>Login to Message Seller
+                    </a>
+                @endauth
+            </div>
             @else
             <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
             @endif
@@ -251,8 +270,9 @@
                     <ul class="list-unstyled mb-0">
                         <li><strong>SKU:</strong> {{ $product->sku }}</li>
                         <li><strong>Category:</strong> {{ $product->category->name }}</li>
-                        @if($product->brand)
-                        <li><strong>Brand:</strong> {{ $product->brand }}</li>
+                        <!-- Brand Display - FIXED -->
+                        @if($product->brand_id && $product->brand)
+                        <li><strong>Brand:</strong> {{ $product->brand->name }}</li>
                         @endif
                         <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
                         @if($product->has_variants && $product->variants->count() > 0)
@@ -286,10 +306,10 @@
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
                         
-                        <!-- Display Brand for Related Products -->
-                        @if($relatedProduct->brand)
+                        <!-- Display Brand for Related Products - FIXED -->
+                        @if($relatedProduct->brand_id && $relatedProduct->brand)
                             <small class="text-muted d-block mb-2">
-                                <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand }}
+                                <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand->name }}
                             </small>
                         @endif
                         
@@ -458,7 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update selected variant value
                 variantInput.value = this.value;
                 
-                
                 // Update image with smooth transition
                 if (variantImage && variantImage !== mainImage.src) {
                     mainImage.classList.add('image-loading');
@@ -470,47 +489,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update price display
                 if (hasDiscount) {
-                    productPrice.textContent = '$' + parseFloat(variantPrice).toFixed(2);
+                    productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
                     productPrice.className = 'h3 text-danger me-2';
                     
                     if (productOriginalPrice) {
-                        productOriginalPrice.textContent = '$' + parseFloat(variantOriginalPrice).toFixed(2);
+                        productOriginalPrice.textContent = '₱' + parseFloat(variantOriginalPrice).toFixed(2);
                         productOriginalPrice.style.display = 'inline';
                     }
                     
-                // Update image discount badge (the one in position-absolute)
-                let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
-                if (hasDiscount) {
-                    if (!imageDiscountBadge) {
-                        imageDiscountBadge = document.createElement('span');
-                        imageDiscountBadge.className = 'badge bg-danger fs-6';
-                        document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
+                    // Update image discount badge (the one in position-absolute)
+                    let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    if (hasDiscount) {
+                        if (!imageDiscountBadge) {
+                            imageDiscountBadge = document.createElement('span');
+                            imageDiscountBadge.className = 'badge bg-danger fs-6';
+                            document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
+                        }
+                        imageDiscountBadge.textContent = discountPercent + '% OFF';
+                    } else if (imageDiscountBadge) {
+                        imageDiscountBadge.remove();
                     }
-                    imageDiscountBadge.textContent = discountPercent + '% OFF';
-                } else if (imageDiscountBadge) {
-                    imageDiscountBadge.remove();
-                }
 
-                // Update price discount badge (the one next to price)
-                let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
-                if (hasDiscount) {
-                    if (!priceDiscountBadge) {
-                        priceDiscountBadge = document.createElement('span');
-                        priceDiscountBadge.className = 'badge bg-danger ms-2';
-                        productPrice.parentNode.appendChild(priceDiscountBadge);
+                    // Update price discount badge (the one next to price)
+                    let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                    if (hasDiscount) {
+                        if (!priceDiscountBadge) {
+                            priceDiscountBadge = document.createElement('span');
+                            priceDiscountBadge.className = 'badge bg-danger ms-2';
+                            productPrice.parentNode.appendChild(priceDiscountBadge);
+                        }
+                        priceDiscountBadge.textContent = discountPercent + '% OFF';
+                    } else if (priceDiscountBadge) {
+                        priceDiscountBadge.remove();
                     }
-                    priceDiscountBadge.textContent = discountPercent + '% OFF';
-                } else if (priceDiscountBadge) {
-                    priceDiscountBadge.remove();
-                }
                     
                     // Remove discount badge if exists
                     const discountBadge = document.querySelector('.badge.bg-danger');
                     if (discountBadge && !discountBadge.closest('.position-absolute')) {
                         discountBadge.remove();
                     }
+                } else {
+                    productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
+                    productPrice.className = 'h3 text-success fw-bold';
+                    
+                    if (productOriginalPrice) {
+                        productOriginalPrice.style.display = 'none';
+                    }
+                    
+                    // Remove discount badges
+                    const imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    if (imageDiscountBadge) {
+                        imageDiscountBadge.remove();
+                    }
+                    
+                    const priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                    if (priceDiscountBadge) {
+                        priceDiscountBadge.remove();
+                    }
                 }
-                
                 
                 // Update selected style
                 document.querySelectorAll('.variant-option').forEach(option => {
@@ -520,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update add to cart button state
                 updateAddToCartButton();
-                
             }
         });
     });

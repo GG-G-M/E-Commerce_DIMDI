@@ -17,13 +17,13 @@
         box-shadow: 0 10px 30px hsla(0, 0%, 0%, 0.20);
         max-width: 1200px;
         margin: 0 auto;
-        height: 300px; /* Fixed height for consistency */
+        height: 300px;
     }
     
     .carousel-image {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Ensures image covers the container without distortion */
+        object-fit: cover;
         object-position: center;
     }
     
@@ -114,7 +114,6 @@
         color: white !important;
     }
 
-    /* Category header styling */
     .category-header {
         border-bottom: 3px solid #2C8F0C;
         padding-bottom: 10px;
@@ -122,14 +121,12 @@
         color: #2C8F0C;
     }
 
-    /* Loading indicator */
     #loading-indicator {
         display: none;
         text-align: center;
         padding: 20px;
     }
 
-    /* End of results message */
     #end-of-results {
         display: none;
         text-align: center;
@@ -137,7 +134,6 @@
         color: #6c757d;
     }
 
-    /* No Products Found Modal Styling */
     .no-products-modal .modal-content {
         border-radius: 15px;
         border: none;
@@ -254,7 +250,6 @@
         box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
     }
 
-    /* Star rating styles */
     .star-rating {
         font-size: 0.7rem;
     }
@@ -268,10 +263,252 @@
         margin-bottom: 8px;
     }
 
-    /* Responsive adjustments for smaller screens */
+    .floating-filter {
+        position: fixed;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        z-index: 1000;
+    }
+
+    .filter-bubble {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(44, 143, 12, 0.3);
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .filter-bubble:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(44, 143, 12, 0.4);
+    }
+
+    .filter-panel {
+        position: absolute;
+        top: 0;
+        right: 60px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        padding: 20px;
+        width: 300px;
+        display: none;
+        z-index: 1001;
+    }
+
+    .filter-panel.show {
+        display: block;
+        animation: slideInRight 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .filter-header {
+        border-bottom: 2px solid #E8F5E6;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .filter-title {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    .filter-section-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filter-options {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .filter-option:hover {
+        background-color: #F8FDF8;
+        padding-left: 5px;
+    }
+
+    .filter-option:last-child {
+        border-bottom: none;
+    }
+
+    .filter-checkbox {
+        margin-right: 10px;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #2C8F0C;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .filter-checkbox.checked {
+        background-color: #2C8F0C;
+    }
+
+    .filter-checkbox.checked::after {
+        content: '✓';
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .filter-label {
+        flex: 1;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .filter-count {
+        background: #E8F5E6;
+        color: #2C8F0C;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .price-range {
+        padding: 10px 0;
+    }
+
+    .price-inputs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .price-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .price-input:focus {
+        outline: none;
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.1);
+    }
+
+    .price-slider {
+        width: 100%;
+        height: 4px;
+        background: #ddd;
+        border-radius: 2px;
+        outline: none;
+        -webkit-appearance: none;
+    }
+
+    .price-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        background: #2C8F0C;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .price-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: #2C8F0C;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .price-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-filter {
+        flex: 1;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-apply {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+    }
+
+    .btn-apply:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    .btn-clear {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+    }
+
+    .btn-clear:hover {
+        background: #e9ecef;
+    }
+
     @media (max-width: 768px) {
         .carousel-card {
-            height: 200px; /* Even smaller on mobile */
+            height: 200px;
         }
         
         .carousel-caption-card {
@@ -291,6 +528,20 @@
             padding: 15px 0;
             margin-bottom: 20px;
         }
+
+        .floating-filter {
+            right: 10px;
+            bottom: 80px;
+            top: auto;
+            transform: none;
+        }
+
+        .filter-panel {
+            right: 60px;
+            bottom: 0;
+            top: auto;
+            width: 280px;
+        }
     }
 
     @media (max-width: 576px) {
@@ -302,11 +553,22 @@
             width: 95% !important;
             max-width: 300px;
         }
+
+        .floating-filter {
+            right: 5px;
+            bottom: 70px;
+        }
+
+        .filter-panel {
+            right: 50px;
+            width: 250px;
+        }
     }
 </style>
 
 <!-- No Products Found Modal -->
-<div class="modal fade no-products-modal" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel" aria-hidden="true">    <div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal fade no-products-modal" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="noProductsModalLabel">
@@ -360,6 +622,52 @@
                     <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
                 </a>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Filter Bubble -->
+<div class="floating-filter">
+    <button class="filter-bubble" id="filterBubble">
+        <i class="fas fa-filter"></i>
+    </button>
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-header">
+            <h4 class="filter-title"><i class="fas fa-sliders-h me-2"></i>Filters</h4>
+        </div>
+        
+        <!-- Brand Filter -->
+        <div class="filter-section">
+            <h6 class="filter-section-title">Brands</h6>
+            <div class="filter-options" id="brandFilters">
+                <!-- Brands will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div class="filter-section">
+            <h6 class="filter-section-title">Price Range</h6>
+            <div class="price-range">
+                <div class="price-inputs">
+                    <input type="number" class="price-input" id="minPrice" placeholder="Min" min="0">
+                    <span class="align-self-center">-</span>
+                    <input type="number" class="price-input" id="maxPrice" placeholder="Max" min="0">
+                </div>
+                <input type="range" class="price-slider" id="priceSlider" min="0" max="10000" step="100">
+                <div class="price-labels">
+                    <span>₱0</span>
+                    <span>₱10,000</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button class="btn-filter btn-clear" id="clearFilters">
+                Clear
+            </button>
+            <button class="btn-filter btn-apply" id="applyFilters">
+                Apply
+            </button>
         </div>
     </div>
 </div>
@@ -466,10 +774,10 @@
                             <div class="card-body d-flex flex-column">
                                 <h6 class="card-title">{{ $product->name }}</h6>
                                 
-                                <!-- Display Brand -->
-                                @if($product->brand)
+                                <!-- Display Brand - FIXED: Only show brand name -->
+                                @if($product->brand_id && $product->brand)
                                     <small class="text-muted d-block mb-2">
-                                        <i class="fas fa-tag me-1"></i>{{ $product->brand }}
+                                        <i class="fas fa-tag me-1"></i>{{ $product->brand->name }}
                                     </small>
                                 @endif
                                 
@@ -618,6 +926,162 @@ document.addEventListener('DOMContentLoaded', function() {
         noProductsModal.show();
     @endif
     
+    // Floating Filter Functionality
+    const filterBubble = document.getElementById('filterBubble');
+    const filterPanel = document.getElementById('filterPanel');
+    const brandFilters = document.getElementById('brandFilters');
+    const minPriceInput = document.getElementById('minPrice');
+    const maxPriceInput = document.getElementById('maxPrice');
+    const priceSlider = document.getElementById('priceSlider');
+    const applyFilters = document.getElementById('applyFilters');
+    const clearFilters = document.getElementById('clearFilters');
+
+    // Use brands passed from controller - FIXED: Only brand names
+    const brands = @json($brands->pluck('name'));
+
+    // Populate brand filters
+    if (brands && brands.length > 0) {
+        brands.forEach(brand => {
+            const option = createFilterOption('brand', brand);
+            brandFilters.appendChild(option);
+        });
+    } else {
+        brandFilters.innerHTML = '<div class="text-muted small">No brands available</div>';
+    }
+
+    // Price range functionality
+    priceSlider.addEventListener('input', function() {
+        const maxPrice = this.value;
+        maxPriceInput.value = maxPrice;
+    });
+
+    maxPriceInput.addEventListener('input', function() {
+        let value = parseInt(this.value) || 0;
+        if (value > 10000) value = 10000;
+        if (value < 0) value = 0;
+        priceSlider.value = value;
+        this.value = value;
+    });
+
+    minPriceInput.addEventListener('input', function() {
+        let value = parseInt(this.value) || 0;
+        if (value < 0) value = 0;
+        this.value = value;
+    });
+
+    function createFilterOption(type, value) {
+        const option = document.createElement('div');
+        option.className = 'filter-option';
+        option.innerHTML = `
+            <div class="filter-checkbox" data-type="${type}" data-value="${value}"></div>
+            <span class="filter-label">${value}</span>
+            <span class="filter-count">0</span>
+        `;
+        
+        option.addEventListener('click', function() {
+            const checkbox = this.querySelector('.filter-checkbox');
+            checkbox.classList.toggle('checked');
+        });
+        
+        return option;
+    }
+
+    // Toggle filter panel
+    filterBubble.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterPanel.classList.toggle('show');
+    });
+
+    // Close filter panel when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!filterPanel.contains(e.target) && !filterBubble.contains(e.target)) {
+            filterPanel.classList.remove('show');
+        }
+    });
+
+    // Apply filters
+    applyFilters.addEventListener('click', function() {
+        const selectedBrands = getSelectedFilters('brand');
+        const minPrice = minPriceInput.value || '';
+        const maxPrice = maxPriceInput.value || '';
+        
+        let url = new URL(window.location.href);
+        
+        // Update URL parameters
+        if (selectedBrands.length > 0) {
+            url.searchParams.set('brands', selectedBrands.join(','));
+        } else {
+            url.searchParams.delete('brands');
+        }
+        
+        if (minPrice) {
+            url.searchParams.set('min_price', minPrice);
+        } else {
+            url.searchParams.delete('min_price');
+        }
+        
+        if (maxPrice) {
+            url.searchParams.set('max_price', maxPrice);
+        } else {
+            url.searchParams.delete('max_price');
+        }
+        
+        // Reset to first page when applying filters
+        url.searchParams.set('page', '1');
+        
+        window.location.href = url.toString();
+    });
+
+    // Clear filters
+    clearFilters.addEventListener('click', function() {
+        // Clear brand checkboxes
+        document.querySelectorAll('.filter-checkbox.checked').forEach(checkbox => {
+            checkbox.classList.remove('checked');
+        });
+        
+        // Clear price inputs
+        minPriceInput.value = '';
+        maxPriceInput.value = '';
+        priceSlider.value = 10000;
+        
+        let url = new URL(window.location.href);
+        url.searchParams.delete('brands');
+        url.searchParams.delete('min_price');
+        url.searchParams.delete('max_price');
+        url.searchParams.set('page', '1');
+        
+        window.location.href = url.toString();
+    });
+
+    function getSelectedFilters(type) {
+        const checkboxes = document.querySelectorAll(`.filter-checkbox[data-type="${type}"].checked`);
+        return Array.from(checkboxes).map(cb => cb.getAttribute('data-value'));
+    }
+
+    // Set current filters from URL
+    function setCurrentFilters() {
+        const urlBrands = urlParams.get('brands')?.split(',') || [];
+        const urlMinPrice = urlParams.get('min_price') || '';
+        const urlMaxPrice = urlParams.get('max_price') || '';
+        
+        // Set brand filters
+        urlBrands.forEach(brand => {
+            const checkbox = document.querySelector(`.filter-checkbox[data-type="brand"][data-value="${brand}"]`);
+            if (checkbox) checkbox.classList.add('checked');
+        });
+        
+        // Set price filters
+        if (urlMinPrice) {
+            minPriceInput.value = urlMinPrice;
+        }
+        if (urlMaxPrice) {
+            maxPriceInput.value = urlMaxPrice;
+            priceSlider.value = urlMaxPrice;
+        }
+    }
+
+    setCurrentFilters();
+
     const hasProducts = {{ $products->count() > 0 ? 'true' : 'false' }};
     
     if (hasProducts) {
@@ -637,6 +1101,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 url += `&search=${encodeURIComponent(searchQuery)}`;
             }
             
+            // Add filter parameters
+            const selectedBrands = getSelectedFilters('brand');
+            const minPrice = minPriceInput.value || '';
+            const maxPrice = maxPriceInput.value || '';
+            
+            if (selectedBrands.length > 0) {
+                url += `&brands=${selectedBrands.join(',')}`;
+            }
+            if (minPrice) {
+                url += `&min_price=${minPrice}`;
+            }
+            if (maxPrice) {
+                url += `&max_price=${maxPrice}`;
+            }
+            
             fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -644,7 +1123,6 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.text())
             .then(html => {
-    
                 if (html.trim() === '') {
                     hasMore = false;
                     endOfResults.style.display = 'block';
