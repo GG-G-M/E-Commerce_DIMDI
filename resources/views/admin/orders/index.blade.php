@@ -166,7 +166,7 @@
                         <td>{{ $order->customer_email }}</td>
                         <td>₱{{ number_format($order->total_amount, 2) }}</td>
                         <td>
-                            <span class="badge badge-{{ 
+                            <span -{{ 
                                 $order->order_status == 'cancelled' ? '' :
                                 ($order->order_status == 'completed' ? '' :
                                 ($order->order_status == 'delivered' ? '' :

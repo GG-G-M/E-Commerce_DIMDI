@@ -174,20 +174,20 @@
                     <td>{{ $customer->address }}</td>
                     <td>
                         @if ($customer->is_archived)
-                            <span class="badge bg-danger">Archived</span>
+                            <span>Archived</span>
                         @else
-                            <span class="badge bg-success">Active</span>
+                            <span>Active</span>
                         @endif
                     </td>
                     <td>
-                        <button class="btn btn-warning btn-sm editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
+                        <button class="btn btn-outline-success btn-sm editBtn me-2" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
                             <i class="fas fa-edit"></i>
                         @if ($customer->is_archived)
-                            <button class="btn btn-success btn-sm unarchiveBtn" data-id="{{ $customer->id }}">
+                            <button class="btn btn-outline-success btn-sm unarchiveBtn" data-id="{{ $customer->id }}">
                                <i class="fas fa-box-open"></i>
                             </button>
                         @else
-                            <button class="btn btn-danger btn-sm archiveBtn" data-id="{{ $customer->id }}">
+                            <button class="btn btn-outline-warning btn-sm archiveBtn" data-id="{{ $customer->id }}">
                                 <i class="fas fa-archive"></i>
                             </button>
                         @endif

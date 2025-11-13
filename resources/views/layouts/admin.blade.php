@@ -126,14 +126,17 @@
                                 <i class="fas fa-store me-2"></i>View Store
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="nav-link btn btn-link text-start w-100">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                </button>
-                            </form>
-                        </li>
+                      <li class="nav-item">
+                        <a href="{{ route('logout') }}" 
+                        class="nav-link"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </li>
                     </ul>
                 </div>
             </nav>

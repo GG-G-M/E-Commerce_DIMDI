@@ -118,8 +118,9 @@
             border-radius: 8px;
             padding: 10px 12px;
             transition: all 0.3s ease;
-            font-size: 0.9rem;
+            font-size: 0.9rem;  
             background: #fff;
+            width: 400px;
         }
         
         .form-control:focus {
@@ -429,9 +430,9 @@
                                    class="form-control @error('password') is-invalid @enderror" 
                                    name="password" required autocomplete="current-password"
                                    placeholder="Enter your password">
-                            <button type="button" class="password-toggle" id="togglePassword">
+                            {{-- <button type="button" class="password-toggle" id="togglePassword">
                                 <i class="bi bi-eye"></i>
-                            </button>
+                            </button> --}}
                             @error('password')
                                 <div class="invalid-feedback" style="font-size: 0.8rem;">
                                     {{ $message }}
@@ -439,23 +440,23 @@
                             @enderror
                         </div>
 
-                        <div class="login-options">
-                            <div class="form-check">
+                        <button type="submit" class="btn btn-login" style="color: #f8f9fa">
+                            Sign In
+                        </button>
+
+                        <div class="login-options" style="display: flex; justify-content: center;">
+                            {{-- <div class="form-check">
                                 <input class="form-check-input" type="checkbox" 
                                        name="remember" id="remember" 
                                        {{ old('remember') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="remember">
                                     Remember me
                                 </label>
-                            </div>
+                            </div> --}}
                             <a href="#" class="forgot-link">
                                 Forgot Password?
                             </a>
                         </div>
-
-                        <button type="submit" class="btn btn-login">
-                            Sign In
-                        </button>
                     </form>
                 </div>
                 

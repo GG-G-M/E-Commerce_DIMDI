@@ -508,7 +508,7 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-register">
+                        <button type="submit" class="btn btn-register" style="color: white">
                             Create Account
                         </button>
                     </form>

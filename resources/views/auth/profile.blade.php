@@ -381,7 +381,7 @@
                 
                 <div class="mb-3 input-group">
                     <label for="current_password" class="form-label">Current Password *</label>
-                    <input id="current_password" type="password" class="form-control @error('current_password') is-invalid @enderror" 
+                    <input id="current_password" type="password" style="border-radius: 8px" class="form-control @error('current_password') is-invalid @enderror" 
                            name="current_password" required
                            placeholder="Enter current password">
                     <button type="button" class="password-toggle" id="toggleCurrentPassword">
@@ -397,7 +397,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3 input-group">
                         <label for="password" class="form-label">New Password *</label>
-                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
+                        <input id="password" type="password" style="border-radius: 8px" class="form-control @error('password') is-invalid @enderror" 
                                name="password" required
                                placeholder="Enter new password">
                         <button type="button" class="password-toggle" id="togglePassword">
@@ -412,7 +412,7 @@
 
                     <div class="col-md-6 mb-3 input-group">
                         <label for="password_confirmation" class="form-label">Confirm New Password *</label>
-                        <input id="password_confirmation" type="password" class="form-control" 
+                        <input id="password_confirmation" type="password" style="border-radius: 8px" class="form-control" 
                                name="password_confirmation" required
                                placeholder="Confirm new password">
                         <button type="button" class="password-toggle" id="togglePasswordConfirm">
