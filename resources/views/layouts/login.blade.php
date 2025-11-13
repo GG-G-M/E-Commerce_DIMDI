@@ -356,7 +356,7 @@
     </main>
 
     <!-- Footer -->
-<footer style="background-color: #2C8F0C !important; color: white !important;">
+{{-- <footer style="background-color: #2C8F0C !important; color: white !important;">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 mb-4">
@@ -410,7 +410,7 @@
             </div>
         </div>
     </div>
-</footer>
+</footer> --}}
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

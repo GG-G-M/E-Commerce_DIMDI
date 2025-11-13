@@ -79,6 +79,42 @@
     .image-loading {
         opacity: 0.7;
     }
+    .star-rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .star-rating-input input {
+        display: none;
+    }
+
+    .star-rating-input label {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #ddd;
+        transition: color 0.2s;
+        margin-right: 5px;
+    }
+
+    .star-rating-input input:checked ~ label,
+    .star-rating-input label:hover,
+    .star-rating-input label:hover ~ label {
+        color: #ffc107;
+    }
+
+    .star-rating-input input:checked + label {
+        color: #ffc107;
+    }
+
+    .star-rating {
+        font-size: 1rem;
+    }
+
+    .star-rating .fas,
+    .star-rating .far {
+        color: #ffc107;
+    }
 </style>
 
 <div class="container py-4">
@@ -108,6 +144,16 @@
 
         <div class="col-lg-6">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
+            
+            <!-- Display Brand - FIXED -->
+            @if($product->brand_id && $product->brand)
+                <div class="mb-2">
+                    <span class="badge bg-light text-dark border px-3 py-2">
+                        <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand->name }}
+                    </span>
+                </div>
+            @endif
+            
             <p class="text-muted mb-2">Category: {{ $product->category->name }}</p>
             
             <div class="mb-3">
@@ -195,6 +241,25 @@
                     </button>
                 </div>
             </form>
+
+            {{-- <!-- Message Button -->
+            <div class="d-grid mb-4">
+                @auth
+                    @php
+                        $adminUser = App\Models\User::where('role', 'admin')->first();
+                    @endphp
+                    @if(auth()->user()->id != $adminUser->id)
+                        <a href="{{ route('messages.show', ['product' => $product->id, 'user' => $adminUser->id]) }}" 
+                           class="btn btn-outline-success btn-lg">
+                            <i class="fas fa-comment-dots me-2"></i>Message Seller
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-outline-success btn-lg">
+                        <i class="fas fa-comment-dots me-2"></i>Login to Message Seller
+                    </a>
+                @endauth
+            </div> --}}
             @else
             <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
             @endif
@@ -205,6 +270,10 @@
                     <ul class="list-unstyled mb-0">
                         <li><strong>SKU:</strong> {{ $product->sku }}</li>
                         <li><strong>Category:</strong> {{ $product->category->name }}</li>
+                        <!-- Brand Display - FIXED -->
+                        @if($product->brand_id && $product->brand)
+                        <li><strong>Brand:</strong> {{ $product->brand->name }}</li>
+                        @endif
                         <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
                         @if($product->has_variants && $product->variants->count() > 0)
                         <li><strong>Available Options:</strong> 
@@ -237,6 +306,13 @@
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
                         
+                        <!-- Display Brand for Related Products - FIXED -->
+                        @if($relatedProduct->brand_id && $relatedProduct->brand)
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand->name }}
+                            </small>
+                        @endif
+                        
                         <!-- Display Available Variants -->
                         @if($relatedProduct->has_variants && $relatedProduct->variants->count() > 0)
                         <div class="mb-2">
@@ -268,6 +344,117 @@
     </section>
     @endif
 </div>
+    <!-- Rating Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Product Reviews & Ratings</h4>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Average Rating Display -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="display-4 text-success fw-bold">{{ number_format($product->average_rating, 1) }}</div>
+                            <div class="star-rating mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($product->average_rating))
+                                        <i class="fas fa-star text-warning"></i>
+                                    @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    @else
+                                        <i class="far fa-star text-warning"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <p class="text-muted">Based on {{ $product->total_ratings }} reviews</p>
+                        </div>
+                        <div class="col-md-8">
+                            <!-- User Rating Form (if purchased and not rated) -->
+                            @auth
+                                @if($product->purchasedBy(auth()->user()) && !$product->ratedBy(auth()->user()))
+                                    <div class="user-rating-form">
+                                        <h5 class="text-success">Rate this product</h5>
+                                        <p class="text-muted">Share your experience with this product</p>
+                                        <form action="{{ route('ratings.store', $product) }}" method="POST">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Your Rating</label>
+                                                <div class="star-rating-input">
+                                                    @for($i = 5; $i >= 1; $i--)
+                                                        <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" required>
+                                                        <label for="star{{ $i }}"><i class="far fa-star"></i></label>
+                                                    @endfor
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="review" class="form-label fw-semibold">Review (Optional)</label>
+                                                <textarea name="review" id="review" class="form-control" rows="3" placeholder="Share your experience with this product..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-paper-plane me-2"></i>Submit Rating
+                                            </button>
+                                        </form>
+                                    </div>
+                                @elseif($product->ratedBy(auth()->user()))
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-check-circle me-2"></i>You have already rated this product. Thank you!
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-info-circle me-2"></i>You can rate this product after purchase and delivery.
+                                    </div>
+                                @endif
+                            @else
+                                <div class="alert alert-info">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    <a href="{{ route('login') }}" class="alert-link">Login</a> to rate this product if you've purchased it.
+                                </div>
+                            @endauth
+                        </div>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div class="reviews-list">
+                        <h5 class="text-success mb-4">Customer Reviews</h5>
+                        @if($product->ratings->count() > 0)
+                            @foreach($product->ratings()->with('user')->latest()->get() as $rating)
+                                <div class="review-item border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong class="text-success">{{ $rating->user->name }}</strong>
+                                            <div class="star-rating mt-1">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    @if($i <= $rating->rating)
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    @else
+                                                        <i class="far fa-star text-warning"></i>
+                                                    @endif
+                                                @endfor
+                                                <span class="ms-2 text-muted">{{ $rating->rating }}/5</span>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ $rating->created_at->format('M d, Y') }}</small>
+                                    </div>
+                                    @if($rating->review)
+                                        <p class="mt-2 mb-0">{{ $rating->review }}</p>
+                                    @else
+                                        <p class="mt-2 mb-0 text-muted"><em>No review text provided</em></p>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="text-center py-4">
+                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @push('scripts')
 <script>
@@ -291,7 +478,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update selected variant value
                 variantInput.value = this.value;
                 
-                
                 // Update image with smooth transition
                 if (variantImage && variantImage !== mainImage.src) {
                     mainImage.classList.add('image-loading');
@@ -303,47 +489,64 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update price display
                 if (hasDiscount) {
-                    productPrice.textContent = '$' + parseFloat(variantPrice).toFixed(2);
+                    productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
                     productPrice.className = 'h3 text-danger me-2';
                     
                     if (productOriginalPrice) {
-                        productOriginalPrice.textContent = '$' + parseFloat(variantOriginalPrice).toFixed(2);
+                        productOriginalPrice.textContent = '₱' + parseFloat(variantOriginalPrice).toFixed(2);
                         productOriginalPrice.style.display = 'inline';
                     }
                     
-                // Update image discount badge (the one in position-absolute)
-                let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
-                if (hasDiscount) {
-                    if (!imageDiscountBadge) {
-                        imageDiscountBadge = document.createElement('span');
-                        imageDiscountBadge.className = 'badge bg-danger fs-6';
-                        document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
+                    // Update image discount badge (the one in position-absolute)
+                    let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    if (hasDiscount) {
+                        if (!imageDiscountBadge) {
+                            imageDiscountBadge = document.createElement('span');
+                            imageDiscountBadge.className = 'badge bg-danger fs-6';
+                            document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
+                        }
+                        imageDiscountBadge.textContent = discountPercent + '% OFF';
+                    } else if (imageDiscountBadge) {
+                        imageDiscountBadge.remove();
                     }
-                    imageDiscountBadge.textContent = discountPercent + '% OFF';
-                } else if (imageDiscountBadge) {
-                    imageDiscountBadge.remove();
-                }
 
-                // Update price discount badge (the one next to price)
-                let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
-                if (hasDiscount) {
-                    if (!priceDiscountBadge) {
-                        priceDiscountBadge = document.createElement('span');
-                        priceDiscountBadge.className = 'badge bg-danger ms-2';
-                        productPrice.parentNode.appendChild(priceDiscountBadge);
+                    // Update price discount badge (the one next to price)
+                    let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                    if (hasDiscount) {
+                        if (!priceDiscountBadge) {
+                            priceDiscountBadge = document.createElement('span');
+                            priceDiscountBadge.className = 'badge bg-danger ms-2';
+                            productPrice.parentNode.appendChild(priceDiscountBadge);
+                        }
+                        priceDiscountBadge.textContent = discountPercent + '% OFF';
+                    } else if (priceDiscountBadge) {
+                        priceDiscountBadge.remove();
                     }
-                    priceDiscountBadge.textContent = discountPercent + '% OFF';
-                } else if (priceDiscountBadge) {
-                    priceDiscountBadge.remove();
-                }
                     
                     // Remove discount badge if exists
                     const discountBadge = document.querySelector('.badge.bg-danger');
                     if (discountBadge && !discountBadge.closest('.position-absolute')) {
                         discountBadge.remove();
                     }
+                } else {
+                    productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
+                    productPrice.className = 'h3 text-success fw-bold';
+                    
+                    if (productOriginalPrice) {
+                        productOriginalPrice.style.display = 'none';
+                    }
+                    
+                    // Remove discount badges
+                    const imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    if (imageDiscountBadge) {
+                        imageDiscountBadge.remove();
+                    }
+                    
+                    const priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
+                    if (priceDiscountBadge) {
+                        priceDiscountBadge.remove();
+                    }
                 }
-                
                 
                 // Update selected style
                 document.querySelectorAll('.variant-option').forEach(option => {
@@ -353,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update add to cart button state
                 updateAddToCartButton();
-                
             }
         });
     });
@@ -511,6 +713,16 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.display = count > 0 ? 'inline-block' : 'none';
         });
     }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star-rating-input input');
+        stars.forEach(star => {
+            star.addEventListener('change', function() {
+                const rating = this.value;
+            
+            });
+        });
+    });
 });
 </script>
 @endpush

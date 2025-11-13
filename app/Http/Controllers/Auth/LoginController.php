@@ -32,6 +32,11 @@ class LoginController extends Controller
             // Transfer guest cart to user after login
             $this->transferGuestCartToUser(Auth::user());
 
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+        }
+
             // Redirect to intended URL or home
             return redirect()->intended('/')->with('success', 'Login successful! Welcome back.');
         }

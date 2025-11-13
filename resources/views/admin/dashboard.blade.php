@@ -84,17 +84,17 @@
     }
     
     .badge-pending {
-        background-color: #FFF3CD;
+        /* background-color: #FFF3CD; */
         color: #856404;
     }
     
     .badge-completed {
-        background-color: #D1ECF1;
+        /* background-color: #D1ECF1; */
         color: #0C5460;
     }
     
     .badge-processing {
-        background-color: #E8F5E6;
+        /* background-color: #E8F5E6; */
         color: #2C8F0C;
     }
     
