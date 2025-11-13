@@ -131,8 +131,9 @@
                     </div>
                 </div>
                 <div class="col-md-2">
+                    <div class="mb-3">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> Apply
+                        <i class="fas fa-check me-1"></i> Apply
                     </button>
                 </div>
             </div>

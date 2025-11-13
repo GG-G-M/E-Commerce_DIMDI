@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\PaymentController; // Add this line
 use App\Http\Controllers\RatingController; // Add this line
@@ -81,7 +82,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('customers.update');
     Route::post('/customers/{id}/archive', [CustomerController::class, 'archive'])->name('customers.archive');
     Route::post('/customers/{id}/unarchive', [CustomerController::class, 'unarchive'])->name('customers.unarchive');
-    
+
+    // Warehouses
+    Route::get('/warehouses', [AdminWarehouseController::class, 'index'])->name('warehouses.index');
+    Route::post('/warehouses', [AdminWarehouseController::class, 'store'])->name('warehouses.store');
+    Route::put('/warehouses/{id}', [AdminWarehouseController::class, 'update'])->name('warehouses.update');
+    Route::post('/warehouses/{id}/archive', [AdminWarehouseController::class, 'archive'])->name('warehouses.archive');
+    Route::post('/warehouses/{id}/unarchive', [AdminWarehouseController::class, 'unarchive'])->name('warehouses.unarchive');
+    Route::delete('/warehouses/{id}', [AdminWarehouseController::class, 'destroy'])->name('warehouses.destroy');
     
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
