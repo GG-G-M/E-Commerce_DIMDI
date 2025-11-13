@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
+use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\PaymentController; // Add this line
 use App\Http\Controllers\RatingController; // Add this line
@@ -57,7 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-     
+
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
@@ -67,14 +68,13 @@ Route::middleware('auth')->group(function () {
     // Rating
     Route::post('/products/{product}/ratings', [App\Http\Controllers\RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [App\Http\Controllers\RatingController::class, 'update'])->name('ratings.update');
-
 });
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
 
     //Customers
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -90,7 +90,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/warehouses/{id}/archive', [AdminWarehouseController::class, 'archive'])->name('warehouses.archive');
     Route::post('/warehouses/{id}/unarchive', [AdminWarehouseController::class, 'unarchive'])->name('warehouses.unarchive');
     Route::delete('/warehouses/{id}', [AdminWarehouseController::class, 'destroy'])->name('warehouses.destroy');
-    
+
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
@@ -101,12 +101,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
     Route::post('/products/{product}/unarchive', [AdminProductController::class, 'unarchive'])->name('products.unarchive');
 
+    // Stock-Ins
+    Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
+    Route::get('/stock-ins/create', [StockInController::class, 'create'])->name('stock_in.create');
+    Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
+    Route::get('/stock-ins/{stockIn}', [StockInController::class, 'show'])->name('stock_in.show');
+    Route::get('/stock-ins/{stockIn}/edit', [StockInController::class, 'edit'])->name('stock_in.edit');
+    Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
+    Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
-    
+
     // Categories
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
@@ -114,9 +122,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
-    
+
     // Brand Routes - ADDED NEW
     Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
     Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
-
 });

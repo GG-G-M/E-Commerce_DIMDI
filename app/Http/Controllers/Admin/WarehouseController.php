@@ -8,30 +8,34 @@ use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
+    /**
+     * Display a listing of warehouses with optional search and status filters
+     */
     public function index(Request $request)
     {
         $query = Warehouse::query();
 
-        // Search filter by name
+        // Search by name
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$request->search}%");
         }
 
-        // Status filter
+        // Status filter: active (default) or archived
         if ($request->status === 'archived') {
             $query->where('is_archived', true);
         } else {
-            // Default or 'active'
             $query->where('is_archived', false);
         }
 
         $perPage = $request->get('per_page', 10);
-        $warehouses = $query->paginate($perPage)->appends($request->query());
+        $warehouses = $query->orderBy('created_at', 'desc')->paginate($perPage)->appends($request->query());
 
         return view('admin.warehouses.index', compact('warehouses'));
     }
 
+    /**
+     * Store a newly created warehouse
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -45,10 +49,13 @@ class WarehouseController extends Controller
 
         return response()->json([
             'success' => true,
-            'warehouse' => $warehouse
+            'warehouse' => $warehouse,
         ]);
     }
 
+    /**
+     * Update the specified warehouse
+     */
     public function update(Request $request, $id)
     {
         $warehouse = Warehouse::findOrFail($id);
@@ -64,24 +71,31 @@ class WarehouseController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Archive a warehouse (soft delete)
+     */
     public function archive($id)
     {
         $warehouse = Warehouse::findOrFail($id);
-        $warehouse->is_archived = true;
-        $warehouse->save();
+        $warehouse->archive(); // Calls a model method for clarity
 
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Unarchive a warehouse
+     */
     public function unarchive($id)
     {
         $warehouse = Warehouse::findOrFail($id);
-        $warehouse->is_archived = false;
-        $warehouse->save();
+        $warehouse->unarchive(); // Calls a model method for clarity
 
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Permanently delete a warehouse
+     */
     public function destroy($id)
     {
         $warehouse = Warehouse::findOrFail($id);
