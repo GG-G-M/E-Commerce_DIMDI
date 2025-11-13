@@ -71,11 +71,11 @@
                         >
                             <i class="fas fa-edit"></i>
                         </button>
-                        <form action="{{ route('admin.stock_out.destroy', $stock) }}" method="POST" class="d-inline">
+                        {{-- <form action="{{ route('admin.stock_out.destroy', $stock) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                        </form>
+                        </form> --}}
                     </td>
                 </tr>
                 @endforeach

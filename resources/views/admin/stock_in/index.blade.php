@@ -31,7 +31,7 @@
     </button>
 </div>
 
-<!-- Filters -->
+{{-- <!-- Filters -->
 <div class="card card-custom mb-4">
     <div class="card-header card-header-custom"><i class="fas fa-filter me-2"></i> Stock-In Filters</div>
     <div class="card-body">
@@ -57,7 +57,7 @@
             </div>
         </form>
     </div>
-</div>
+</div> --}}
 
 <!-- Stock-In Table -->
 <div class="card card-custom">
@@ -102,11 +102,11 @@
                         >
                             <i class="fas fa-edit"></i>
                         </button>
-                        <form action="{{ route('admin.stock_in.destroy', $stock) }}" method="POST" class="d-inline">
+                        {{-- <form action="{{ route('admin.stock_in.destroy', $stock) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                        </form>
+                        </form> --}}
                     </td>
                 </tr>
                 @endforeach
