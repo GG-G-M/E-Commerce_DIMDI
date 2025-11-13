@@ -26,7 +26,7 @@
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <h1 class="mb-0">Stock-In Management</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockInModal">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockInModal">
         <i class="bi bi-plus-circle"></i> Add Stock-In
     </button>
 </div>
@@ -91,7 +91,17 @@
                     <td>{{ $stock->reason }}</td>
                     <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
                     <td>
-                        <a href="{{ route('admin.stock_in.edit', $stock) }}" class="btn btn-warning btn-sm me-1"><i class="fas fa-edit"></i></a>
+                        <button 
+                            class="btn btn-warning btn-sm me-1 editStockBtn"
+                            data-id="{{ $stock->id }}"
+                            data-product-id="{{ $stock->product_id }}"
+                            data-variant-id="{{ $stock->product_variant_id }}"
+                            data-warehouse-id="{{ $stock->warehouse_id }}"
+                            data-quantity="{{ $stock->quantity }}"
+                            data-reason="{{ $stock->reason }}"
+                        >
+                            <i class="fas fa-edit"></i>
+                        </button>
                         <form action="{{ route('admin.stock_in.destroy', $stock) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
@@ -108,58 +118,104 @@
     </div>
 </div>
 
-<!-- Add Stock-In Modal -->
-<div class="modal fade" id="addStockInModal" tabindex="-1" aria-hidden="true">
+<!-- Stock-In Modal (Add/Edit) -->
+<div class="modal fade" id="stockInModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="{{ route('admin.stock_in.store') }}" method="POST">
+        <form id="stockInForm" method="POST" action="{{ route('admin.stock_in.store') }}">
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Stock-In</h5>
+                    <h5 class="modal-title" id="modalTitle">Add Stock-In</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="_method" id="formMethod" value="POST">
+
                     <div class="mb-3">
                         <label class="form-label">Product</label>
-                        <select class="form-select" name="product_id">
+                        <select class="form-select" name="product_id" id="productSelect">
                             <option value="">Select Product</option>
                             @foreach($products as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Variant</label>
-                        <select class="form-select" name="product_variant_id">
+                        <select class="form-select" name="product_variant_id" id="variantSelect">
                             <option value="">Select Variant</option>
                             @foreach($variants as $variant)
                                 <option value="{{ $variant->id }}">{{ $variant->product->name }} / {{ $variant->variant_name }}</option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Warehouse</label>
-                        <select class="form-select" name="warehouse_id" required>
+                        <select class="form-select" name="warehouse_id" id="warehouseSelect" required>
                             <option value="">Select Warehouse</option>
                             @foreach($warehouses as $warehouse)
                                 <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Quantity</label>
-                        <input type="number" class="form-control" name="quantity" min="1" required>
+                        <input type="number" class="form-control" name="quantity" id="quantityInput" min="1" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">Reason</label>
-                        <input type="text" class="form-control" name="reason">
+                        <input type="text" class="form-control" name="reason" id="reasonInput">
                     </div>
                 </div>
+
                 <div class="modal-footer">
-                    <button class="btn btn-primary">Save Stock-In</button>
+                    <button class="btn btn-primary" id="saveBtn">Save</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
+
+<!-- JavaScript for editing on same page -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const stockModal = new bootstrap.Modal(document.getElementById('stockInModal'));
+        const form = document.getElementById('stockInForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const formMethod = document.getElementById('formMethod');
+
+        document.querySelectorAll('.editStockBtn').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.dataset.id;
+
+                // Fill modal fields
+                document.getElementById('productSelect').value = button.dataset.productId;
+                document.getElementById('variantSelect').value = button.dataset.variantId;
+                document.getElementById('warehouseSelect').value = button.dataset.warehouseId;
+                document.getElementById('quantityInput').value = button.dataset.quantity;
+                document.getElementById('reasonInput').value = button.dataset.reason;
+
+                // Change form action and method
+                form.action = `/admin/stock-ins/${id}`;
+                formMethod.value = 'PUT';
+                modalTitle.textContent = 'Edit Stock-In';
+
+                // Show modal
+                stockModal.show();
+            });
+        });
+
+        // Reset modal when hidden (for Add Stock-In)
+        document.getElementById('stockInModal').addEventListener('hidden.bs.modal', () => {
+            form.action = "{{ route('admin.stock_in.store') }}";
+            formMethod.value = 'POST';
+            modalTitle.textContent = 'Add Stock-In';
+            form.reset();
+        });
+    });
+</script>
 @endsection

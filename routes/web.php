@@ -103,10 +103,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
-    Route::get('/stock-ins/create', [StockInController::class, 'create'])->name('stock_in.create');
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
-    Route::get('/stock-ins/{stockIn}', [StockInController::class, 'show'])->name('stock_in.show');
-    Route::get('/stock-ins/{stockIn}/edit', [StockInController::class, 'edit'])->name('stock_in.edit');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
 
