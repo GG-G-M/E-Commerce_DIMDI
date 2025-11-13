@@ -59,6 +59,7 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'brand' => 'nullable|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -101,6 +102,7 @@ class ProductController extends Controller
             'is_active' => $request->has('is_active'),
             'is_archived' => false,
             'category_id' => $request->category_id,
+            'brand' => $request->brand,
         ]);
 
         // Create variants if enabled
@@ -152,6 +154,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
+            'brand' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -175,6 +178,7 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'sale_price' => $validated['sale_price'],
             'category_id' => $validated['category_id'],
+            'brand' => $validated['brand'],
             'is_featured' => $request->boolean('is_featured'),
             'is_active' => $request->boolean('is_active'),
         ];

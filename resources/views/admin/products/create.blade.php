@@ -196,6 +196,25 @@
                         </div>
                     </div>
 
+                    <!-- Simple Brand Field -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="brand" class="form-label">Brand</label>
+                                <input type="text" class="form-control @error('brand') is-invalid @enderror" 
+                                       id="brand" name="brand" value="{{ old('brand') }}" 
+                                       placeholder="e.g., Nike, Apple, Samsung">
+                                @error('brand')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Enter the product brand (optional)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- You can add more fields here if needed -->
+                        </div>
+                    </div>
+
                     <!-- Variants Toggle -->
                     <div class="mb-4">
                         <div class="form-check form-switch">

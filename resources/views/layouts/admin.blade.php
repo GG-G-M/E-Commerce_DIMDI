@@ -123,7 +123,7 @@
                         <li class="nav-item">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="nav-link btn btn-link text-start w-100">
+                                <button type="submit" class="nav-link text-start w-200">
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout
                                 </button>
                             </form>
