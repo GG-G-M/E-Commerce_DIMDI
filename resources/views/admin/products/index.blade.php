@@ -217,71 +217,63 @@
                         <td>
                             @if($product->brand_id && $product->brand)
                                 <span class="text-dark">
-                                    <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand->name }}
+                                    {{ $product->brand->name }}
                                 </span>
                             @else
                                 <span class="text-muted">
-                                    <i class="fas fa-times me-1"></i>No Brand
+                                    No Brand
                                 </span>
                             @endif
                         </td>
-
                         <td>
                             <span class="text-dark">
-                                <i class="fas fa-folder me-1 text-success"></i>{{ $product->category->name }}
+                                {{ $product->category->name }}
                             </span>
                             @if(!$product->category->is_active)
                                 <div class="text-warning small mt-1">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>Inactive Category
+                                    Inactive Category
                                 </div>
                             @endif
                         </td>
                         <td>
                             @if($product->has_variants && $product->variants && $product->variants->count() > 0)
-                                @foreach($product->variants->take(2) as $variant)
-                                    <div class="text-dark mb-1" title="{{ $variant->variant_description }}">
-                                        <i class="fas fa-cube me-1 text-info"></i>{{ $variant->variant_name }}
-                                    </div>
-                                @endforeach
-                                @if($product->variants->count() > 2)
-                                    <div class="text-muted small">
-                                        +{{ $product->variants->count() - 2 }} more variants
-                                    </div>
-                                @endif
+                                <span class="text-dark">
+                                    {{ $product->variants->count() }} variants
+                                </span>
                             @else
                                 <span class="text-muted">
-                                    <i class="fas fa-cube me-1"></i>No Variants
+                                    No Variants
                                 </span>
                             @endif
                         </td>
                         <td>
-                            <strong class="text-success">₱{{ number_format($product->price, 2) }}</strong>
-                            @if($product->sale_price && $product->sale_price < $product->price)
-                                <div class="text-danger text-decoration-line-through small">
-                                    ₱{{ number_format($product->sale_price, 2) }}
+                            @if($product->has_discount)
+                                <strong class="text-danger">₱{{ number_format($product->sale_price, 2) }}</strong>
+                                <div class="text-muted text-decoration-line-through small">
+                                    ₱{{ number_format($product->price, 2) }}
                                 </div>
+                                <span class="badge bg-danger small">{{ $product->discount_percentage }}% OFF</span>
+                            @else
+                                <strong class="text-success">₱{{ number_format($product->price, 2) }}</strong>
                             @endif
                         </td>
                         <td>
                             @if($product->has_variants)
                                 <span class="stock-high">
-                                    <i class="fas fa-layer-group me-1"></i>{{ $product->total_stock }} units
+                                    {{ $product->total_stock }} units
                                 </span>
-                                <div class="text-muted small mt-1">
-                                    ({{ $product->variants->count() }} variants)
-                                </div>
                             @else
                                 @if($product->stock_quantity > 10)
                                     <span class="stock-high">
-                                        <i class="fas fa-box me-1"></i>{{ $product->stock_quantity }}
+                                        {{ $product->stock_quantity }}
                                     </span>
                                 @elseif($product->stock_quantity > 0)
                                     <span class="stock-low">
-                                        <i class="fas fa-box me-1"></i>{{ $product->stock_quantity }}
+                                        {{ $product->stock_quantity }}
                                     </span>
                                 @else
                                     <span class="stock-out">
-                                        <i class="fas fa-box me-1"></i>{{ $product->stock_quantity }}
+                                        {{ $product->stock_quantity }}
                                     </span>
                                 @endif
                             @endif
@@ -289,21 +281,21 @@
                         <td>
                             @if($product->is_archived)
                                 <span class="status-archived">
-                                    <i class="fas fa-archive me-1"></i>Archived
+                                    Archived
                                 </span>
                             @else
                                 @if($product->is_effectively_inactive)
                                     <span class="status-inactive">
-                                        <i class="fas fa-pause-circle me-1"></i>Inactive
+                                        Inactive
                                     </span>
                                 @else
                                     <span class="status-active">
-                                        <i class="fas fa-check-circle me-1"></i>Active
+                                        Active
                                     </span>
                                 @endif
                                 @if($product->is_featured)
                                     <div class="status-featured small mt-1">
-                                        <i class="fas fa-star me-1"></i>Featured
+                                        Featured
                                     </div>
                                 @endif
                             @endif

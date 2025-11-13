@@ -196,18 +196,24 @@
                         </div>
                     </div>
 
-                    <!-- Simple Brand Field -->
+                    <!-- Brand Dropdown -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="brand" class="form-label">Brand</label>
-                                <input type="text" class="form-control @error('brand') is-invalid @enderror" 
-                                       id="brand" name="brand" value="{{ old('brand') }}" 
-                                       placeholder="e.g., Nike, Apple, Samsung">
-                                @error('brand')
+                                <label for="brand_id" class="form-label">Brand</label>
+                                <select class="form-select @error('brand_id') is-invalid @enderror" 
+                                        id="brand_id" name="brand_id">
+                                    <option value="">Select Brand</option>
+                                    @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('brand_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <small class="text-muted">Enter the product brand (optional)</small>
+                                <small class="text-muted">Select the product brand (optional)</small>
                             </div>
                         </div>
                         <div class="col-md-6">
