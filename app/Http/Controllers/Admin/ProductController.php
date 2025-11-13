@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Category;
+use App\Models\Brand; // Add this import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -13,41 +14,42 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     public function index(Request $request)
-{
-    $search = $request->get('search');
-    $categoryId = $request->get('category_id');
-    $status = $request->get('status', 'active');
-    
-    $products = Product::with(['category', 'variants']) // Add 'variants' here
-        ->when($search, function($query) use ($search) {
-            return $query->search($search);
-        })
-        ->when($categoryId, function($query) use ($categoryId) {
-            return $query->filterByCategory($categoryId);
-        })
-        ->when($status, function($query) use ($status) {
-            return $query->filterByStatus($status);
-        })
-        ->latest()
-        ->paginate(10)
-        ->appends($request->all());
+    {
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
+        $status = $request->get('status', 'active');
+        
+        $products = Product::with(['category', 'variants']) // Add 'variants' here
+            ->when($search, function($query) use ($search) {
+                return $query->search($search);
+            })
+            ->when($categoryId, function($query) use ($categoryId) {
+                return $query->filterByCategory($categoryId);
+            })
+            ->when($status, function($query) use ($status) {
+                return $query->filterByStatus($status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->appends($request->all());
 
-    $categories = Category::active()->get();
-    $statuses = [
-        'active' => 'Active',
-        'inactive' => 'Inactive', 
-        'archived' => 'Archived',
-        'featured' => 'Featured',
-        'all' => 'All'
-    ];
+        $categories = Category::active()->get();
+        $statuses = [
+            'active' => 'Active',
+            'inactive' => 'Inactive', 
+            'archived' => 'Archived',
+            'featured' => 'Featured',
+            'all' => 'All'
+        ];
 
-    return view('admin.products.index', compact('products', 'categories', 'statuses'));
-}
+        return view('admin.products.index', compact('products', 'categories', 'statuses'));
+    }
 
     public function create()
     {
         $categories = Category::active()->get();
-        return view('admin.products.create', compact('categories'));
+        $brands = Brand::all(); // Add this line
+        return view('admin.products.create', compact('categories', 'brands')); // Add brands here
     }
 
     public function store(Request $request)
@@ -59,7 +61,7 @@ class ProductController extends Controller
             'sale_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -102,7 +104,7 @@ class ProductController extends Controller
             'is_active' => $request->has('is_active'),
             'is_archived' => false,
             'category_id' => $request->category_id,
-            'brand' => $request->brand,
+            'brand_id' => $request->brand_id,
         ]);
 
         // Create variants if enabled
@@ -141,9 +143,10 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::active()->get();
+        $brands = Brand::all(); // Add this line
         $variants = $product->variants;
         
-        return view('admin.products.edit', compact('product', 'categories', 'variants'));
+        return view('admin.products.edit', compact('product', 'categories', 'brands', 'variants')); // Add brands here
     }
 
     public function update(Request $request, Product $product)
@@ -154,7 +157,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'brand' => 'nullable|string|max:255',
+            'brand_id' => 'nullable|exists:brands,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
@@ -178,7 +181,7 @@ class ProductController extends Controller
             'price' => $validated['price'],
             'sale_price' => $validated['sale_price'],
             'category_id' => $validated['category_id'],
-            'brand' => $validated['brand'],
+            'brand_id' => $validated['brand_id'],
             'is_featured' => $request->boolean('is_featured'),
             'is_active' => $request->boolean('is_active'),
         ];

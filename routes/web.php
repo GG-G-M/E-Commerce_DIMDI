@@ -107,4 +107,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/messages', [App\Http\Controllers\Admin\MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/{product}/{user}', [App\Http\Controllers\Admin\MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages', [App\Http\Controllers\Admin\MessageController::class, 'store'])->name('messages.store');
+
+    // Brand Routes - ADDED NEW
+    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+    Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
 });
