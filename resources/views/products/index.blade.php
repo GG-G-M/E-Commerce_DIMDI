@@ -465,6 +465,14 @@
                             
                             <div class="card-body d-flex flex-column">
                                 <h6 class="card-title">{{ $product->name }}</h6>
+                                
+                                <!-- Display Brand -->
+                                @if($product->brand)
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="fas fa-tag me-1"></i>{{ $product->brand }}
+                                    </small>
+                                @endif
+                                
                                 <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
                                 
                                 <!-- Display Available Variants (View Only) -->

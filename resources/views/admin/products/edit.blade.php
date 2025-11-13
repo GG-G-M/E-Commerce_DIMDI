@@ -179,6 +179,21 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label for="brand" class="form-label">Brand</label>
+                                <input type="text" class="form-control @error('brand') is-invalid @enderror"
+                                       id="brand" name="brand" value="{{ old('brand', $product->brand) }}"
+                                       placeholder="e.g., Nike, Apple, Samsung">
+                                @error('brand')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Enter the product brand (optional)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror"
                                        id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" 

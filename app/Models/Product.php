@@ -12,20 +12,21 @@ use Illuminate\Support\Str;
 class Product extends Model
 {
     protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'price',
-        'sale_price',
-        'stock_quantity',
-        'sku',
-        'image',
-        'gallery',
-        'is_featured',
-        'is_active',
-        'is_archived',
-        'category_id'
-    ];
+    'name',
+    'slug',
+    'description',
+    'price',
+    'sale_price',
+    'stock_quantity',
+    'sku',
+    'image',
+    'gallery',
+    'is_featured',
+    'is_active',
+    'is_archived',
+    'category_id',
+    'brand',
+];
 
     protected $casts = [
         'gallery' => 'array',

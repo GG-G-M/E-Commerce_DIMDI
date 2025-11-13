@@ -144,6 +144,16 @@
 
         <div class="col-lg-6">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
+            
+            <!-- Display Brand -->
+            @if($product->brand)
+                <div class="mb-2">
+                    <span class="badge bg-light text-dark border px-3 py-2">
+                        <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand }}
+                    </span>
+                </div>
+            @endif
+            
             <p class="text-muted mb-2">Category: {{ $product->category->name }}</p>
             
             <div class="mb-3">
@@ -241,6 +251,9 @@
                     <ul class="list-unstyled mb-0">
                         <li><strong>SKU:</strong> {{ $product->sku }}</li>
                         <li><strong>Category:</strong> {{ $product->category->name }}</li>
+                        @if($product->brand)
+                        <li><strong>Brand:</strong> {{ $product->brand }}</li>
+                        @endif
                         <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
                         @if($product->has_variants && $product->variants->count() > 0)
                         <li><strong>Available Options:</strong> 
@@ -272,6 +285,13 @@
                     <img src="{{ $relatedProduct->image_url }}" class="card-img-top product-image" alt="{{ $relatedProduct->name }}">
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
+                        
+                        <!-- Display Brand for Related Products -->
+                        @if($relatedProduct->brand)
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand }}
+                            </small>
+                        @endif
                         
                         <!-- Display Available Variants -->
                         @if($relatedProduct->has_variants && $relatedProduct->variants->count() > 0)
@@ -658,13 +678,13 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.display = count > 0 ? 'inline-block' : 'none';
         });
     }
-        // Star rating interaction
+    
     document.addEventListener('DOMContentLoaded', function() {
         const stars = document.querySelectorAll('.star-rating-input input');
         stars.forEach(star => {
             star.addEventListener('change', function() {
                 const rating = this.value;
-                // You can add any additional logic here
+            
             });
         });
     });
