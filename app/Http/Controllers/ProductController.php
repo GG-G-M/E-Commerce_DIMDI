@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category')
+        $query = Product::with(['category', 'brand']) // Add 'brand' to with()
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0);
 
@@ -20,6 +21,9 @@ class ProductController extends Controller
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'like', '%' . $searchTerm . '%')
                   ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('brand', function($brandQuery) use ($searchTerm) {
+                      $brandQuery->where('name', 'like', '%' . $searchTerm . '%'); // Search by brand name
+                  })
                   ->orWhereHas('category', function($categoryQuery) use ($searchTerm) {
                       $categoryQuery->where('name', 'like', '%' . $searchTerm . '%');
                   });
@@ -31,6 +35,14 @@ class ProductController extends Controller
             $query->whereHas('category', function($q) use ($request) {
                 $q->where('slug', $request->category)
                   ->where('is_active', true);
+            });
+        }
+
+        // Brand filter (multiple brands)
+        if ($request->filled('brands')) {
+            $brandNames = explode(',', $request->brands);
+            $query->whereHas('brand', function($q) use ($brandNames) {
+                $q->whereIn('name', $brandNames);
             });
         }
 
@@ -73,18 +85,27 @@ class ProductController extends Controller
         $products = $query->paginate(12);
         $categories = Category::where('is_active', true)->get();
 
-        return view('products.index', compact('products', 'categories'));
+        // Get unique brands for filter - FIXED: Use Brand model instead of Product brand column
+        $brands = Brand::whereHas('products', function($q) {
+                $q->where('is_active', true)
+                  ->where('stock_quantity', '>', 0);
+            })
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('products.index', compact('products', 'categories', 'brands'));
     }
 
     public function show($slug)
     {
-        $product = Product::with(['category', 'variants'])
+        $product = Product::with(['category', 'variants', 'brand']) // Add 'brand' here
             ->where('slug', $slug)
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0)
             ->firstOrFail();
 
-        $relatedProducts = Product::with('category')
+        $relatedProducts = Product::with(['category', 'brand'])
             ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->where('is_active', true)
@@ -92,9 +113,6 @@ class ProductController extends Controller
             ->inRandomOrder()
             ->take(4)
             ->get();
-
-        // Remove or comment out this line since 'views' column doesn't exist
-        // $product->increment('views');
 
         return view('products.show', compact('product', 'relatedProducts'));
     }
@@ -104,7 +122,7 @@ class ProductController extends Controller
      */
     public function quickSearch(Request $request)
     {
-        $query = Product::with('category')
+        $query = Product::with(['category', 'brand'])
             ->where('is_active', true)
             ->where('stock_quantity', '>', 0);
 
@@ -112,7 +130,10 @@ class ProductController extends Controller
             $searchTerm = $request->q;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('description', 'like', '%' . $searchTerm . '%');
+                  ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('brand', function($brandQuery) use ($searchTerm) {
+                      $brandQuery->where('name', 'like', '%' . $searchTerm . '%');
+                  });
             });
         }
 
@@ -121,5 +142,32 @@ class ProductController extends Controller
         return response()->json([
             'products' => $products
         ]);
+    }
+
+    /**
+     * Get products by brand
+     */
+    public function byBrand($brandSlug)
+    {
+        $products = Product::with(['category', 'brand'])
+            ->whereHas('brand', function($q) use ($brandSlug) {
+                $q->where('slug', $brandSlug);
+            })
+            ->where('is_active', true)
+            ->where('stock_quantity', '>', 0)
+            ->paginate(12);
+
+        $categories = Category::where('is_active', true)->get();
+        $brands = Brand::whereHas('products', function($q) {
+                $q->where('is_active', true)
+                  ->where('stock_quantity', '>', 0);
+            })
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $selectedBrand = Brand::where('slug', $brandSlug)->first();
+
+        return view('products.index', compact('products', 'categories', 'brands', 'selectedBrand'));
     }
 }

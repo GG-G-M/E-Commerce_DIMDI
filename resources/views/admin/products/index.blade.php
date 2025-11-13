@@ -58,10 +58,40 @@
         transition: background-color 0.2s ease;
     }
 
-    .badge-success { background-color: #2C8F0C; }
-    .badge-danger { background-color: #C62828; }
-    .badge-warning { background-color: #FBC02D; }
-    .badge-info { background-color: #0288D1; }
+    .status-active {
+        color: #2C8F0C;
+        font-weight: 600;
+    }
+
+    .status-inactive {
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .status-archived {
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .status-featured {
+        color: #2C8F0C;
+        font-weight: 600;
+    }
+
+    .stock-high {
+        color: #2C8F0C;
+        font-weight: 600;
+    }
+
+    .stock-low {
+        color: #ffc107;
+        font-weight: 600;
+    }
+
+    .stock-out {
+        color: #dc3545;
+        font-weight: 600;
+    }
 </style>
 
 <!-- Header -->
@@ -83,16 +113,23 @@
     <div class="card-body">
         <form method="GET" action="{{ route('admin.products.index') }}">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label for="search" class="form-label fw-bold">Search Products</label>
                         <input type="text" class="form-control" id="search" name="search" 
                             value="{{ request('search') }}" placeholder="Search by name, description, or SKU...">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
-                        <label for="category_id" class="form-label fw-bold">Filter by Category</label>
+                        <label for="brand" class="form-label fw-bold">Brand</label>
+                        <input type="text" class="form-control" id="brand" name="brand" 
+                            value="{{ request('brand') }}" placeholder="Filter by brand...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label fw-bold">Category</label>
                         <select class="form-select" id="category_id" name="category_id">
                             <option value="">All Categories</option>
                             @foreach($categories as $category)
@@ -103,9 +140,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
-                        <label for="status" class="form-label fw-bold">Filter by Status</label>
+                        <label for="status" class="form-label fw-bold">Status</label>
                         <select class="form-select" id="status" name="status">
                             @foreach($statuses as $key => $label)
                                 <option value="{{ $key }}" {{ request('status', 'active') == $key ? 'selected' : '' }}>
@@ -125,6 +162,16 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-1">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">&nbsp;</label>
+                        <div class="d-grid">
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-refresh"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -132,8 +179,13 @@
 
 <!-- Product Table -->
 <div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <i class="fas fa-boxes me-2"></i> Product List
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-boxes me-2"></i> Product List
+        </div>
+        <div class="text-muted small">
+            Total: {{ $products->total() }} products
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -142,6 +194,7 @@
                     <tr>
                         <th>Image</th>
                         <th>Name</th>
+                        <th>Brand</th>
                         <th>Category</th>
                         <th>Variants</th>
                         <th>Price</th>
@@ -153,7 +206,6 @@
                 <tbody>
                     @foreach($products as $product)
                     <tr>
-                        
                         <td>
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
                                  class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
@@ -163,66 +215,118 @@
                             <small class="text-muted">SKU: {{ $product->sku }}</small>
                         </td>
                         <td>
-                            {{ $product->category->name }}
+                            @if($product->brand_id && $product->brand)
+                                <span class="text-dark">
+                                    {{ $product->brand->name }}
+                                </span>
+                            @else
+                                <span class="text-muted">
+                                    No Brand
+                                </span>
+                            @endif
+                        </td>
+                        <td>
+                            <span class="text-dark">
+                                {{ $product->category->name }}
+                            </span>
                             @if(!$product->category->is_active)
-                                <span class="badge bg-warning ms-1">Inactive</span>
+                                <div class="text-warning small mt-1">
+                                    Inactive Category
+                                </div>
                             @endif
                         </td>
                         <td>
                             @if($product->has_variants && $product->variants && $product->variants->count() > 0)
-                                @foreach($product->variants->take(3) as $variant)
-                                    <span class="badge bg-secondary me-1 mb-1" title="{{ $variant->variant_description }}">
-                                        {{ $variant->variant_name }}
-                                    </span>
-                                @endforeach
-                                @if($product->variants->count() > 3)
-                                    <span class="badge bg-light text-dark">+{{ $product->variants->count() - 3 }} more</span>
-                                @endif
+                                <span class="text-dark">
+                                    {{ $product->variants->count() }} variants
+                                </span>
                             @else
-                                <span class="badge bg-secondary">No Variants</span>
+                                <span class="text-muted">
+                                    No Variants
+                                </span>
                             @endif
                         </td>
-                        <td>₱{{ number_format($product->price, 2) }}</td>
                         <td>
-                            <span class="badge bg-{{ $product->stock_quantity > 10 ? 'success' : ($product->stock_quantity > 0 ? 'warning' : 'danger') }}">
-                                {{ $product->stock_quantity }}
-                            </span>
+                            @if($product->has_discount)
+                                <strong class="text-danger">₱{{ number_format($product->sale_price, 2) }}</strong>
+                                <div class="text-muted text-decoration-line-through small">
+                                    ₱{{ number_format($product->price, 2) }}
+                                </div>
+                                <span class="badge bg-danger small">{{ $product->discount_percentage }}% OFF</span>
+                            @else
+                                <strong class="text-success">₱{{ number_format($product->price, 2) }}</strong>
+                            @endif
+                        </td>
+                        <td>
+                            @if($product->has_variants)
+                                <span class="stock-high">
+                                    {{ $product->total_stock }} units
+                                </span>
+                            @else
+                                @if($product->stock_quantity > 10)
+                                    <span class="stock-high">
+                                        {{ $product->stock_quantity }}
+                                    </span>
+                                @elseif($product->stock_quantity > 0)
+                                    <span class="stock-low">
+                                        {{ $product->stock_quantity }}
+                                    </span>
+                                @else
+                                    <span class="stock-out">
+                                        {{ $product->stock_quantity }}
+                                    </span>
+                                @endif
+                            @endif
                         </td>
                         <td>
                             @if($product->is_archived)
-                                <span class="badge bg-dark">Archived</span>
+                                <span class="status-archived">
+                                    Archived
+                                </span>
                             @else
                                 @if($product->is_effectively_inactive)
-                                    <span class="badge bg-danger">Inactive</span>
+                                    <span class="status-inactive">
+                                        Inactive
+                                    </span>
                                 @else
-                                    <span class="badge bg-success">Active</span>
+                                    <span class="status-active">
+                                        Active
+                                    </span>
                                 @endif
                                 @if($product->is_featured)
-                                    <span class="badge bg-info mt-1">Featured</span>
+                                    <div class="status-featured small mt-1">
+                                        Featured
+                                    </div>
                                 @endif
                             @endif
                         </td>
                         <td class="text-center">
-                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-outline-success me-1">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            @if($product->is_archived)
-                                <form action="{{ route('admin.products.unarchive', $product) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-success"
-                                            onclick="return confirm('Are you sure you want to unarchive this product?')">
-                                        <i class="fas fa-box-open"></i>
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('admin.products.archive', $product) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-warning"
-                                            onclick="return confirm('Are you sure you want to archive this product?')">
-                                        <i class="fas fa-archive"></i>
-                                    </button>
-                                </form>
-                            @endif
+                            <div class="btn-group" role="group">
+                                <a href="{{ route('admin.products.edit', $product) }}" 
+                                   class="btn btn-sm btn-outline-success me-1" 
+                                   title="Edit Product">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @if($product->is_archived)
+                                    <form action="{{ route('admin.products.unarchive', $product) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-success"
+                                                onclick="return confirm('Are you sure you want to unarchive this product?')"
+                                                title="Unarchive Product">
+                                            <i class="fas fa-box-open"></i>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('admin.products.archive', $product) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-warning"
+                                                onclick="return confirm('Are you sure you want to archive this product?')"
+                                                title="Archive Product">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @endforeach

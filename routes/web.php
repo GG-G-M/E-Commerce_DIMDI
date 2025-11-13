@@ -11,12 +11,20 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
+use App\Http\Controllers\Admin\StockInController;
+use App\Http\Controllers\Admin\StockOutController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\PaymentController; // Add this line
 use App\Http\Controllers\RatingController; // Add this line
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// About and Contact Routes - ADD THESE
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 // Products
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -51,7 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-     
+
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
@@ -61,14 +69,29 @@ Route::middleware('auth')->group(function () {
     // Rating
     Route::post('/products/{product}/ratings', [App\Http\Controllers\RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [App\Http\Controllers\RatingController::class, 'update'])->name('ratings.update');
-
 });
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
+
+    //Customers
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::post('/customers/{id}/archive', [CustomerController::class, 'archive'])->name('customers.archive');
+    Route::post('/customers/{id}/unarchive', [CustomerController::class, 'unarchive'])->name('customers.unarchive');
+
+    // Warehouses
+    Route::get('/warehouses', [AdminWarehouseController::class, 'index'])->name('warehouses.index');
+    Route::post('/warehouses', [AdminWarehouseController::class, 'store'])->name('warehouses.store');
+    Route::put('/warehouses/{id}', [AdminWarehouseController::class, 'update'])->name('warehouses.update');
+    Route::post('/warehouses/{id}/archive', [AdminWarehouseController::class, 'archive'])->name('warehouses.archive');
+    Route::post('/warehouses/{id}/unarchive', [AdminWarehouseController::class, 'unarchive'])->name('warehouses.unarchive');
+    Route::delete('/warehouses/{id}', [AdminWarehouseController::class, 'destroy'])->name('warehouses.destroy');
+
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
@@ -79,11 +102,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
     Route::post('/products/{product}/unarchive', [AdminProductController::class, 'unarchive'])->name('products.unarchive');
 
+    // Stock-Ins
+    Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
+    Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
+    Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
+    Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
+
+    // Stock-Outs
+    Route::get('/stock-outs', [StockOutController::class, 'index'])->name('stock_out.index');
+    Route::post('/stock-outs', [StockOutController::class, 'store'])->name('stock_out.store');
+    Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
+    Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
+
+
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
-    
+
     // Categories
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
@@ -91,4 +127,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+
+    // Brand Routes - ADDED NEW
+    Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
+    Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
 });

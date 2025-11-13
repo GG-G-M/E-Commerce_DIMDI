@@ -447,7 +447,7 @@
         @yield('content')
     </main>
 
-    <!-- Footer -->
+    {{-- <!-- Footer -->
     <footer style="background-color: #2C8F0C !important; color: white !important;">
         <div class="container">
             <div class="row">
@@ -502,7 +502,7 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </footer> --}}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

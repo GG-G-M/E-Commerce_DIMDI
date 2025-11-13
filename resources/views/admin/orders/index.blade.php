@@ -96,7 +96,7 @@
     }
 </style>
 
-<!-- 🌿 Page Header -->
+
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Order Management</h1>
@@ -104,7 +104,6 @@
     </div>
 </div>
 
-<!-- 🌿 Filters and Search -->
 <div class="card card-custom mb-4">
     <div class="card-header card-header-custom">
         <i class="fas fa-filter me-2"></i> Filters & Search
@@ -132,8 +131,9 @@
                     </div>
                 </div>
                 <div class="col-md-2">
+                    <div class="mb-3">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search me-1"></i> Apply
+                        <i class="fas fa-check me-1"></i> Apply
                     </button>
                 </div>
             </div>
@@ -141,7 +141,6 @@
     </div>
 </div>
 
-<!-- 🌿 Orders Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <i class="fas fa-shopping-cart me-2"></i> Orders List
@@ -168,12 +167,12 @@
                         <td>{{ $order->customer_email }}</td>
                         <td>₱{{ number_format($order->total_amount, 2) }}</td>
                         <td>
-                            <span class="badge badge-{{ 
-                                $order->order_status == 'cancelled' ? 'danger' :
-                                ($order->order_status == 'completed' ? 'success' :
-                                ($order->order_status == 'delivered' ? 'success' :
-                                ($order->order_status == 'shipped' ? 'info' :
-                                ($order->order_status == 'processing' ? 'primary' :
+                            <span -{{ 
+                                $order->order_status == 'cancelled' ? '' :
+                                ($order->order_status == 'completed' ? '' :
+                                ($order->order_status == 'delivered' ? '' :
+                                ($order->order_status == 'shipped' ? '' :
+                                ($order->order_status == 'processing' ? '' :
                                 ($order->order_status == 'confirmed' ? 'secondary' : 'warning'))))) 
                             }}">
                                 {{ ucfirst($order->order_status) }}
