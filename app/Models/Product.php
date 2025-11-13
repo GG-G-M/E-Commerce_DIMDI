@@ -8,25 +8,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-
 class Product extends Model
 {
     protected $fillable = [
-    'name',
-    'slug',
-    'description',
-    'price',
-    'sale_price',
-    'stock_quantity',
-    'sku',
-    'image',
-    'gallery',
-    'is_featured',
-    'is_active',
-    'is_archived',
-    'category_id',
-    'brand_id',
-];
+        'name',
+        'slug',
+        'description',
+        'price',
+        'sale_price',
+        'stock_quantity',
+        'sku',
+        'image',
+        'gallery',
+        'is_featured',
+        'is_active',
+        'is_archived',
+        'category_id',
+        'brand_id',
+    ];
 
     protected $casts = [
         'gallery' => 'array',
@@ -36,6 +35,12 @@ class Product extends Model
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2'
     ];
+
+    // Add the brand relationship method
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
+    }
 
     public function category(): BelongsTo
     {
@@ -291,7 +296,7 @@ class Product extends Model
 
     public function unarchive()
     {
-        $this->update(['is_archived', false]);
+        $this->update(['is_archived' => false]);
     }
 
     public function getRouteKeyName()
@@ -337,7 +342,8 @@ class Product extends Model
 
         return 'One Size';
     }
-        // Rating relationships and methods
+
+    // Rating relationships and methods
     public function ratings()
     {
         return $this->hasMany(Rating::class);
