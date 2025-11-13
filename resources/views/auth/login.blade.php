@@ -22,26 +22,33 @@
             height: 100vh;
             margin: 0;
             overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
-        .login-container {
+        .login-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
             display: flex;
-            min-height: 100vh;
+            min-height: 550px;
         }
         
         .login-form-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 2rem;
-            background: white;
+            padding: 2.5rem;
             position: relative;
-            max-width: 450px;
         }
         
         .login-image-section {
-            flex: 1.5;
+            flex: 1;
             background-image: url('https://cgifurniture.com/_ipx/f_auto&s_1536x2304/cms/uploads/3d_visualization_of_furniture_lifestyle_chair_view2_2ba0b97949.webp');
             background-size: cover;
             background-position: center;
@@ -91,7 +98,7 @@
         
         /* Form Styles - Compact */
         .login-form {
-            max-width: 350px;
+            max-width: 100%;
             margin: 0 auto;
         }
         
@@ -311,13 +318,16 @@
                 display: none;
             }
             
-            .login-form-section {
-                max-width: 100%;
-                margin: 0 auto;
+            .login-card {
+                max-width: 500px;
             }
         }
         
         @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
             .login-form-section {
                 padding: 1.5rem;
             }
@@ -377,7 +387,7 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="login-card">
         <div class="login-form-section">
             <!-- Home/Back Button -->
             <a href="/" class="home-btn" title="Back to Home">
@@ -419,7 +429,9 @@
                                    class="form-control @error('password') is-invalid @enderror" 
                                    name="password" required autocomplete="current-password"
                                    placeholder="Enter your password">
-            
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
                             @error('password')
                                 <div class="invalid-feedback" style="font-size: 0.8rem;">
                                     {{ $message }}
@@ -519,7 +531,6 @@
         // Ensure bottom links are always visible
         function adjustLayout() {
             const formContent = document.querySelector('.form-content');
-            const bottomLinks = document.querySelector('.bottom-links');
             const container = document.querySelector('.login-form-section');
             
             if (window.innerHeight < 600) {
