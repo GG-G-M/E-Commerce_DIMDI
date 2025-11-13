@@ -215,9 +215,9 @@
                             <small class="text-muted">SKU: {{ $product->sku }}</small>
                         </td>
                         <td>
-                            @if($product->brand)
+                            @if($product->brand_id && $product->brand)
                                 <span class="text-dark">
-                                    <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand }}
+                                    <i class="fas fa-tag me-1 text-success"></i>{{ $product->brand->name }}
                                 </span>
                             @else
                                 <span class="text-muted">
@@ -225,6 +225,7 @@
                                 </span>
                             @endif
                         </td>
+
                         <td>
                             <span class="text-dark">
                                 <i class="fas fa-folder me-1 text-success"></i>{{ $product->category->name }}
