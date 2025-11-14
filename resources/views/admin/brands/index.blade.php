@@ -11,6 +11,11 @@
         border-left: 4px solid #2C8F0C;
     }
 
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -34,6 +39,13 @@
         color: #6c757d;
         font-weight: 600;
     }
+
+    .table th {
+        background-color: #E8F5E6;
+        color: #2C8F0C;
+        font-weight: 600;
+        border-bottom: 2px solid #2C8F0C;
+    }
 </style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -51,7 +63,7 @@
         <div>
             <i class="fas fa-tags me-2"></i> Brand List
         </div>
-        <div class="text-muted small">
+        <div class="text-white small">
             Total: {{ $brands->total() }} brands
         </div>
     </div>
