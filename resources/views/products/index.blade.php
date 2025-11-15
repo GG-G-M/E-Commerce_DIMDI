@@ -2,52 +2,6 @@
 
 @section('content')
 <style>
-    .hero-carousel-container {
-        background: linear-gradient(rgba(0,0,0,0.3), rgba(255, 255, 255, 0.3)), 
-                    url('{{ asset('images/background-pattern.jpg') }}');
-        background-size: cover;
-        background-position: center;
-        padding: 20px 0;
-        margin-bottom: 30px;
-    }
-    
-    .carousel-card {
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px hsla(0, 0%, 0%, 0.20);
-        max-width: 1200px;
-        margin: 0 auto;
-        height: 300px;
-    }
-    
-    .carousel-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-    }
-    
-    .carousel-caption-card {
-        background: rgba(0, 0, 0, 0.7) !important;
-        border-radius: 10px;
-        padding: 15px !important;
-        bottom: 20px !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        width: 90% !important;
-        max-width: 500px;
-    }
-
-    .carousel-caption-card h1 {
-        font-size: 1.5rem !important;
-        margin-bottom: 5px;
-    }
-
-    .carousel-caption-card p {
-        font-size: 0.9rem !important;
-        margin-bottom: 0;
-    }
-
     .category-slider-full {
         background-color: #2C8F0C !important;
         width: 100vw;
@@ -506,29 +460,50 @@
         background: #e9ecef;
     }
 
-    @media (max-width: 768px) {
-        .carousel-card {
-            height: 200px;
-        }
-        
-        .carousel-caption-card {
-            padding: 10px !important;
-            bottom: 15px !important;
-        }
-        
-        .carousel-caption-card h1 {
-            font-size: 1.2rem !important;
-        }
-        
-        .carousel-caption-card p {
-            font-size: 0.8rem !important;
-        }
-        
-        .hero-carousel-container {
-            padding: 15px 0;
-            margin-bottom: 20px;
-        }
+    /* Ultra Compact Banner Styles */
+    .banner-card-compact {
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        max-height: 300px !important;
+        height: 300px !important;
+        padding: 0 !important;
+    }
+    
+    .carousel-compact {
+        height: 350px !important;
+        max-height: 350px !important;
+    }
+    
+    .carousel-inner-compact {
+        height: 350px !important;
+        max-height: 350px !important;
+    }
+    
+    .carousel-item-compact {
+        height: 350px !important;
+        max-height: 350px !important;
+    }
+    
+    .carousel-image-compact {
+        width: 100%;
+        height: 350px !important;
+        object-fit: cover;
+        object-position: center;
+        max-height: 350px !important;
+    }
+    
+    /* Hide all captions and controls for ultra compact */
+    .carousel-caption,
+    .carousel-indicators,
+    .carousel-control-prev,
+    .carousel-control-next {
+        display: none !important;
+    }
 
+    @media (max-width: 768px) {
         .floating-filter {
             right: 10px;
             bottom: 80px;
@@ -542,18 +517,22 @@
             top: auto;
             width: 280px;
         }
+
+        .banner-card-compact {
+            height: 35px !important;
+            max-height: 35px !important;
+        }
+        
+        .carousel-compact,
+        .carousel-inner-compact,
+        .carousel-item-compact,
+        .carousel-image-compact {
+            height: 35px !important;
+            max-height: 35px !important;
+        }
     }
 
     @media (max-width: 576px) {
-        .carousel-card {
-            height: 180px;
-        }
-        
-        .carousel-caption-card {
-            width: 95% !important;
-            max-width: 300px;
-        }
-
         .floating-filter {
             right: 5px;
             bottom: 70px;
@@ -562,6 +541,20 @@
         .filter-panel {
             right: 50px;
             width: 250px;
+        }
+
+        .banner-card-compact {
+            height: 30px !important;
+            max-height: 30px !important;
+            margin-bottom: 10px;
+        }
+        
+        .carousel-compact,
+        .carousel-inner-compact,
+        .carousel-item-compact,
+        .carousel-image-compact {
+            height: 30px !important;
+            max-height: 30px !important;
         }
     }
 </style>
@@ -672,47 +665,20 @@
     </div>
 </div>
 
-<!-- Smaller Hero Banner -->
-<div class="hero-carousel-container">
-    <div id="heroCarousel" class="carousel slide carousel-card" data-bs-ride="carousel">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+<!-- Ultra Compact Banner -->
+@if(isset($banners) && count($banners) > 0)
+<div class="card banner-card-compact">
+    <div id="heroCarousel" class="carousel slide carousel-compact" data-bs-ride="carousel">
+        <div class="carousel-inner carousel-inner-compact">
+            @foreach($banners as $index => $banner)
+                <div class="carousel-item carousel-item-compact {{ $index === 0 ? 'active' : '' }}">
+                    <img src="{{ asset($banner['image']) }}" class="d-block w-100 carousel-image-compact" alt="{{ $banner['alt'] }}">
+                </div>
+            @endforeach
         </div>
-
-        <div class="carousel-inner h-100">
-            <div class="carousel-item active h-100">
-                <img src="{{ asset('images/banner1.png') }}" class="d-block w-100 carousel-image" alt="Big Sale">
-                <div class="carousel-caption carousel-caption-card">
-                    <h1 class="fw-bold">🔥 Big Sale!</h1>
-                    <p class="fs-5">Up to 50% off on selected products.</p>
-                </div>
-            </div>
-            <div class="carousel-item h-100">
-                <img src="{{ asset('images/NW.png') }}" class="d-block w-100 carousel-image" alt="New Arrivals">
-                <div class="carousel-caption carousel-caption-card">
-                    <h1 class="fw-bold">✨ New Arrivals</h1>
-                    <p class="fs-5">Check out our latest collections.</p>
-                </div>
-            </div>
-            <div class="carousel-item h-100">
-                <img src="{{ asset('images/GO.jpeg') }}" class="d-block w-100 carousel-image" alt="Exclusive Deals">
-                <div class="carousel-caption carousel-caption-card">
-                    <h1 class="fw-bold">💎 Exclusive Deals</h1>
-                    <p class="fs-5">Shop now before the offers end!</p>
-                </div>
-            </div>
-        </div>
-
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
     </div>
 </div>
+@endif
 
 <!-- Main Content -->
 <div class="container py-4">
@@ -741,14 +707,13 @@
     <div id="products-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Products</h2>
-            <span class="text-muted" id="products-count">{{ $products->count() }} products loaded</span>
+            <span class="text-muted" id="products-count">{{ $products->count() }} products found</span>
         </div>
 
         @if($products->count() > 0)
             <!-- Products grouped by category -->
             @php
                 $groupedProducts = $products->groupBy('category_id');
-                $currentCategory = null;
             @endphp
             
             @foreach($groupedProducts as $categoryId => $categoryProducts)
@@ -774,7 +739,7 @@
                             <div class="card-body d-flex flex-column">
                                 <h6 class="card-title">{{ $product->name }}</h6>
                                 
-                                <!-- Display Brand - FIXED: Only show brand name -->
+                                <!-- Display Brand -->
                                 @if($product->brand_id && $product->brand)
                                     <small class="text-muted d-block mb-2">
                                         <i class="fas fa-tag me-1"></i>{{ $product->brand->name }}
@@ -791,7 +756,6 @@
                                         @foreach($product->variants as $variant)
                                             @php
                                                 $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
-                                                $variantPrice = $variant->current_price ?? $variant->price ?? $variant->sale_price ?? 0;
                                                 $variantStock = $variant->stock_quantity ?? 0;
                                                 $isInStock = $variantStock > 0;
                                             @endphp
@@ -810,10 +774,10 @@
                                     <!-- Price Display -->
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         @if($product->has_discount)
-                                        <span class="text-danger fw-bold">₱{{ $product->sale_price }}</span>
-                                        <span class="text-muted text-decoration-line-through small">₱{{ $product->price }}</span>
+                                        <span class="text-danger fw-bold">₱{{ number_format($product->sale_price, 2) }}</span>
+                                        <span class="text-muted text-decoration-line-through small">₱{{ number_format($product->price, 2) }}</span>
                                         @else
-                                        <span class="text-primary fw-bold">₱{{ $product->price }}</span>
+                                        <span class="text-primary fw-bold">₱{{ number_format($product->price, 2) }}</span>
                                         @endif
                                     </div>
 
@@ -851,13 +815,12 @@
                                             
                                             @if($product->has_variants && $product->variants->count() > 0)
                                                 @php
-                                                    // Get the first IN STOCK variant, not just the first variant
+                                                    // Get the first IN STOCK variant
                                                     $firstInStockVariant = $product->variants->where('stock_quantity', '>', 0)->first();
                                                 @endphp
                                                 @if($firstInStockVariant)
                                                     <input type="hidden" name="selected_size" value="{{ $firstInStockVariant->size ?? $firstInStockVariant->variant_name ?? 'Standard' }}">
                                                 @else
-                                                    {{-- If no variants are in stock, don't show add to cart --}}
                                                     <input type="hidden" name="selected_size" value="">
                                                 @endif
                                             @else
@@ -936,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const applyFilters = document.getElementById('applyFilters');
     const clearFilters = document.getElementById('clearFilters');
 
-    // Use brands passed from controller - FIXED: Only brand names
+    // Use brands passed from controller
     const brands = @json($brands->pluck('name'));
 
     // Populate brand filters
@@ -1143,50 +1106,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 
-                // Group products by category from the new page
-                const newProductsByCategory = {};
-                const productCards = newProducts.querySelectorAll('.category-products');
-                
-                productCards.forEach(categoryGroup => {
-                    const categoryId = categoryGroup.getAttribute('data-category-id');
-                    if (!newProductsByCategory[categoryId]) {
-                        newProductsByCategory[categoryId] = [];
-                    }
-                    
-                    const productsInCategory = categoryGroup.querySelectorAll('.col-xl-3, .col-lg-4, .col-md-6, .col-sm-6');
-                    productsInCategory.forEach(product => {
-                        newProductsByCategory[categoryId].push(product.outerHTML);
-                    });
-                });
-            
-                Object.keys(newProductsByCategory).forEach(categoryId => {
-                    const existingCategory = productsContainer.querySelector(`.category-products[data-category-id="${categoryId}"]`);
-                    
-                    if (existingCategory) {
-                        // Append to existing category
-                        newProductsByCategory[categoryId].forEach(productHtml => {
-                            existingCategory.innerHTML += productHtml;
-                        });
-                    } else {
-                        // Create new category header and container
-                        const categoryHeader = document.createElement('div');
-                        categoryHeader.className = 'category-header';
-                        
-                        // Find category name from the response
-                        const categoryName = tempContainer.querySelector(`.category-products[data-category-id="${categoryId}"]`)?.closest('.category-header')?.querySelector('h3')?.textContent || 'Uncategorized';
-                        
-                        categoryHeader.innerHTML = `<h3 class="mb-0">${categoryName}</h3>`;
-                        
-                        const categoryProductsContainer = document.createElement('div');
-                        categoryProductsContainer.className = 'row category-products';
-                        categoryProductsContainer.setAttribute('data-category-id', categoryId);
-                        categoryProductsContainer.innerHTML = newProductsByCategory[categoryId].join('');
-                        
-                        // Append to the main container
-                        productsContainer.appendChild(categoryHeader);
-                        productsContainer.appendChild(categoryProductsContainer);
-                    }
-                });
+                // Append new products to existing container
+                productsContainer.innerHTML += newProducts.innerHTML;
                 
                 // Update products count
                 const newCount = tempContainer.querySelector('#products-count');
@@ -1198,6 +1119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingIndicator.style.display = 'none';
                 
                 // Check if we've reached the end
+                const productCards = newProducts.querySelectorAll('.col-lg-3, .col-md-6');
                 if (productCards.length === 0) {
                     hasMore = false;
                     endOfResults.style.display = 'block';

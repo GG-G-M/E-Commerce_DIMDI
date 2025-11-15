@@ -15,10 +15,11 @@ use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\SalesReportController; // ADD THIS LINE
+use App\Http\Controllers\Admin\SalesReportController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\BannerController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -132,10 +133,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
     Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
     
-    // SALES REPORT ROUTES - FIXED
+    // SALES REPORT ROUTES
     Route::prefix('sales-report')->name('sales-report.')->group(function () {
         Route::get('/', [SalesReportController::class, 'index'])->name('index');
         Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
         Route::get('/export', [SalesReportController::class, 'export'])->name('export');
     });
+
+    // BANNER ROUTES - Complete routes
+    Route::resource('banners', BannerController::class);
+    Route::post('/banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
 });

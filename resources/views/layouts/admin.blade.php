@@ -161,6 +161,12 @@
                                 <i class="fas fa-chart-line me-2"></i>Sales Reports
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}"
+                                href="{{ route('admin.banners.index') }}">
+                                <i class="fas fa-image me-2"></i>Banners
+                            </a>
+                        </li>
                         <li class="nav-item mt-4">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <i class="fas fa-store me-2"></i>View Store
