@@ -80,6 +80,13 @@
         .bg-white {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
+        /* Chart Styles */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -145,6 +152,13 @@
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
                                 href="{{ route('admin.orders.index') }}">
                                 <i class="fas fa-shopping-cart me-2"></i>Orders
+                            </a>
+                        </li>
+                        <!-- SALES REPORT MENU ITEM -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}"
+                                href="{{ route('admin.sales-report.index') }}">
+                                <i class="fas fa-chart-line me-2"></i>Sales Reports
                             </a>
                         </li>
                         <li class="nav-item mt-4">
@@ -215,6 +229,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @stack('scripts')
 </body>
 

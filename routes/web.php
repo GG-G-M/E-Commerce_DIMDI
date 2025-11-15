@@ -15,14 +15,15 @@ use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\PaymentController; // Add this line
-use App\Http\Controllers\RatingController; // Add this line
+use App\Http\Controllers\Admin\SalesReportController; // ADD THIS LINE
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// About and Contact Routes - ADD THESE
+// About and Contact Routes
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
@@ -43,15 +44,14 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear'); // Add this line
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
-// Payment Routes - Add these new routes
+// Payment Routes
 Route::post('/payment/create-intent', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
 Route::post('/payment/create-source', [PaymentController::class, 'createSource'])->name('payment.create-source');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
-
 
 // Authenticated User Routes
 Route::middleware('auth')->group(function () {
@@ -66,6 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    
     // Rating
     Route::post('/products/{product}/ratings', [App\Http\Controllers\RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [App\Http\Controllers\RatingController::class, 'update'])->name('ratings.update');
@@ -76,8 +77,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
-    //Customers
+    // Customers
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
     Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('customers.update');
@@ -114,7 +114,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
     Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
 
-
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
@@ -128,7 +127,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 
-    // Brand Routes - ADDED NEW
+    // Brand Routes
     Route::resource('brands', App\Http\Controllers\Admin\BrandController::class);
     Route::post('brands/quick-store', [App\Http\Controllers\Admin\BrandController::class, 'quickStore'])->name('brands.quick-store');
+    
+    // SALES REPORT ROUTES - FIXED
+    Route::prefix('sales-report')->name('sales-report.')->group(function () {
+        Route::get('/', [SalesReportController::class, 'index'])->name('index');
+        Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
+        Route::get('/export', [SalesReportController::class, 'export'])->name('export');
+    });
 });
