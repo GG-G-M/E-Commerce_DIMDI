@@ -22,6 +22,14 @@ class StockOut extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
+    /**
+     * MANY-TO-MANY (each stock-out may consume multiple stock-in batches)
+     */
+    public function stockInBatches()
+    {
+        return $this->belongsToMany(StockIn::class, 'stock_in_stock_out')
+                    ->withPivot('deducted_quantity')
+                    ->withTimestamps();
+    }
 }
-
-

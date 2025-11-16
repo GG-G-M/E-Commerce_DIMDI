@@ -5,14 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\StockIn;
 use App\Models\StockOut;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StockOutController extends Controller
 {
     public function index()
     {
-        $stockOuts = StockOut::with(['product', 'variant'])->latest()->paginate(10);
+        $stockOuts = StockOut::with(['product', 'variant', 'stockInBatches'])->latest()->paginate(10);
         $products = Product::all();
         $variants = ProductVariant::with('product')->get();
 
@@ -28,16 +30,54 @@ class StockOutController extends Controller
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $stockOut = StockOut::create($request->all());
+        $quantityToDeduct = $request->quantity;
 
-        // Deduct stock quantity
-        if ($stockOut->product_id) {
-            $stockOut->product->decrement('stock_quantity', $stockOut->quantity);
-        } elseif ($stockOut->product_variant_id) {
-            $stockOut->variant->decrement('stock_quantity', $stockOut->quantity);
+        // Create the stock-out record first
+        $stockOut = StockOut::create($request->only([
+            'product_id',
+            'product_variant_id',
+            'quantity',
+            'reason'
+        ]));
+
+        // Get FIFO stock-in batches
+        $stockInBatches = StockIn::where(function ($q) use ($request) {
+                $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
+                  ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
+            })
+            ->where('quantity', '>', 0)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        foreach ($stockInBatches as $batch) {
+            if ($quantityToDeduct <= 0) break;
+
+            $deducted = min($batch->quantity, $quantityToDeduct);
+
+            // Deduct stock from batch
+            $batch->decrement('quantity', $deducted);
+
+            // Log in pivot table
+            $stockOut->stockInBatches()->attach($batch->id, ['deducted_quantity' => $deducted]);
+
+            $quantityToDeduct -= $deducted;
         }
 
-        return redirect()->route('admin.stock_out.index')->with('success', 'Stock-Out recorded successfully.');
+        // Not enough stock
+        if ($quantityToDeduct > 0) {
+            $stockOut->delete(); // rollback
+            return back()->withErrors(['quantity' => 'Not enough stock available (FIFO).']);
+        }
+
+        // Decrement total product/variant stock
+        if ($stockOut->product_id) {
+            $stockOut->product->decrement('stock_quantity', $request->quantity);
+        } elseif ($stockOut->product_variant_id) {
+            $stockOut->variant->decrement('stock_quantity', $request->quantity);
+        }
+
+        return redirect()->route('admin.stock_out.index')
+            ->with('success', 'Stock-Out processed using FIFO successfully.');
     }
 
     public function update(Request $request, StockOut $stockOut)
@@ -49,34 +89,71 @@ class StockOutController extends Controller
             'reason' => 'nullable|string|max:255',
         ]);
 
-        // Adjust stock quantity based on difference
         $oldQuantity = $stockOut->quantity;
-        $newQuantity = $request->quantity;
-        $difference = $newQuantity - $oldQuantity;
 
-        $stockOut->update($request->all());
+        // 1️⃣ Restore previous stock-outs to stock-in batches
+        foreach ($stockOut->stockInBatches as $batch) {
+            $batch->increment('quantity', $batch->pivot->deducted_quantity);
+        }
+        $stockOut->stockInBatches()->detach(); // remove old pivot
 
-        if ($stockOut->product_id) {
-            $stockOut->product->decrement('stock_quantity', $difference);
-        } elseif ($stockOut->product_variant_id) {
-            $stockOut->variant->decrement('stock_quantity', $difference);
+        // 2️⃣ Update stock-out record
+        $stockOut->update($request->only(['product_id', 'product_variant_id', 'quantity', 'reason']));
+
+        // 3️⃣ Apply FIFO again for new quantity
+        $quantityToDeduct = $request->quantity;
+        $stockInBatches = StockIn::where(function ($q) use ($request) {
+                $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
+                  ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
+            })
+            ->where('quantity', '>', 0)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        foreach ($stockInBatches as $batch) {
+            if ($quantityToDeduct <= 0) break;
+
+            $deducted = min($batch->quantity, $quantityToDeduct);
+
+            $batch->decrement('quantity', $deducted);
+            $stockOut->stockInBatches()->attach($batch->id, ['deducted_quantity' => $deducted]);
+
+            $quantityToDeduct -= $deducted;
         }
 
-        return redirect()->route('admin.stock_out.index')->with('success', 'Stock-Out updated successfully.');
+        if ($quantityToDeduct > 0) {
+            return back()->withErrors(['quantity' => 'Not enough stock available (FIFO).']);
+        }
+
+        // Update total stock
+        if ($stockOut->product_id) {
+            $stockOut->product->update(['stock_quantity' => StockIn::where('product_id', $stockOut->product_id)->sum('quantity')]);
+        } elseif ($stockOut->product_variant_id) {
+            $stockOut->variant->update(['stock_quantity' => StockIn::where('product_variant_id', $stockOut->product_variant_id)->sum('quantity')]);
+        }
+
+        return redirect()->route('admin.stock_out.index')
+            ->with('success', 'Stock-Out updated using FIFO successfully.');
     }
 
     public function destroy(StockOut $stockOut)
     {
-        // Restore stock
+        // Restore stock to batches
+        foreach ($stockOut->stockInBatches as $batch) {
+            $batch->increment('quantity', $batch->pivot->deducted_quantity);
+        }
+        $stockOut->stockInBatches()->detach();
+
+        // Update total stock
         if ($stockOut->product_id) {
-            $stockOut->product->increment('stock_quantity', $stockOut->quantity);
+            $stockOut->product->update(['stock_quantity' => StockIn::where('product_id', $stockOut->product_id)->sum('quantity')]);
         } elseif ($stockOut->product_variant_id) {
-            $stockOut->variant->increment('stock_quantity', $stockOut->quantity);
+            $stockOut->variant->update(['stock_quantity' => StockIn::where('product_variant_id', $stockOut->product_variant_id)->sum('quantity')]);
         }
 
         $stockOut->delete();
 
-        return redirect()->route('admin.stock_out.index')->with('success', 'Stock-Out deleted successfully.');
+        return redirect()->route('admin.stock_out.index')
+            ->with('success', 'Stock-Out deleted and stock restored successfully.');
     }
 }
-

@@ -41,6 +41,7 @@
                     <th>ID</th>
                     <th>Product / Variant</th>
                     <th>Quantity</th>
+                    <th>Stock-In Batches (FIFO)</th>
                     <th>Reason</th>
                     <th>Date</th>
                     <th>Actions</th>
@@ -58,6 +59,19 @@
                         @endif
                     </td>
                     <td>{{ $stock->quantity }}</td>
+                    <td>
+                        @if($stock->stockInBatches->count() > 0)
+                            <ul class="mb-0">
+                                @foreach($stock->stockInBatches as $batch)
+                                    <li>
+                                        Batch #{{ $batch->id }}: {{ $batch->pivot->deducted_quantity }} pcs
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <span class="text-muted">No batch info</span>
+                        @endif
+                    </td>
                     <td>{{ $stock->reason }}</td>
                     <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
                     <td>
