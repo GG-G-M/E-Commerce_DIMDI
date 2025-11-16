@@ -12,6 +12,7 @@ class StockIn extends Model
         'product_variant_id',
         'warehouse_id',
         'quantity',
+        'remaining_quantity', // add this so it can be mass-assigned
         'reason',
     ];
 
@@ -41,22 +42,26 @@ class StockIn extends Model
     }
 
     /**
-     * Auto-increment stock on creation
+     * Auto-set remaining_quantity on creation
      */
     protected static function booted()
     {
+        static::creating(function ($stockIn) {
+            $stockIn->remaining_quantity = $stockIn->quantity;
+        });
+
         static::created(function ($stockIn) {
+            // Increment product or variant total stock
             if ($stockIn->product_id) {
-                $product = $stockIn->product;
-                $product->increment('stock_quantity', $stockIn->quantity);
+                $stockIn->product->increment('stock_quantity', $stockIn->quantity);
             }
 
             if ($stockIn->product_variant_id) {
-                $variant = $stockIn->variant;
-                $variant->increment('stock_quantity', $stockIn->quantity);
-
-                // Update parent product stock if needed
-                $variant->product->updateTotalStock();
+                $stockIn->variant->increment('stock_quantity', $stockIn->quantity);
+                // Optional: update parent product total stock
+                if (method_exists($stockIn->variant->product, 'updateTotalStock')) {
+                    $stockIn->variant->product->updateTotalStock();
+                }
             }
         });
     }
