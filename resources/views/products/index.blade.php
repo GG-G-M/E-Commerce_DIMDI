@@ -219,7 +219,7 @@
 
     .floating-filter {
         position: fixed;
-        top: 50%;
+        top: 45%;
         right: 20px;
         transform: translateY(-50%);
         z-index: 1000;
@@ -366,26 +366,37 @@
         padding: 10px 0;
     }
 
-    .price-inputs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
+   .price-inputs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    align-items: center;
+}
 
-    .price-input {
-        flex: 1;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 0.9rem;
-        text-align: center;
-    }
+.price-input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    text-align: center;
+    max-width: 80px;
+    min-width: 60px;
+}
 
-    .price-input:focus {
-        outline: none;
-        border-color: #2C8F0C;
-        box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.1);
-    }
+.price-input:focus {
+    outline: none;
+    border-color: #2C8F0C;
+    box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.1);
+}
+
+.price-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.7rem;
+    color: #666;
+}
 
     .price-slider {
         width: 100%;
@@ -415,14 +426,6 @@
         cursor: pointer;
         border: 2px solid white;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    .price-labels {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 5px;
-        font-size: 0.8rem;
-        color: #666;
     }
 
     .filter-actions {
@@ -502,7 +505,64 @@
     .carousel-control-next {
         display: none !important;
     }
+    .brand-dropdown-container {
+    margin-bottom: 10px;
+}
 
+.brand-dropdown-container {
+    margin-bottom: 10px;
+}
+
+.brand-dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.brand-dropdown-menu .form-check {
+    padding: 0.5rem 1rem;
+    margin: 0;
+}
+
+.brand-dropdown-menu .form-check-input {
+    margin-right: 8px;
+}
+
+.brand-dropdown-menu .form-check-label {
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.selected-brands {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 0.8rem;
+}
+
+.brand-tag {
+    background: #E8F5E6;
+    color: #2C8F0C;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.brand-tag .remove-brand {
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: #2C8F0C;
+}
+
+.brand-tag .remove-brand:hover {
+    color: #1E6A08;
+}
     @media (max-width: 768px) {
         .floating-filter {
             right: 10px;
@@ -630,12 +690,30 @@
         </div>
         
         <!-- Brand Filter -->
-        <div class="filter-section">
-            <h6 class="filter-section-title">Brands</h6>
-            <div class="filter-options" id="brandFilters">
-                <!-- Brands will be populated by JavaScript -->
-            </div>
+<div class="filter-section">
+    <h6 class="filter-section-title">Brands</h6>
+    <div class="brand-dropdown-container">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="brandDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Brands
+            </button>
+            <ul class="dropdown-menu brand-dropdown-menu" aria-labelledby="brandDropdown">
+                @foreach($brands as $brand)
+                    <li>
+                        <div class="form-check dropdown-item">
+                            <input class="form-check-input brand-checkbox" type="checkbox" value="{{ $brand->name }}" id="brand{{ $brand->id }}"
+                                {{ in_array($brand->name, explode(',', request('brands', ''))) ? 'checked' : '' }}>
+                            <label class="form-check-label w-100" for="brand{{ $brand->id }}">
+                                {{ $brand->name }}
+                            </label>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
         </div>
+        <div id="selectedBrands" class="selected-brands mt-2"></div>
+    </div>
+</div>
 
         <!-- Price Range Filter -->
         <div class="filter-section">
@@ -892,79 +970,93 @@ document.addEventListener('DOMContentLoaded', function() {
     // Floating Filter Functionality
     const filterBubble = document.getElementById('filterBubble');
     const filterPanel = document.getElementById('filterPanel');
-    const brandFilters = document.getElementById('brandFilters');
     const minPriceInput = document.getElementById('minPrice');
     const maxPriceInput = document.getElementById('maxPrice');
     const priceSlider = document.getElementById('priceSlider');
     const applyFilters = document.getElementById('applyFilters');
     const clearFilters = document.getElementById('clearFilters');
 
-    // Use brands passed from controller
-    const brands = @json($brands->pluck('name'));
-
-    // Populate brand filters
-    if (brands && brands.length > 0) {
-        brands.forEach(brand => {
-            const option = createFilterOption('brand', brand);
-            brandFilters.appendChild(option);
-        });
-    } else {
-        brandFilters.innerHTML = '<div class="text-muted small">No brands available</div>';
-    }
-
-    // Price range functionality
-    priceSlider.addEventListener('input', function() {
-        const maxPrice = this.value;
-        maxPriceInput.value = maxPrice;
-    });
-
-    maxPriceInput.addEventListener('input', function() {
-        let value = parseInt(this.value) || 0;
-        if (value > 10000) value = 10000;
-        if (value < 0) value = 0;
-        priceSlider.value = value;
-        this.value = value;
-    });
-
-    minPriceInput.addEventListener('input', function() {
-        let value = parseInt(this.value) || 0;
-        if (value < 0) value = 0;
-        this.value = value;
-    });
-
-    function createFilterOption(type, value) {
-        const option = document.createElement('div');
-        option.className = 'filter-option';
-        option.innerHTML = `
-            <div class="filter-checkbox" data-type="${type}" data-value="${value}"></div>
-            <span class="filter-label">${value}</span>
-            <span class="filter-count">0</span>
-        `;
+    // Brand dropdown functionality
+    function updateBrandDropdown() {
+        const brandCheckboxes = document.querySelectorAll('.brand-checkbox:checked');
+        const dropdownButton = document.getElementById('brandDropdown');
+        const selectedBrandsContainer = document.getElementById('selectedBrands');
         
-        option.addEventListener('click', function() {
-            const checkbox = this.querySelector('.filter-checkbox');
-            checkbox.classList.toggle('checked');
-        });
+        const selectedBrands = Array.from(brandCheckboxes).map(cb => cb.value);
         
-        return option;
-    }
-
-    // Toggle filter panel
-    filterBubble.addEventListener('click', function(e) {
-        e.stopPropagation();
-        filterPanel.classList.toggle('show');
-    });
-
-    // Close filter panel when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!filterPanel.contains(e.target) && !filterBubble.contains(e.target)) {
-            filterPanel.classList.remove('show');
+        // Update dropdown button text
+        if (selectedBrands.length === 0) {
+            dropdownButton.textContent = 'Select Brands';
+        } else if (selectedBrands.length === 1) {
+            dropdownButton.textContent = selectedBrands[0];
+        } else {
+            dropdownButton.textContent = `${selectedBrands.length} brands selected`;
         }
-    });
+        
+        // Update selected brands display
+        selectedBrandsContainer.innerHTML = '';
+        selectedBrands.forEach(brand => {
+            const tag = document.createElement('span');
+            tag.className = 'brand-tag';
+            tag.innerHTML = `
+                ${brand}
+                <button type="button" class="remove-brand" data-brand="${brand}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            selectedBrandsContainer.appendChild(tag);
+        });
+        
+        // Add event listeners to remove buttons
+        document.querySelectorAll('.remove-brand').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const brand = this.getAttribute('data-brand');
+                const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    updateBrandDropdown();
+                }
+            });
+        });
+    }
+
+    // Get selected brands
+    function getSelectedBrands() {
+        const brandCheckboxes = document.querySelectorAll('.brand-checkbox:checked');
+        return Array.from(brandCheckboxes).map(cb => cb.value);
+    }
+
+    // Set current filters from URL
+    function setCurrentFilters() {
+        const urlBrands = urlParams.get('brands')?.split(',') || [];
+        const urlMinPrice = urlParams.get('min_price') || '';
+        const urlMaxPrice = urlParams.get('max_price') || '';
+        
+        // Set brand filters
+        urlBrands.forEach(brand => {
+            const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+        
+        // Update dropdown display
+        updateBrandDropdown();
+        
+        // Set price filters
+        if (urlMinPrice) {
+            minPriceInput.value = urlMinPrice;
+        }
+        if (urlMaxPrice) {
+            maxPriceInput.value = urlMaxPrice;
+            priceSlider.value = urlMaxPrice;
+        }
+    }
 
     // Apply filters
     applyFilters.addEventListener('click', function() {
-        const selectedBrands = getSelectedFilters('brand');
+        const selectedBrands = getSelectedBrands();
         const minPrice = minPriceInput.value || '';
         const maxPrice = maxPriceInput.value || '';
         
@@ -997,10 +1089,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Clear filters
     clearFilters.addEventListener('click', function() {
-        // Clear brand checkboxes
-        document.querySelectorAll('.filter-checkbox.checked').forEach(checkbox => {
-            checkbox.classList.remove('checked');
+        // Clear brand selection
+        document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
         });
+        updateBrandDropdown();
         
         // Clear price inputs
         minPriceInput.value = '';
@@ -1016,33 +1109,45 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = url.toString();
     });
 
-    function getSelectedFilters(type) {
-        const checkboxes = document.querySelectorAll(`.filter-checkbox[data-type="${type}"].checked`);
-        return Array.from(checkboxes).map(cb => cb.getAttribute('data-value'));
-    }
+    // Price range functionality
+    priceSlider.addEventListener('input', function() {
+        const maxPrice = this.value;
+        maxPriceInput.value = maxPrice;
+    });
 
-    // Set current filters from URL
-    function setCurrentFilters() {
-        const urlBrands = urlParams.get('brands')?.split(',') || [];
-        const urlMinPrice = urlParams.get('min_price') || '';
-        const urlMaxPrice = urlParams.get('max_price') || '';
-        
-        // Set brand filters
-        urlBrands.forEach(brand => {
-            const checkbox = document.querySelector(`.filter-checkbox[data-type="brand"][data-value="${brand}"]`);
-            if (checkbox) checkbox.classList.add('checked');
-        });
-        
-        // Set price filters
-        if (urlMinPrice) {
-            minPriceInput.value = urlMinPrice;
-        }
-        if (urlMaxPrice) {
-            maxPriceInput.value = urlMaxPrice;
-            priceSlider.value = urlMaxPrice;
-        }
-    }
+    maxPriceInput.addEventListener('input', function() {
+        let value = parseInt(this.value) || 0;
+        if (value > 10000) value = 10000;
+        if (value < 0) value = 0;
+        priceSlider.value = value;
+        this.value = value;
+    });
 
+    minPriceInput.addEventListener('input', function() {
+        let value = parseInt(this.value) || 0;
+        if (value < 0) value = 0;
+        this.value = value;
+    });
+
+    // Toggle filter panel
+    filterBubble.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterPanel.classList.toggle('show');
+    });
+
+    // Close filter panel when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!filterPanel.contains(e.target) && !filterBubble.contains(e.target)) {
+            filterPanel.classList.remove('show');
+        }
+    });
+
+    // Initialize brand dropdown
+    document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateBrandDropdown);
+    });
+
+    // Set current filters on page load
     setCurrentFilters();
 
     const hasProducts = {{ $products->count() > 0 ? 'true' : 'false' }};
@@ -1065,7 +1170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Add filter parameters
-            const selectedBrands = getSelectedFilters('brand');
+            const selectedBrands = getSelectedBrands();
             const minPrice = minPriceInput.value || '';
             const maxPrice = maxPriceInput.value || '';
             
@@ -1137,6 +1242,120 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
                 loadMoreProducts();
             }
+        });
+    }
+
+    // Add to cart functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-to-cart-btn')) {
+            e.preventDefault();
+            const form = e.target.closest('.add-to-cart-form');
+            const submitBtn = form.querySelector('.add-to-cart-btn');
+            const originalText = submitBtn.innerHTML;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Product added to cart successfully!', 'success');
+                    // Update cart count if needed
+                    if (data.cart_count !== undefined) {
+                        updateCartCount(data.cart_count);
+                    }
+                } else {
+                    showToast(data.message || 'Error adding product to cart.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Unable to add product to cart. Please try again.', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        }
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                // Add fade out animation
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+
+    // Update cart count function
+    function updateCartCount(count) {
+        const cartCountElements = document.querySelectorAll('#cartCount, #mobileCartCount');
+        cartCountElements.forEach(element => {
+            element.textContent = count;
         });
     }
 });

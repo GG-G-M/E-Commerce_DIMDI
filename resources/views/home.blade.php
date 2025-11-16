@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.home')
+
 @section('content')
     
-
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
@@ -24,7 +24,8 @@
         </section>
 
         <!-- Stats Section -->
-        <section class="stats-section">
+        <section class="stats-section" id="stats">
+
             <div class="container">
                 <div class="row">
                     <div class="col-md-3 col-6">
@@ -56,7 +57,7 @@
         </section>
 
         <!-- About Section -->
-        <section class="about-section">
+        <section class="about-section" id="about">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-6 mb-5 mb-lg-0">
@@ -99,7 +100,7 @@
         </section>
 
         <!-- Featured Products -->
-        <section class="featured-section">
+        <section class="featured-section" id="featured">
             <div class="container">
                 <div class="row mb-5">
                     <div class="col-12 text-center">
@@ -199,7 +200,7 @@
         </section>
 
         <!-- Why Choose Us Section -->
-        <section class="why-section">
+        <<section class="why-section" id="why-choose-us">
             <div class="container">
                 <div class="row mb-5">
                     <div class="col-12 text-center">
@@ -274,7 +275,7 @@
             </div>
         </section>
 
-        <!-- Testimonials Section -->
+        <section class="testimonials-section" id="testimonials">
         <section class="testimonials-section">
             <div class="container">
                 <div class="row mb-5">
@@ -335,7 +336,7 @@
         </section>
 
         <!-- Contact Section -->
-        <section class="contact-section">
+        <section class="contact-section" id="contact">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 mb-5 mb-lg-0">

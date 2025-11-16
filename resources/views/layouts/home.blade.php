@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIMDI Store - Premium Home Appliances & Furniture</title>
+    <title>E-Commerce DIMDI</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -18,7 +18,6 @@
             --text-dark: #212529;
         }
         
-        /* Navigation Styles */
         .navbar {
             background-color: #2C8F0C !important;
             padding: 0.6rem 0;
@@ -32,7 +31,6 @@
         
         body {
             padding-top: 70px;
-            scroll-behavior: smooth;
         }
         
         .navbar-brand, 
@@ -294,45 +292,303 @@
             height: 35px;
             font-size: 0.9rem;
         }
-        
-        /* Demo sections for navigation */
-        .demo-section {
-            height: 100vh;
+
+        /* HOME LAYOUT SPECIFIC STYLES */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: #fff;
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            padding: 6rem 0 5rem;
+            margin-bottom: 3rem;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" opacity="0.05"><polygon fill="white" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-title {
+            font-weight: 700;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .btn-hero {
+            background-color: white;
+            color: var(--primary-green);
+            border-radius: 30px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            font-weight: 700;
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            font-size: 2.5rem;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-green);
+            border-radius: 2px;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            margin-bottom: 2rem;
+        }
+
+        .about-feature {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-feature-icon {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
-            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        /* Featured Products Section */
+        .featured-section {
+            padding: 5rem 0;
+            background-color: var(--light-gray);
+        }
+
+        /* Why Choose Us Section */
+        .why-section {
+            padding: 5rem 0;
+            background: linear-gradient(to bottom, #ffffff 0%, var(--light-green) 100%);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            height: 100%;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid var(--primary-green);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
             color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
         }
-        
-        #hero {
-            background: linear-gradient(135deg, #2C8F0C 0%, #1E6A08 100%);
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
         }
-        
-        #about {
-            background: linear-gradient(135deg, #4CAF50 0%, #2C8F0C 100%);
+
+        .feature-text {
+            color: var(--dark-gray);
         }
-        
-        #featured {
-            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 5rem 0;
+            background-color: var(--light-green);
         }
-        
-        #why {
-            background: linear-gradient(135deg, #81C784 0%, #66BB6A 100%);
+
+        .testimonial-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            position: relative;
         }
-        
-        #reviews {
-            background: linear-gradient(135deg, #A5D6A7 0%, #81C784 100%);
-            color: #333;
-            text-shadow: none;
+
+        .testimonial-card::before {
+            content: """;
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            font-size: 4rem;
+            color: var(--light-green);
+            font-family: Georgia, serif;
+            line-height: 1;
         }
-        
-        #contact {
-            background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
-            color: #333;
-            text-shadow: none;
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+        }
+
+        .author-info h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .author-info p {
+            margin: 0;
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 5rem 0;
+        }
+
+        .contact-info {
+            margin-bottom: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-icon {
+            background-color: var(--light-green);
+            color: var(--primary-green);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 991.98px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .section-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
@@ -340,8 +596,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg shadow-sm" id="mainNavbar">
         <div class="container">
-            <a class="navbar-brand" href="#hero">
-                <img src="https://via.placeholder.com/40x40/2C8F0C/FFFFFF?text=DI" alt="DIMDI Store" class="logo-img me-2">
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <img src="{{ asset('images/logo-bg-removed.png') }}" alt="DIMDI Store" class="logo-img me-2">
                 <span class="d-none d-sm-inline" style="font-size: 1.1rem;">DIMDI Store</span>
             </a>
 
@@ -350,41 +606,44 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             
-            <!-- Desktop Navigation with Text Only -->
             <div class="collapse navbar-collapse desktop-nav" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#hero">
-                            Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">
-                            About
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#featured">
-                            Featured
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#why">
-                            Why DIMDI
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#reviews">
-                            Reviews
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">
-                            Visit Store
-                        </a>
-                    </li>
-                </ul>
-
+    <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#home">
+                Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#stats">
+                Stats
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#about">
+                About
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#featured">
+                Featured
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#why-choose-us">
+                Why Choose Us
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#testimonials">
+                Testimonials
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}#contact">
+                Contact
+            </a>
+        </li>
+    </ul>
                 <!-- Search Bar -->
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
@@ -398,15 +657,18 @@
 
                 <!-- Right Section -->
                 <ul class="navbar-nav align-items-center">
-                    <!-- Cart - Icon Only -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative cart-container" href="#">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">3</span>
-                        </a>
-                    </li>
+                    @auth
+                        @if(Auth::user()->isAdmin())
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                                Admin
+                            </a>
+                        </li>
+                        @endif
+                    @endauth
                     
                     <!-- User Dropdown -->
+                    @auth
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                         data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.9rem;">
@@ -414,23 +676,38 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{ route('profile.show') }}">
                                     <i class="fas fa-user me-2"></i>Profile
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{{ route('orders.index') }}">
                                     <i class="fas fa-shopping-bag me-2"></i>My Orders
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                </a>
+                                <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                    @csrf
+                                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                </form>
                             </li>
                         </ul>
                     </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('register') }}">
+                            Register
+                        </a>
+                    </li>
+                    @endauth
                 </ul>
             </div>
         </div>
@@ -438,56 +715,40 @@
 
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-nav-icons d-lg-none">
-        <a href="#hero" class="mobile-nav-item">
+        <a href="{{ route('home') }}" class="mobile-nav-item">
             <i class="fas fa-home mobile-nav-icon"></i>
             <span class="mobile-nav-label">Home</span>
         </a>
-        <a href="#about" class="mobile-nav-item">
+        <a href="{{ route('products.index') }}" class="mobile-nav-item">
+            <i class="fas fa-box mobile-nav-icon"></i>
+            <span class="mobile-nav-label">Products</span>
+        </a>
+        <a href="{{ route('about') }}" class="mobile-nav-item">
             <i class="fas fa-info-circle mobile-nav-icon"></i>
             <span class="mobile-nav-label">About</span>
         </a>
-        <a href="#featured" class="mobile-nav-item">
-            <i class="fas fa-star mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Featured</span>
+        <a href="{{ route('cart.index') }}" class="mobile-nav-item position-relative">
+            <i class="fas fa-shopping-cart mobile-nav-icon"></i>
+            <span class="mobile-nav-label">Cart</span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="mobileCartCount">0</span>
         </a>
-        <a href="#why" class="mobile-nav-item">
-            <i class="fas fa-question-circle mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Why DIMDI</span>
+        @auth
+        <a href="{{ route('profile.show') }}" class="mobile-nav-item">
+            <i class="fas fa-user mobile-nav-icon"></i>
+            <span class="mobile-nav-label">Account</span>
         </a>
-        <a href="#reviews" class="mobile-nav-item">
-            <i class="fas fa-comment mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Reviews</span>
+        @else
+        <a href="{{ route('login') }}" class="mobile-nav-item">
+            <i class="fas fa-sign-in-alt mobile-nav-icon"></i>
+            <span class="mobile-nav-label">Login</span>
         </a>
-        <a href="#contact" class="mobile-nav-item">
-            <i class="fas fa-store mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Visit Store</span>
-        </a>
+        @endauth
     </div>
 
-    <!-- Demo Sections -->
-    <section class="demo-section" id="hero">
-        Home Section
-    </section>
-    
-    <section class="demo-section" id="about">
-        About Section
-    </section>
-    
-    <section class="demo-section" id="featured">
-        Featured Section
-    </section>
-    
-    <section class="demo-section" id="why">
-        Why DIMDI Section
-    </section>
-    
-    <section class="demo-section" id="reviews">
-        Reviews Section
-    </section>
-    
-    <section class="demo-section" id="contact">
-        Visit Store Section
-    </section>
+    <!-- Main Content -->
+    <main>
+        @yield('content')
+    </main>
 
     <!-- Footer -->
     <footer style="background-color: #2C8F0C !important; color: white !important;">
@@ -497,30 +758,30 @@
                     <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">DIMDI Store</h5>
                     <p style="color: white !important; font-size: 0.9rem;">Your trusted destination for premium appliances and furniture that transform houses into homes.</p>
                     <div class="social-links mt-3">
-                        <a href="#" class="btn btn-light btn-sm rounded-circle me-2" style="color: #2C8F0C !important;"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="btn btn-light btn-sm rounded-circle me-2" style="color: #2C8F0C !important;"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="btn btn-light btn-sm rounded-circle me-2" style="color: #2C8F0C !important;"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="btn btn-light btn-sm rounded-circle me-2" style="color: #2C8F0C !important;"><i class="fab fa-pinterest"></i></a>
+                        <a href="#" style="color: white !important;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" style="color: white !important;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="color: white !important;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" style="color: white !important;"><i class="fab fa-pinterest"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">Shop</h5>
-                    <ul class="footer-links list-unstyled">
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">All Products</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Appliances</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Furniture</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">New Arrivals</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Best Sellers</a></li>
+                    <ul class="footer-links">
+                        <li><a href="{{ url('/products') }}" style="color: white !important; font-size: 0.9rem;">All Products</a></li>
+                        <li><a href="{{ url('/products?category=appliances') }}" style="color: white !important; font-size: 0.9rem;">Appliances</a></li>
+                        <li><a href="{{ url('/products?category=furniture') }}" style="color: white !important; font-size: 0.9rem;">Furniture</a></li>
+                        <li><a href="{{ url('/products?sort=newest') }}" style="color: white !important; font-size: 0.9rem;">New Arrivals</a></li>
+                        <li><a href="{{ url('/products?sort=popular') }}" style="color: white !important; font-size: 0.9rem;">Best Sellers</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">Help</h5>
-                    <ul class="footer-links list-unstyled">
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Customer Service</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Track Order</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Returns & Exchanges</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">Shipping Info</a></li>
-                        <li><a href="#" style="color: white !important; font-size: 0.9rem;">FAQ</a></li>
+                    <ul class="footer-links">
+                        <li><a href="{{ url('/contact') }}" style="color: white !important; font-size: 0.9rem;">Customer Service</a></li>
+                        <li><a href="{{ url('/track-order') }}" style="color: white !important; font-size: 0.9rem;">Track Order</a></li>
+                        <li><a href="{{ url('/returns') }}" style="color: white !important; font-size: 0.9rem;">Returns & Exchanges</a></li>
+                        <li><a href="{{ url('/shipping') }}" style="color: white !important; font-size: 0.9rem;">Shipping Info</a></li>
+                        <li><a href="{{ url('/faq') }}" style="color: white !important; font-size: 0.9rem;">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">
@@ -538,8 +799,8 @@
                         <p style="color: white !important; font-size: 0.85rem;">&copy; 2024 DIMDI Store. All rights reserved.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <a href="#" style="color: white !important; margin-right: 1rem; font-size: 0.85rem;">Privacy Policy</a>
-                        <a href="#" style="color: white !important; font-size: 0.85rem;">Terms of Service</a>
+                        <a href="{{ url('/privacy') }}" style="color: white !important; margin-right: 1rem; font-size: 0.85rem;">Privacy Policy</a>
+                        <a href="{{ url('/terms') }}" style="color: white !important; font-size: 0.85rem;">Terms of Service</a>
                     </div>
                 </div>
             </div>
@@ -548,7 +809,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Search functionality
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
@@ -582,7 +842,6 @@
 
         // Perform search with proper error handling
         function performSearch(query) {
-            // Simulate API call with timeout
             setTimeout(() => {
                 const mockResults = [
                     { type: 'Product', name: 'Modern Refrigerator', price: '$899.99', slug: 'modern-refrigerator' },
@@ -626,11 +885,9 @@
         // Handle result selection
         function selectResult(slug, type) {
             if (type === 'Product') {
-                alert(`Navigating to product: ${slug}`);
-                // window.location.href = `/products/${slug}`;
+                window.location.href = `/products/${slug}`;
             } else {
-                alert(`Navigating to category: ${slug}`);
-                // window.location.href = `/products?category=${slug}`;
+                window.location.href = `/products?category=${slug}`;
             }
         }
 
@@ -639,11 +896,20 @@
             if (e.key === 'Enter') {
                 const query = e.target.value.trim();
                 if (query.length > 0) {
-                    alert(`Searching for: ${query}`);
-                    // window.location.href = `/products?search=${encodeURIComponent(query)}`;
+                    window.location.href = `/products?search=${encodeURIComponent(query)}`;
                 }
             }
         });
+
+        // Update cart count
+        function updateCartCount() {
+            fetch('{{ route("cart.count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cartCount').textContent = data.count;
+                    document.getElementById('mobileCartCount').textContent = data.count;
+                });
+        }
 
         // Navbar scroll effect
         window.addEventListener('scroll', function() {
@@ -655,13 +921,17 @@
             }
         });
 
-        // Initialize navbar state
+        // Update cart count on page load
         document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+            
+            // Initialize navbar state
             const navbar = document.getElementById('mainNavbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             }
         });
     </script>
+    @stack('scripts')
 </body>
 </html>
