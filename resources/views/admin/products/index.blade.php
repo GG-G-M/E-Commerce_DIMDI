@@ -46,6 +46,24 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
+    .btn-success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1e7e34, #1a9368);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        border: none;
+    }
+
+    .btn-info:hover {
+        background: linear-gradient(135deg, #138496, #5a32a3);
+    }
+
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -92,7 +110,124 @@
         color: #dc3545;
         font-weight: 600;
     }
+
+    .csv-instructions {
+        background: #f8f9fa;
+        border-left: 4px solid #2C8F0C;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+
+    .csv-instructions h6 {
+        color: #2C8F0C;
+        margin-bottom: 10px;
+    }
+
+    .template-download {
+        background: #e8f5e9;
+        border: 1px dashed #2C8F0C;
+        padding: 15px;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 </style>
+
+<!-- CSV Upload Modal -->
+<div class="modal fade" id="csvUploadModal" tabindex="-1" aria-labelledby="csvUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="csvUploadModalLabel">
+                    <i class="fas fa-file-csv me-2"></i>Upload Products via CSV
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.products.import.csv') }}" method="POST" enctype="multipart/form-data" id="csvUploadForm">
+                @csrf
+                <div class="modal-body">
+                    
+                    <!-- Template Download Section -->
+                    <div class="template-download">
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-download me-2"></i>Download CSV Template
+                        </h6>
+                        <p class="text-muted mb-3">
+                            Use our template to ensure your CSV file has the correct format.
+                        </p>
+                        <a href="{{ route('admin.products.csv.template') }}" class="btn btn-success">
+                            <i class="fas fa-file-download me-2"></i>Download Template
+                        </a>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="csv-instructions">
+                        <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
+                        <ul class="small mb-0">
+                            <li>File must be in CSV format (Comma Separated Values)</li>
+                            <li>First row must contain column headers</li>
+                            <li>Required columns: <code>name</code>, <code>sku</code>, <code>price</code>, <code>category_id</code></li>
+                            <li>Optional columns: <code>description</code>, <code>brand_id</code>, <code>stock_quantity</code>, <code>image_url</code></li>
+                            <li>Make sure SKU values are unique</li>
+                            <li>Category ID must exist in your categories table</li>
+                        </ul>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="mb-3">
+                        <label for="csv_file" class="form-label fw-bold">Select CSV File</label>
+                        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                        <div class="form-text">
+                            Only .csv files are allowed. Maximum file size: 10MB
+                        </div>
+                    </div>
+
+                    <!-- Processing Options -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Duplicate Handling</label>
+                                <select class="form-select" name="duplicate_handling">
+                                    <option value="skip">Skip duplicates (keep existing)</option>
+                                    <option value="update">Update existing products</option>
+                                    <option value="overwrite">Overwrite existing products</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Default Status</label>
+                                <select class="form-select" name="default_status">
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar (Hidden by default) -->
+                    <div class="progress mb-3" style="height: 20px; display: none;" id="uploadProgress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <span class="progress-text">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Status Messages -->
+                    <div id="uploadStatus" class="alert" style="display: none;"></div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadCsvBtn">
+                        <i class="fas fa-upload me-2"></i>Upload CSV
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <!-- Header -->
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -100,11 +235,17 @@
         <h1 class="h3 mb-1">Product Management</h1>
         <p class="text-muted mb-0">Manage your products, categories, and inventory here.</p>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-1"></i> Add Product
-    </a>
+    <div class="btn-group">
+        <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+            <i class="fas fa-file-csv me-1"></i> Import CSV
+        </button>
+        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Add Product
+        </a>
+    </div>
 </div>
 
+<!-- Rest of your existing code remains the same -->
 <!-- Filters and Search -->
 <div class="card card-custom mb-4">
     <div class="card-header card-header-custom">
@@ -339,4 +480,86 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csvUploadForm = document.getElementById('csvUploadForm');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+    const progressBar = uploadProgress.querySelector('.progress-bar');
+    const progressText = uploadProgress.querySelector('.progress-text');
+
+    csvUploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Show progress bar
+        uploadProgress.style.display = 'block';
+        uploadStatus.style.display = 'none';
+        uploadCsvBtn.disabled = true;
+        uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+        
+        // Simulate progress (in real implementation, you'd use AJAX with progress events)
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += 5;
+            if (progress <= 100) {
+                progressBar.style.width = progress + '%';
+                progressBar.setAttribute('aria-valuenow', progress);
+                progressText.textContent = progress + '%';
+            }
+        }, 100);
+        
+        // Submit the form
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            progressText.textContent = '100%';
+            
+            if (data.success) {
+                showUploadStatus('success', data.message);
+                // Refresh the page after 2 seconds to show new products
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                showUploadStatus('danger', data.message || 'Upload failed. Please check your CSV file.');
+            }
+        })
+        .catch(error => {
+            clearInterval(progressInterval);
+            showUploadStatus('danger', 'Upload failed: ' + error.message);
+        })
+        .finally(() => {
+            uploadCsvBtn.disabled = false;
+            uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
+        });
+    });
+    
+    function showUploadStatus(type, message) {
+        uploadStatus.className = `alert alert-${type}`;
+        uploadStatus.innerHTML = message;
+        uploadStatus.style.display = 'block';
+    }
+    
+    // Reset form when modal is closed
+    document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
+        csvUploadForm.reset();
+        uploadProgress.style.display = 'none';
+        uploadStatus.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressText.textContent = '0%';
+    });
+});
+</script>
 @endsection

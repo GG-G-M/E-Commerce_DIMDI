@@ -253,4 +253,52 @@ class SalesReportController extends Controller
             return response()->stream($callback, 200, $headers);
         }
     }
+   public function comparison(Request $request)
+{
+    // Get years for comparison (default to current year and previous year)
+    $year1 = $request->get('year1', date('Y'));
+    $year2 = $request->get('year2', date('Y') - 1);
+    
+    // Get monthly sales data for both years
+    $year1Sales = $this->getMonthlySalesData($year1);
+    $year2Sales = $this->getMonthlySalesData($year2);
+    
+    // Calculate growth percentages
+    $growthData = [];
+    $totalYear1 = array_sum($year1Sales);
+    $totalYear2 = array_sum($year2Sales);
+    $totalGrowth = $totalYear2 > 0 ? (($totalYear1 - $totalYear2) / $totalYear2) * 100 : ($totalYear1 > 0 ? 100 : 0);
+    
+    // Monthly growth
+    foreach ($year1Sales as $month => $sales1) {
+        $sales2 = $year2Sales[$month];
+        $growth = $sales2 > 0 ? (($sales1 - $sales2) / $sales2) * 100 : ($sales1 > 0 ? 100 : 0);
+        $growthData[$month] = round($growth, 2);
+    }
+    
+    return view('admin.sales-report.comparison', compact(
+        'year1', 
+        'year2', 
+        'year1Sales', 
+        'year2Sales',
+        'growthData',
+        'totalGrowth'
+    ));
+}
+
+private function getMonthlySalesData($year)
+{
+    $monthlySales = [];
+    
+    for ($month = 1; $month <= 12; $month++) {
+        $sales = Order::where('order_status', 'delivered') // Changed from 'status' to 'order_status'
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->sum('total_amount');
+        
+        $monthlySales[$month] = (float) $sales;
+    }
+    
+    return $monthlySales;
+}
 }

@@ -25,7 +25,7 @@
     }
 
     .card-custom:hover {
-        transform: translateY(-5px);
+        transform: translateY(-2px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
@@ -44,6 +44,16 @@
 
     .btn-primary:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-1px);
     }
 
     .table th {
@@ -94,8 +104,16 @@
     .pagination .page-link:hover {
         background-color: #E8F5E6;
     }
-</style>
 
+    /* Button group fixes */
+    .btn-group .btn {
+        margin-right: 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+</style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
@@ -167,13 +185,12 @@
                         <td>{{ $order->customer_email }}</td>
                         <td>₱{{ number_format($order->total_amount, 2) }}</td>
                         <td>
-                            <span -{{ 
-                                $order->order_status == 'cancelled' ? '' :
-                                ($order->order_status == 'completed' ? '' :
-                                ($order->order_status == 'delivered' ? '' :
-                                ($order->order_status == 'shipped' ? '' :
-                                ($order->order_status == 'processing' ? '' :
-                                ($order->order_status == 'confirmed' ? 'secondary' : 'warning'))))) 
+                            <span class="badge bg-{{ 
+                                $order->order_status == 'cancelled' ? 'danger' :
+                                ($order->order_status == 'delivered' ? 'success' :
+                                ($order->order_status == 'shipped' ? 'info' :
+                                ($order->order_status == 'processing' ? 'primary' :
+                                ($order->order_status == 'confirmed' ? 'secondary' : 'warning')))) 
                             }}">
                                 {{ ucfirst($order->order_status) }}
                             </span>
@@ -184,9 +201,16 @@
                         </td>
                         <td>{{ $order->created_at->format('M d, Y') }}</td>
                         <td>
-                            <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-eye"></i> View
-                            </a>
+                            <div class="btn-group" role="group">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                @if($order->order_status == 'cancelled' && !$order->refund_processed)
+                                <a href="{{ route('admin.orders.refund.show', $order) }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-money-bill-wave"></i> Refund
+                                </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @endforeach

@@ -146,6 +146,22 @@
     </button>
 </div>
 
+<!-- Add this button in the page-header div, next to the existing Export PDF button -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="h3 mb-1">Sales Reports</h1>
+        <p class="text-muted mb-0">Track and analyze your sales performance</p>
+    </div>
+    <div>
+        <a href="{{ route('admin.sales-report.comparison') }}" class="btn btn-outline-success me-2">
+            <i class="fas fa-chart-line me-1"></i> Year Comparison
+        </a>
+        <button type="button" class="btn btn-success" onclick="exportReport('pdf')">
+            <i class="fas fa-download me-1"></i> Export PDF
+        </button>
+    </div>
+</div>
+
 <!-- Filters -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">

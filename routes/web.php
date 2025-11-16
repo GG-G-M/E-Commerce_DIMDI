@@ -103,6 +103,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
     Route::post('/products/{product}/unarchive', [AdminProductController::class, 'unarchive'])->name('products.unarchive');
+    
+    // CSV Upload Routes - ADDED HERE
+    Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
+    Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
 
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
@@ -120,6 +124,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+    // NEW REFUND ROUTE
+    Route::put('/orders/{order}/refund', [AdminOrderController::class, 'processRefund'])->name('orders.refund');
+    Route::get('/orders/{order}/refund', [AdminOrderController::class, 'showRefund'])->name('orders.refund.show');
+    Route::put('/orders/{order}/refund', [AdminOrderController::class, 'processRefund'])->name('orders.refund.process');
 
     // Categories
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
@@ -138,6 +146,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('/', [SalesReportController::class, 'index'])->name('index');
         Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
         Route::get('/export', [SalesReportController::class, 'export'])->name('export');
+        Route::get('/comparison', [SalesReportController::class, 'comparison'])->name('comparison');
     });
 
     // BANNER ROUTES - Complete routes

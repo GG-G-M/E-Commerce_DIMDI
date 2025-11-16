@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Category;
-use App\Models\Brand; // Add this import
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use League\Csv\Reader;
+use League\Csv\Statement;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
@@ -19,7 +22,7 @@ class ProductController extends Controller
         $categoryId = $request->get('category_id');
         $status = $request->get('status', 'active');
         
-        $products = Product::with(['category', 'variants']) // Add 'variants' here
+        $products = Product::with(['category', 'variants'])
             ->when($search, function($query) use ($search) {
                 return $query->search($search);
             })
@@ -48,8 +51,8 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::active()->get();
-        $brands = Brand::all(); // Add this line
-        return view('admin.products.create', compact('categories', 'brands')); // Add brands here
+        $brands = Brand::all();
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     public function store(Request $request)
@@ -143,10 +146,10 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::active()->get();
-        $brands = Brand::all(); // Add this line
+        $brands = Brand::all();
         $variants = $product->variants;
         
-        return view('admin.products.edit', compact('product', 'categories', 'brands', 'variants')); // Add brands here
+        return view('admin.products.edit', compact('product', 'categories', 'brands', 'variants'));
     }
 
     public function update(Request $request, Product $product)
@@ -281,5 +284,210 @@ class ProductController extends Controller
         // Instead of deleting, archive the product
         $product->archive();
         return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+    }
+
+    /**
+     * Import products from CSV file
+     */
+    public function importCSV(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240', // 10MB max
+            'duplicate_handling' => 'required|in:skip,update,overwrite',
+            'default_status' => 'required|in:active,inactive',
+        ]);
+
+        try {
+            $file = $request->file('csv_file');
+            $csv = Reader::createFromPath($file->getPathname(), 'r');
+            $csv->setHeaderOffset(0); // Use first row as header
+            
+            $headers = $csv->getHeader();
+            $requiredHeaders = ['name', 'sku', 'price', 'category_id'];
+            
+            // Validate headers
+            foreach ($requiredHeaders as $required) {
+                if (!in_array($required, $headers)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Missing required column: {$required}"
+                    ], 422);
+                }
+            }
+            
+            $records = Statement::create()->process($csv);
+            $imported = 0;
+            $updated = 0;
+            $skipped = 0;
+            $errors = [];
+            
+            foreach ($records as $index => $row) {
+                try {
+                    // Clean the row data
+                    $row = array_map('trim', $row);
+                    
+                    // Validate required fields
+                    if (empty($row['name']) || empty($row['sku']) || empty($row['price']) || empty($row['category_id'])) {
+                        $errors[] = "Row " . ($index + 2) . ": Missing required fields";
+                        continue;
+                    }
+
+                    // Check if category exists
+                    $category = Category::find($row['category_id']);
+                    if (!$category) {
+                        $errors[] = "Row " . ($index + 2) . ": Category ID {$row['category_id']} does not exist";
+                        continue;
+                    }
+
+                    // Check if brand exists if provided
+                    if (!empty($row['brand_id'])) {
+                        $brand = Brand::find($row['brand_id']);
+                        if (!$brand) {
+                            $errors[] = "Row " . ($index + 2) . ": Brand ID {$row['brand_id']} does not exist";
+                            continue;
+                        }
+                    }
+
+                    // Check if product exists
+                    $existingProduct = Product::where('sku', $row['sku'])->first();
+                    
+                    $duplicateHandling = $request->input('duplicate_handling');
+                    
+                    // Handle duplicates based on user selection
+                    if ($existingProduct) {
+                        if ($duplicateHandling === 'skip') {
+                            $skipped++;
+                            continue;
+                        } elseif ($duplicateHandling === 'overwrite') {
+                            // Delete existing product and create new one
+                            $existingProduct->delete();
+                            $existingProduct = null;
+                        }
+                    }
+
+                    $productData = [
+                        'name' => $row['name'],
+                        'sku' => $row['sku'],
+                        'slug' => Str::slug($row['name']),
+                        'description' => $row['description'] ?? '',
+                        'price' => floatval($row['price']),
+                        'sale_price' => !empty($row['sale_price']) ? floatval($row['sale_price']) : null,
+                        'stock_quantity' => !empty($row['stock_quantity']) ? intval($row['stock_quantity']) : 0,
+                        'category_id' => intval($row['category_id']),
+                        'brand_id' => !empty($row['brand_id']) ? intval($row['brand_id']) : null,
+                        'image' => $row['image_url'] ?? null,
+                        'is_active' => $request->input('default_status') === 'active',
+                        'is_featured' => !empty($row['is_featured']) ? filter_var($row['is_featured'], FILTER_VALIDATE_BOOLEAN) : false,
+                        'is_archived' => false,
+                    ];
+
+                    if ($existingProduct && $duplicateHandling === 'update') {
+                        // Update existing product
+                        $existingProduct->update($productData);
+                        $updated++;
+                    } else {
+                        // Create new product
+                        Product::create($productData);
+                        $imported++;
+                    }
+                    
+                } catch (\Exception $e) {
+                    $errors[] = "Row " . ($index + 2) . ": " . $e->getMessage();
+                }
+            }
+            
+            $message = "CSV import completed. Imported: {$imported}, Updated: {$updated}, Skipped: {$skipped}";
+            if (!empty($errors)) {
+                $message .= ". Errors: " . implode('; ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= " and " . (count($errors) - 5) . " more errors";
+                }
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'imported' => $imported,
+                'updated' => $updated,
+                'skipped' => $skipped,
+                'total_errors' => count($errors),
+                'errors' => $errors
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process CSV: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Download CSV template for product import
+     */
+    public function downloadCSVTemplate(): StreamedResponse
+    {
+        $fileName = 'product-import-template.csv';
+        
+        return response()->streamDownload(function() {
+            $file = fopen('php://output', 'w');
+            
+            // Add BOM for UTF-8 to handle special characters
+            fwrite($file, "\xEF\xBB\xBF");
+            
+            // Headers with descriptions
+            $headers = [
+                'name' => 'Product Name (Required)',
+                'sku' => 'SKU - Must be unique (Required)', 
+                'price' => 'Price in PHP (Required)',
+                'category_id' => 'Category ID from Categories table (Required)',
+                'brand_id' => 'Brand ID from Brands table (Optional)',
+                'stock_quantity' => 'Initial Stock Quantity (Optional, default: 0)',
+                'description' => 'Product Description (Optional)',
+                'image_url' => 'Product Image URL (Optional)',
+                'sale_price' => 'Sale/Discounted Price (Optional)',
+                'is_featured' => 'Featured Product true/false (Optional)'
+            ];
+            
+            fputcsv($file, array_keys($headers));
+            fputcsv($file, array_values($headers));
+            
+            // Empty row for separation
+            fputcsv($file, []);
+            
+            // Example rows
+            $examples = [
+                [
+                    'Sample Product 1',
+                    'SKU001',
+                    '29.99',
+                    '1', // Must be existing category ID
+                    '1', // Must be existing brand ID
+                    '100',
+                    'This is a sample product description',
+                    'https://example.com/image1.jpg',
+                    '24.99',
+                    'true'
+                ],
+                [
+                    'Sample Product 2',
+                    'SKU002',
+                    '49.99',
+                    '2',
+                    '', // No brand
+                    '50',
+                    'Another sample product',
+                    '',
+                    '', // No sale price
+                    'false'
+                ]
+            ];
+            
+            foreach ($examples as $example) {
+                fputcsv($file, $example);
+            }
+            
+            fclose($file);
+        }, $fileName);
     }
 }
