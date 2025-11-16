@@ -112,49 +112,64 @@
                                 <i class="fas fa-users me-2"></i>Customers
                             </a>
                         </li>
+
+                        <!-- Products Menu with Sub-items -->
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}"
-                                href="{{ route('admin.warehouses.index') }}">
-                                <i class="fas fa-warehouse me-2"></i>Warehouses
+                            <a class="nav-link {{ request()->routeIs('admin.products.*', 'admin.warehouses.*', 'admin.brands.*', 'admin.categories.*', 'admin.stock_in.*', 'admin.stock_out.*') ? 'active' : '' }}"
+                                data-bs-toggle="collapse" href="#productsMenu" role="button" aria-expanded="false"
+                                aria-controls="productsMenu">
+                                <i class="fas fa-clipboard-list me-2"></i>Inventory
+                                <i class="fas fa-chevron-down float-end"></i>
                             </a>
+                            <div class="collapse {{ request()->routeIs('admin.products.*', 'admin.warehouses.*', 'admin.brands.*', 'admin.categories.*', 'admin.stock_in.*', 'admin.stock_out.*') ? 'show' : '' }}"
+                                id="productsMenu">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.products.index') }}">
+                                            <i class="fas fa-box me-2"></i>Products
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.warehouses.index') }}">
+                                            <i class="fas fa-warehouse me-2"></i>Warehouses
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.categories.index') }}">
+                                            <i class="fas fa-tags me-2"></i>Categories
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.brands.index') }}">
+                                            <i class="fas fa-tag me-2"></i>Brands
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.stock_in.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.stock_in.index') }}">
+                                            <i class="fas fa-boxes me-2"></i>Stock-In
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.stock_out.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.stock_out.index') }}">
+                                            <i class="fas fa-box-open me-2"></i>Stock-Out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
-                                href="{{ route('admin.categories.index') }}">
-                                <i class="fas fa-tags me-2"></i>Categories
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
-                                href="{{ route('admin.brands.index') }}">
-                                <i class="fas fa-tag me-2"></i>Brands
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"
-                                href="{{ route('admin.products.index') }}">
-                                <i class="fas fa-box me-2"></i>Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.stock_in.*') ? 'active' : '' }}"
-                                href="{{ route('admin.stock_in.index') }}">
-                                <i class="fas fa-boxes me-2"></i>Stock-In
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.stock_out.*') ? 'active' : '' }}"
-                                href="{{ route('admin.stock_out.index') }}">
-                                <i class="fas fa-box-open me-2"></i>Stock-Out
-                            </a>
-                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
                                 href="{{ route('admin.orders.index') }}">
                                 <i class="fas fa-shopping-cart me-2"></i>Orders
                             </a>
                         </li>
-                        <!-- SALES REPORT MENU ITEM -->
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}"
                                 href="{{ route('admin.sales-report.index') }}">
@@ -167,6 +182,7 @@
                                 <i class="fas fa-image me-2"></i>Banners
                             </a>
                         </li>
+
                         <li class="nav-item mt-4">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <i class="fas fa-store me-2"></i>View Store
@@ -186,6 +202,7 @@
                 </div>
             </nav>
 
+
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <!-- Top navbar -->
@@ -203,7 +220,8 @@
                                         <i class="fas fa-user me-1"></i> {{ Auth::user()->name }}
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('profile.show') }}">My Profile</a>
+                                        <li><a class="dropdown-item" href="{{ route('profile.show') }}">My
+                                                Profile</a>
                                         </li>
                                     </ul>
                                 </li>
