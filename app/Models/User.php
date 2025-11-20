@@ -23,7 +23,11 @@ class User extends Authenticatable
         'city',
         'state',
         'zip_code',
-        'country'
+        'country',
+        'vehicle_type',
+        'vehicle_number',
+        'license_number',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -36,6 +40,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -66,5 +71,15 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    public function isDelivery()
+    {
+        return $this->role === 'delivery';
+    }
+
+    public function isCustomer()
+    {
+        return $this->role === 'customer' || empty($this->role);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Delivery;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -13,7 +14,7 @@ class OrderController extends Controller
         $search = $request->get('search');
         $status = $request->get('status', 'active');
         
-        $orders = Order::with('user')
+        $orders = Order::with(['user', 'delivery']) // ADD DELIVERY RELATIONSHIP
             ->when($search, function($query) use ($search) {
                 return $query->where(function($q) use ($search) {
                     $q->where('order_number', 'like', "%{$search}%")
@@ -40,24 +41,30 @@ class OrderController extends Controller
             'confirmed' => 'Confirmed',
             'processing' => 'Processing',
             'shipped' => 'Shipped',
+            'out_for_delivery' => 'Out for Delivery', // ADD THIS
             'delivered' => 'Delivered',
             'completed' => 'Completed',
             'cancelled' => 'Cancelled',
             'all' => 'All Orders'
         ];
 
-        return view('admin.orders.index', compact('orders', 'statuses'));
+        // GET ACTIVE DELIVERY PERSONNEL FOR ASSIGNMENT
+        $deliveries = Delivery::active()->get();
+
+        return view('admin.orders.index', compact('orders', 'statuses', 'deliveries'));
     }
 
     public function show(Order $order)
     {
-        $order->load('items.product');
-        return view('admin.orders.show', compact('order'));
+        $order->load(['items.product', 'delivery']); // ADD DELIVERY RELATIONSHIP
+        $deliveries = Delivery::active()->get(); // GET DELIVERY PERSONNEL FOR ASSIGNMENT
+        
+        return view('admin.orders.show', compact('order', 'deliveries'));
     }
 
     public function updateStatus(Request $request, Order $order)
     {
-        $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
+        $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered', 'completed', 'cancelled'];
         
         $request->validate([
             'order_status' => 'required|in:' . implode(',', $validStatuses),
@@ -74,7 +81,159 @@ class OrderController extends Controller
         return redirect()->back()->with('success', "Order status updated from " . ucfirst($oldStatus) . " to " . ucfirst($newStatus) . " successfully!");
     }
 
-    // NEW METHOD: Show refund page
+    // NEW METHOD: Assign order to delivery
+    public function assignToDelivery(Request $request, Order $order)
+    {
+        $request->validate([
+            'delivery_id' => 'required|exists:deliveries,id'
+        ]);
+
+        // Check if order is ready for delivery assignment
+        if (!in_array($order->order_status, ['confirmed', 'processing', 'shipped'])) {
+            return redirect()->back()->with('error', 'Order must be in confirmed, processing, or shipped status to assign for delivery.');
+        }
+
+        // Check if delivery person is active
+        $delivery = Delivery::find($request->delivery_id);
+        if (!$delivery->is_active) {
+            return redirect()->back()->with('error', 'Selected delivery person is not active.');
+        }
+
+        try {
+            $order->assignToDelivery($request->delivery_id);
+            
+            return redirect()->back()->with('success', 'Order successfully assigned to ' . $delivery->name . '!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to assign delivery: ' . $e->getMessage());
+        }
+    }
+
+    // NEW METHOD: Unassign delivery from order
+    public function unassignDelivery(Order $order)
+    {
+        if (!$order->delivery_id) {
+            return redirect()->back()->with('error', 'Order is not assigned to any delivery person.');
+        }
+
+        try {
+            $deliveryName = $order->delivery->name;
+            $order->update([
+                'delivery_id' => null,
+                'assigned_at' => null
+            ]);
+
+            // Update status back to shipped if it was out for delivery
+            if ($order->order_status === 'out_for_delivery') {
+                $order->updateStatus('shipped', 'Delivery assignment removed');
+            }
+
+            return redirect()->back()->with('success', 'Delivery assignment removed from ' . $deliveryName . ' successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to remove delivery assignment: ' . $e->getMessage());
+        }
+    }
+
+    // NEW METHOD: Get orders ready for delivery assignment
+    public function getOrdersForDelivery()
+    {
+        $orders = Order::readyForDelivery()
+            ->with('user')
+            ->latest()
+            ->get();
+
+        $deliveries = Delivery::active()->get();
+
+        return view('admin.orders.delivery-assignment', compact('orders', 'deliveries'));
+    }
+
+    // NEW METHOD: Bulk assign delivery
+    public function bulkAssignDelivery(Request $request)
+    {
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id',
+            'delivery_id' => 'required|exists:deliveries,id'
+        ]);
+
+        $delivery = Delivery::find($request->delivery_id);
+        $assignedCount = 0;
+
+        foreach ($request->order_ids as $orderId) {
+            $order = Order::find($orderId);
+            
+            // Check if order is ready for delivery assignment
+            if (in_array($order->order_status, ['confirmed', 'processing', 'shipped']) && !$order->delivery_id) {
+                $order->assignToDelivery($request->delivery_id);
+                $assignedCount++;
+            }
+        }
+
+        if ($assignedCount > 0) {
+            return redirect()->back()->with('success', "Successfully assigned {$assignedCount} orders to {$delivery->name}!");
+        } else {
+            return redirect()->back()->with('error', 'No orders were assigned. Please check if orders are in the correct status.');
+        }
+    }
+
+    // NEW METHOD: Show delivery assignment page
+    public function showDeliveryAssignment()
+    {
+        $orders = Order::readyForDelivery()
+            ->with('user')
+            ->latest()
+            ->paginate(10);
+
+        $deliveries = Delivery::active()->get();
+
+        return view('admin.orders.delivery-assignment', compact('orders', 'deliveries'));
+    }
+
+    // NEW METHOD: Get available deliveries (for AJAX)
+    public function getAvailableDeliveries()
+    {
+        $deliveries = Delivery::active()->get();
+        return response()->json($deliveries);
+    }
+
+    // NEW METHOD: Mark order as picked up
+    public function markAsPickedUp(Order $order)
+    {
+        if (!$order->delivery_id) {
+            return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
+        }
+
+        if ($order->order_status !== 'out_for_delivery') {
+            return redirect()->back()->with('error', 'Order must be out for delivery to mark as picked up.');
+        }
+
+        try {
+            $order->markAsPickedUp();
+            return redirect()->back()->with('success', 'Order marked as picked up successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+        }
+    }
+
+    // NEW METHOD: Mark order as delivered
+    public function markAsDelivered(Order $order)
+    {
+        if (!$order->delivery_id) {
+            return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
+        }
+
+        if (!in_array($order->order_status, ['out_for_delivery', 'shipped'])) {
+            return redirect()->back()->with('error', 'Order must be out for delivery or shipped to mark as delivered.');
+        }
+
+        try {
+            $order->markAsDelivered();
+            return redirect()->back()->with('success', 'Order marked as delivered successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to mark order as delivered: ' . $e->getMessage());
+        }
+    }
+
+    // REFUND METHODS (keep your existing refund methods)
     public function showRefund(Order $order)
     {
         // Check if order is cancelled and not already refunded
@@ -91,7 +250,6 @@ class OrderController extends Controller
         return view('admin.orders.refund', compact('order'));
     }
 
-    // UPDATED METHOD: Process refund
     public function processRefund(Order $order, Request $request)
     {
         // Check if order is eligible for refund

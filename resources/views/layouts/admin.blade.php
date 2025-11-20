@@ -112,6 +112,13 @@
                                 <i class="fas fa-users me-2"></i>Customers
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
+                                href="{{ route('admin.deliveries.index') }}">
+                                <i class="fas fa-truck me-2"></i>Delivery
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}"
                                 href="{{ route('admin.warehouses.index') }}">
