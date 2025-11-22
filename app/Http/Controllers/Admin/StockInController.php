@@ -10,6 +10,10 @@ use App\Models\StockIn;
 use App\Models\Supplier;
 use App\Models\StockChecker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use League\Csv\Reader;
+use League\Csv\Writer;
 
 class StockInController extends Controller
 {
@@ -20,7 +24,7 @@ class StockInController extends Controller
     {
         $stockIns = StockIn::with(['product', 'variant', 'warehouse', 'supplier', 'checker'])
             ->when($request->search, fn($q) => $q->whereHas('product', fn($p) => $p->where('name', 'like', "%{$request->search}%"))
-                ->orWhereHas('variant', fn($v) => $v->where('variant_name', 'like', "%{$request->search}%")) )
+                ->orWhereHas('variant', fn($v) => $v->where('variant_name', 'like', "%{$request->search}%")))
             ->when($request->warehouse_id, fn($q) => $q->where('warehouse_id', $request->warehouse_id))
             ->latest()
             ->paginate($request->per_page ?? 10);
@@ -51,8 +55,13 @@ class StockInController extends Controller
 
         StockIn::create(array_merge(
             $request->only([
-                'warehouse_id', 'product_id', 'product_variant_id', 
-                'supplier_id', 'stock_checker_id', 'quantity', 'reason'
+                'warehouse_id',
+                'product_id',
+                'product_variant_id',
+                'supplier_id',
+                'stock_checker_id',
+                'quantity',
+                'reason'
             ]),
             ['remaining_quantity' => $request->quantity]
         ));
@@ -83,13 +92,17 @@ class StockInController extends Controller
 
         $stockIn->update(array_merge(
             $request->only([
-                'warehouse_id', 'product_id', 'product_variant_id', 
-                'supplier_id', 'stock_checker_id', 'quantity', 'reason'
+                'warehouse_id',
+                'product_id',
+                'product_variant_id',
+                'supplier_id',
+                'stock_checker_id',
+                'quantity',
+                'reason'
             ]),
             ['remaining_quantity' => $newRemaining]
         ));
 
-        // Update total stock for product or variant
         if ($stockIn->product_id) {
             $stockIn->product->increment('stock_quantity', $difference);
         } elseif ($stockIn->product_variant_id) {
@@ -104,7 +117,6 @@ class StockInController extends Controller
      */
     public function destroy(StockIn $stockIn)
     {
-        // Reduce total stock by remaining_quantity before deletion
         if ($stockIn->product_id) {
             $stockIn->product->decrement('stock_quantity', $stockIn->remaining_quantity);
         } elseif ($stockIn->product_variant_id) {
@@ -114,5 +126,80 @@ class StockInController extends Controller
         $stockIn->delete();
 
         return redirect()->route('admin.stock_in.index')->with('success', 'Stock-In deleted successfully.');
+    }
+
+    /**
+     * Download CSV template for stock-in.
+     */
+    public function downloadCsvTemplate()
+    {
+        $csv = Writer::createFromString('');
+        $csv->insertOne(['product_id', 'product_variant_id', 'warehouse_id', 'supplier_id', 'stock_checker_id', 'quantity', 'reason']);
+
+        $filename = 'stock_in_template.csv';
+        return response((string) $csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ]);
+    }
+
+    /**
+     * Import stock-ins from CSV file.
+     */
+    public function importCsv(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+        ]);
+
+        $path = $request->file('csv_file')->getRealPath();
+        $csv = Reader::createFromPath($path, 'r');
+        $csv->setHeaderOffset(0);
+        $records = $csv->getRecords();
+
+        $errors = [];
+        $createdCount = 0;
+
+        foreach ($records as $index => $row) {
+            // Convert empty strings to null for nullable columns
+            $row['product_id'] = $row['product_id'] !== '' ? $row['product_id'] : null;
+            $row['product_variant_id'] = $row['product_variant_id'] !== '' ? $row['product_variant_id'] : null;
+            $row['reason'] = $row['reason'] !== '' ? $row['reason'] : null;
+
+            $validator = Validator::make($row, [
+                'warehouse_id' => 'required|exists:warehouses,id',
+                'product_id' => 'nullable|exists:products,id',
+                'product_variant_id' => 'nullable|exists:product_variants,id',
+                'supplier_id' => 'required|exists:suppliers,id',
+                'stock_checker_id' => 'required|exists:stock_checkers,id',
+                'quantity' => 'required|integer|min:1',
+                'reason' => 'nullable|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                $errors[$index + 2] = $validator->errors()->all(); // +2 because CSV header + 0-based index
+                continue;
+            }
+
+            StockIn::create(array_merge(
+                $validator->validated(),
+                ['remaining_quantity' => $row['quantity']]
+            ));
+
+            $createdCount++;
+        }
+
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Some rows failed to import. Check row numbers.',
+                'errors' => $errors,
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "$createdCount stock-ins imported successfully.",
+        ]);
     }
 }
