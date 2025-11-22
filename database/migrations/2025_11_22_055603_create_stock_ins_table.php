@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
             
             $table->integer('quantity')->default(0);
+            $table->integer('remaining_quantity')->default(0); // New column for remaining stock
             $table->string('reason')->nullable();
             
             $table->timestamps();

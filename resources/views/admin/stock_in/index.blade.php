@@ -31,34 +31,6 @@
     </button>
 </div>
 
-{{-- <!-- Filters -->
-<div class="card card-custom mb-4">
-    <div class="card-header card-header-custom"><i class="fas fa-filter me-2"></i> Stock-In Filters</div>
-    <div class="card-body">
-        <form method="GET" action="{{ route('admin.stock_in.index') }}">
-            <div class="row">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Search Product/Variant</label>
-                    <input type="text" class="form-control" name="search" value="{{ request('search') }}" placeholder="Search...">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">Filter by Warehouse</label>
-                    <select class="form-select" name="warehouse_id">
-                        <option value="">All</option>
-                        @foreach($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary d-block w-100"><i class="fas fa-check me-1"></i> Apply</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div> --}}
-
 <!-- Stock-In Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">Stock-In List</div>
@@ -70,6 +42,7 @@
                     <th>Product / Variant</th>
                     <th>Warehouse</th>
                     <th>Quantity</th>
+                    <th>Remaining Quantity</th>
                     <th>Reason</th>
                     <th>Date</th>
                     <th>Actions</th>
@@ -88,6 +61,7 @@
                     </td>
                     <td>{{ $stock->warehouse->name }}</td>
                     <td>{{ $stock->quantity }}</td>
+                    <td>{{ $stock->remaining_quantity }}</td>
                     <td>{{ $stock->reason }}</td>
                     <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
                     <td>
@@ -98,6 +72,7 @@
                             data-variant-id="{{ $stock->product_variant_id }}"
                             data-warehouse-id="{{ $stock->warehouse_id }}"
                             data-quantity="{{ $stock->quantity }}"
+                            data-remaining="{{ $stock->remaining_quantity }}"
                             data-reason="{{ $stock->reason }}"
                         >
                             <i class="fas fa-edit"></i>
@@ -166,6 +141,11 @@
                         <input type="number" class="form-control" name="quantity" id="quantityInput" min="1" required>
                     </div>
 
+                    {{-- <div class="mb-3">
+                        <label class="form-label">Remaining Quantity</label>
+                        <input type="number" class="form-control" name="remaining_quantity" id="remainingInput" min="0" required>
+                    </div> --}}
+
                     <div class="mb-3">
                         <label class="form-label">Reason</label>
                         <input type="text" class="form-control" name="reason" id="reasonInput">
@@ -182,40 +162,37 @@
 
 <!-- JavaScript for editing on same page -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const stockModal = new bootstrap.Modal(document.getElementById('stockInModal'));
-        const form = document.getElementById('stockInForm');
-        const modalTitle = document.getElementById('modalTitle');
-        const formMethod = document.getElementById('formMethod');
+document.addEventListener('DOMContentLoaded', function () {
+    const stockModal = new bootstrap.Modal(document.getElementById('stockInModal'));
+    const form = document.getElementById('stockInForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const formMethod = document.getElementById('formMethod');
 
-        document.querySelectorAll('.editStockBtn').forEach(button => {
-            button.addEventListener('click', () => {
-                const id = button.dataset.id;
+    document.querySelectorAll('.editStockBtn').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.dataset.id;
 
-                // Fill modal fields
-                document.getElementById('productSelect').value = button.dataset.productId;
-                document.getElementById('variantSelect').value = button.dataset.variantId;
-                document.getElementById('warehouseSelect').value = button.dataset.warehouseId;
-                document.getElementById('quantityInput').value = button.dataset.quantity;
-                document.getElementById('reasonInput').value = button.dataset.reason;
+            document.getElementById('productSelect').value = button.dataset.productId;
+            document.getElementById('variantSelect').value = button.dataset.variantId;
+            document.getElementById('warehouseSelect').value = button.dataset.warehouseId;
+            document.getElementById('quantityInput').value = button.dataset.quantity;
+            document.getElementById('remainingInput').value = button.dataset.remaining;
+            document.getElementById('reasonInput').value = button.dataset.reason;
 
-                // Change form action and method
-                form.action = `/admin/stock-ins/${id}`;
-                formMethod.value = 'PUT';
-                modalTitle.textContent = 'Edit Stock-In';
+            form.action = `/admin/stock-ins/${id}`;
+            formMethod.value = 'PUT';
+            modalTitle.textContent = 'Edit Stock-In';
 
-                // Show modal
-                stockModal.show();
-            });
-        });
-
-        // Reset modal when hidden (for Add Stock-In)
-        document.getElementById('stockInModal').addEventListener('hidden.bs.modal', () => {
-            form.action = "{{ route('admin.stock_in.store') }}";
-            formMethod.value = 'POST';
-            modalTitle.textContent = 'Add Stock-In';
-            form.reset();
+            stockModal.show();
         });
     });
+
+    document.getElementById('stockInModal').addEventListener('hidden.bs.modal', () => {
+        form.action = "{{ route('admin.stock_in.store') }}";
+        formMethod.value = 'POST';
+        modalTitle.textContent = 'Add Stock-In';
+        form.reset();
+    });
+});
 </script>
 @endsection
