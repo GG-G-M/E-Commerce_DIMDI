@@ -77,13 +77,94 @@
             font-weight: 600;
             color: #2C8F0C;
         }
+
+        .csv-instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #2C8F0C;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .csv-instructions h6 {
+            color: #2C8F0C;
+            margin-bottom: 10px;
+        }
     </style>
 
     <div class="page-header d-flex justify-content-between align-items-center">
         <h1 class="mb-0">Stock-In Management</h1>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockInModal">
-            <i class="bi bi-plus-circle"></i> Add Stock-In
-        </button>
+        <div class="btn-group">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockInModal">
+                <i class="bi bi-plus-circle"></i> Add Stock-In
+            </button>
+            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                <i class="fas fa-file-csv"></i> Import CSV
+            </button>
+        </div>
+    </div>
+
+    <!-- CSV Upload Modal -->
+    <div class="modal fade" id="csvUploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form action="{{ route('admin.stock_in.import.csv') }}" method="POST" enctype="multipart/form-data"
+                    id="csvUploadForm">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-file-csv me-2"></i>Upload Stock-In via CSV</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <!-- Template Download -->
+                        <div class="mb-3">
+                            <a href="{{ route('admin.stock_in.csv.template') }}" class="btn btn-success">
+                                <i class="fas fa-file-download me-2"></i>Download CSV Template
+                            </a>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="csv-instructions">
+                            <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
+                            <ul class="small mb-0">
+                                <li>File must be CSV format</li>
+                                <li>Required columns: <code>product_id</code>, <code>variant_id</code>,
+                                    <code>warehouse_id</code>, <code>supplier_id</code>, <code>stock_checker_id</code>,
+                                    <code>quantity</code>, <code>reason</code>
+                                </li>
+                                <li>Ensure IDs correspond to existing products, variants, warehouses, suppliers, and stock
+                                    checkers</li>
+                            </ul>
+                        </div>
+
+                        <!-- File Input -->
+                        <div class="mb-3">
+                            <label class="form-label">Select CSV File</label>
+                            <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                            <div class="form-text">Only CSV files allowed, max 10MB</div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" style="height: 20px; display: none;" id="uploadProgress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <span class="progress-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div id="uploadStatus" class="alert" style="display: none;"></div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="uploadCsvBtn">
+                            <i class="fas fa-upload me-2"></i>Upload CSV
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Stock-In Table -->
@@ -130,15 +211,9 @@
                                     data-warehouse-id="{{ $stock->warehouse_id }}"
                                     data-supplier-id="{{ $stock->supplier_id }}"
                                     data-checker-id="{{ $stock->stock_checker_id }}"
-                                    data-quantity="{{ $stock->quantity }}"
-                                    data-remaining="{{ $stock->remaining_quantity }}" data-reason="{{ $stock->reason }}">
+                                    data-quantity="{{ $stock->quantity }}" data-reason="{{ $stock->reason }}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                {{-- <form action="{{ route('admin.stock_in.destroy', $stock) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                            </form> --}}
                             </td>
                         </tr>
                     @endforeach
@@ -149,7 +224,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Stock-In Modal (Add/Edit) -->
     <div class="modal fade" id="stockInModal" tabindex="-1" aria-hidden="true">
@@ -219,8 +293,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Quantity</label>
-                            <input type="number" class="form-control" name="quantity" id="quantityInput" min="1"
-                                required>
+                            <input type="number" class="form-control" name="quantity" id="quantityInput"
+                                min="1" required>
                         </div>
 
                         <div class="mb-3">
@@ -238,38 +312,77 @@
         </div>
     </div>
 
-    <!-- JavaScript for editing on same page -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const stockModal = new bootstrap.Modal(document.getElementById('stockInModal'));
-            const form = document.getElementById('stockInForm');
-            const modalTitle = document.getElementById('modalTitle');
-            const formMethod = document.getElementById('formMethod');
+            const csvUploadForm = document.getElementById('csvUploadForm');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+            const progressBar = uploadProgress.querySelector('.progress-bar');
+            const progressText = uploadProgress.querySelector('.progress-text');
 
-            document.querySelectorAll('.editStockBtn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const id = button.dataset.id;
+            csvUploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
 
-                    document.getElementById('productSelect').value = button.dataset.productId;
-                    document.getElementById('variantSelect').value = button.dataset.variantId;
-                    document.getElementById('warehouseSelect').value = button.dataset.warehouseId;
-                    document.getElementById('quantityInput').value = button.dataset.quantity;
-                    document.getElementById('remainingInput').value = button.dataset.remaining;
-                    document.getElementById('reasonInput').value = button.dataset.reason;
+                uploadProgress.style.display = 'block';
+                uploadStatus.style.display = 'none';
+                uploadCsvBtn.disabled = true;
+                uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
 
-                    form.action = `/admin/stock-ins/${id}`;
-                    formMethod.value = 'PUT';
-                    modalTitle.textContent = 'Edit Stock-In';
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    if (progress <= 100) {
+                        progressBar.style.width = progress + '%';
+                        progressBar.setAttribute('aria-valuenow', progress);
+                        progressText.textContent = progress + '%';
+                    }
+                }, 100);
 
-                    stockModal.show();
-                });
+                fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        clearInterval(progressInterval);
+                        progressBar.style.width = '100%';
+                        progressText.textContent = '100%';
+                        if (data.success) {
+                            showUploadStatus('success', data.message);
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            showUploadStatus('danger', data.message || 'Upload failed.');
+                        }
+                    })
+                    .catch(error => {
+                        clearInterval(progressInterval);
+                        showUploadStatus('danger', 'Upload failed: ' + error.message);
+                    })
+                    .finally(() => {
+                        uploadCsvBtn.disabled = false;
+                        uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
+                    });
             });
 
-            document.getElementById('stockInModal').addEventListener('hidden.bs.modal', () => {
-                form.action = "{{ route('admin.stock_in.store') }}";
-                formMethod.value = 'POST';
-                modalTitle.textContent = 'Add Stock-In';
-                form.reset();
+            function showUploadStatus(type, message) {
+                uploadStatus.className = `alert alert-${type}`;
+                uploadStatus.innerHTML = message;
+                uploadStatus.style.display = 'block';
+            }
+
+            document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
+                csvUploadForm.reset();
+                uploadProgress.style.display = 'none';
+                uploadStatus.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
             });
         });
     </script>

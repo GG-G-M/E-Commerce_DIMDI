@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\StockCheckerController;
+use App\Http\Controllers\Admin\StockCheckerController as AdminStockCheckerController;
+use App\Http\Controllers\Admin\LowStockController;
 use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -155,12 +156,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
 
     // Stock Checkers
-    Route::get('/stock-checkers', [StockCheckerController::class, 'index'])->name('stock_checkers.index');
-    Route::post('/stock-checkers', [StockCheckerController::class, 'store'])->name('stock_checkers.store');
-    Route::put('/stock-checkers/{id}', [StockCheckerController::class, 'update'])->name('stock_checkers.update');
-    Route::post('/stock-checkers/{id}/archive', [StockCheckerController::class, 'archive'])->name('stock_checkers.archive');
-    Route::post('/stock-checkers/{id}/unarchive', [StockCheckerController::class, 'unarchive'])->name('stock_checkers.unarchive');
-    Route::delete('/stock-checkers/{id}', [StockCheckerController::class, 'destroy'])->name('stock_checkers.destroy');
+    Route::get('/stock-checkers', [AdminStockCheckerController::class, 'index'])->name('stock_checkers.index');
+    Route::post('/stock-checkers', [AdminStockCheckerController::class, 'store'])->name('stock_checkers.store');
+    Route::put('/stock-checkers/{id}', [AdminStockCheckerController::class, 'update'])->name('stock_checkers.update');
+    Route::post('/stock-checkers/{id}/archive', [AdminStockCheckerController::class, 'archive'])->name('stock_checkers.archive');
+    Route::post('/stock-checkers/{id}/unarchive', [AdminStockCheckerController::class, 'unarchive'])->name('stock_checkers.unarchive');
+    Route::delete('/stock-checkers/{id}', [AdminStockCheckerController::class, 'destroy'])->name('stock_checkers.destroy');
 
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
@@ -175,12 +176,22 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // CSV Upload Routes
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
+    
 
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
+
+    // CSV
+    Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');
+    Route::post('/stock-ins/import-csv', [StockInController::class, 'importCsv'])->name('stock_in.import.csv');
+
+    // Low Stocks
+    Route::get('low-stock', [LowStockController::class, 'index'])->name('low_stock.index');
+    Route::get('low-stock/download-csv', [LowStockController::class, 'downloadCsv'])->name('low_stock.download_csv');
+
 
     // Stock-Outs
     Route::get('/stock-outs', [StockOutController::class, 'index'])->name('stock_out.index');
