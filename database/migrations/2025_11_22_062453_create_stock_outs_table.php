@@ -14,12 +14,6 @@ return new class extends Migration
         Schema::create('stock_outs', function (Blueprint $table) {
             $table->id();
 
-            // NEW: Link to stock_in batch
-            $table->foreignId('stock_in_id')
-                ->nullable()
-                ->constrained('stock_ins')
-                ->cascadeOnDelete();
-
             $table->foreignId('product_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_variant_id')->nullable()->constrained()->cascadeOnDelete();
 

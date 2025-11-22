@@ -16,10 +16,16 @@ return new class extends Migration
             $table->foreignId('product_variant_id')->nullable()->constrained()->onDelete('cascade');
             
             $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
-            
+
+            // New relationships
+            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('stock_checker_id')->nullable()->constrained('stock_checkers')->onDelete('set null');
+
             $table->integer('quantity')->default(0);
             $table->integer('remaining_quantity')->default(0); // New column for remaining stock
             $table->string('reason')->nullable();
+            
+            $table->boolean('is_archived')->default(false); // Optional: archive flag
             
             $table->timestamps();
         });

@@ -11,8 +11,10 @@ class StockIn extends Model
         'product_id',
         'product_variant_id',
         'warehouse_id',
+        'supplier_id',       // added
+        'stock_checker_id',  // added
         'quantity',
-        'remaining_quantity', // add this so it can be mass-assigned
+        'remaining_quantity',
         'reason',
     ];
 
@@ -29,6 +31,16 @@ class StockIn extends Model
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function checker(): BelongsTo
+    {
+        return $this->belongsTo(StockChecker::class, 'stock_checker_id');
     }
 
     /**
