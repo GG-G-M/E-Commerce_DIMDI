@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\StockCheckerController;
 use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -71,11 +73,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
-    
+
     // NEW PAYMENT ROUTES FOR ORDERS
     Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');
     Route::get('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
-    
+
     // Rating
     Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
@@ -85,29 +87,29 @@ Route::middleware('auth')->group(function () {
 Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DeliveryDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Order Routes - STATIC ROUTES FIRST
     Route::get('/orders', [DeliveryOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/pickup', [DeliveryOrderController::class, 'pickup'])->name('orders.pickup');
     Route::get('/orders/delivered', [DeliveryOrderController::class, 'delivered'])->name('orders.delivered');
     Route::get('/orders/my-orders', [DeliveryOrderController::class, 'myOrders'])->name('orders.my-orders');
-    
+
     // PARAMETERIZED ROUTES LAST - CORRECTED METHOD NAMES
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/claim', [DeliveryOrderController::class, 'claimOrder'])->name('orders.claim');
     Route::post('/orders/{order}/deliver', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver');
-    
+
     // ADD THIS LINE TO FIX THE ERROR
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
-    
+
     // ADD THIS LINE TO FIX THE pickup-order ERROR
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'claimOrder'])->name('orders.pickup-order');
-    
+
     Route::post('/orders/{order}/unclaim', [DeliveryOrderController::class, 'unclaimOrder'])->name('orders.unclaim');
-    
+
     // ADD THIS LINE - For compatibility with existing views
     Route::post('/orders/{order}/pickup', [DeliveryOrderController::class, 'claimOrder'])->name('orders.markAsPickedUp');
-    
+
     // Profile Routes
     Route::get('/profile', [DeliveryProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [DeliveryProfileController::class, 'update'])->name('profile.update');
@@ -144,6 +146,22 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/warehouses/{id}/unarchive', [AdminWarehouseController::class, 'unarchive'])->name('warehouses.unarchive');
     Route::delete('/warehouses/{id}', [AdminWarehouseController::class, 'destroy'])->name('warehouses.destroy');
 
+    // Suppliers
+    Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
+    Route::post('/suppliers', [SupplierController::class, 'store'])->name('suppliers.store');
+    Route::put('/suppliers/{id}', [SupplierController::class, 'update'])->name('suppliers.update');
+    Route::post('/suppliers/{id}/archive', [SupplierController::class, 'archive'])->name('suppliers.archive');
+    Route::post('/suppliers/{id}/unarchive', [SupplierController::class, 'unarchive'])->name('suppliers.unarchive');
+    Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+    // Stock Checkers
+    Route::get('/stock-checkers', [StockCheckerController::class, 'index'])->name('stock_checkers.index');
+    Route::post('/stock-checkers', [StockCheckerController::class, 'store'])->name('stock_checkers.store');
+    Route::put('/stock-checkers/{id}', [StockCheckerController::class, 'update'])->name('stock_checkers.update');
+    Route::post('/stock-checkers/{id}/archive', [StockCheckerController::class, 'archive'])->name('stock_checkers.archive');
+    Route::post('/stock-checkers/{id}/unarchive', [StockCheckerController::class, 'unarchive'])->name('stock_checkers.unarchive');
+    Route::delete('/stock-checkers/{id}', [StockCheckerController::class, 'destroy'])->name('stock_checkers.destroy');
+
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
@@ -153,7 +171,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
     Route::post('/products/{product}/unarchive', [AdminProductController::class, 'unarchive'])->name('products.unarchive');
-    
+
     // CSV Upload Routes
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
@@ -174,7 +192,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
-    
+
     // REFUND ROUTES
     Route::get('/orders/{order}/refund', [AdminOrderController::class, 'showRefund'])->name('orders.refund.show');
     Route::post('/orders/{order}/refund', [AdminOrderController::class, 'processRefund'])->name('orders.refund.process');
@@ -199,7 +217,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Brand Routes
     Route::resource('brands', BrandController::class);
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
-    
+
     // SALES REPORT ROUTES
     Route::prefix('sales-report')->name('sales-report.')->group(function () {
         Route::get('/', [SalesReportController::class, 'index'])->name('index');

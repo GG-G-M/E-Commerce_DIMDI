@@ -11,7 +11,10 @@ class StockIn extends Model
         'product_id',
         'product_variant_id',
         'warehouse_id',
+        'supplier_id',       // added
+        'stock_checker_id',  // added
         'quantity',
+        'remaining_quantity',
         'reason',
     ];
 
@@ -30,21 +33,47 @@ class StockIn extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
+    public function checker(): BelongsTo
+    {
+        return $this->belongsTo(StockChecker::class, 'stock_checker_id');
+    }
+
     /**
-     * Update stock quantity after creating a stock-in
+     * MANY-TO-MANY (FIFO batches consumed by stock-out)
+     */
+    public function stockOutLogs()
+    {
+        return $this->belongsToMany(StockOut::class, 'stock_in_stock_out')
+                    ->withPivot('deducted_quantity')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Auto-set remaining_quantity on creation
      */
     protected static function booted()
     {
-        static::created(function ($stockIn) {
-            if ($stockIn->product_id) {
-                $product = $stockIn->product;
-                $product->increment('stock_quantity', $stockIn->quantity);
-            } elseif ($stockIn->product_variant_id) {
-                $variant = $stockIn->variant;
-                $variant->increment('stock_quantity', $stockIn->quantity);
+        static::creating(function ($stockIn) {
+            $stockIn->remaining_quantity = $stockIn->quantity;
+        });
 
-                // Optionally, update parent product total stock
-                $variant->product->updateTotalStock();
+        static::created(function ($stockIn) {
+            // Increment product or variant total stock
+            if ($stockIn->product_id) {
+                $stockIn->product->increment('stock_quantity', $stockIn->quantity);
+            }
+
+            if ($stockIn->product_variant_id) {
+                $stockIn->variant->increment('stock_quantity', $stockIn->quantity);
+                // Optional: update parent product total stock
+                if (method_exists($stockIn->variant->product, 'updateTotalStock')) {
+                    $stockIn->variant->product->updateTotalStock();
+                }
             }
         });
     }

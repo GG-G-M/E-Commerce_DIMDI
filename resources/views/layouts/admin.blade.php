@@ -126,6 +126,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}"
+                                href="{{ route('admin.suppliers.index') }}">
+                                <i class="fas fa-truck-loading me-2"></i>Suppliers
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.stock_checkers.*') ? 'active' : '' }}"
+                                href="{{ route('admin.stock_checkers.index') }}">
+                                <i class="fas fa-user-check me-2"></i>Stock Checkers
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
                                 href="{{ route('admin.categories.index') }}">
                                 <i class="fas fa-tags me-2"></i>Categories
@@ -210,7 +222,8 @@
                                         <i class="fas fa-user me-1"></i> {{ Auth::user()->name }}
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{{ route('profile.show') }}">My Profile</a>
+                                        <li><a class="dropdown-item" href="{{ route('profile.show') }}">My
+                                                Profile</a>
                                         </li>
                                     </ul>
                                 </li>
