@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\StockCheckerController;
 use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -152,6 +153,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/suppliers/{id}/archive', [SupplierController::class, 'archive'])->name('suppliers.archive');
     Route::post('/suppliers/{id}/unarchive', [SupplierController::class, 'unarchive'])->name('suppliers.unarchive');
     Route::delete('/suppliers/{id}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
+
+    // Stock Checkers
+    Route::get('/stock-checkers', [StockCheckerController::class, 'index'])->name('stock_checkers.index');
+    Route::post('/stock-checkers', [StockCheckerController::class, 'store'])->name('stock_checkers.store');
+    Route::put('/stock-checkers/{id}', [StockCheckerController::class, 'update'])->name('stock_checkers.update');
+    Route::post('/stock-checkers/{id}/archive', [StockCheckerController::class, 'archive'])->name('stock_checkers.archive');
+    Route::post('/stock-checkers/{id}/unarchive', [StockCheckerController::class, 'unarchive'])->name('stock_checkers.unarchive');
+    Route::delete('/stock-checkers/{id}', [StockCheckerController::class, 'destroy'])->name('stock_checkers.destroy');
 
     // Products
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
