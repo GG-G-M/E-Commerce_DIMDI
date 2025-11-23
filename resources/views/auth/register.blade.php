@@ -66,7 +66,7 @@
             background: linear-gradient(135deg, rgba(40, 167, 69, 0.7), rgba(33, 136, 56, 0.8));
         }
         
-        /* Header Styles - Compact */
+        /* Header Styles */
         .register-header {
             text-align: center;
             margin-bottom: 2rem;
@@ -97,7 +97,7 @@
             font-size: 0.9rem;
         }
         
-        /* Form Styles - Compact */
+        /* Form Styles */
         .register-form {
             max-width: 100%;
             margin: 0 auto;
@@ -146,7 +146,7 @@
             font-size: 0.9rem;
         }
         
-        /* Button Styles - Compact */
+        /* Button Styles */
         .btn-register {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             border: none;
@@ -164,6 +164,100 @@
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
         
+        /* NDA Section Styles */
+        .nda-section {
+            background: #f8fff8;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+        }
+        
+        .nda-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .nda-text {
+            line-height: 1.4;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .nda-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .nda-checkbox input {
+            margin-top: 2px;
+        }
+        
+        .nda-checkbox label {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: #555;
+            cursor: pointer;
+        }
+        
+        .nda-link {
+            color: var(--primary-color);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        
+        .nda-link:hover {
+            color: var(--primary-dark);
+        }
+        
+        /* NDA Modal Styles */
+        .nda-modal .modal-content {
+            border-radius: 12px;
+            border: none;
+        }
+        
+        .nda-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-bottom: none;
+        }
+        
+        .nda-modal .modal-body {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .nda-content {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .nda-content h4 {
+            color: var(--primary-color);
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .nda-content p {
+            margin-bottom: 0.8rem;
+        }
+        
+        .nda-content ul {
+            padding-left: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .nda-content li {
+            margin-bottom: 0.3rem;
+        }
+
         /* Options and Links */
         .login-link {
             text-align: center;
@@ -188,7 +282,7 @@
             margin-top: 0.25rem;
         }
         
-        /* Home/Back Button - Compact */
+        /* Home/Back Button */
         .home-btn {
             position: absolute;
             top: 20px;
@@ -235,14 +329,25 @@
             padding-top: 1rem;
         }
         
-        /* Responsive adjustments */
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .register-card {
+                max-width: 900px;
+            }
+        }
+        
         @media (max-width: 992px) {
             .register-image-section {
                 display: none;
             }
             
             .register-card {
-                max-width: 600px;
+                max-width: 700px;
+                min-height: auto;
+            }
+            
+            .register-form-section {
+                padding: 2rem;
             }
         }
         
@@ -273,24 +378,30 @@
                 max-width: 100%;
             }
             
-            .row {
-                margin-left: -0.5rem;
-                margin-right: -0.5rem;
+            /* Improved mobile form layout */
+            .row-cols-md-3 > .col {
+                flex: 0 0 100%;
+                max-width: 100%;
             }
             
             .row > [class*="col-"] {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
+                margin-bottom: 0.5rem;
             }
         }
         
         @media (max-width: 576px) {
             body {
                 padding: 10px;
+                align-items: flex-start;
+            }
+            
+            .register-card {
+                margin: 10px 0;
+                min-height: auto;
             }
             
             .register-form-section {
-                padding: 1rem;
+                padding: 1.25rem;
             }
             
             .form-group {
@@ -298,27 +409,104 @@
             }
             
             .btn-register {
-                margin: 0.5rem 0;
+                margin: 0.75rem 0;
                 padding: 10px;
+                font-size: 0.95rem;
+            }
+            
+            /* Stack all columns on very small screens */
+            .row > [class*="col-"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            /* Adjust form spacing for mobile */
+            .form-control {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .form-label {
+                font-size: 0.8rem;
+            }
+            
+            /* NDA section mobile adjustments */
+            .nda-section {
+                padding: 12px;
+                margin: 0.75rem 0;
+            }
+            
+            .nda-checkbox {
+                align-items: flex-start;
+            }
+            
+            .nda-checkbox label {
+                font-size: 0.7rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .register-form-section {
+                padding: 1rem;
+            }
+            
+            .register-header {
+                margin-bottom: 1.5rem;
+            }
+            
+            .register-title {
+                font-size: 1.2rem;
+            }
+            
+            .register-subtitle {
+                font-size: 0.8rem;
+            }
+            
+            .home-btn {
+                top: 10px;
+                left: 10px;
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            
+            .btn-register {
+                padding: 8px;
+                font-size: 0.9rem;
             }
         }
         
         @media (max-height: 700px) {
+            body {
+                align-items: flex-start;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+            
             .register-form-section {
-                padding: 1rem 2rem;
+                padding: 1.5rem 2rem;
                 justify-content: flex-start;
             }
             
             .register-header {
                 margin-bottom: 1.5rem;
             }
+            
+            .form-content {
+                justify-content: flex-start;
+            }
         }
-        
-        /* Custom column adjustments for better mobile layout */
-        @media (max-width: 400px) {
-            .row-cols-md-3 > [class*="col-"] {
-                flex: 0 0 100%;
-                max-width: 100%;
+
+        /* Print styles */
+        @media print {
+            .register-image-section,
+            .home-btn {
+                display: none;
+            }
+            
+            .register-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
             }
         }
     </style>
@@ -343,7 +531,7 @@
                     </div>
                     
                     <!-- Registration Form -->
-                    <form method="POST" action="{{ route('register') }}" class="register-form">
+                    <form method="POST" action="{{ route('register') }}" class="register-form" id="registerForm">
                         @csrf
 
                         <div class="row row-cols-1 row-cols-md-3">
@@ -437,7 +625,6 @@
                                        class="form-control" 
                                        name="password_confirmation" required autocomplete="new-password"
                                        placeholder="Confirm password">
-                                
                             </div>
                         </div>
 
@@ -508,6 +695,24 @@
                             @enderror
                         </div>
 
+                        <!-- NDA Agreement Section -->
+                        <div class="nda-section">
+                            <div class="nda-title">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Confidentiality Agreement
+                            </div>
+                            <div class="nda-text">
+                                By creating an account, you agree to maintain the confidentiality of all proprietary information and data you may encounter while using our services.
+                            </div>
+                            <div class="nda-checkbox">
+                                <input type="checkbox" id="ndaAgreement" name="nda_agreement" required>
+                                <label for="ndaAgreement">
+                                    I agree to the <span class="nda-link" data-bs-toggle="modal" data-bs-target="#ndaModal">Non-Disclosure Agreement</span> 
+                                    and understand that unauthorized disclosure may result in legal action.
+                                </label>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-register" style="color: white">
                             Create Account
                         </button>
@@ -530,59 +735,124 @@
         </div>
     </div>
 
+    <!-- NDA Modal -->
+    <div class="modal fade nda-modal" id="ndaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Non-Disclosure Agreement
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="nda-content">
+                        <h4>CONFIDENTIALITY AGREEMENT</h4>
+                        <p><strong>Effective Date:</strong> {{ date('F d, Y') }}</p>
+                        
+                        <h4>1. PURPOSE</h4>
+                        <p>The purpose of this Non-Disclosure Agreement (NDA) is to protect confidential information that may be disclosed between the parties.</p>
+                        
+                        <h4>2. DEFINITION OF CONFIDENTIAL INFORMATION</h4>
+                        <p>For purposes of this Agreement, "Confidential Information" shall include all information or material that has or could have commercial value or other utility in the business in which Disclosing Party is engaged.</p>
+                        
+                        <h4>3. OBLIGATIONS OF RECEIVING PARTY</h4>
+                        <p>Both parties agree to:</p>
+                        <ul>
+                            <li>Maintain the confidentiality of the Confidential Information</li>
+                            <li>Not disclose any Confidential Information to any third parties</li>
+                            <li>Use the Confidential Information only for authorized purposes</li>
+                            <li>Protect the Confidential Information with the same degree of care used to protect their own confidential information</li>
+                        </ul>
+                        
+                        <h4>4. TIME PERIODS</h4>
+                        <p>The obligations of confidentiality shall survive the termination of this Agreement and shall continue for a period of 3 years from the date of disclosure.</p>
+                        
+                        <h4>5. RETURN OF CONFIDENTIAL INFORMATION</h4>
+                        <p>Upon request, all documents and materials containing Confidential Information shall be returned to the Disclosing Party or destroyed.</p>
+                        
+                        <h4>6. REMEDIES</h4>
+                        <p>Any violation of this Agreement may result in irreparable injury to the Disclosing Party, who shall be entitled to seek equitable relief, including injunctive relief and specific performance.</p>
+                        
+                        <h4>7. GENERAL PROVISIONS</h4>
+                        <p>This Agreement constitutes the entire understanding between the parties and supersedes all prior discussions, representations, and understandings.</p>
+                        
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <p class="mb-1"><strong>By checking the agreement box and creating an account, you acknowledge that you have read, understood, and agree to be bound by the terms of this Non-Disclosure Agreement.</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Password toggle functionality
-        function setupPasswordToggle(inputId, buttonId) {
-            const toggleBtn = document.getElementById(buttonId);
-            const passwordInput = document.getElementById(inputId);
-            
-            if (toggleBtn && passwordInput) {
-                toggleBtn.addEventListener('click', function() {
-                    const icon = this.querySelector('i');
-                    
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
-                    }
-                });
-            }
-        }
-
-        setupPasswordToggle('password', 'togglePassword');
-        setupPasswordToggle('password-confirm', 'togglePasswordConfirm');
+        const registerForm = document.getElementById('registerForm');
+        const ndaCheckbox = document.getElementById('ndaAgreement');
 
         // Form validation enhancements
-        const form = document.querySelector('form');
-        const inputs = form.querySelectorAll('input[required], textarea[required]');
-        
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                if (this.value.trim() === '') {
-                    this.classList.add('is-invalid');
-                } else {
-                    this.classList.remove('is-invalid');
+        registerForm.addEventListener('submit', function(e) {
+            let hasError = false;
+            const requiredFields = registerForm.querySelectorAll('input[required], textarea[required]');
+            
+            // Check required fields
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    hasError = true;
                 }
             });
             
+            // Check NDA agreement
+            if (!ndaCheckbox.checked) {
+                e.preventDefault();
+                alert('Please agree to the Non-Disclosure Agreement to create your account.');
+                hasError = true;
+                // Scroll to NDA section
+                ndaCheckbox.closest('.nda-section').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+            
+            // Check password match
+            const password = document.getElementById('password');
+            const passwordConfirm = document.getElementById('password-confirm');
+            if (password.value !== passwordConfirm.value) {
+                passwordConfirm.classList.add('is-invalid');
+                hasError = true;
+            }
+            
+            if (hasError) {
+                e.preventDefault();
+            }
+        });
+
+        // Clear validation on input
+        const inputs = registerForm.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
             input.addEventListener('input', function() {
-                if (this.value.trim() !== '') {
-                    this.classList.remove('is-invalid');
+                this.classList.remove('is-invalid');
+                
+                // Real-time password validation
+                if (this.id === 'password' || this.id === 'password-confirm') {
+                    validatePassword();
                 }
             });
         });
         
         // Password confirmation validation
-        const password = document.getElementById('password');
-        const passwordConfirm = document.getElementById('password-confirm');
-        
         function validatePassword() {
+            const password = document.getElementById('password');
+            const passwordConfirm = document.getElementById('password-confirm');
+            
             if (password.value && passwordConfirm.value && password.value !== passwordConfirm.value) {
                 passwordConfirm.classList.add('is-invalid');
             } else {
@@ -590,15 +860,17 @@
             }
         }
         
-        password.addEventListener('input', validatePassword);
-        passwordConfirm.addEventListener('input', validatePassword);
+        // Auto-check NDA if user clicks "I Understand" in modal
+        document.querySelector('#ndaModal .btn-primary').addEventListener('click', function() {
+            ndaCheckbox.checked = true;
+        });
 
-        // Adjust layout for small screens
+        // Adjust layout for different screen sizes
         function adjustLayout() {
             const formContent = document.querySelector('.form-content');
             const container = document.querySelector('.register-form-section');
             
-            if (window.innerHeight < 600) {
+            if (window.innerHeight < 600 || window.innerWidth < 576) {
                 formContent.style.justifyContent = 'flex-start';
                 container.style.padding = '1rem';
             } else {
@@ -608,6 +880,11 @@
 
         window.addEventListener('load', adjustLayout);
         window.addEventListener('resize', adjustLayout);
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', function() {
+            setTimeout(adjustLayout, 100);
+        });
     });
     </script>
 </body>

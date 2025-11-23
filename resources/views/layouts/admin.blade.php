@@ -20,10 +20,47 @@
             min-height: 100vh;
             background: linear-gradient(180deg, var(--primary-green) 0%, var(--dark-green) 100%);
             box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            /* Reserve space for scrollbar */
+            padding-right: 4px;
         }
 
         .sidebar .position-sticky {
             padding-top: 1rem;
+            height: 100vh;
+            overflow-y: auto;
+            /* Prevent content shift */
+            width: calc(100% - 4px);
+        }
+
+        /* Modern subtle scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .sidebar:hover::-webkit-scrollbar-thumb {
+            opacity: 1;
+        }
+
+        /* Firefox scrollbar */
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
         }
 
         .sidebar h4 {
@@ -32,6 +69,10 @@
             padding: 1rem 1.5rem;
             margin-bottom: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            /* Prevent text wrapping */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sidebar .nav-link {
@@ -41,6 +82,10 @@
             border-radius: 8px;
             transition: all 0.3s ease;
             font-weight: 500;
+            /* Prevent text wrapping */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sidebar .nav-link:hover {
@@ -59,6 +104,7 @@
             width: 20px;
             margin-right: 10px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .sidebar .btn-link {
@@ -70,6 +116,10 @@
             border: none;
             background: transparent;
             font-weight: 500;
+            /* Prevent text wrapping */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .sidebar .btn-link:hover {
@@ -77,8 +127,45 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Adjust nested menu items */
+        .sidebar .nav.flex-column.ms-3 .nav-link {
+            padding-left: 2rem;
+            font-size: 0.9rem;
+        }
+
         .bg-white {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Main content area with modern scrollbar */
+        main {
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Modern scrollbar for main content */
+        main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        main::-webkit-scrollbar-track {
+            background: #f8f9fa;
+        }
+
+        main::-webkit-scrollbar-thumb {
+            background: rgba(44, 143, 12, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        main::-webkit-scrollbar-thumb:hover {
+            background: rgba(44, 143, 12, 0.4);
+        }
+
+        /* Firefox scrollbar for main */
+        main {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(44, 143, 12, 0.2) #f8f9fa;
         }
 
         /* Chart Styles */
@@ -86,6 +173,26 @@
             position: relative;
             height: 300px;
             width: 100%;
+        }
+
+        /* Ensure dropdown icons don't cause wrapping */
+        .sidebar .nav-link .float-end {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* Make sidebar content flex to handle text properly */
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link span {
+            flex: 1;
+            min-width: 0; /* Allow text truncation */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
@@ -104,14 +211,16 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                                 href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                <span>Dashboard</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.customers.*') ? 'active' : '' }}"
                                 href="{{ route('admin.customers.index') }}">
-                                <i class="fas fa-users me-2"></i>Customers
+                                <i class="fas fa-users me-2"></i>
+                                <span>Customers</span>
                             </a>
                         </li>
 
@@ -119,7 +228,8 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" data-bs-toggle="collapse" href="#managementMenu"
                                 role="button" aria-expanded="false" aria-controls="managementMenu">
-                                <i class="fas fa-cogs me-2"></i>Management
+                                <i class="fas fa-cogs me-2"></i>
+                                <span>Management</span>
                                 <i class="fas fa-chevron-down float-end"></i>
                             </a>
 
@@ -139,49 +249,56 @@
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}"
                                             href="{{ route('admin.suppliers.index') }}">
-                                            <i class="fas fa-truck-loading me-2"></i>Suppliers
+                                            <i class="fas fa-truck-loading me-2"></i>
+                                            <span>Suppliers</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}"
                                             href="{{ route('admin.warehouses.index') }}">
-                                            <i class="fas fa-warehouse me-2"></i>Warehouses
+                                            <i class="fas fa-warehouse me-2"></i>
+                                            <span>Warehouses</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.stock_checkers.*') ? 'active' : '' }}"
                                             href="{{ route('admin.stock_checkers.index') }}">
-                                            <i class="fas fa-user-check me-2"></i>Stock Checkers
+                                            <i class="fas fa-user-check me-2"></i>
+                                            <span>Stock Checkers</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
                                             href="{{ route('admin.deliveries.index') }}">
-                                            <i class="fas fa-truck me-2"></i>Delivery
+                                            <i class="fas fa-truck me-2"></i>
+                                            <span>Delivery</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
                                             href="{{ route('admin.categories.index') }}">
-                                            <i class="fas fa-tags me-2"></i>Categories
+                                            <i class="fas fa-tags me-2"></i>
+                                            <span>Categories</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
                                             href="{{ route('admin.brands.index') }}">
-                                            <i class="fas fa-tag me-2"></i>Brands
+                                            <i class="fas fa-tag me-2"></i>
+                                            <span>Brands</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}"
                                             href="{{ route('admin.banners.index') }}">
-                                            <i class="fas fa-image me-2"></i>Banners
+                                            <i class="fas fa-image me-2"></i>
+                                            <span>Banners</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -193,7 +310,8 @@
                         <li class="nav-item">
                             <a class="nav-link collapsed" data-bs-toggle="collapse" href="#inventoryMenu" role="button"
                                 aria-expanded="false" aria-controls="inventoryMenu">
-                                <i class="fas fa-boxes me-2"></i>Inventory
+                                <i class="fas fa-boxes me-2"></i>
+                                <span>Inventory</span>
                                 <i class="fas fa-chevron-down float-end"></i>
                             </a>
 
@@ -210,28 +328,32 @@
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"
                                             href="{{ route('admin.products.index') }}">
-                                            <i class="fas fa-box me-2"></i>Products
+                                            <i class="fas fa-box me-2"></i>
+                                            <span>Products</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.low_stock.*') ? 'active' : '' }}"
                                             href="{{ route('admin.low_stock.index') }}">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>Low Stocks
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            <span>Low Stocks</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.stock_in.*') ? 'active' : '' }}"
                                             href="{{ route('admin.stock_in.index') }}">
-                                            <i class="fas fa-boxes me-2"></i>Stock-In
+                                            <i class="fas fa-boxes me-2"></i>
+                                            <span>Stock-In</span>
                                         </a>
                                     </li>
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.stock_out.*') ? 'active' : '' }}"
                                             href="{{ route('admin.stock_out.index') }}">
-                                            <i class="fas fa-box-open me-2"></i>Stock-Out
+                                            <i class="fas fa-box-open me-2"></i>
+                                            <span>Stock-Out</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -243,25 +365,29 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
                                 href="{{ route('admin.orders.index') }}">
-                                <i class="fas fa-shopping-cart me-2"></i>Orders
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                <span>Orders</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}"
                                 href="{{ route('admin.sales-report.index') }}">
-                                <i class="fas fa-chart-line me-2"></i>Sales Reports
+                                <i class="fas fa-chart-line me-2"></i>
+                                <span>Sales Reports</span>
                             </a>
                         </li>
 
                         <li class="nav-item mt-4">
                             <a class="nav-link" href="{{ route('home') }}">
-                                <i class="fas fa-store me-2"></i>View Store
+                                <i class="fas fa-store me-2"></i>
+                                <span>View Store</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                <span>Logout</span>
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                 @csrf

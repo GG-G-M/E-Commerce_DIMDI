@@ -13,7 +13,8 @@ class DeliveryController extends Controller
 {
     public function index()
     {
-        $deliveries = User::where('role', 'delivery')->latest()->get();
+        // Change this line from get() to paginate()
+        $deliveries = User::where('role', 'delivery')->latest()->paginate(10);
         return view('admin.deliveries.index', compact('deliveries'));
     }
 

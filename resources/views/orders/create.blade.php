@@ -122,7 +122,7 @@
                                         ₱{{ number_format($item->unit_price, 2) }}</small>
                                     @if ($item->selected_size)
                                         <br>
-                                        <small class="text-muted">Size: {{ $item->selected_size }}</small>
+                                        <small class="text-muted">Variant: {{ $item->selected_size }}</small>
                                     @endif
                                 </div>
                                 <span class="text-success">₱{{ number_format($item->total_price, 2) }}</span>

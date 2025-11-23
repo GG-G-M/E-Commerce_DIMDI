@@ -25,6 +25,13 @@
     .btn-primary:hover {
         background-color: #25750A !important;
     }
+    .btn-success {
+        background-color: #198754 !important;
+        border: none;
+    }
+    .btn-success:hover {
+        background-color: #157347 !important;
+    }
     .btn-outline-primary {
         color: #2C8F0C;
         border-color: #2C8F0C;
@@ -114,6 +121,16 @@
     .star-rating .fas,
     .star-rating .far {
         color: #ffc107;
+    }
+    .btn-buy-now {
+        background: linear-gradient(135deg, #FF6B35, #FF8E53) !important;
+        border: none;
+        color: white;
+        font-weight: 600;
+    }
+    .btn-buy-now:hover {
+        background: linear-gradient(135deg, #E55A2B, #FF7B3A) !important;
+        color: white;
     }
 </style>
 
@@ -228,19 +245,36 @@
             </div>
 
             @if($product->in_stock)
-            <form action="{{ route('cart.store') }}" method="POST" class="mb-4" id="add-to-cart-form">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <input type="hidden" name="quantity" value="1" id="quantity-input">
-                <input type="hidden" name="selected_size" id="selected_variant_input" 
-                       value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg add-to-cart-btn" id="add-to-cart-btn">
-                        <i class="fas fa-cart-plus me-2"></i>Add to Cart
-                    </button>
+            <!-- Action Buttons -->
+            <div class="row g-3 mb-4">
+                <!-- Buy Now Button -->
+                <div class="col-md-6">
+                    <form action="{{ route('orders.create') }}" method="GET" id="buy-now-form">
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1" id="buy-now-quantity">
+                        <input type="hidden" name="selected_size" id="buy-now-variant-input" 
+                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
+                        <input type="hidden" name="direct_checkout" value="true">
+                        <button type="submit" class="btn btn-buy-now btn-lg w-100" id="buy-now-btn">
+                            <i class="fas fa-bolt me-2"></i>Buy Now
+                        </button>
+                    </form>
                 </div>
-            </form>
+                
+                <!-- Add to Cart Button -->
+                <div class="col-md-6">
+                    <form action="{{ route('cart.store') }}" method="POST" id="add-to-cart-form">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1" id="quantity-input">
+                        <input type="hidden" name="selected_size" id="selected_variant_input" 
+                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 add-to-cart-btn" id="add-to-cart-btn">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             {{-- <!-- Message Button -->
             <div class="d-grid mb-4">
@@ -343,7 +377,7 @@
         </div>
     </section>
     @endif
-</div>
+
     <!-- Rating Section -->
     <div class="row mt-5">
         <div class="col-12">
@@ -455,6 +489,7 @@
             </div>
         </div>
     </div>
+</div>
 
 @push('scripts')
 <script>
@@ -463,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const productPrice = document.getElementById('product-price');
     const productOriginalPrice = document.getElementById('product-original-price');
     const variantInput = document.getElementById('selected_variant_input');
+    const buyNowVariantInput = document.getElementById('buy-now-variant-input');
     const variantRadios = document.querySelectorAll('input[name="selected_variant"]');
     
     // Update selected variant when user clicks on a variant option
@@ -475,8 +511,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const hasDiscount = this.getAttribute('data-variant-has-discount') === 'true';
                 const discountPercent = this.getAttribute('data-variant-discount-percent');
                 
-                // Update selected variant value
+                // Update selected variant value for both forms
                 variantInput.value = this.value;
+                buyNowVariantInput.value = this.value;
                 
                 // Update image with smooth transition
                 if (variantImage && variantImage !== mainImage.src) {
@@ -555,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.closest('.form-check').querySelector('.variant-option').classList.add('selected');
                 
                 // Update add to cart button state
-                updateAddToCartButton();
+                updateButtonStates();
             }
         });
     });
@@ -571,25 +608,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    function updateAddToCartButton() {
+    function updateButtonStates() {
         const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
         const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const buyNowBtn = document.getElementById('buy-now-btn');
         
         if (selectedVariant && selectedVariant.disabled) {
             addToCartBtn.disabled = true;
             addToCartBtn.innerHTML = '<i class="fas fa-times me-2"></i>Out of Stock';
             addToCartBtn.classList.remove('btn-primary');
             addToCartBtn.classList.add('btn-secondary');
+            
+            buyNowBtn.disabled = true;
+            buyNowBtn.innerHTML = '<i class="fas fa-times me-2"></i>Out of Stock';
+            buyNowBtn.classList.remove('btn-buy-now');
+            buyNowBtn.classList.add('btn-secondary');
         } else {
             addToCartBtn.disabled = false;
             addToCartBtn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
             addToCartBtn.classList.remove('btn-secondary');
             addToCartBtn.classList.add('btn-primary');
+            
+            buyNowBtn.disabled = false;
+            buyNowBtn.innerHTML = '<i class="fas fa-bolt me-2"></i>Buy Now';
+            buyNowBtn.classList.remove('btn-secondary');
+            buyNowBtn.classList.add('btn-buy-now');
         }
     }
 
     // Initialize button state
-    updateAddToCartButton();
+    updateButtonStates();
 
     // Add to cart form handling
     const addToCartForm = document.getElementById('add-to-cart-form');
@@ -650,6 +698,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
             });
+        });
+    }
+
+    // Buy Now form handling
+    const buyNowForm = document.getElementById('buy-now-form');
+    
+    if (buyNowForm) {
+        buyNowForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('#buy-now-btn');
+            const originalText = submitBtn.innerHTML;
+            
+            // Validate variant selection only if product has variants
+            if (variantRadios.length > 0) {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                if (!selectedVariant || selectedVariant.disabled) {
+                    e.preventDefault();
+                    showToast('Please select an available option before purchasing.', 'warning');
+                    return;
+                }
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            
+            // Allow form to submit normally (redirect to orders create page)
+            // The form will handle the redirect
         });
     }
     

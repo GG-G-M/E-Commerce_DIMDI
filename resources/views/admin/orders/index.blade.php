@@ -68,19 +68,14 @@
         transition: background-color 0.2s ease;
     }
 
-    .badge {
-        padding: 0.5em 0.75em;
-        font-size: 0.85em;
-        font-weight: 600;
-        border-radius: 6px;
-    }
+    /* Status indicators (replaced badges) */
 
-    .badge-success { background-color: #2C8F0C !important; color: #fff; }
-    .badge-info { background-color: #4CAF50 !important; color: #fff; }
-    .badge-primary { background-color: #1E6A08 !important; color: #fff; }
-    .badge-warning { background-color: #FFC107 !important; color: #000; }
-    .badge-danger { background-color: #C62828 !important; color: #fff; }
-    .badge-secondary { background-color: #6C757D !important; color: #fff; }
+    .status-cancelled {color: #000000ff; }
+    .status-delivered {color: #000000ff; }
+    .status-shipped {color: #000000ff; }
+    .status-processing { color: #000000ff; }
+    .status-confirmed {  color: #000000ff; }
+    .status-pending {color: #000; #000; }
 
     .btn-outline-primary {
         color: #2C8F0C;
@@ -92,17 +87,33 @@
         color: #fff;
     }
 
+    /* Fixed Pagination Styling */
+    .pagination {
+        margin-bottom: 0;
+    }
+    
     .pagination .page-item.active .page-link {
         background-color: #2C8F0C;
         border-color: #2C8F0C;
+        color: white;
     }
 
     .pagination .page-link {
         color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 0.75rem;
     }
 
     .pagination .page-link:hover {
         background-color: #E8F5E6;
+        color: #1E6A08;
+        border-color: #2C8F0C;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
     }
 
     /* Button group fixes */
@@ -112,6 +123,22 @@
 
     .btn-group .btn:last-child {
         margin-right: 0;
+    }
+
+    /* Filter form styling */
+    .filter-form .form-control:focus,
+    .filter-form .form-select:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
+    }
+
+    /* Loading indicator for search */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
     }
 </style>
 
@@ -127,32 +154,32 @@
         <i class="fas fa-filter me-2"></i> Filters & Search
     </div>
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.orders.index') }}">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="filter-form" id="filterForm">
             <div class="row align-items-end">
                 <div class="col-md-6">
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Orders</label>
                         <input type="text" class="form-control" id="search" name="search"
                             value="{{ request('search') }}" placeholder="Search by order number, customer name, email, or phone...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
+                            <option value="">All Statuses</option>
                             @foreach($statuses as $key => $label)
-                            <option value="{{ $key }}" {{ request('status', 'active') == $key ? 'selected' : '' }}>
+                            <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>
                                 {{ $label }}
                             </option>
                             @endforeach
                         </select>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="mb-3">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-check me-1"></i> Apply
-                    </button>
                 </div>
             </div>
         </form>
@@ -162,8 +189,10 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <i class="fas fa-shopping-cart me-2"></i> Orders List
+        <span class="badge bg-light text-dark ms-2">{{ $orders->total() }} orders</span>
     </div>
     <div class="card-body">
+        @if($orders->count() > 0)
         <div class="table-responsive">
             <table class="table align-middle table-hover">
                 <thead>
@@ -185,13 +214,7 @@
                         <td>{{ $order->customer_email }}</td>
                         <td>₱{{ number_format($order->total_amount, 2) }}</td>
                         <td>
-                            <span class="badge bg-{{ 
-                                $order->order_status == 'cancelled' ? 'danger' :
-                                ($order->order_status == 'delivered' ? 'success' :
-                                ($order->order_status == 'shipped' ? 'info' :
-                                ($order->order_status == 'processing' ? 'primary' :
-                                ($order->order_status == 'confirmed' ? 'secondary' : 'warning')))) 
-                            }}">
+                            <span class="status-badge status-{{ $order->order_status }}">
                                 {{ ucfirst($order->order_status) }}
                             </span>
                             @if($order->order_status == 'cancelled' && $order->cancellation_reason)
@@ -218,9 +241,49 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-center mt-3">
+        @if($orders->hasPages())
+        <div class="d-flex justify-content-center mt-4">
             {{ $orders->links() }}
         </div>
+        @endif
+
+        @else
+        <div class="text-center py-5">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No orders found</h4>
+            <p class="text-muted">Try adjusting your search or filter criteria</p>
+        </div>
+        @endif
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search');
+        const statusSelect = document.getElementById('status');
+        const filterForm = document.getElementById('filterForm');
+        const searchLoading = document.getElementById('searchLoading');
+        let searchTimeout;
+
+        // Auto-submit search with delay
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchLoading.style.display = 'block';
+            
+            searchTimeout = setTimeout(() => {
+                filterForm.submit();
+            }, 800);
+        });
+
+        // Auto-submit status filter immediately
+        statusSelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+
+        // Clear loading indicator when form submits
+        filterForm.addEventListener('submit', function() {
+            searchLoading.style.display = 'none';
+        });
+    });
+</script>
 @endsection

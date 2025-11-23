@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str; // Add this
 
 class BannerController extends Controller
 {
@@ -34,19 +35,22 @@ class BannerController extends Controller
         ]);
 
         try {
-            // Create banners directory if it doesn't exist
-            if (!Storage::exists('public/banners')) {
-                Storage::makeDirectory('public/banners');
+            // Create banners directory in public/images/banners (like your products)
+            $directory = public_path('images/banners');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
             }
 
-            // Store image
-            $imagePath = $request->file('image')->store('public/banners');
-            $imageName = basename($imagePath);
+            // Store image like your ProductController does
+            $image = $request->file('image');
+            $imageName = time() . '_' . Str::slug($request->title) . '.' . $image->getClientOriginalExtension();
+            $image->move($directory, $imageName);
+            $imagePath = 'images/banners/' . $imageName;
 
             Banner::create([
                 'title' => $request->title,
                 'description' => $request->description,
-                'image_path' => $imageName,
+                'image_path' => $imagePath, // Store full path like products
                 'alt_text' => $request->alt_text,
                 'target_url' => $request->target_url,
                 'order' => $request->order ?? 0,
@@ -88,14 +92,18 @@ class BannerController extends Controller
 
             // Update image if new one is uploaded
             if ($request->hasFile('image')) {
-                // Delete old image
-                if (Storage::exists('public/banners/' . $banner->image_path)) {
-                    Storage::delete('public/banners/' . $banner->image_path);
+                $directory = public_path('images/banners');
+                
+                // Delete old image if it exists
+                if ($banner->image_path && file_exists(public_path($banner->image_path))) {
+                    unlink(public_path($banner->image_path));
                 }
 
                 // Store new image
-                $imagePath = $request->file('image')->store('public/banners');
-                $data['image_path'] = basename($imagePath);
+                $image = $request->file('image');
+                $imageName = time() . '_' . Str::slug($request->title) . '.' . $image->getClientOriginalExtension();
+                $image->move($directory, $imageName);
+                $data['image_path'] = 'images/banners/' . $imageName;
             }
 
             $banner->update($data);
@@ -109,9 +117,9 @@ class BannerController extends Controller
     public function destroy(Banner $banner)
     {
         try {
-            // Delete image file
-            if (Storage::exists('public/banners/' . $banner->image_path)) {
-                Storage::delete('public/banners/' . $banner->image_path);
+            // Delete image file from public directory
+            if ($banner->image_path && file_exists(public_path($banner->image_path))) {
+                unlink(public_path($banner->image_path));
             }
 
             $banner->delete();

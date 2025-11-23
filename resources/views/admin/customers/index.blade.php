@@ -78,6 +78,19 @@
         font-weight: 600;
         color: #2C8F0C;
     }
+
+    /* Loading indicator for search */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
 </style>
 
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -93,20 +106,25 @@
         <i class="fas fa-filter me-2"></i> Customer Filters
     </div>
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.customers.index') }}">
+        <form method="GET" action="{{ route('admin.customers.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Email -->
-                <div class="col-md-6">
-                    <div class="mb-3">
+                <div class="col-md-5">
+                    <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Customers</label>
                         <input type="text" class="form-control" id="search" name="search"
                             value="{{ request('search') }}"
                             placeholder="Search by name or email...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Filter by Status (Active / Archived) -->
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
@@ -116,12 +134,11 @@
                     </div>
                 </div>
 
-
                 <!-- Items per page selection -->
-                <div class="col-md-2">
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
-                        <select class="form-select" id="per_page" name="per_page" onchange="this.form.submit()">
+                        <select class="form-select" id="per_page" name="per_page">
                             @foreach([2, 5, 10, 15, 25, 50] as $option)
                                 <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
@@ -130,24 +147,10 @@
                         </select>
                     </div>
                 </div>
-
-
-                <!-- Apply Button -->
-                <div class="col-md-2">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check me-1"></i> Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </form>
     </div>
 </div>
-
 
 <div class="card card-custom">
     <div class="card-header card-header-custom">Customer List</div>
@@ -174,14 +177,15 @@
                     <td>{{ $customer->address }}</td>
                     <td>
                         @if ($customer->is_archived)
-                            <span>Archived</span>
+                            <span class="badge bg-warning text-dark">Archived</span>
                         @else
-                            <span>Active</span>
+                            <span class="">Active</span>
                         @endif
                     </td>
                     <td>
                         <button class="btn btn-outline-success btn-sm editBtn me-2" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
                             <i class="fas fa-edit"></i>
+                        </button>
                         @if ($customer->is_archived)
                             <button class="btn btn-outline-success btn-sm unarchiveBtn" data-id="{{ $customer->id }}">
                                <i class="fas fa-box-open"></i>
@@ -249,91 +253,125 @@
 
 @push('scripts')
 <script>
-/* === Add Customer === */
-document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const statusSelect = document.getElementById('status');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    let searchTimeout;
 
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch('{{ route("admin.customers.store") }}', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert('Error adding customer.');
+    // Auto-submit search with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800); // 800ms delay after typing stops
     });
-});
 
-/* === Edit Customer === */
-document.querySelectorAll('.editBtn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const c = JSON.parse(this.dataset.customer);
-        const form = document.getElementById('editCustomerForm');
-        form.action = `/admin/customers/${c.id}`;
-        for (const key in c) {
-            const input = form.querySelector(`[name="${key}"]`);
-            if (input) input.value = c[key];
-        }
+    // Auto-submit status filter immediately
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
-});
 
-document.getElementById('editCustomerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-
-    fetch(form.action, {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-HTTP-Method-Override': 'PUT' },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) location.reload();
-        else alert('Error updating customer.');
+    // Auto-submit per page selection immediately
+    perPageSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
-});
 
-/* === Archive Customer === */
-document.querySelectorAll('.archiveBtn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        if (!confirm('Are you sure you want to archive this customer?')) return;
-        const id = this.dataset.id;
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
 
-        fetch(`/admin/customers/${id}/archive`, {
+    /* === Add Customer === */
+    document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch('{{ route("admin.customers.store") }}', {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: formData
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) location.reload();
-            else alert('Failed to archive customer.');
+            else alert('Error adding customer.');
         });
     });
-});
 
-/* === Unarchive Customer === */
-document.querySelectorAll('.unarchiveBtn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        if (!confirm('Are you sure you want to unarchive this customer?')) return;
-        const id = this.dataset.id;
+    /* === Edit Customer === */
+    document.querySelectorAll('.editBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const c = JSON.parse(this.dataset.customer);
+            const form = document.getElementById('editCustomerForm');
+            form.action = `/admin/customers/${c.id}`;
+            for (const key in c) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) input.value = c[key];
+            }
+        });
+    });
 
-        fetch(`/admin/customers/${id}/unarchive`, {
+    document.getElementById('editCustomerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch(form.action, {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-HTTP-Method-Override': 'PUT' },
+            body: formData
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) location.reload();
-            else alert('Failed to unarchive customer.');
+            else alert('Error updating customer.');
+        });
+    });
+
+    /* === Archive Customer === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to archive this customer?')) return;
+            const id = this.dataset.id;
+
+            fetch(`/admin/customers/${id}/archive`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert('Failed to archive customer.');
+            });
+        });
+    });
+
+    /* === Unarchive Customer === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to unarchive this customer?')) return;
+            const id = this.dataset.id;
+
+            fetch(`/admin/customers/${id}/unarchive`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert('Failed to unarchive customer.');
+            });
         });
     });
 });
-
 </script>
 @endpush
 

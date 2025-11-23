@@ -1,5 +1,5 @@
 <?php
-// app/Http\Controllers/Admin\SalesReportController.php
+// app/Http/Controllers/Admin/SalesReportController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -30,7 +30,6 @@ class SalesReportController extends Controller
         return view('admin.sales-report.index', compact('orders', 'salesData'));
     }
 
-    // ... rest of the methods remain the same as before ...
     private function applyFilters($query, Request $request)
     {
         // Date filters
@@ -104,42 +103,60 @@ class SalesReportController extends Controller
             ];
         }
 
-        // Daily sales for the last 30 days
-        $dailySales = Order::where('order_status', 'delivered')
-            ->where('delivered_at', '>=', Carbon::now()->subDays(30))
-            ->selectRaw('DATE(delivered_at) as date, SUM(total_amount) as total, COUNT(*) as count')
-            ->groupBy('date')
-            ->orderBy('date')
+        // Get date range for queries
+        $dateRange = $this->getDateRangeForQuery($request);
+        $startDate = $dateRange['start'];
+        $endDate = $dateRange['end'];
+
+        // Daily sales - generate all dates in range (even empty ones)
+        $dailySales = $this->getDailySalesWithAllDates($startDate, $endDate);
+
+        // Weekly sales for the date range
+        $weeklySales = Order::where('order_status', 'delivered')
+            ->whereBetween('delivered_at', [$startDate, $endDate])
+            ->selectRaw('YEAR(delivered_at) as year, WEEK(delivered_at) as week, SUM(total_amount) as total, COUNT(*) as count')
+            ->groupBy('year', 'week')
+            ->orderBy('year', 'desc')
+            ->orderBy('week', 'desc')
             ->get();
 
-        // Monthly sales for the year
+        // Monthly sales for the date range
         $monthlySales = Order::where('order_status', 'delivered')
-            ->whereYear('delivered_at', Carbon::now()->year)
-            ->selectRaw('MONTH(delivered_at) as month, SUM(total_amount) as total, COUNT(*) as count')
-            ->groupBy('month')
-            ->orderBy('month')
+            ->whereBetween('delivered_at', [$startDate, $endDate])
+            ->selectRaw('YEAR(delivered_at) as year, MONTH(delivered_at) as month, SUM(total_amount) as total, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
             ->get();
+
+        // Prepare weekly data for chart
+        $weeklySalesData = new Collection();
+        foreach ($weeklySales as $sale) {
+            $weekStart = Carbon::now()->setISODate($sale->year, $sale->week)->startOfWeek();
+            $weekEnd = Carbon::now()->setISODate($sale->year, $sale->week)->endOfWeek();
+            
+            $weeklySalesData->push([
+                'week' => "Week {$sale->week}",
+                'week_number' => $sale->week,
+                'year' => $sale->year,
+                'week_range' => $weekStart->format('M j') . ' - ' . $weekEnd->format('M j'),
+                'total' => $sale->total,
+                'count' => $sale->count
+            ]);
+        }
 
         // Prepare monthly data for chart
-        $monthlySalesArray = array_fill(0, 12, 0);
+        $monthlySalesData = new Collection();
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        
         foreach ($monthlySales as $sale) {
-            $monthlySalesArray[$sale->month - 1] = $sale->total;
-        }
-
-        // Prepare daily data for chart
-        $dailyLabels = [];
-        $dailyData = [];
-        foreach ($dailySales as $sale) {
-            $dailyLabels[] = Carbon::parse($sale->date)->format('M j');
-            $dailyData[] = $sale->total;
-        }
-
-        // Prepare payment method data for chart
-        $paymentLabels = [];
-        $paymentData = [];
-        foreach ($salesByPayment as $method => $data) {
-            $paymentLabels[] = ucfirst($method);
-            $paymentData[] = $data['total'];
+            $monthlySalesData->push([
+                'month' => $monthNames[$sale->month - 1] . ' ' . $sale->year,
+                'month_number' => $sale->month,
+                'year' => $sale->year,
+                'total' => $sale->total,
+                'count' => $sale->count
+            ]);
         }
 
         // Date range text for display
@@ -150,21 +167,89 @@ class SalesReportController extends Controller
             'totalOrders' => $totalOrders,
             'salesByPayment' => $salesByPayment,
             'dailySales' => $dailySales,
-            'monthlySales' => $monthlySales,
-            'monthlySalesArray' => $monthlySalesArray,
+            'weeklySales' => $weeklySalesData->sortBy(['year', 'week_number'])->values(),
+            'monthlySales' => $monthlySalesData->sortBy(['year', 'month_number'])->values(),
             'averageOrderValue' => $totalOrders > 0 ? $totalSales / $totalOrders : 0,
             'dateRangeText' => $dateRangeText,
-            'chartData' => [
-                'payment' => [
-                    'labels' => $paymentLabels,
-                    'data' => $paymentData
-                ],
-                'daily' => [
-                    'labels' => $dailyLabels,
-                    'data' => $dailyData
-                ]
-            ]
         ];
+    }
+
+    private function getDateRangeForQuery(Request $request)
+    {
+        switch ($request->date_range) {
+            case 'today':
+                return [
+                    'start' => Carbon::today(),
+                    'end' => Carbon::today()->endOfDay()
+                ];
+            case 'yesterday':
+                return [
+                    'start' => Carbon::yesterday(),
+                    'end' => Carbon::yesterday()->endOfDay()
+                ];
+            case 'this_week':
+                return [
+                    'start' => Carbon::now()->startOfWeek(),
+                    'end' => Carbon::now()->endOfWeek()
+                ];
+            case 'this_month':
+                return [
+                    'start' => Carbon::now()->startOfMonth(),
+                    'end' => Carbon::now()->endOfMonth()
+                ];
+            case 'this_year':
+                return [
+                    'start' => Carbon::now()->startOfYear(),
+                    'end' => Carbon::now()->endOfYear()
+                ];
+            case 'custom':
+                if ($request->start_date && $request->end_date) {
+                    return [
+                        'start' => Carbon::parse($request->start_date)->startOfDay(),
+                        'end' => Carbon::parse($request->end_date)->endOfDay()
+                    ];
+                }
+                break;
+        }
+        
+        // Default: last 30 days
+        return [
+            'start' => Carbon::now()->subDays(30),
+            'end' => Carbon::now()
+        ];
+    }
+
+    private function getDailySalesWithAllDates($startDate, $endDate)
+    {
+        // Get actual sales data
+        $actualSales = Order::where('order_status', 'delivered')
+            ->whereBetween('delivered_at', [$startDate, $endDate])
+            ->selectRaw('DATE(delivered_at) as date, SUM(total_amount) as total, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get()
+            ->keyBy('date');
+
+        $dailySalesData = new Collection();
+        $currentDate = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+
+        // Generate all dates in the range
+        while ($currentDate <= $end) {
+            $dateString = $currentDate->format('Y-m-d');
+            $saleData = $actualSales->get($dateString);
+
+            $dailySalesData->push([
+                'date' => $currentDate->format('M j'),
+                'full_date' => $dateString,
+                'total' => $saleData ? $saleData->total : 0,
+                'count' => $saleData ? $saleData->count : 0
+            ]);
+
+            $currentDate->addDay();
+        }
+
+        return $dailySalesData;
     }
 
     private function getDateRangeText(Request $request)
@@ -186,11 +271,12 @@ class SalesReportController extends Controller
                 }
                 break;
         }
-        return 'All Time';
+        return 'Last 30 Days'; // Default
     }
 
     public function export(Request $request)
     {
+        // Your existing export method
         $query = Order::where('order_status', 'delivered');
         $query = $this->applyFilters($query, $request);
         
@@ -253,52 +339,50 @@ class SalesReportController extends Controller
             return response()->stream($callback, 200, $headers);
         }
     }
-   public function comparison(Request $request)
-{
-    // Get years for comparison (default to current year and previous year)
-    $year1 = $request->get('year1', date('Y'));
-    $year2 = $request->get('year2', date('Y') - 1);
-    
-    // Get monthly sales data for both years
-    $year1Sales = $this->getMonthlySalesData($year1);
-    $year2Sales = $this->getMonthlySalesData($year2);
-    
-    // Calculate growth percentages
-    $growthData = [];
-    $totalYear1 = array_sum($year1Sales);
-    $totalYear2 = array_sum($year2Sales);
-    $totalGrowth = $totalYear2 > 0 ? (($totalYear1 - $totalYear2) / $totalYear2) * 100 : ($totalYear1 > 0 ? 100 : 0);
-    
-    // Monthly growth
-    foreach ($year1Sales as $month => $sales1) {
-        $sales2 = $year2Sales[$month];
-        $growth = $sales2 > 0 ? (($sales1 - $sales2) / $sales2) * 100 : ($sales1 > 0 ? 100 : 0);
-        $growthData[$month] = round($growth, 2);
-    }
-    
-    return view('admin.sales-report.comparison', compact(
-        'year1', 
-        'year2', 
-        'year1Sales', 
-        'year2Sales',
-        'growthData',
-        'totalGrowth'
-    ));
-}
 
-private function getMonthlySalesData($year)
-{
-    $monthlySales = [];
-    
-    for ($month = 1; $month <= 12; $month++) {
-        $sales = Order::where('order_status', 'delivered') // Changed from 'status' to 'order_status'
-            ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->sum('total_amount');
+    public function comparison(Request $request)
+    {
+        // Your existing comparison method
+        $year1 = $request->get('year1', date('Y'));
+        $year2 = $request->get('year2', date('Y') - 1);
         
-        $monthlySales[$month] = (float) $sales;
+        $year1Sales = $this->getMonthlySalesData($year1);
+        $year2Sales = $this->getMonthlySalesData($year2);
+        
+        $growthData = [];
+        $totalYear1 = array_sum($year1Sales);
+        $totalYear2 = array_sum($year2Sales);
+        $totalGrowth = $totalYear2 > 0 ? (($totalYear1 - $totalYear2) / $totalYear2) * 100 : ($totalYear1 > 0 ? 100 : 0);
+        
+        foreach ($year1Sales as $month => $sales1) {
+            $sales2 = $year2Sales[$month];
+            $growth = $sales2 > 0 ? (($sales1 - $sales2) / $sales2) * 100 : ($sales1 > 0 ? 100 : 0);
+            $growthData[$month] = round($growth, 2);
+        }
+        
+        return view('admin.sales-report.comparison', compact(
+            'year1', 
+            'year2', 
+            'year1Sales', 
+            'year2Sales',
+            'growthData',
+            'totalGrowth'
+        ));
     }
-    
-    return $monthlySales;
-}
+
+    private function getMonthlySalesData($year)
+    {
+        $monthlySales = [];
+        
+        for ($month = 1; $month <= 12; $month++) {
+            $sales = Order::where('order_status', 'delivered')
+                ->whereYear('created_at', $year)
+                ->whereMonth('created_at', $month)
+                ->sum('total_amount');
+            
+            $monthlySales[$month] = (float) $sales;
+        }
+        
+        return $monthlySales;
+    }
 }
