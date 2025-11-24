@@ -654,7 +654,7 @@
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" class="form-control search-input"
                                 placeholder="Search products or categories..." id="searchInput" autocomplete="off">
-                            <div class="search-results" id="searchResults"></div>
+                            {{-- <div class="search-results" id="searchResults"></div> --}}
                         </div>
                     </li>
 
@@ -708,7 +708,7 @@
                 </ul>
 
             </div>
-        </div>
+        </div>  
     </nav>
 
 
