@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\SessionController;
 use App\Http\Controllers\Delivery\DashboardController as DeliveryDashboardController;
 use App\Http\Controllers\Delivery\OrderController as DeliveryOrderController;
 use App\Http\Controllers\Delivery\ProfileController as DeliveryProfileController;
@@ -240,4 +241,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // BANNER ROUTES
     Route::resource('banners', BannerController::class);
     Route::post('/banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
+
+    // Developer: Authentication Sessions
+    Route::get('/sessions', [SessionController::class, 'index'])->name('sessions.index');
 });
