@@ -270,51 +270,58 @@ class ProductController extends Controller
     /**
      * Get banners from database.
      */
-    private function getBanners()
-    {
-        // Check if Banner model exists and has records
-        if (class_exists(Banner::class)) {
-            $banners = Banner::active()
-                ->ordered()
-                ->get()
-                ->map(function($banner) {
-                    return [
-                        'image' => asset('storage/banners/' . $banner->image_path),
-                        'alt' => $banner->alt_text ?? $banner->title,
-                        'title' => $banner->title,
-                        'description' => $banner->description
-                    ];
-                })
-                ->toArray();
+   /**
+ * Get banners from database.
+ */
+private function getBanners()
+{
+    // Check if Banner model exists and has records
+    if (class_exists(Banner::class)) {
+        $banners = Banner::where('is_active', true)
+            ->orderBy('order')
+            ->get()
+            ->map(function($banner) {
+                return [
+                    'image' => asset($banner->image_path),
+                    'alt' => $banner->alt_text ?? $banner->title,
+                    'title' => $banner->title,
+                    'description' => $banner->description,
+                    'target_url' => $banner->target_url // Add this line
+                ];
+            })
+            ->toArray();
 
-            // Return banners if we have any
-            if (!empty($banners)) {
-                return $banners;
-            }
+        // Return banners if we have any
+        if (!empty($banners)) {
+            return $banners;
         }
-
-        // Fallback to default banners if no database banners exist
-        return [
-            [
-                'image' => asset('images/banner1.png'),
-                'alt' => 'Big Sale',
-                'title' => '🔥 Big Sale!',
-                'description' => 'Up to 50% off on selected products.'
-            ],
-            [
-                'image' => asset('images/NW.png'),
-                'alt' => 'New Arrivals',
-                'title' => '✨ New Arrivals',
-                'description' => 'Check out our latest collections.'
-            ],
-            [
-                'image' => asset('images/GO.jpeg'),
-                'alt' => 'Exclusive Deals',
-                'title' => '💎 Exclusive Deals',
-                'description' => 'Shop now before the offers end!'
-            ]
-        ];
     }
+
+    // Fallback to default banners if no database banners exist
+    return [
+        [
+            'image' => asset('images/banner1.png'),
+            'alt' => 'Big Sale',
+            'title' => '🔥 Big Sale!',
+            'description' => 'Up to 50% off on selected products.',
+            'target_url' => '/products?sort=discount' // Example fallback URL
+        ],
+        [
+            'image' => asset('images/NW.png'),
+            'alt' => 'New Arrivals',
+            'title' => '✨ New Arrivals',
+            'description' => 'Check out our latest collections.',
+            'target_url' => '/products?sort=newest'
+        ],
+        [
+            'image' => asset('images/GO.jpeg'),
+            'alt' => 'Exclusive Deals',
+            'title' => '💎 Exclusive Deals',
+            'description' => 'Shop now before the offers end!',
+            'target_url' => '/products?featured=true'
+        ]
+    ];
+}
 
     /**
      * Get new arrivals.

@@ -306,10 +306,7 @@
                             <span>₱{{ number_format($tax, 2) }}</span>
                         </div>
 
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span>
-                            <span>{{ $shipping == 0 ? 'FREE' : '$' . number_format($shipping, 2) }}</span>
-                        </div>
+                     
 
                         <hr>
 

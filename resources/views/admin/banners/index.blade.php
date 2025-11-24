@@ -33,9 +33,15 @@
                             <tr>
                                 <td>{{ $banner->order }}</td>
                                 <td>
-                                    <img src="{{ asset('storage/banners/' . $banner->image_path) }}" 
-                                         alt="{{ $banner->alt_text }}" 
-                                         style="width: 100px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    @if($banner->image_path)
+                                        <img src="{{ asset($banner->image_path) }}" 
+                                             alt="{{ $banner->alt_text }}" 
+                                             style="width: 100px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                    @else
+                                        <div class="text-muted" style="width: 100px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f8f9fa; border-radius: 4px;">
+                                            <i class="fas fa-image fa-lg"></i>
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>{{ $banner->title }}</td>
                                 <td>{{ Str::limit($banner->description, 50) }}</td>
@@ -48,17 +54,17 @@
                                     <div class="btn-group">
                                         <form action="{{ route('admin.banners.toggle-status', $banner) }}" method="POST" class="d-inline">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-{{ $banner->is_active ? 'warning' : 'success' }}">
+                                            <button type="submit" class="btn btn-sm btn-{{ $banner->is_active ? 'warning' : 'success' }}" title="{{ $banner->is_active ? 'Deactivate' : 'Activate' }}">
                                                 <i class="fas fa-{{ $banner->is_active ? 'eye-slash' : 'eye' }}"></i>
                                             </button>
                                         </form>
-                                        <a href="{{ route('admin.banners.edit', $banner) }}" class="btn btn-sm btn-primary">
+                                        <a href="{{ route('admin.banners.edit', $banner) }}" class="btn btn-sm btn-primary" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('admin.banners.destroy', $banner) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this banner?')">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this banner?')" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>

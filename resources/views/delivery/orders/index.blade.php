@@ -4,39 +4,189 @@
 
 @section('content')
 <style>
-    .card-available {
-        border-left: 4px solid #28a745;
+    .dashboard-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
     }
-    .card-my-order {
-        border-left: 4px solid #007bff;
+    
+    .section-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
     }
-    .badge-available {
-        background-color: #28a745;
-        color: white;
+    
+    .section-card .card-header {
+        background: white;
+        border-bottom: 2px solid #E8F5E6;
+        font-weight: 600;
+        color: #2C8F0C;
+        padding: 1rem 1.5rem;
     }
-    .order-item {
-        border-bottom: 1px solid #e9ecef;
-        padding: 8px 0;
+    
+    .table th {
+        background-color: #E8F5E6;
+        color: #2C8F0C;
+        font-weight: 600;
+        border-bottom: 2px solid #2C8F0C;
     }
-    .order-item:last-child {
-        border-bottom: none;
+    
+    .btn-success {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        font-weight: 500;
     }
+    
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-1px);
+    }
+    
+    .filter-active {
+        background-color: #2C8F0C !important;
+        color: white !important;
+        border-color: #2C8F0C !important;
+    }
+    
+    .search-box {
+        border-radius: 8px;
+        border: 1px solid #E8F5E6;
+        padding: 0.5rem 1rem;
+    }
+    
+    .search-box:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(44, 143, 12, 0.05);
+    }
+    
+    .empty-state {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .status-available {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .status-my-order {
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .status-assigned {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .status-processing { color: #ffc107; font-weight: 600; }
+    .status-shipped { color: #17a2b8; font-weight: 600; }
+    .status-out-for-delivery { color: #fd7e14; font-weight: 600; }
+    .status-delivered { color: #28a745; font-weight: 600; }
+    .status-cancelled { color: #dc3545; font-weight: 600; }
 </style>
 
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-3 mb-4 border-bottom">
-    <h1 class="h2">All Orders</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-sm btn-outline-success">
-                <i class="fas fa-box me-1"></i> Available for Pickup
-            </a>
-            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-list me-1"></i> My Orders
-            </a>
-            <a href="{{ route('delivery.orders.delivered') }}" class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-check-circle me-1"></i> Delivered
-            </a>
+<div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">All Orders</h1>
+            <p class="mb-0 text-muted">Manage and track all delivery orders in one place.</p>
         </div>
+        <div class="text-end">
+            <small class="text-muted">Total Orders: {{ $orders->total() }}</small>
+        </div>
+    </div>
+</div>
+
+<!-- Filter and Search Section -->
+<div class="card section-card mb-4">
+    <div class="card-body">
+        <form id="filterForm" method="GET" action="{{ route('delivery.orders.index') }}">
+            <div class="row align-items-end">
+                <!-- Search Box -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold text-muted mb-2">Search Orders</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control search-box" name="search" 
+                               placeholder="Search by order number, customer name..." 
+                               value="{{ request('search') }}">
+                        <button class="btn btn-success" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Filter -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold text-muted mb-2">Order Status</label>
+                    <select class="form-select search-box" name="status" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">All Statuses</option>
+                        <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
+                        <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="out_for_delivery" {{ request('status') == 'out_for_delivery' ? 'selected' : '' }}>Out for Delivery</option>
+                        <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Assignment Filter -->
+                <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold text-muted mb-2">Assignment</label>
+                    <select class="form-select search-box" name="assignment" onchange="document.getElementById('filterForm').submit()">
+                        <option value="">All Assignments</option>
+                        <option value="available" {{ request('assignment') == 'available' ? 'selected' : '' }}>Available for Pickup</option>
+                        <option value="my_orders" {{ request('assignment') == 'my_orders' ? 'selected' : '' }}>My Orders</option>
+                        <option value="assigned" {{ request('assignment') == 'assigned' ? 'selected' : '' }}>Assigned to Others</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quick Filter Buttons -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label class="form-label fw-bold text-muted mb-2">Quick Filters</label>
+                    <div class="btn-group" role="group">
+                        <input type="radio" class="btn-check" name="date_filter" value="today" id="today" 
+                               {{ request('date_filter') == 'today' ? 'checked' : '' }} autocomplete="off">
+                        <label class="btn btn-outline-success" for="today">Today</label>
+
+                        <input type="radio" class="btn-check" name="date_filter" value="week" id="week" 
+                               {{ request('date_filter') == 'week' ? 'checked' : '' }} autocomplete="off">
+                        <label class="btn btn-outline-success" for="week">This Week</label>
+
+                        <input type="radio" class="btn-check" name="date_filter" value="month" id="month" 
+                               {{ request('date_filter') == 'month' ? 'checked' : '' }} autocomplete="off">
+                        <label class="btn btn-outline-success" for="month">This Month</label>
+
+                        <input type="radio" class="btn-check" name="date_filter" value="" id="all_dates" 
+                               {{ !request('date_filter') ? 'checked' : '' }} autocomplete="off">
+                        <label class="btn btn-outline-success" for="all_dates">All Dates</label>
+                    </div>
+
+                    <!-- Reset Filters -->
+                    @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
+                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-times me-1"></i> Clear Filters
+                    </a>
+                    @endif
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -54,127 +204,163 @@
     </div>
 @endif
 
-@if($orders->count() > 0)
-    <div class="row">
-        @foreach($orders as $order)
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 {{ is_null($order->delivery_id) ? 'card-available' : ($order->delivery_id == Auth::id() ? 'card-my-order' : '') }}">
-                <div class="card-header d-flex justify-content-between align-items-center 
-                    {{ is_null($order->delivery_id) ? 'bg-success text-white' : ($order->delivery_id == Auth::id() ? 'bg-primary text-white' : 'bg-secondary text-white') }}">
-                    <strong>#{{ $order->order_number }}</strong>
+<!-- Orders Table -->
+<div class="card section-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold">
+            <i class="fas fa-list me-2"></i>Orders List
+            @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
+                <small class="text-muted ms-2">(Filtered Results)</small>
+            @endif
+        </h6>
+        <div class="btn-group">
+            <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-box me-1"></i> Available Orders
+            </a>
+            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-list me-1"></i> My Orders
+            </a>
+        </div>
+    </div>
+    
+    <div class="card-body p-0">
+        @if($orders->count() > 0)
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Assignment</th>
+                            <th>Order Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($orders as $order)
+                        <tr>
+                            <td>
+                                <strong class="text-dark">#{{ $order->order_number }}</strong>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ $order->customer_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ $order->customer_phone }}</small>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-success">
+                                ₱{{ number_format($order->total_amount, 2) }}
+                            </td>
+                            <td>
+                                <span class="status-{{ str_replace('_', '-', $order->order_status) }}">
+                                    {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
+                                </span>
+                            </td>
+                            <td>
+                                @if(is_null($order->delivery_id))
+                                    <span class="status-available">Available</span>
+                                @elseif($order->delivery_id == Auth::id())
+                                    <span class="status-my-order">My Order</span>
+                                @else
+                                    <span class="status-assigned">Assigned</span>
+                                @endif
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ $order->created_at->format('M j, Y') }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    
+                                    @if(is_null($order->delivery_id) && $order->order_status == 'processing')
+                                    <form action="{{ route('delivery.orders.pickup-order', $order) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-hand-paper"></i> Pick Up
+                                        </button>
+                                    </form>
+                                    @endif
+
+                                    @if($order->delivery_id == Auth::id() && in_array($order->order_status, ['shipped', 'out_for_delivery']))
+                                    <form action="{{ route('delivery.orders.deliver-order', $order) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-warning" 
+                                                onclick="return confirm('Mark order #{{ $order->order_number }} as delivered?')">
+                                            <i class="fas fa-check"></i> Deliver
+                                        </button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        @if(is_null($order->delivery_id))
-                            <span class="badge badge-available">Available</span>
-                        @elseif($order->delivery_id == Auth::id())
-                            <span class="badge bg-light text-primary">My Order</span>
-                        @else
-                            <span class="badge bg-light text-dark">Assigned to Other</span>
-                        @endif
-                        <span class="badge bg-light text-dark ms-1">
-                            {{ strtoupper($order->order_status) }}
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-body">
-                    <!-- Customer Information -->
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">CUSTOMER INFORMATION</h6>
-                        <strong>{{ $order->customer_name }}</strong><br>
                         <small class="text-muted">
-                            <i class="fas fa-phone me-1"></i>{{ $order->customer_phone }}<br>
-                            <i class="fas fa-envelope me-1"></i>{{ $order->customer_email }}
+                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
                         </small>
                     </div>
-
-                    <!-- Delivery Address -->
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">DELIVERY ADDRESS</h6>
-                        <small>{{ $order->shipping_address }}</small>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">ORDER ITEMS ({{ $order->orderItems->count() }})</h6>
-                        <div style="max-height: 120px; overflow-y: auto;">
-                            @foreach($order->orderItems as $item)
-                            <div class="order-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="flex-grow-1">
-                                        <strong class="d-block">{{ $item->product->name ?? 'Product' }}</strong>
-                                        <small class="text-muted">
-                                            Qty: {{ $item->quantity }} × ₱{{ number_format($item->unit_price, 2) }}
-                                        </small>
-                                    </div>
-                                    <div class="text-end">
-                                        <strong>₱{{ number_format($item->quantity * $item->unit_price, 2) }}</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Order Summary -->
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">ORDER SUMMARY</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Total Amount:</span>
-                            <strong>₱{{ number_format($order->total_amount, 2) }}</strong>
-                        </div>
-                        @if(!is_null($order->delivery_id) && $order->delivery_id == Auth::id())
-                        <div class="d-flex justify-content-between mt-2">
-                            <span>Assigned To You:</span>
-                            <small class="text-muted">{{ $order->assigned_at ? $order->assigned_at->format('M j, Y g:i A') : 'N/A' }}</small>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-                
-                <div class="card-footer">
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-eye me-1"></i> View Details
-                        </a>
-                        
-                        <!-- Action Buttons -->
-                        @if(is_null($order->delivery_id) && $order->order_status == 'processing')
-                        <form action="{{ route('delivery.orders.pickup-order', $order) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-success btn-sm w-100">
-                                <i class="fas fa-hand-paper me-1"></i> Pick Up This Order
-                            </button>
-                        </form>
-                        @endif
-
-                        <!-- MARK AS DELIVERED BUTTON - ADD THIS -->
-                        @if($order->delivery_id == Auth::id() && in_array($order->order_status, ['shipped', 'out_for_delivery']))
-                        <form action="{{ route('delivery.orders.deliver-order', $order) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-warning btn-sm w-100" 
-                                    onclick="return confirm('Mark order #{{ $order->order_number }} as delivered?')">
-                                <i class="fas fa-check me-1"></i> Mark as Delivered
-                            </button>
-                        </form>
-                        @endif
+                    <div>
+                        {{ $orders->links() }}
                     </div>
                 </div>
             </div>
-        </div>
-        @endforeach
+        @else
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h5 class="text-muted">No Orders Found</h5>
+                <p class="text-muted mb-3">
+                    @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
+                        No orders match your current filters.
+                    @else
+                        There are no orders available at the moment.
+                    @endif
+                </p>
+                @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
+                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-success">
+                        <i class="fas fa-times me-1"></i> Clear Filters
+                    </a>
+                @else
+                    <a href="{{ route('delivery.dashboard') }}" class="btn btn-success">
+                        <i class="fas fa-tachometer-alt me-1"></i> Back to Dashboard
+                    </a>
+                @endif
+            </div>
+        @endif
     </div>
+</div>
 
-    <div class="d-flex justify-content-center">
-        {{ $orders->links() }}
-    </div>
-@else
-    <div class="text-center py-5">
-        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-        <h4>No Orders Available</h4>
-        <p class="text-muted">There are no orders available at the moment.</p>
-        <a href="{{ route('delivery.dashboard') }}" class="btn btn-primary">
-            <i class="fas fa-tachometer-alt me-1"></i> Back to Dashboard
-        </a>
-    </div>
-@endif
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form when radio buttons change
+    const dateFilters = document.querySelectorAll('input[name="date_filter"]');
+    dateFilters.forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+
+    // Add active class to filter buttons
+    const filterButtons = document.querySelectorAll('.btn-check');
+    filterButtons.forEach(button => {
+        if (button.checked) {
+            const label = document.querySelector(`label[for="${button.id}"]`);
+            label.classList.add('filter-active');
+        }
+    });
+});
+</script>
 @endsection

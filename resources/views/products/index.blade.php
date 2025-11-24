@@ -585,38 +585,38 @@
         
         .carousel-compact,
         .carousel-inner-compact,
-        .carousel-item-compact,
+        .carousel-item-compact {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Maintains 16:9 ratio */
+            max-height: 400px;
+        }
+
         .carousel-image-compact {
-            height: 35px !important;
-            max-height: 35px !important;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .floating-filter {
-            right: 5px;
-            bottom: 70px;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
         }
 
-        .filter-panel {
-            right: 50px;
-            width: 250px;
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .carousel-compact,
+            .carousel-inner-compact,
+            .carousel-item-compact {
+                aspect-ratio: 16 / 9;
+                max-height: 250px;
+            }
         }
 
-        .banner-card-compact {
-            height: 30px !important;
-            max-height: 30px !important;
-            margin-bottom: 10px;
+        @media (max-width: 576px) {
+            .carousel-compact,
+            .carousel-inner-compact,
+            .carousel-item-compact {
+                aspect-ratio: 16 / 9;
+                max-height: 180px;
+            }
         }
-        
-        .carousel-compact,
-        .carousel-inner-compact,
-        .carousel-item-compact,
-        .carousel-image-compact {
-            height: 30px !important;
-            max-height: 30px !important;
-        }
-    }
+            }
 </style>
 
 <!-- No Products Found Modal -->
@@ -743,14 +743,24 @@
     </div>
 </div>
 
-<!-- Ultra Compact Banner -->
+<!-- Clean Auto-sliding Carousel (No Visible Controls) -->
 @if(isset($banners) && count($banners) > 0)
 <div class="card banner-card-compact">
-    <div id="heroCarousel" class="carousel slide carousel-compact" data-bs-ride="carousel">
+    <div id="heroCarousel" class="carousel slide carousel-compact" data-bs-ride="carousel" data-bs-interval="4000">
         <div class="carousel-inner carousel-inner-compact">
             @foreach($banners as $index => $banner)
                 <div class="carousel-item carousel-item-compact {{ $index === 0 ? 'active' : '' }}">
-                    <img src="{{ asset($banner['image']) }}" class="d-block w-100 carousel-image-compact" alt="{{ $banner['alt'] }}">
+                    @if(!empty($banner['target_url']))
+                        <a href="{{ $banner['target_url'] }}" target="_blank" class="banner-link">
+                            <img src="{{ $banner['image'] }}" 
+                                 class="d-block w-100 carousel-image-compact" 
+                                 alt="{{ $banner['alt'] }}">
+                        </a>
+                    @else
+                        <img src="{{ $banner['image'] }}" 
+                             class="d-block w-100 carousel-image-compact" 
+                             alt="{{ $banner['alt'] }}">
+                    @endif
                 </div>
             @endforeach
         </div>

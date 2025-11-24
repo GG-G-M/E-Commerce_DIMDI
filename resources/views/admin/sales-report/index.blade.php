@@ -82,32 +82,33 @@
         transition: background-color 0.2s ease;
     }
 
+    /* Smaller stat cards */
     .stat-card {
         background: linear-gradient(135deg, #ffffff 0%, #f8fdf8 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        border-left: 4px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 3px solid #2C8F0C;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         height: 100%;
     }
 
     .stat-value {
-        font-size: 2rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #2C8F0C;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
 
     .stat-label {
         color: #6c757d;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 0.875rem;
+        font-size: 0.75rem;
     }
 
     .chart-container {
         position: relative;
-        height: 300px;
+        height: 250px;
         width: 100%;
     }
 
@@ -127,24 +128,17 @@
     .payment-method-badge {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+    }
+
+    .small-card {
+        height: 100%;
     }
 </style>
-
-<!-- Header -->
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h3 mb-1">Sales Reports</h1>
-        <p class="text-muted mb-0">Track and analyze your sales performance</p>
-    </div>
-    <button type="button" class="btn btn-success" onclick="exportReport('pdf')">
-        <i class="fas fa-download me-1"></i> Export PDF
-    </button>
-</div>
 
 <!-- Add this button in the page-header div, next to the existing Export PDF button -->
 <div class="page-header d-flex justify-content-between align-items-center">
@@ -170,10 +164,10 @@
     <div class="card-body">
         <form action="{{ route('admin.sales-report.index') }}" method="GET" id="filterForm">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Date Range</label>
-                        <select name="date_range" class="form-select" onchange="toggleCustomDate()">
+                        <select name="date_range" class="form-select" id="dateRangeSelect" onchange="handleDateRangeChange()">
                             <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
                             <option value="yesterday" {{ request('date_range') == 'yesterday' ? 'selected' : '' }}>Yesterday</option>
                             <option value="this_week" {{ request('date_range') == 'this_week' ? 'selected' : '' }}>This Week</option>
@@ -184,21 +178,21 @@
                     </div>
                 </div>
                 
-                <div class="col-md-3" id="customDateRange" style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
+                <div class="col-md-4" id="customDateRange" style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Start Date</label>
-                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                        <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request('start_date') }}" onchange="handleCustomDateChange()">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">End Date</label>
-                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                        <input type="date" name="end_date" class="form-control" id="endDate" value="{{ request('end_date') }}" onchange="handleCustomDateChange()">
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Payment Method</label>
-                        <select name="payment_method" class="form-select">
+                        <select name="payment_method" class="form-select" onchange="submitForm()">
                             <option value="all">All Payments</option>
                             <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Credit/Debit Card</option>
                             <option value="gcash" {{ request('payment_method') == 'gcash' ? 'selected' : '' }}>GCash</option>
@@ -206,60 +200,66 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-check me-1"></i> Apply Filters
-                            </button>
-                            <a href="{{ route('admin.sales-report.index') }}" class="btn btn-outline-success">
-                                <i class="fas fa-refresh me-1"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
+            
+            <!-- Hidden submit button for form submission -->
+            <button type="submit" id="hiddenSubmit" style="display: none;"></button>
         </form>
     </div>
 </div>
-
-<!-- Summary Cards -->
+<!-- Summary Cards - Smaller and more compact -->
 <div class="row">
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
             <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
             <div class="stat-label">Total Sales</div>
-            <div class="text-success small mt-2">
-                <i class="fas fa-chart-line me-1"></i> Overall revenue
+            <div class="text-success small mt-1">
+                <i class="fas fa-chart-line me-1"></i> Revenue
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
             <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
             <div class="stat-label">Total Orders</div>
-            <div class="text-success small mt-2">
-                <i class="fas fa-shopping-cart me-1"></i> Completed orders
+            <div class="text-success small mt-1">
+                <i class="fas fa-shopping-cart me-1"></i> Orders
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
             <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
-            <div class="stat-label">Average Order Value</div>
-            <div class="text-success small mt-2">
-                <i class="fas fa-calculator me-1"></i> Per order average
+            <div class="stat-label">Avg Order Value</div>
+            <div class="text-success small mt-1">
+                <i class="fas fa-calculator me-1"></i> Average
             </div>
         </div>
     </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="stat-card">
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
             <div class="stat-value">{{ $salesData['dateRangeText'] }}</div>
             <div class="stat-label">Date Range</div>
-            <div class="text-success small mt-2">
-                <i class="fas fa-calendar me-1"></i> Selected period
+            <div class="text-success small mt-1">
+                <i class="fas fa-calendar me-1"></i> Period
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
+            <div class="stat-value">{{ $salesData['salesByPayment']->count() }}</div>
+            <div class="stat-label">Payment Methods</div>
+            <div class="text-success small mt-1">
+                <i class="fas fa-credit-card me-1"></i> Methods
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-3">
+        <div class="stat-card small-card">
+            <div class="stat-value">{{ $salesData['dailySales']->count() }}</div>
+            <div class="stat-label">Data Points</div>
+            <div class="text-success small mt-1">
+                <i class="fas fa-database me-1"></i> Points
             </div>
         </div>
     </div>
@@ -267,8 +267,28 @@
 
 <!-- Charts Section -->
 <div class="row mt-4">
+    <!-- Dynamic Sales Trend Chart -->
+<div class="col-xl-8 col-lg-7">
+    <div class="card card-custom">
+        <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-chart-line me-2"></i> 
+                Sales Trend
+            </div>
+            <div class="text-white small">
+                {{ $salesData['dateRangeText'] }}
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="salesTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Payment Method Chart -->
-    <div class="col-xl-6 col-lg-6">
+    <div class="col-xl-4 col-lg-5">
         <div class="card card-custom">
             <div class="card-header card-header-custom">
                 <i class="fas fa-credit-card me-2"></i> Sales by Payment Method
@@ -277,50 +297,20 @@
                 <div class="chart-container">
                     <canvas id="paymentMethodChart"></canvas>
                 </div>
-                <div class="mt-4 text-center small">
+                <div class="mt-3 text-center small">
                     @php
                         $colors = ['#2C8F0C', '#4CAF50', '#8BC34A', '#CDDC39'];
                     @endphp
                     @if($salesData['salesByPayment']->count() > 0)
                         @foreach($salesData['salesByPayment'] as $method => $data)
-                        <span class="me-3">
+                        <div class="mb-1">
                             <i class="fas fa-circle me-1" style="color: {{ $colors[$loop->index] ?? '#2C8F0C' }}"></i> 
                             {{ ucfirst($method) }} ({{ number_format($data['percentage'], 1) }}%)
-                        </span>
+                        </div>
                         @endforeach
                     @else
                         <p class="text-muted">No payment method data available.</p>
                     @endif
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Monthly Sales Chart -->
-    <div class="col-xl-6 col-lg-6">
-        <div class="card card-custom">
-            <div class="card-header card-header-custom">
-                <i class="fas fa-chart-bar me-2"></i> Monthly Sales ({{ date('Y') }})
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="monthlySalesChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Daily Sales Chart -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card card-custom">
-            <div class="card-header card-header-custom">
-                <i class="fas fa-chart-line me-2"></i> Daily Sales (Last 30 Days)
-            </div>
-            <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="dailySalesChart"></canvas>
                 </div>
             </div>
         </div>
@@ -338,12 +328,12 @@
                 <div class="row">
                     @if($salesData['salesByPayment']->count() > 0)
                         @foreach($salesData['salesByPayment'] as $method => $data)
-                        <div class="col-md-4 mb-3">
-                            <div class="stat-card text-center">
-                                <div class="payment-method-badge mb-3">{{ $method }}</div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card text-center small-card">
+                                <div class="payment-method-badge mb-2">{{ $method }}</div>
                                 <div class="stat-value">₱{{ number_format($data['total'], 2) }}</div>
                                 <div class="stat-label">Total Sales</div>
-                                <div class="text-muted small mt-2">
+                                <div class="text-muted small mt-1">
                                     {{ $data['count'] }} orders • {{ number_format($data['percentage'], 1) }}%
                                 </div>
                             </div>
@@ -441,6 +431,12 @@
 
 @push('scripts')
 <script>
+// Global variables to store chart instances and form state
+let salesTrendChart = null;
+let paymentMethodChart = null;
+let formSubmissionTimer = null;
+let customDateWaitTimer = null;
+
 function toggleCustomDate() {
     const dateRange = document.querySelector('select[name="date_range"]').value;
     const customDateRange = document.getElementById('customDateRange');
@@ -449,7 +445,62 @@ function toggleCustomDate() {
         customDateRange.style.display = 'block';
     } else {
         customDateRange.style.display = 'none';
+        // Auto-submit when switching from custom to other ranges
+        submitFormWithDelay();
     }
+}
+
+function handleDateRangeChange() {
+    const dateRange = document.getElementById('dateRangeSelect').value;
+    
+    if (dateRange === 'custom') {
+        document.getElementById('customDateRange').style.display = 'block';
+        // Don't auto-submit for custom until dates are selected
+    } else {
+        document.getElementById('customDateRange').style.display = 'none';
+        // Auto-submit for non-custom ranges
+        submitFormWithDelay();
+    }
+}
+
+function handleCustomDateChange() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    // Clear any existing timer
+    if (customDateWaitTimer) {
+        clearTimeout(customDateWaitTimer);
+    }
+    
+    // Only submit if both dates are selected
+    if (startDate && endDate) {
+        // Wait a moment to ensure both dates are set, then submit
+        customDateWaitTimer = setTimeout(() => {
+            submitFormWithDelay();
+        }, 500);
+    }
+}
+
+function submitForm() {
+    // Clear any existing timer
+    if (formSubmissionTimer) {
+        clearTimeout(formSubmissionTimer);
+    }
+    
+    // Submit immediately for non-custom filters
+    document.getElementById('filterForm').submit();
+}
+
+function submitFormWithDelay() {
+    // Clear any existing timer
+    if (formSubmissionTimer) {
+        clearTimeout(formSubmissionTimer);
+    }
+    
+    // Submit after a short delay to avoid rapid requests
+    formSubmissionTimer = setTimeout(() => {
+        document.getElementById('filterForm').submit();
+    }, 300);
 }
 
 function exportReport(type) {
@@ -482,143 +533,255 @@ function exportReport(type) {
     document.body.removeChild(exportForm);
 }
 
+// Function to destroy existing chart if it exists
+function destroyChart(chart) {
+    if (chart) {
+        chart.destroy();
+    }
+}
+
+// Function to initialize sales trend chart based on current filter
+function initializeSalesTrendChart() {
+    const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+    
+    // Destroy existing chart
+    destroyChart(salesTrendChart);
+    
+    // Always use line graph regardless of date range
+    const dateRange = "{{ request('date_range', 'this_month') }}";
+    
+    if (dateRange === 'this_year' || dateRange === 'custom' && isLongRange()) {
+        // For yearly or long custom ranges, use monthly data with line graph
+        const monthlyLabels = {!! json_encode($salesData['monthlySales']->pluck('month')->toArray()) !!};
+        const monthlyData = {!! json_encode($salesData['monthlySales']->pluck('total')->toArray()) !!};
+        
+        if (monthlyData.length > 0) {
+            salesTrendChart = new Chart(salesTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: "Monthly Sales (₱)",
+                        backgroundColor: "rgba(44, 143, 12, 0.1)",
+                        borderColor: "#2C8F0C",
+                        pointBackgroundColor: "#2C8F0C",
+                        pointBorderColor: "#2C8F0C",
+                        pointHoverBackgroundColor: "#1E6A08",
+                        pointHoverBorderColor: "#1E6A08",
+                        borderWidth: 3,
+                        tension: 0.4,
+                        data: monthlyData,
+                    }],
+                },
+                options: getLineChartOptions("Monthly Sales (₱)")
+            });
+        } else {
+            showNoDataMessage('salesTrendChart', 'Sales Trend', 'No monthly sales data available for the selected filters.');
+        }
+    } else if (dateRange === 'this_week' || (dateRange === 'custom' && isMediumRange())) {
+        // For weekly or medium custom ranges, use weekly data with line graph
+        const weeklyLabels = {!! json_encode($salesData['weeklySales']->pluck('week_range')->toArray()) !!};
+        const weeklyData = {!! json_encode($salesData['weeklySales']->pluck('total')->toArray()) !!};
+        
+        if (weeklyData.length > 0) {
+            salesTrendChart = new Chart(salesTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: weeklyLabels,
+                    datasets: [{
+                        label: "Weekly Sales (₱)",
+                        backgroundColor: "rgba(44, 143, 12, 0.1)",
+                        borderColor: "#2C8F0C",
+                        pointBackgroundColor: "#2C8F0C",
+                        pointBorderColor: "#2C8F0C",
+                        pointHoverBackgroundColor: "#1E6A08",
+                        pointHoverBorderColor: "#1E6A08",
+                        borderWidth: 3,
+                        tension: 0.4,
+                        data: weeklyData,
+                    }],
+                },
+                options: getLineChartOptions("Weekly Sales (₱)")
+            });
+        } else {
+            showNoDataMessage('salesTrendChart', 'Sales Trend', 'No weekly sales data available for the selected filters.');
+        }
+    } else {
+        // For daily or short ranges, use daily data with line graph
+        const dailyLabels = {!! json_encode($salesData['dailySales']->pluck('date')->toArray()) !!};
+        const dailyData = {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!};
+        
+        if (dailyData.length > 0) {
+            salesTrendChart = new Chart(salesTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyLabels,
+                    datasets: [{
+                        label: "Daily Sales (₱)",
+                        backgroundColor: "rgba(44, 143, 12, 0.1)",
+                        borderColor: "#2C8F0C",
+                        pointBackgroundColor: "#2C8F0C",
+                        pointBorderColor: "#2C8F0C",
+                        pointHoverBackgroundColor: "#1E6A08",
+                        pointHoverBorderColor: "#1E6A08",
+                        borderWidth: 3,
+                        tension: 0.4,
+                        data: dailyData,
+                    }],
+                },
+                options: getLineChartOptions("Daily Sales (₱)")
+            });
+        } else {
+            showNoDataMessage('salesTrendChart', 'Sales Trend', 'No daily sales data available for the selected filters.');
+        }
+    }
+}
+
+// Helper function to determine if custom range is long (more than 3 months)
+function isLongRange() {
+    const startDate = "{{ request('start_date') }}";
+    const endDate = "{{ request('end_date') }}";
+    
+    if (!startDate || !endDate) return false;
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 90; // More than 3 months
+}
+
+// Helper function to determine if custom range is medium (1-3 months)
+function isMediumRange() {
+    const startDate = "{{ request('start_date') }}";
+    const endDate = "{{ request('end_date') }}";
+    
+    if (!startDate || !endDate) return false;
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays >= 30 && diffDays <= 90; // 1 to 3 months
+}
+
+// Common line chart options
+function getLineChartOptions(label) {
+    return {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                }
+            },
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₱' + value.toLocaleString();
+                    }
+                }
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${label}: ₱${context.raw.toLocaleString()}`;
+                    }
+                }
+            }
+        }
+    };
+}
+
+// Helper function to show no data message
+function showNoDataMessage(canvasId, title, message) {
+    const card = document.getElementById(canvasId).closest('.card');
+    card.innerHTML = `
+        <div class="card-header card-header-custom">
+            <i class="fas fa-chart-line me-2"></i> ${title}
+        </div>
+        <div class="card-body text-center py-5">
+            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+            <p class="text-muted">${message}</p>
+        </div>
+    `;
+}
+
+// Function to initialize payment method chart
+function initializePaymentMethodChart() {
+    const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+    
+    // Destroy existing chart
+    destroyChart(paymentMethodChart);
+    
+    const paymentLabels = {!! json_encode($salesData['salesByPayment']->keys()->map(fn($key) => ucfirst($key))->toArray()) !!};
+    const paymentData = {!! json_encode($salesData['salesByPayment']->pluck('total')->toArray()) !!};
+    
+    if (paymentData.length > 0) {
+        paymentMethodChart = new Chart(paymentMethodCtx, {
+            type: 'doughnut',
+            data: {
+                labels: paymentLabels,
+                datasets: [{
+                    data: paymentData,
+                    backgroundColor: ['#2C8F0C', '#4CAF50', '#8BC34A', '#CDDC39'],
+                    hoverBackgroundColor: ['#1E6A08', '#2C8F0C', '#4CAF50', '#8BC34A'],
+                    hoverBorderColor: "rgba(255, 255, 255, 1)",
+                    borderWidth: 2
+                }],
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ₱${value.toLocaleString()} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '60%',
+            },
+        });
+    } else {
+        // Hide chart container if no data
+        document.getElementById('paymentMethodChart').closest('.card').innerHTML = `
+            <div class="card-header card-header-custom">
+                <i class="fas fa-credit-card me-2"></i> Sales by Payment Method
+            </div>
+            <div class="card-body text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No payment method data available for the selected filters.</p>
+            </div>
+        `;
+    }
+}
+
 // Initialize charts when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Payment Method Pie Chart
-    @if($salesData['salesByPayment']->count() > 0)
-    const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
-    const paymentMethodChart = new Chart(paymentMethodCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {!! json_encode($salesData['salesByPayment']->keys()->map(fn($key) => ucfirst($key))->toArray()) !!},
-            datasets: [{
-                data: {!! json_encode($salesData['salesByPayment']->pluck('total')->toArray()) !!},
-                backgroundColor: ['#2C8F0C', '#4CAF50', '#8BC34A', '#CDDC39'],
-                hoverBackgroundColor: ['#1E6A08', '#2C8F0C', '#4CAF50', '#8BC34A'],
-                hoverBorderColor: "rgba(255, 255, 255, 1)",
-                borderWidth: 2
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((value / total) * 100);
-                            return `${label}: ₱${value.toLocaleString()} (${percentage}%)`;
-                        }
-                    }
-                }
-            },
-            cutout: '60%',
-        },
-    });
-    @else
-    document.getElementById('paymentMethodChart').closest('.card').style.display = 'none';
-    @endif
+    initializeSalesTrendChart();
+    initializePaymentMethodChart();
+});
 
-    // Monthly Sales Bar Chart
-    const monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
-    const monthlySalesChart = new Chart(monthlySalesCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            datasets: [{
-                label: "Sales (₱)",
-                backgroundColor: "#2C8F0C",
-                hoverBackgroundColor: "#1E6A08",
-                borderColor: "#2C8F0C",
-                borderRadius: 6,
-                data: {!! json_encode($salesData['monthlySalesArray']) !!},
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₱' + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Sales: ₱${context.raw.toLocaleString()}`;
-                        }
-                    }
-                }
-            }
-        },
-    });
-
-    // Daily Sales Chart
-    @if($salesData['dailySales']->count() > 0)
-    const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
-    const dailySalesChart = new Chart(dailySalesCtx, {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($salesData['dailySales']->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('M j'))->toArray()) !!},
-            datasets: [{
-                label: "Daily Sales (₱)",
-                backgroundColor: "rgba(44, 143, 12, 0.1)",
-                borderColor: "#2C8F0C",
-                pointBackgroundColor: "#2C8F0C",
-                pointBorderColor: "#2C8F0C",
-                pointHoverBackgroundColor: "#1E6A08",
-                pointHoverBorderColor: "#1E6A08",
-                borderWidth: 3,
-                tension: 0.4,
-                data: {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!},
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₱' + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Sales: ₱${context.raw.toLocaleString()}`;
-                        }
-                    }
-                }
-            }
-        },
-    });
-    @else
-    document.getElementById('dailySalesChart').closest('.card').style.display = 'none';
-    @endif
+// Reinitialize charts when window is resized (for responsiveness)
+window.addEventListener('resize', function() {
+    initializeSalesTrendChart();
+    initializePaymentMethodChart();
 });
 </script>
 @endpush

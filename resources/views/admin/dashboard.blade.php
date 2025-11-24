@@ -409,7 +409,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge badge-success performance-badge">
+                                    <span class="">
                                         {{ $item->product->category->name ?? 'N/A' }}
                                     </span>
                                 </td>
@@ -480,7 +480,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge badge-warning performance-badge">
+                                    <span class="">
                                         {{ $item->product->category->name ?? 'N/A' }}
                                     </span>
                                 </td>
