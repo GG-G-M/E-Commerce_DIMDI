@@ -341,7 +341,7 @@
                            placeholder="Search products or categories..." 
                            id="searchInput"
                            autocomplete="off">
-                    <div class="search-results" id="searchResults"></div>
+                    {{-- <div class="search-results" id="searchResults"></div> --}}
                 </div>
 
                 <!-- Right Section -->
