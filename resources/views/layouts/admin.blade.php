@@ -234,15 +234,15 @@
                             </a>
 
                             <div class="collapse 
-        {{ request()->routeIs('admin.suppliers.*') ||
-        request()->routeIs('admin.warehouses.*') ||
-        request()->routeIs('admin.stock_checkers.*') ||
-        request()->routeIs('admin.deliveries.*') ||
-        request()->routeIs('admin.categories.*') ||
-        request()->routeIs('admin.brands.*') ||
-        request()->routeIs('admin.banners.*')
-            ? 'show'
-            : '' }}"
+                                {{ request()->routeIs('admin.suppliers.*') ||
+                                request()->routeIs('admin.warehouses.*') ||
+                                request()->routeIs('admin.stock_checkers.*') ||
+                                request()->routeIs('admin.deliveries.*') ||
+                                request()->routeIs('admin.categories.*') ||
+                                request()->routeIs('admin.brands.*') ||
+                                request()->routeIs('admin.banners.*')
+                                    ? 'show'
+                                    : '' }}"
                                 id="managementMenu">
 
                                 <ul class="nav flex-column ms-3">
@@ -316,12 +316,12 @@
                             </a>
 
                             <div class="collapse 
-        {{ request()->routeIs('admin.products.*') ||
-        request()->routeIs('admin.low_stock.*') ||
-        request()->routeIs('admin.stock_in.*') ||
-        request()->routeIs('admin.stock_out.*')
-            ? 'show'
-            : '' }}"
+                                {{ request()->routeIs('admin.products.*') ||
+                                request()->routeIs('admin.low_stock.*') ||
+                                request()->routeIs('admin.stock_in.*') ||
+                                request()->routeIs('admin.stock_out.*')
+                                    ? 'show'
+                                    : '' }}"
                                 id="inventoryMenu">
 
                                 <ul class="nav flex-column ms-3">
