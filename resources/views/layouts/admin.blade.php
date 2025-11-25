@@ -94,6 +94,26 @@
             height: 300px;
             width: 100%;
         }
+
+        /* Ensure dropdown icons don't cause wrapping */
+        .sidebar .nav-link .float-end {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* Make sidebar content flex to handle text properly */
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link span {
+            flex: 1;
+            min-width: 0; /* Allow text truncation */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 
@@ -189,6 +209,88 @@
                                         <a class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}"
                                             href="{{ route('admin.banners.index') }}">
                                             <i class="fas fa-image me-2"></i>Banners
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
+
+                        <!-- MANAGEMENT DROPDOWN -->
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" data-bs-toggle="collapse" href="#managementMenu"
+                                role="button" aria-expanded="false" aria-controls="managementMenu">
+                                <i class="fas fa-cogs me-2"></i>
+                                <span>Management</span>
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </a>
+
+                            <div class="collapse 
+                                {{ request()->routeIs('admin.suppliers.*') ||
+                                request()->routeIs('admin.warehouses.*') ||
+                                request()->routeIs('admin.stock_checkers.*') ||
+                                request()->routeIs('admin.deliveries.*') ||
+                                request()->routeIs('admin.categories.*') ||
+                                request()->routeIs('admin.brands.*') ||
+                                request()->routeIs('admin.banners.*')
+                                    ? 'show'
+                                    : '' }}"
+                                id="managementMenu">
+
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.suppliers.index') }}">
+                                            <i class="fas fa-truck-loading me-2"></i>
+                                            <span>Suppliers</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.warehouses.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.warehouses.index') }}">
+                                            <i class="fas fa-warehouse me-2"></i>
+                                            <span>Warehouses</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.stock_checkers.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.stock_checkers.index') }}">
+                                            <i class="fas fa-user-check me-2"></i>
+                                            <span>Stock Checkers</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.deliveries.index') }}">
+                                            <i class="fas fa-truck me-2"></i>
+                                            <span>Delivery</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.categories.index') }}">
+                                            <i class="fas fa-tags me-2"></i>
+                                            <span>Categories</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.brands.index') }}">
+                                            <i class="fas fa-tag me-2"></i>
+                                            <span>Brands</span>
+                                        </a>
+                                    </li>
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.banners.index') }}">
+                                            <i class="fas fa-image me-2"></i>
+                                            <span>Banners</span>
                                         </a>
                                     </li>
                                 </ul>
