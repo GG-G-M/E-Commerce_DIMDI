@@ -102,9 +102,6 @@
 
 <!-- Filters and Search -->
 <div class="card card-custom mb-4">
-    <div class="card-header card-header-custom">
-        <i class="fas fa-filter me-2"></i> Customer Filters
-    </div>
     <div class="card-body">
         <form method="GET" action="{{ route('admin.customers.index') }}" id="filterForm">
             <div class="row">

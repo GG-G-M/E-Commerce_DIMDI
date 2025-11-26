@@ -96,27 +96,24 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::get('/orders/delivered', [DeliveryOrderController::class, 'delivered'])->name('orders.delivered');
     Route::get('/orders/my-orders', [DeliveryOrderController::class, 'myOrders'])->name('orders.my-orders');
 
-    // PARAMETERIZED ROUTES LAST - CORRECTED METHOD NAMES
+    // PARAMETERIZED ROUTES LAST - CLEANED UP AND CORRECTED
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
+    
+    // ✅ FIXED: Use consistent method names
+    Route::post('/orders/{order}/pickup', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.markAsPickedUp');
+    Route::post('/orders/{order}/deliver', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.markAsDelivered');
+    
+    // ✅ REMOVE DUPLICATES - Keep only these:
     Route::post('/orders/{order}/claim', [DeliveryOrderController::class, 'claimOrder'])->name('orders.claim');
-    Route::post('/orders/{order}/deliver', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver');
-
-    // ADD THIS LINE TO FIX THE ERROR
-    Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
-
-    // ADD THIS LINE TO FIX THE pickup-order ERROR
-    Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'claimOrder'])->name('orders.pickup-order');
-
-    Route::post('/orders/{order}/unclaim', [DeliveryOrderController::class, 'unclaimOrder'])->name('orders.unclaim');
-
-    // ADD THIS LINE - For compatibility with existing views
-    Route::post('/orders/{order}/pickup', [DeliveryOrderController::class, 'claimOrder'])->name('orders.markAsPickedUp');
-
+    
     // Profile Routes
     Route::get('/profile', [DeliveryProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [DeliveryProfileController::class, 'update'])->name('profile.update');
+    
+    // ✅ ADD MISSING ROUTES FOR COMPATIBILITY
+    Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
+    Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
-
 // Admin Routes (Role checking in controllers)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Dashboard
