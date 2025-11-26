@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -13,14 +14,11 @@ class OrderController extends Controller
     {
         $deliveryUserId = Auth::id();
         
-        // Get orders assigned to current delivery person AND available orders
         $orders = Order::where(function($query) use ($deliveryUserId) {
-                // Orders assigned to current delivery person
                 $query->where('delivery_id', $deliveryUserId)
                       ->whereIn('order_status', ['shipped', 'out_for_delivery']);
             })
             ->orWhere(function($query) {
-                // Available orders that anyone can pick up (PROCESSING status)
                 $query->where('order_status', 'processing')
                       ->whereNull('delivery_id');
             })
@@ -33,7 +31,6 @@ class OrderController extends Controller
 
     public function pickup()
     {
-        // Show ONLY available orders (processing status, no delivery person assigned)
         $orders = Order::where('order_status', 'processing')
             ->whereNull('delivery_id')
             ->with(['user', 'orderItems.product'])
@@ -47,11 +44,10 @@ class OrderController extends Controller
     {
         $deliveryUserId = Auth::id();
         
-        // Show only orders delivered by current delivery person
         $orders = Order::where('delivery_id', $deliveryUserId)
             ->where('order_status', 'delivered')
             ->with(['user', 'orderItems.product'])
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('delivered_at', 'desc')
             ->paginate(9);
 
         return view('delivery.orders.delivered', compact('orders'));
@@ -61,7 +57,6 @@ class OrderController extends Controller
     {
         $deliveryUserId = Auth::id();
         
-        // Show only orders currently assigned to this delivery person
         $orders = Order::where('delivery_id', $deliveryUserId)
             ->whereIn('order_status', ['shipped', 'out_for_delivery'])
             ->with(['user', 'orderItems.product'])
@@ -82,31 +77,42 @@ class OrderController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $order->load(['user', 'orderItems.product', 'orderItems.product.images']);
+        $order->load(['user', 'orderItems.product', 'orderItems.product.images', 'statusHistory']);
 
         return view('delivery.orders.show', compact('order'));
     }
 
     public function markAsPickedUp(Order $order, Request $request)
-{
-    $deliveryUserId = Auth::id();
-    
-    // Check if order is available for pickup (should be 'processing' status)
-    if ($order->order_status !== 'processing' || !is_null($order->delivery_id)) {
-        return redirect()->back()->with('error', 'This order is no longer available for pickup.');
+    {
+        $deliveryUserId = Auth::id();
+        
+        // Check if order can be picked up using model method
+        if (!$order->canBePickedUp()) {
+            return redirect()->back()->with('error', 'This order is no longer available for pickup.');
+        }
+
+        try {
+            // ✅ FIX: Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
+            DB::transaction(function () use ($order, $deliveryUserId) {
+                // First assign delivery person and update timestamps
+                $order->update([
+                    'delivery_id' => $deliveryUserId,
+                    'picked_up_at' => now(),
+                    'assigned_at' => now(),
+                ]);
+                
+                // ✅ USE updateStatus (same as admin) - This creates timeline entries!
+                $order->updateStatus('shipped', 'Order picked up by delivery personnel');
+            });
+
+            return redirect()->route('delivery.orders.index')
+                ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+        }
     }
 
-    // Assign order to current delivery person and update status to 'shipped'
-    $order->update([
-        'delivery_id' => $deliveryUserId,
-        'order_status' => 'shipped', // Automatically change status to shipped
-        'assigned_at' => now(),
-        // Remove picked_up_at and let updated_at track the timestamp
-    ]);
-
-    return redirect()->route('delivery.orders.index')
-        ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
-}
     public function markAsDelivered(Order $order, Request $request)
     {
         $deliveryUserId = Auth::id();
@@ -116,23 +122,128 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Unauthorized action. This order is not assigned to you.');
         }
 
-        // Check if order is in correct status for delivery
-        if (!in_array($order->order_status, ['shipped', 'out_for_delivery'])) {
+        // Check if order can be marked as delivered using model method
+        if (!$order->canBeMarkedAsDelivered()) {
             return redirect()->back()->with('error', 'This order cannot be marked as delivered. Current status: ' . $order->order_status);
         }
 
-        // Update order status to 'delivered'
-        $order->update([
-            'order_status' => 'delivered',
-            'delivered_at' => now(),
+        try {
+            // ✅ FIX: Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
+            $order->updateStatus('delivered', 'Order delivered by delivery personnel');
+
+            return redirect()->route('delivery.orders.index')
+                ->with('success', 'Order #' . $order->order_number . ' has been marked as delivered successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to mark order as delivered: ' . $e->getMessage());
+        }
+    }
+
+    public function markAsOutForDelivery(Order $order, Request $request)
+    {
+        $deliveryUserId = Auth::id();
+        
+        if ($order->delivery_id !== $deliveryUserId) {
+            return redirect()->back()->with('error', 'Unauthorized action. This order is not assigned to you.');
+        }
+
+        if ($order->order_status !== 'shipped') {
+            return redirect()->back()->with('error', 'Order must be in shipped status to mark as out for delivery.');
+        }
+
+        try {
+            $order->updateStatus('out_for_delivery', 'Order is out for delivery');
+
+            return redirect()->back()->with('success', 'Order marked as out for delivery successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update order status: ' . $e->getMessage());
+        }
+    }
+
+    public function updateDeliveryNotes(Order $order, Request $request)
+    {
+        $deliveryUserId = Auth::id();
+        
+        if ($order->delivery_id !== $deliveryUserId) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'delivery_notes' => 'nullable|string|max:500'
         ]);
 
-        return redirect()->route('delivery.orders.index')
-            ->with('success', 'Order #' . $order->order_number . ' has been marked as delivered successfully!');
+        try {
+            $order->update([
+                'notes' => $request->delivery_notes
+            ]);
+
+            return response()->json(['success' => 'Delivery notes updated successfully']);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to update notes'], 500);
+        }
     }
+
     public function claimOrder(Order $order, Request $request)
-{
-    // This is just an alias for markAsPickedUp
-    return $this->markAsPickedUp($order, $request);
-}
+    {
+        // Alias for markAsPickedUp
+        return $this->markAsPickedUp($order, $request);
+    }
+
+    public function getOrderStats()
+    {
+        $deliveryUserId = Auth::id();
+        
+        $stats = [
+            'total_assigned' => Order::where('delivery_id', $deliveryUserId)
+                ->whereIn('order_status', ['shipped', 'out_for_delivery'])
+                ->count(),
+                
+            'available_for_pickup' => Order::where('order_status', 'processing')
+                ->whereNull('delivery_id')
+                ->count(),
+                
+            'delivered_today' => Order::where('delivery_id', $deliveryUserId)
+                ->where('order_status', 'delivered')
+                ->whereDate('delivered_at', today())
+                ->count(),
+                
+            'total_delivered' => Order::where('delivery_id', $deliveryUserId)
+                ->where('order_status', 'delivered')
+                ->count(),
+        ];
+
+        return response()->json($stats);
+    }
+
+    public function searchOrders(Request $request)
+    {
+        $deliveryUserId = Auth::id();
+        $search = $request->get('search');
+        
+        $orders = Order::where(function($query) use ($deliveryUserId, $search) {
+                $query->where('delivery_id', $deliveryUserId)
+                      ->whereIn('order_status', ['shipped', 'out_for_delivery'])
+                      ->where(function($q) use ($search) {
+                          $q->where('order_number', 'like', "%{$search}%")
+                            ->orWhere('customer_name', 'like', "%{$search}%")
+                            ->orWhere('customer_phone', 'like', "%{$search}%");
+                      });
+            })
+            ->orWhere(function($query) use ($search) {
+                $query->where('order_status', 'processing')
+                      ->whereNull('delivery_id')
+                      ->where(function($q) use ($search) {
+                          $q->where('order_number', 'like', "%{$search}%")
+                            ->orWhere('customer_name', 'like', "%{$search}%")
+                            ->orWhere('customer_phone', 'like', "%{$search}%");
+                      });
+            })
+            ->with(['user', 'orderItems.product'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(9);
+
+        return view('delivery.orders.index', compact('orders'));
+    }
 }

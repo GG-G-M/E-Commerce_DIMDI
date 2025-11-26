@@ -215,6 +215,7 @@
                             </div>
                         </li>
 
+                        
                         <!-- INVENTORY DROPDOWN -->
                         <li class="nav-item">
                             <a class="nav-link collapsed" data-bs-toggle="collapse" href="#inventoryMenu" role="button"
