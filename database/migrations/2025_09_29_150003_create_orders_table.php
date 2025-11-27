@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('payment_method')->default('cash');
             $table->string('payment_status')->default('pending');
             $table->string('order_status')->default('pending');
+            $table->string('cancellation_reason')->nullable();
+            $table->timestamp('cancelled_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

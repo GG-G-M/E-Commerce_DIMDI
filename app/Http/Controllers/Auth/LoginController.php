@@ -32,7 +32,16 @@ class LoginController extends Controller
             // Transfer guest cart to user after login
             $this->transferGuestCartToUser(Auth::user());
 
-            // Redirect to intended URL or home
+            $user = Auth::user();
+            
+            // FIXED: Added delivery role check and proper role hierarchy
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+            } elseif ($user->role === 'delivery') {
+                return redirect()->route('delivery.dashboard')->with('success', 'Welcome back!');
+            }
+
+            // Redirect to intended URL or home for customers
             return redirect()->intended('/')->with('success', 'Login successful! Welcome back.');
         }
 
@@ -51,7 +60,7 @@ class LoginController extends Controller
         return redirect('/')->with('success', 'You have been logged out successfully.');
     }
 
-    private function transferGuestCartToUser(User $user) // Fixed type hint
+    private function transferGuestCartToUser(User $user)
     {
         $sessionId = session()->get('cart_session_id');
         

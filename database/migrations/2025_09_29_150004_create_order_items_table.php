@@ -16,6 +16,7 @@ return new class extends Migration
             $table->decimal('unit_price', 10, 2);
             $table->integer('quantity');
             $table->decimal('total_price', 10, 2);
+            $table->string('selected_size')->nullable();
             $table->timestamps();
         });
     }

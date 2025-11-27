@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // ADD DELIVERY GUARD
+        'delivery' => [
+            'driver' => 'session',
+            'provider' => 'deliveries',
+        ],
     ],
 
     /*
@@ -63,6 +69,12 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        // ADD DELIVERY PROVIDER
+        'deliveries' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Delivery::class,
         ],
 
         // 'users' => [
@@ -94,6 +106,14 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // ADD DELIVERY PASSWORD RESET (Optional)
+        'deliveries' => [
+            'provider' => 'deliveries',
+            'table' => 'delivery_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
