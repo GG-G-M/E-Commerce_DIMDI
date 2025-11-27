@@ -88,9 +88,9 @@
 
 <!-- Filters -->
 <div class="card card-custom mb-4">
-    <div class="card-header card-header-custom">
+    {{-- <div class="card-header card-header-custom">
         <i class="fas fa-filter me-2"></i> Supplier Filters
-    </div>
+    </div> --}}
     <div class="card-body">
         <form method="GET" action="{{ route('admin.suppliers.index') }}">
             <div class="row">
@@ -103,7 +103,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
@@ -114,7 +114,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page" onchange="this.form.submit()">
@@ -127,10 +127,15 @@
                     </div>
                 </div>
 
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-check me-1"></i> Apply
-                    </button>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-1"></i> Apply
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
             </div>

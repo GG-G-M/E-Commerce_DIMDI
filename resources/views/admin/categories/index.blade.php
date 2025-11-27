@@ -88,9 +88,9 @@
 
     <!-- Search -->
     <div class="card card-custom mb-4">
-        <div class="card-header card-header-custom">
+        {{-- <div class="card-header card-header-custom">
             <i class="fas fa-search me-2"></i> Search Categories
-        </div>
+        </div> --}}
         <div class="card-body">
             <form method="GET" action="{{ route('admin.categories.index') }}">
                 <div class="row g-2 align-items-end">
