@@ -27,7 +27,7 @@
 <div class="page-header d-flex justify-content-between align-items-center">
     <h1 class="mb-0">Stock-Out Management</h1>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockOutModal">
-        <i class="bi bi-plus-circle"></i> Add Stock-Out
+        <i class="bi bi-plus-circle"></i> Stock-Out
     </button>
 </div>
 
@@ -44,7 +44,7 @@
                     <th>Stock-In Batches (FIFO)</th>
                     <th>Reason</th>
                     <th>Date</th>
-                    <th>Actions</th>
+                    {{-- <th>Actions</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -74,7 +74,7 @@
                     </td>
                     <td>{{ $stock->reason }}</td>
                     <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
-                    <td>
+                    {{-- <td>
                         <button 
                             class="btn btn-warning btn-sm me-1 editStockBtn"
                             data-id="{{ $stock->id }}"
@@ -85,12 +85,12 @@
                         >
                             <i class="fas fa-edit"></i>
                         </button>
-                        {{-- <form action="{{ route('admin.stock_out.destroy', $stock) }}" method="POST" class="d-inline">
+                        <form action="{{ route('admin.stock_out.destroy', $stock) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                        </form> --}}
-                    </td>
+                        </form>
+                    </td> --}}
                 </tr>
                 @endforeach
             </tbody>

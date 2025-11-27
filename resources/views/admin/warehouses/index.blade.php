@@ -88,9 +88,9 @@
 
 <!-- Filters -->
 <div class="card card-custom mb-4">
-    <div class="card-header card-header-custom">
+    {{-- <div class="card-header card-header-custom">
         <i class="fas fa-filter me-2"></i> Warehouse Filters
-    </div>
+    </div> --}}
     <div class="card-body">
         <form method="GET" action="{{ route('admin.warehouses.index') }}">
             <div class="row">

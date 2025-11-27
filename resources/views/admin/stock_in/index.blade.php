@@ -183,7 +183,7 @@
                         <th>Remaining Quantity</th>
                         <th>Reason</th>
                         <th>Date</th>
-                        <th>Actions</th>
+                        {{-- <th>Actions</th> --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -204,7 +204,7 @@
                             <td>{{ $stock->remaining_quantity }}</td>
                             <td>{{ $stock->reason }}</td>
                             <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
-                            <td>
+                            {{-- <td>
                                 <button class="btn btn-warning btn-sm me-1 editStockBtn" data-id="{{ $stock->id }}"
                                     data-product-id="{{ $stock->product_id }}"
                                     data-variant-id="{{ $stock->product_variant_id }}"
@@ -214,7 +214,7 @@
                                     data-quantity="{{ $stock->quantity }}" data-reason="{{ $stock->reason }}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                            </td>
+                            </td> --}}
                         </tr>
                     @endforeach
                 </tbody>

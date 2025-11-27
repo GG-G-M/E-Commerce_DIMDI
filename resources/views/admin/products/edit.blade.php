@@ -203,7 +203,7 @@
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror"
                                        id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" 
-                                       {{ $product->has_variants ? 'disabled' : 'required' }}>
+                                       {{ $product->has_variants ? 'disabled' : 'required' }} readonly @disabled(true)>
                                 @error('stock_quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
