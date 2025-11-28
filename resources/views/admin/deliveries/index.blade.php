@@ -4,22 +4,6 @@
 
 @section('content')
 <style>
-    /* === Green Theme and Card Styling === */
-    .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-
-    .page-header h1 {
-        color: #2C8F0C;
-        font-weight: 700;
-        margin-bottom: 0;
-    }
-
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -38,7 +22,15 @@
         font-weight: 600;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
     }
 
     .btn-primary {
@@ -140,21 +132,117 @@
         justify-content: center;
         color: white;
     }
+
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    /* Theme consistent buttons */
+    .btn-outline-success {
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+        color: white;
+    }
+
+    .btn-outline-warning {
+        border-color: #FBC02D;
+        color: #FBC02D;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: #FBC02D;
+        border-color: #FBC02D;
+        color: white;
+    }
+
+    .btn-outline-danger {
+        border-color: #C62828;
+        color: #C62828;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #C62828;
+        border-color: #C62828;
+        color: white;
+    }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h3 mb-1">Delivery Management</h1>
-        <p class="text-muted mb-0">Manage delivery personnel and their assignments</p>
+<!-- Filters -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.deliveries.index') }}" id="filterForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3 position-relative">
+                        <label for="search" class="form-label fw-bold">Search Delivery Personnel</label>
+                        <input type="text" class="form-control" id="search" name="search"
+                            value="{{ request('search') }}" placeholder="Search by name, email, or phone...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="status" class="form-label fw-bold">Filter by Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Status</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="vehicle_type" class="form-label fw-bold">Vehicle Type</label>
+                        <select class="form-select" id="vehicle_type" name="vehicle_type">
+                            <option value="">All Vehicles</option>
+                            <option value="motorcycle" {{ request('vehicle_type') == 'motorcycle' ? 'selected' : '' }}>Motorcycle</option>
+                            <option value="car" {{ request('vehicle_type') == 'car' ? 'selected' : '' }}>Car</option>
+                            <option value="van" {{ request('vehicle_type') == 'van' ? 'selected' : '' }}>Van</option>
+                            <option value="truck" {{ request('vehicle_type') == 'truck' ? 'selected' : '' }}>Truck</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label for="per_page" class="form-label fw-bold">Items per page</label>
+                        <select class="form-select" id="per_page" name="per_page">
+                            @foreach([5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-    <a href="{{ route('admin.deliveries.create') }}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Delivery Person
-    </a>
 </div>
 
+<!-- Delivery Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
-        <i class="fas fa-truck me-2"></i> Delivery Personnel
+        <h5 class="mb-0">Delivery Personnel</h5>
+        <a href="{{ route('admin.deliveries.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Delivery Person
+        </a>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -199,17 +287,17 @@
                         <td>
                             <div class="btn-group" role="group">
                                 <a href="{{ route('admin.deliveries.show', $delivery) }}" 
-                                   class="btn btn-outline-primary btn-sm">
+                                   class="btn btn-outline-success btn-sm">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ route('admin.deliveries.edit', $delivery) }}" 
-                                   class="btn btn-outline-primary btn-sm">
+                                   class="btn btn-outline-success btn-sm">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.deliveries.toggle-status', $delivery) }}" 
                                       method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-{{ $delivery->is_active ? 'warning' : 'success' }} btn-sm">
+                                    <button type="submit" class="btn btn-outline-{{ $delivery->is_active ? 'warning' : 'success' }} btn-sm">
                                         <i class="fas fa-{{ $delivery->is_active ? 'pause' : 'play' }}"></i>
                                     </button>
                                 </form>
@@ -217,7 +305,7 @@
                                       method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" 
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
                                             onclick="return confirm('Are you sure you want to delete this delivery person?')">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -277,4 +365,50 @@
         border-color: #dee2e6;
     }
 </style>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const statusSelect = document.getElementById('status');
+    const vehicleTypeSelect = document.getElementById('vehicle_type');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    let searchTimeout;
+
+    // Auto-submit search with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800); // 800ms delay after typing stops
+    });
+
+    // Auto-submit status filter immediately
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit vehicle type filter immediately
+    vehicleTypeSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit per page selection immediately
+    perPageSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
+});
+</script>
+@endpush
+
 @endsection

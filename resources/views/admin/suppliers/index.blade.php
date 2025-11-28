@@ -2,20 +2,6 @@
 
 @section('content')
 <style>
-    .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-
-    .page-header h1 {
-        color: #2C8F0C;
-        font-weight: 700;
-    }
-
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -34,6 +20,15 @@
         font-weight: 600;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
     }
 
     .btn-primary {
@@ -77,29 +72,35 @@
         font-weight: 600;
         color: #2C8F0C;
     }
-</style>
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">Supplier Management</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-        <i class="bi bi-plus-circle"></i> Add Supplier
-    </button>
-</div>
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+</style>
 
 <!-- Filters -->
 <div class="card card-custom mb-4">
-    {{-- <div class="card-header card-header-custom">
-        <i class="fas fa-filter me-2"></i> Supplier Filters
-    </div> --}}
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.suppliers.index') }}">
+        <form method="GET" action="{{ route('admin.suppliers.index') }}" id="filterForm">
             <div class="row">
-
                 <div class="col-md-4">
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Supplier</label>
                         <input type="text" class="form-control" id="search" name="search"
                                value="{{ request('search') }}" placeholder="Search by name or contact...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -117,7 +118,7 @@
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
-                        <select class="form-select" id="per_page" name="per_page" onchange="this.form.submit()">
+                        <select class="form-select" id="per_page" name="per_page">
                             @foreach([5, 10, 15, 25, 50] as $option)
                                 <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
@@ -126,18 +127,6 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="col-md-2">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check me-1"></i> Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </form>
     </div>
@@ -145,7 +134,12 @@
 
 <!-- Supplier Table -->
 <div class="card card-custom">
-    <div class="card-header card-header-custom">Supplier List</div>
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Supplier List</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+            <i class="bi bi-plus-circle"></i> Add Supplier
+        </button>
+    </div>
     <div class="card-body">
         <table class="table table-bordered align-middle w-100">
             <thead>
@@ -297,6 +291,41 @@
 
 @push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const statusSelect = document.getElementById('status');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    let searchTimeout;
+
+    // Auto-submit search with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800); // 800ms delay after typing stops
+    });
+
+    // Auto-submit status filter immediately
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit per page selection immediately
+    perPageSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
+});
+
 // ADD SUPPLIER
 document.getElementById('addSupplierForm').addEventListener('submit', e => {
     e.preventDefault();
