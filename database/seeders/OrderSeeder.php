@@ -29,12 +29,12 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        $baseDate = Carbon::now()->subMonths(3);
+        $baseDate = Carbon::now()->subMonths(5);
         $orderNumber = 1000;
 
-        // Create orders spanning 3 months (increased to 80 orders)
-        for ($i = 0; $i < 80; $i++) {
-            $orderDate = $baseDate->copy()->addDays(rand(0, 90));
+        // Create orders spanning 5 months (300+ orders for high volume business)
+        for ($i = 0; $i < 320; $i++) {
+            $orderDate = $baseDate->copy()->addDays(rand(0, 150));
             $customer = $customers->random();
             
             // Random number of items per order (1-4)
@@ -70,10 +70,12 @@ class OrderSeeder extends Seeder
             $orderStatus = $this->getRandomOrderStatus();
             $isDelivered = in_array($orderStatus, ['delivered', 'cancelled']);
             
+            $deliveryId = in_array($orderStatus, ['shipped', 'delivered']) ? rand(1, 6) : null;
+            
             $order = Order::create([
                 'order_number' => 'ORD-' . str_pad($orderNumber++, 6, '0', STR_PAD_LEFT),
                 'user_id' => $customer->id,
-                'delivery_id' => in_array($orderStatus, ['shipped', 'delivered']) ? rand(1, 3) : null,
+                'delivery_id' => $deliveryId,
                 'assigned_at' => in_array($orderStatus, ['shipped', 'delivered']) ? $orderDate->copy()->addHours(rand(1, 24)) : null,
                 'customer_email' => $customer->email,
                 'customer_name' => $customer->first_name . ' ' . $customer->last_name,
@@ -103,13 +105,13 @@ class OrderSeeder extends Seeder
             $this->createOrderStatusHistory($order, $orderDate);
         }
         
-        $this->command->info('Orders created successfully with 3-month date range!');
+        $this->command->info('Orders created successfully! 320 orders spanning 5 months with 65% delivery rate!');
     }
 
     private function getRandomOrderStatus()
     {
         $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
-        $weights = [0.10, 0.15, 0.20, 0.50, 0.05]; // Increased delivered to 50%
+        $weights = [0.08, 0.12, 0.15, 0.65, 0.03]; // Increased delivered to 65% for more ratings
         
         $rand = rand(0, 100) / 100;
         $cumulative = 0;

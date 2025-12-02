@@ -52,7 +52,7 @@ class StockSeeder extends Seeder
             );
         }
         
-        $baseDate = Carbon::now()->subMonths(3);
+        $baseDate = Carbon::now()->subMonths(5);
         $products = Product::all();
         
         // Create initial stock ins (received from suppliers at start)
@@ -94,9 +94,9 @@ class StockSeeder extends Seeder
             }
         }
         
-        // Create additional stock ins during the 3-month period (restocking)
-        for ($i = 0; $i < 30; $i++) {
-            $restockDate = $baseDate->copy()->addDays(rand(5, 90));
+        // Create additional stock ins during the 5-month period (restocking)
+        for ($i = 0; $i < 80; $i++) {
+            $restockDate = $baseDate->copy()->addDays(rand(5, 150));
             $product = $products->random();
             $quantity = rand(10, 50);
             
@@ -115,9 +115,9 @@ class StockSeeder extends Seeder
             ]);
         }
         
-        // Create stock outs based on orders (simulating order fulfillment)
-        for ($i = 0; $i < 40; $i++) {
-            $outDate = $baseDate->copy()->addDays(rand(0, 90));
+        // Create stock outs based on orders (simulating order fulfillment) - 150 outs for 320 orders
+        for ($i = 0; $i < 150; $i++) {
+            $outDate = $baseDate->copy()->addDays(rand(0, 150));
             $product = $products->random();
             $quantity = rand(1, 5);
             
@@ -147,7 +147,7 @@ class StockSeeder extends Seeder
         }
         
         // Create damage/adjustment stock outs
-        for ($i = 0; $i < 8; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $product = $products->random();
             
             StockOut::create([
@@ -155,11 +155,11 @@ class StockSeeder extends Seeder
                 'product_variant_id' => null,
                 'quantity' => rand(1, 3),
                 'reason' => 'Damaged goods write-off',
-                'created_at' => $baseDate->copy()->addDays(rand(0, 90)),
-                'updated_at' => $baseDate->copy()->addDays(rand(0, 90)),
+                'created_at' => $baseDate->copy()->addDays(rand(0, 150)),
+                'updated_at' => $baseDate->copy()->addDays(rand(0, 150)),
             ]);
         }
         
-        $this->command->info('Stock In/Out data created successfully with 3-month history!');
+        $this->command->info('Stock In/Out data created successfully! 80 restocks + 150 order outs + 20 damage adjustments over 5 months!');
     }
 }

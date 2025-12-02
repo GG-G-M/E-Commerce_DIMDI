@@ -41,6 +41,36 @@ class DeliverySeeder extends Seeder
                 'password' => Hash::make('12345678'),
                 'is_active' => true,
             ],
+            [
+                'name' => 'Carmen Rodriguez',
+                'email' => 'carmen.rodriguez@delivery.local',
+                'phone' => '09174567890',
+                'vehicle_type' => 'Motorcycle',
+                'vehicle_number' => 'MC-004',
+                'license_number' => 'DL-MC-004',
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Antonio Mendoza',
+                'email' => 'antonio.mendoza@delivery.local',
+                'phone' => '09175678901',
+                'vehicle_type' => 'Tricycle',
+                'vehicle_number' => 'TC-005',
+                'license_number' => 'DL-TC-005',
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Rosa Villena',
+                'email' => 'rosa.villena@delivery.local',
+                'phone' => '09176789012',
+                'vehicle_type' => 'Van',
+                'vehicle_number' => 'VN-006',
+                'license_number' => 'DL-VN-006',
+                'password' => Hash::make('12345678'),
+                'is_active' => true,
+            ],
         ];
         
         foreach ($deliveries as $delivery) {
@@ -50,6 +80,6 @@ class DeliverySeeder extends Seeder
             );
         }
         
-        $this->command->info('Delivery personnel created successfully!');
+        $this->command->info('Delivery personnel created successfully! 6 delivery staff ready for 320+ orders!');
     }
 }
