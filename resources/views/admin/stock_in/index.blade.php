@@ -422,10 +422,12 @@
                                         <span class="text-muted">#{{ $stock->id }}</span>
                                     </td>
                                     <td>
-                                        @if ($stock->product)
+                                        @if ($stock->product && !$stock->variant)
+                                            <!-- Stock-in is for a main product only -->
                                             <strong>{{ $stock->product->name }}</strong>
                                             <div class="text-muted small">Main Product</div>
                                         @elseif($stock->variant)
+                                            <!-- Stock-in is for a variant -->
                                             <strong>{{ $stock->variant->product->name }}</strong>
                                             <div class="text-muted small">Variant: {{ $stock->variant->variant_name }}
                                             </div>
