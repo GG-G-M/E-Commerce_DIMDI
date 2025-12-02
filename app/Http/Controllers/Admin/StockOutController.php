@@ -42,9 +42,9 @@ class StockOutController extends Controller
 
         // Get FIFO stock-in batches with remaining_quantity > 0
         $stockInBatches = StockIn::where(function ($q) use ($request) {
-                $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
-                  ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
-            })
+            $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
+                ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
+        })
             ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -100,9 +100,9 @@ class StockOutController extends Controller
         // 3️⃣ Apply FIFO again for new quantity
         $quantityToDeduct = $request->quantity;
         $stockInBatches = StockIn::where(function ($q) use ($request) {
-                $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
-                  ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
-            })
+            $q->when($request->product_id, fn($x) => $x->where('product_id', $request->product_id))
+                ->when($request->product_variant_id, fn($x) => $x->where('product_variant_id', $request->product_variant_id));
+        })
             ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -153,4 +153,18 @@ class StockOutController extends Controller
         return redirect()->route('admin.stock_out.index')
             ->with('success', 'Stock-Out deleted and stock restored successfully.');
     }
+
+
+    public function autoStockOut($productId, $variantId, $quantity, $reason = 'Order Shipped')
+    {
+        $request = new \Illuminate\Http\Request([
+            'product_id' => $productId,
+            'product_variant_id' => $variantId,
+            'quantity' => $quantity,
+            'reason' => $reason,
+        ]);
+
+        return $this->store($request);
+    }
+
 }
