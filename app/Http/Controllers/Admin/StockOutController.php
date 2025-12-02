@@ -164,10 +164,7 @@ class StockOutController extends Controller
             'reason' => $reason,
         ]);
 
-<<<<<<< HEAD
-
-=======
         return $this->store($request);
     }
->>>>>>> fd6f028 (stock product/variant fields)
+
 }

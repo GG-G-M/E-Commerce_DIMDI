@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\StockInController;
 use App\Http\Controllers\Admin\StockOutController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\SalesReportController;
+use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
@@ -99,18 +100,18 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
 
     // PARAMETERIZED ROUTES LAST - CLEANED UP AND CORRECTED
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
-    
+
     // ✅ FIXED: Use consistent method names
     Route::post('/orders/{order}/pickup', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.markAsPickedUp');
     Route::post('/orders/{order}/deliver', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.markAsDelivered');
-    
+
     // ✅ REMOVE DUPLICATES - Keep only these:
     Route::post('/orders/{order}/claim', [DeliveryOrderController::class, 'claimOrder'])->name('orders.claim');
-    
+
     // Profile Routes
     Route::get('/profile', [DeliveryProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [DeliveryProfileController::class, 'update'])->name('profile.update');
-    
+
     // ✅ ADD MISSING ROUTES FOR COMPATIBILITY
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
@@ -176,7 +177,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // CSV Upload Routes
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
-    
+
 
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
@@ -228,6 +229,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Brand Routes
     Route::resource('brands', BrandController::class);
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
+
+    // INVENTORY REPORTS
+    Route::prefix('inventory-report')->name('inventory-report.')->group(function () {
+        Route::get('/', [InventoryReportController::class, 'index'])->name('index');
+    });
+
 
     // SALES REPORT ROUTES
     Route::prefix('sales-report')->name('sales-report.')->group(function () {
