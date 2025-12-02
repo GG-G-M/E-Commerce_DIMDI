@@ -123,8 +123,18 @@ class PaymentController extends Controller
             // Reduce stock for confirmed orders
             $order->reduceStock();
             
-            // Clear cart
-            Cart::where('user_id', $order->user_id)->delete();
+            // Clear selected items from cart if multi-select was used
+            $selectedItemIds = session()->get('selected_cart_items');
+            if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+                Cart::where('user_id', $order->user_id)
+                    ->whereIn('id', $selectedItemIds)
+                    ->delete();
+                session()->forget('selected_cart_items');
+            } else {
+                // Otherwise clear entire cart (backward compatibility)
+                Cart::where('user_id', $order->user_id)->delete();
+            }
+            
             session()->forget('last_order_id');
 
             return redirect()->route('orders.show', $order)
