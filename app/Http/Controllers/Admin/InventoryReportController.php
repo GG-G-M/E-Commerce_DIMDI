@@ -11,6 +11,7 @@ use App\Models\StockOut;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class InventoryReportController extends Controller
 {
@@ -37,17 +38,9 @@ class InventoryReportController extends Controller
         // -------------------------
         $productsQuery = Product::with('category');
 
-        if ($categoryId) {
-            $productsQuery->where('category_id', $categoryId);
-        }
-
-        if ($search) {
-            $productsQuery->where('name', 'like', '%' . $search . '%');
-        }
-
-        if ($productId) {
-            $productsQuery->where('id', $productId);
-        }
+        if ($categoryId) $productsQuery->where('category_id', $categoryId);
+        if ($search) $productsQuery->where('name', 'like', '%' . $search . '%');
+        if ($productId) $productsQuery->where('id', $productId);
 
         $filteredProductIds = $productsQuery->pluck('id')->toArray();
 
@@ -90,11 +83,12 @@ class InventoryReportController extends Controller
         // -------------------------
         // 4. MERGE & GROUP INVENTORY
         // -------------------------
-        $merged = $stockIns->merge($stockOuts)->sortByDesc('created_at');
+        $merged = collect($stockIns)->merge($stockOuts)->sortByDesc('created_at');
 
         $inventoryGrouped = $merged->groupBy(fn($item) => $item['product_id'] . '-' . $item['variant_name']);
 
         $inventoryTable = $inventoryGrouped->map(function ($items) {
+            $items = collect($items); // <-- make sure it’s a collection
             $first = $items->first();
             $stockIn = $items->where('type', 'in')->sum('quantity');
             $stockOut = $items->where('type', 'out')->sum('quantity');
@@ -139,29 +133,32 @@ class InventoryReportController extends Controller
         // -------------------------
         // 7. CHARTS
         // -------------------------
+        // INVENTORY TREND (cumulative stock by day)
         $trendGrouped = $merged->groupBy(fn($item) => Carbon::parse($item['created_at'])->format('Y-m-d'));
         $trendLabels = $trendGrouped->keys()->toArray();
         $trendData = [];
         $cumulativeStock = 0;
-
         foreach ($trendLabels as $date) {
-            $dayItems = $trendGrouped[$date];
+            $dayItems = collect($trendGrouped[$date]); // <-- important
             $stockIn = $dayItems->where('type', 'in')->sum('quantity');
             $stockOut = $dayItems->where('type', 'out')->sum('quantity');
             $cumulativeStock += $stockIn - $stockOut;
             $trendData[] = $cumulativeStock;
         }
 
-        $inOutStockIn = $trendGrouped->map(fn($items) => $items->where('type', 'in')->sum('quantity'))->values()->toArray();
-        $inOutStockOut = $trendGrouped->map(fn($items) => $items->where('type', 'out')->sum('quantity'))->values()->toArray();
+        // STOCK-IN VS STOCK-OUT (per day)
+        $inOutStockIn = collect($trendGrouped)->map(fn($items) => collect($items)->where('type', 'in')->sum('quantity'))->values()->toArray();
+        $inOutStockOut = collect($trendGrouped)->map(fn($items) => collect($items)->where('type', 'out')->sum('quantity'))->values()->toArray();
 
+        // LOW STOCK ITEMS (top 5 lowest stock)
         $lowStockItems = $inventoryTable->sortBy('current_stock')->take(5);
         $lowStockLabels = $lowStockItems->pluck('product_name')->toArray();
         $lowStockData = $lowStockItems->pluck('current_stock')->toArray();
 
-        $categories = Category::withCount('products')->get();
-        $categoryLabels = $categories->pluck('name')->toArray();
-        $categoryData = $categories->pluck('products_count')->toArray();
+        // CATEGORY DISTRIBUTION
+        $categoryGrouped = collect($inventoryTable)->groupBy('category_name');
+        $categoryLabels = $categoryGrouped->keys()->toArray();
+        $categoryData = $categoryGrouped->map(fn($items) => collect($items)->sum('current_stock'))->values()->toArray();
 
         $charts = [
             'trend' => ['labels' => $trendLabels, 'data' => $trendData],
@@ -169,6 +166,8 @@ class InventoryReportController extends Controller
             'low_stock' => ['labels' => $lowStockLabels, 'data' => $lowStockData],
             'categories' => ['labels' => $categoryLabels, 'data' => $categoryData],
         ];
+
+        $categories = Category::all();
 
         // -------------------------
         // 8. RENDER VIEW

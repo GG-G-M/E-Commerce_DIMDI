@@ -205,15 +205,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        /* INVENTORY TREND CHART */
+        /* ================== INVENTORY TREND CHART ================== */
         const trendCtx = document.getElementById('inventoryTrendChart').getContext('2d');
+        const trendLabels = @json($charts['trend']['labels'] ?? []);
+        const trendData = @json($charts['trend']['data'] ?? []);
+
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: @json($charts['trend']['labels']),
+                labels: trendLabels,
                 datasets: [{
                     label: 'Stock Level',
-                    data: @json($charts['trend']['data']),
+                    data: trendData,
                     borderColor: 'rgba(40, 167, 69, 1)',
                     backgroundColor: 'rgba(40, 167, 69, 0.2)',
                     borderWidth: 2,
@@ -236,20 +239,24 @@
             }
         });
 
-        /* STOCK IN VS STOCK OUT CHART */
+        /* ================== STOCK-IN VS STOCK-OUT ================== */
         const inOutCtx = document.getElementById('stockInOutChart').getContext('2d');
+        const inOutLabels = @json($charts['in_out']['labels'] ?? []);
+        const stockInData = @json($charts['in_out']['stock_in'] ?? []);
+        const stockOutData = @json($charts['in_out']['stock_out'] ?? []);
+
         new Chart(inOutCtx, {
             type: 'bar',
             data: {
-                labels: @json($charts['in_out']['labels']),
+                labels: inOutLabels,
                 datasets: [{
                         label: 'Stock-In',
-                        data: @json($charts['in_out']['stock_in']),
+                        data: stockInData,
                         backgroundColor: 'rgba(0, 123, 255, 0.7)',
                     },
                     {
                         label: 'Stock-Out',
-                        data: @json($charts['in_out']['stock_out']),
+                        data: stockOutData,
                         backgroundColor: 'rgba(220, 53, 69, 0.7)',
                     }
                 ]
@@ -269,15 +276,18 @@
             }
         });
 
-        /* LOW STOCK CHART */
+        /* ================== LOW STOCK CHART ================== */
         const lowCtx = document.getElementById('lowStockChart').getContext('2d');
+        const lowLabels = @json($charts['low_stock']['labels'] ?? []);
+        const lowData = @json($charts['low_stock']['data'] ?? []);
+
         new Chart(lowCtx, {
             type: 'bar',
             data: {
-                labels: @json($charts['low_stock']['labels']),
+                labels: lowLabels,
                 datasets: [{
                     label: 'Stock',
-                    data: @json($charts['low_stock']['data']),
+                    data: lowData,
                     backgroundColor: 'rgba(255, 193, 7, 0.7)',
                 }]
             },
@@ -296,17 +306,20 @@
             }
         });
 
-        /* CATEGORY DISTRIBUTION CHART */
+        /* ================== CATEGORY DISTRIBUTION CHART ================== */
         const catCtx = document.getElementById('categoryDistributionChart').getContext('2d');
+        const catLabels = @json($charts['categories']['labels'] ?? []);
+        const catData = @json($charts['categories']['data'] ?? []);
+
         new Chart(catCtx, {
             type: 'pie',
             data: {
-                labels: @json($charts['categories']['labels']),
+                labels: catLabels,
                 datasets: [{
-                    data: @json($charts['categories']['data']),
+                    data: catData,
                     backgroundColor: [
-                        '#0d6efd', '#198754', '#ffc107', '#dc3545', '#0dcaf0', '#6f42c1', '#fd7e14',
-                        '#6c757d'
+                        '#0d6efd', '#198754', '#ffc107', '#dc3545',
+                        '#0dcaf0', '#6f42c1', '#fd7e14', '#6c757d'
                     ]
                 }]
             },
