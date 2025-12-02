@@ -24,10 +24,32 @@
             width: 270px;
             background: linear-gradient(180deg, var(--primary-green) 0%, var(--dark-green) 100%);
             box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
-            overflow-y: scroll;
+            overflow-y: auto;
             z-index: 1000;
+            /* Custom scrollbar for Webkit browsers */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            padding-right: 10px;
         }
 
+        /* Custom scrollbar styling for Webkit browsers */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+             margin-right: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
 
         .sidebar .position-sticky {
             padding-top: 1rem;
@@ -84,6 +106,17 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        main {
+        margin-left: 270px !important;
+        padding-left: 20px; /* Add extra padding on the left */
+        }
+
+        /* Ensure content doesn't get too close to sidebar */
+        .container-fluid.py-4 {
+            padding-left: 25px !important;
+            padding-right: 15px !important;
+        }
+
         .bg-white {
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
@@ -92,7 +125,7 @@
         .chart-container {
             position: relative;
             height: 300px;
-            width: 100%;
+            width: 90%;
         }
 
         /* Ensure dropdown icons don't cause wrapping */
@@ -114,6 +147,31 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        /* Fix for profile dropdown overflow */
+        .navbar-nav .dropdown-menu {
+            position: absolute;
+            right: 0;
+            left: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            main {
+                margin-left: 0 !important;
+            }
+            
+            .navbar-nav .dropdown-menu {
+                right: auto;
+                left: 0;
+            }
+        }
     </style>
 </head>
 
@@ -121,8 +179,8 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
+            <nav class="col-md-2 col-lg-1 d-md-block sidebar collapse">
+                <div class="position-sticky pt-2">
                     <h4 class="text-center mb-4">
                         <i class="fas fa-cogs me-2"></i>DIMDI Admin
                     </h4>
@@ -317,7 +375,7 @@
                                         role="button" data-bs-toggle="dropdown">
                                         <i class="fas fa-user me-1"></i> {{ Auth::user()->name }}
                                     </a>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="{{ route('profile.show') }}">My
                                                 Profile</a>
                                         </li>

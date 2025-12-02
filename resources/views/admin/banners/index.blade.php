@@ -26,8 +26,9 @@
     }
 
     .btn-success {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        background: linear-gradient(135deg, #48b036ff, #ffffffff);
         border: none;
+        color: black;
     }
 
     .btn-success:hover {

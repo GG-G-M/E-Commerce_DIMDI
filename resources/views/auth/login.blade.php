@@ -142,7 +142,7 @@
         
         /* Button Styles - Compact */
         .btn-login {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            background: #2C8F0C;
             border: none;
             border-radius: 8px;
             font-weight: 600;

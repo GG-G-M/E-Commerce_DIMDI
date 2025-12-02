@@ -567,4 +567,14 @@ class Order extends Model
         return $query->where('delivery_id', $deliveryId)
                     ->whereIn('order_status', ['shipped', 'out_for_delivery']);
     }
+    // Add this to your Order model
+    public function deliveryRecords()
+    {
+        return $this->hasMany(OrderDelivery::class);
+    }
+
+    public function currentDelivery()
+    {
+        return $this->hasOne(OrderDelivery::class)->latest();
+    }
 }

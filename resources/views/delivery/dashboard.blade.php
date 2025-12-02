@@ -199,8 +199,8 @@
     <!-- My Active Orders -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.my-orders') }}" class="text-decoration-none">
-            <div class="card stats-card card-success h-100 clickable-card">
-                <div class="card-body">
+            <div class="card stats-card h-100 clickable-card" style="color: #1E6A08">
+                <div class="card-body" style="color: #1E6A08">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="stats-label">MY ACTIVE ORDERS</div>
@@ -321,12 +321,12 @@
 
     <!-- My Active Orders -->
     <div class="col-lg-6">
-        <div class="card section-card">
+        <div class="card section-card" style="color: #1E6A08" >
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-clipboard-list me-2"></i>My Active Orders
+                <h6 class="m-0 font-weight-bold  " style="color: #1E6A08">
+                    <i class="fas fa-clipboard-list me-2" style="color: #1E6A08"></i>My Active Orders
                 </h6>
-                <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-primary">
+                <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-success">
                     View All <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -340,7 +340,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h6 class="mb-0 fw-bold text-dark">#{{ $order->order_number }}</h6>
-                                            <span class="badge bg-primary">{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
+                                            <span class="badge" style="color: #1E6A08">{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
                                         </div>
                                         <p class="mb-1 text-muted">
                                             <i class="fas fa-user me-1"></i>{{ $order->customer_name }}
@@ -375,7 +375,7 @@
                         <i class="fas fa-clipboard-list"></i>
                         <h5 class="text-muted">No Active Orders</h5>
                         <p class="text-muted mb-3">You don't have any active orders assigned to you.</p>
-                        <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-primary">
+                        <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-success">
                             <i class="fas fa-box me-1"></i> Pick Up Orders
                         </a>
                     </div>

@@ -175,7 +175,7 @@
             @endif
         </h6>
         <div class="btn-group">
-            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-primary">
+            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-success">
                 <i class="fas fa-list me-1"></i> My Orders
             </a>
             <a href="{{ route('delivery.orders.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -305,10 +305,10 @@
                             <i class="fas fa-times me-1"></i> Clear Filters
                         </a>
                     @endif
-                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-primary">
+                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-success">
                         <i class="fas fa-list me-1"></i> View All Orders
                     </a>
-                    <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-success">
                         <i class="fas fa-clipboard-list me-1"></i> My Orders
                     </a>
                 </div>

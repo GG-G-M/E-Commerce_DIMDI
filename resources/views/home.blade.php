@@ -778,6 +778,7 @@
 
         .btn-add-cart:hover {
             background-color: var(--dark-green);
+            color: white;
             transform: translateY(-2px);
         }
 

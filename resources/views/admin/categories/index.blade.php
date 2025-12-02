@@ -48,8 +48,8 @@
         }
 
         .badge-active {
-            background-color: #2C8F0C;
-            color: white;
+         
+            color: black;
             padding: 0.35em 0.65em;
             border-radius: 0.25rem;
             font-size: 0.75em;
@@ -57,8 +57,8 @@
         }
 
         .badge-inactive {
-            background-color: #C62828;
-            color: white;
+        
+            color: black;
             padding: 0.35em 0.65em;
             border-radius: 0.25rem;
             font-size: 0.75em;

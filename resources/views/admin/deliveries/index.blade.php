@@ -80,18 +80,19 @@
 
     /* Status badges */
     .badge-success {
-        background-color: #2C8F0C !important;
-        color: #fff;
+        font-weight: 600;
+        color: #000000ff;
     }
 
     .badge-danger {
-        background-color: #C62828 !important;
-        color: #fff;
+    
+        color: #000000ff;
+        font-weight: 600;
     }
 
     .badge-info {
-        background-color: #2196F3 !important;
-        color: #fff;
+        font-weight: 600;
+        color: #000000ff;
     }
 
     .badge-warning {
@@ -297,9 +298,7 @@
                                 <form action="{{ route('admin.deliveries.toggle-status', $delivery) }}" 
                                       method="POST" class="d-inline">
                                     @csrf
-                                    <button type="submit" class="btn btn-outline-{{ $delivery->is_active ? 'warning' : 'success' }} btn-sm">
-                                        <i class="fas fa-{{ $delivery->is_active ? 'pause' : 'play' }}"></i>
-                                    </button>
+                                    
                                 </form>
                                 <form action="{{ route('admin.deliveries.destroy', $delivery) }}" 
                                       method="POST" class="d-inline">

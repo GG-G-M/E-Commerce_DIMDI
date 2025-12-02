@@ -77,18 +77,15 @@
     }
 
     .badge-critical {
-        background-color: #C62828;
-        color: white;
+        color: black;
     }
 
     .badge-warning {
-        background-color: #FBC02D;
         color: #000;
     }
 
     .badge-low {
-        background-color: #2C8F0C;
-        color: white;
+        color: black;
     }
 
     .product-name {
@@ -244,9 +241,9 @@
                                 </td>
                                 <td>
                                     @if($product->is_active)
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge" style="color:black">Active</span>
                                     @else
-                                        <span class="badge bg-secondary">Inactive</span>
+                                        <span class="badge" style="color:black">Inactive</span>
                                     @endif
                                 </td>
                                 <td>
