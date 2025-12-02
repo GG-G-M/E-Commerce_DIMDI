@@ -153,4 +153,17 @@ class StockOutController extends Controller
         return redirect()->route('admin.stock_out.index')
             ->with('success', 'Stock-Out deleted and stock restored successfully.');
     }
+
+    public function autoStockOut($productId, $variantId, $quantity, $reason = 'Order Shipped')
+{
+    $request = new \Illuminate\Http\Request([
+        'product_id' => $productId,
+        'product_variant_id' => $variantId,
+        'quantity' => $quantity,
+        'reason' => $reason,
+    ]);
+
+    return $this->store($request);
+}
+
 }
