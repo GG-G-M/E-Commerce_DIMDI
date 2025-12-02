@@ -114,6 +114,7 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
+
 // Admin Routes (Role checking in controllers)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Dashboard

@@ -240,7 +240,8 @@
                             <select class="form-select" id="warehouse_id" name="warehouse_id">
                                 <option value="">All Warehouses</option>
                                 @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                    <option value="{{ $warehouse->id }}"
+                                        {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
                                         {{ $warehouse->name }}
                                     </option>
                                 @endforeach
@@ -253,7 +254,8 @@
                             <select class="form-select" id="supplier_id" name="supplier_id">
                                 <option value="">All Suppliers</option>
                                 @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                    <option value="{{ $supplier->id }}"
+                                        {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
                                         {{ $supplier->name }}
                                     </option>
                                 @endforeach
@@ -265,9 +267,12 @@
                             <label for="date_range" class="form-label fw-bold">Date Range</label>
                             <select class="form-select" id="date_range" name="date_range">
                                 <option value="">All Time</option>
-                                <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
-                                <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week</option>
-                                <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month</option>
+                                <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today
+                                </option>
+                                <option value="week" {{ request('date_range') == 'week' ? 'selected' : '' }}>This Week
+                                </option>
+                                <option value="month" {{ request('date_range') == 'month' ? 'selected' : '' }}>This Month
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -276,7 +281,8 @@
                             <label for="per_page" class="form-label fw-bold">Items per page</label>
                             <select class="form-select" id="per_page" name="per_page">
                                 @foreach ([5, 10, 15, 25, 50] as $option)
-                                    <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                    <option value="{{ $option }}"
+                                        {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                         {{ $option }}
                                     </option>
                                 @endforeach
@@ -337,8 +343,9 @@
 
                         <!-- Progress Bar -->
                         <div class="progress mb-3" style="height: 20px; display: none;" id="uploadProgress">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
-                                style="width:0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0"
+                                aria-valuemax="100">
                                 <span class="progress-text">0%</span>
                             </div>
                         </div>
@@ -371,7 +378,7 @@
             </div>
         </div>
         <div class="card-body">
-            @if($stockIns->count() > 0)
+            @if ($stockIns->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -391,9 +398,11 @@
                         <tbody>
                             @foreach ($stockIns as $stock)
                                 @php
-                                    $usagePercentage = $stock->quantity > 0 ? 
-                                        (($stock->quantity - $stock->remaining_quantity) / $stock->quantity) * 100 : 0;
-                                    
+                                    $usagePercentage =
+                                        $stock->quantity > 0
+                                            ? (($stock->quantity - $stock->remaining_quantity) / $stock->quantity) * 100
+                                            : 0;
+
                                     if ($usagePercentage >= 80) {
                                         $statusClass = 'stock-low';
                                         $statusBadge = 'badge-danger';
@@ -414,25 +423,27 @@
                                     </td>
                                     <td>
                                         @if ($stock->product)
-                                            <div class="product-name">{{ $stock->product->name }}</div>
+                                            <strong>{{ $stock->product->name }}</strong>
                                             <div class="text-muted small">Main Product</div>
                                         @elseif($stock->variant)
-                                            <div class="product-name">{{ $stock->variant->product->name }}</div>
-                                            <div class="variant-name">{{ $stock->variant->variant_name }}</div>
+                                            <strong>{{ $stock->variant->product->name }}</strong>
+                                            <div class="text-muted small">Variant: {{ $stock->variant->variant_name }}
+                                            </div>
                                         @endif
                                     </td>
+
                                     <td>
                                         <span class="text-dark">{{ $stock->warehouse->name }}</span>
                                     </td>
                                     <td>
-                                        @if($stock->supplier)
+                                        @if ($stock->supplier)
                                             <span class="text-dark">{{ $stock->supplier->name }}</span>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
-                                        @if($stock->checker)
+                                        @if ($stock->checker)
                                             <span class="text-dark">
                                                 {{ $stock->checker->firstname }} {{ $stock->checker->lastname }}
                                             </span>
@@ -503,23 +514,21 @@
                     <div class="modal-body">
                         <input type="hidden" name="_method" id="formMethod" value="POST">
 
-                        <div class="mb-3">
+                        <div class="mb-3 position-relative">
                             <label class="form-label">Product</label>
-                            <select class="form-select" name="product_id" id="productSelect">
-                                <option value="">Select Product</option>
-                                @foreach ($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" id="productField"
+                                placeholder="Click to select product" readonly>
+                            <input type="hidden" name="product_id" id="productId">
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3" id="variantContainer">
                             <label class="form-label">Variant</label>
                             <select class="form-select" name="product_variant_id" id="variantSelect">
                                 <option value="">Select Variant</option>
                                 @foreach ($variants as $variant)
-                                    <option value="{{ $variant->id }}">{{ $variant->product->name }} /
-                                        {{ $variant->variant_name }}</option>
+                                    <option value="{{ $variant->id }}" data-product-id="{{ $variant->product_id }}">
+                                        {{ $variant->product->name }} / {{ $variant->variant_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -576,126 +585,219 @@
         </div>
     </div>
 
+    <!-- Product Selection Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="productTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>SKU</th>
+                                    <th>Category</th>
+                                    <th>Variants</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($products as $product)
+                                    <tr>
+                                        <td>
+                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                                class="img-thumbnail"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
+                                        </td>
+                                        <td>{{ $product->name }}</td>
+                                        <td>{{ $product->sku }}</td>
+                                        <td>{{ $product->category->name ?? 'N/A' }}</td>
+                                        <td>
+                                            @if ($product->has_variants && $product->variants->count() > 0)
+                                                {{ $product->variants->count() }} variants
+                                            @else
+                                                None
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <button type="button" class="select-product-btn btn btn-sm btn-primary"
+                                                data-id="{{ $product->id }}" data-name="{{ $product->name }}"
+                                                data-has-variants="{{ $product->variants->count() ? 1 : 0 }}">
+                                                Select
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auto-filter functionality
-            const filterForm = document.getElementById('filterForm');
-            const searchInput = document.getElementById('search');
-            const warehouseSelect = document.getElementById('warehouse_id');
-            const supplierSelect = document.getElementById('supplier_id');
-            const dateRangeSelect = document.getElementById('date_range');
-            const perPageSelect = document.getElementById('per_page');
-            const searchLoading = document.getElementById('searchLoading');
-            
-            let searchTimeout;
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // --- Product & Variant selection ---
+                const productField = document.getElementById('productField');
+                const productIdInput = document.getElementById('productId');
+                const variantContainer = document.getElementById('variantContainer');
+                const variantSelect = document.getElementById('variantSelect');
 
-            // Auto-submit search with delay
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchLoading.style.display = 'block';
-                
-                searchTimeout = setTimeout(() => {
-                    filterForm.submit();
-                }, 800);
-            });
+                // Hide variant field initially
+                variantContainer.style.display = 'none';
 
-            // Auto-submit other filters immediately
-            warehouseSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
-
-            supplierSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
-
-            dateRangeSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
-
-            perPageSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
-
-            // Clear loading indicator when form submits
-            filterForm.addEventListener('submit', function() {
-                searchLoading.style.display = 'none';
-            });
-
-            // CSV Upload functionality
-            const csvUploadForm = document.getElementById('csvUploadForm');
-            const uploadProgress = document.getElementById('uploadProgress');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const uploadCsvBtn = document.getElementById('uploadCsvBtn');
-            const progressBar = uploadProgress.querySelector('.progress-bar');
-            const progressText = uploadProgress.querySelector('.progress-text');
-
-            if (csvUploadForm) {
-                csvUploadForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-
-                    uploadProgress.style.display = 'block';
-                    uploadStatus.style.display = 'none';
-                    uploadCsvBtn.disabled = true;
-                    uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
-
-                    let progress = 0;
-                    const progressInterval = setInterval(() => {
-                        progress += 5;
-                        if (progress <= 100) {
-                            progressBar.style.width = progress + '%';
-                            progressBar.setAttribute('aria-valuenow', progress);
-                            progressText.textContent = progress + '%';
-                        }
-                    }, 100);
-
-                    fetch(this.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            clearInterval(progressInterval);
-                            progressBar.style.width = '100%';
-                            progressText.textContent = '100%';
-                            if (data.success) {
-                                showUploadStatus('success', data.message);
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000);
-                            } else {
-                                showUploadStatus('danger', data.message || 'Upload failed.');
-                            }
-                        })
-                        .catch(error => {
-                            clearInterval(progressInterval);
-                            showUploadStatus('danger', 'Upload failed: ' + error.message);
-                        })
-                        .finally(() => {
-                            uploadCsvBtn.disabled = false;
-                            uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
-                        });
+                // Show product modal when product field is clicked
+                productField.addEventListener('click', function() {
+                    const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+                    productModal.show();
                 });
 
-                function showUploadStatus(type, message) {
-                    uploadStatus.className = `alert alert-${type}`;
-                    uploadStatus.innerHTML = message;
-                    uploadStatus.style.display = 'block';
+                // Handle product selection from modal
+                document.querySelectorAll('.select-product-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const productId = this.dataset.id.toString();
+                        const productName = this.dataset.name;
+                        const hasVariants = this.dataset.hasVariants === '1';
+
+                        // Set selected product
+                        productField.value = productName;
+                        productIdInput.value = productId;
+
+                        if (hasVariants) {
+                            variantContainer.style.display = 'block';
+
+                            // Filter variant options to only the selected product
+                            Array.from(variantSelect.options).forEach(option => {
+                                if (option.value === "" || option.dataset.productId ===
+                                    productId) {
+                                    option.style.display = 'block';
+                                } else {
+                                    option.style.display = 'none';
+                                }
+                            });
+
+                            // Reset selected variant
+                            variantSelect.value = "";
+                        } else {
+                            variantContainer.style.display = 'none';
+                            variantSelect.value = "";
+                        }
+
+                        // Close modal
+                        const modalEl = document.getElementById('productModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
+                    });
+                });
+
+                // --- Auto-submit filters ---
+                const filterForm = document.getElementById('filterForm');
+                if (filterForm) {
+                    const searchInput = document.getElementById('search');
+                    const warehouseSelect = document.getElementById('warehouse_id');
+                    const supplierSelect = document.getElementById('supplier_id');
+                    const dateRangeSelect = document.getElementById('date_range');
+                    const perPageSelect = document.getElementById('per_page');
+                    const searchLoading = document.getElementById('searchLoading');
+                    let searchTimeout;
+
+                    // Auto-submit search with delay
+                    searchInput?.addEventListener('input', function() {
+                        clearTimeout(searchTimeout);
+                        searchLoading && (searchLoading.style.display = 'block');
+                        searchTimeout = setTimeout(() => filterForm.submit(), 800);
+                    });
+
+                    // Auto-submit other filters immediately
+                    [warehouseSelect, supplierSelect, dateRangeSelect, perPageSelect].forEach(el => {
+                        el?.addEventListener('change', () => filterForm.submit());
+                    });
+
+                    filterForm.addEventListener('submit', () => {
+                        searchLoading && (searchLoading.style.display = 'none');
+                    });
                 }
 
-                document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
-                    csvUploadForm.reset();
-                    uploadProgress.style.display = 'none';
-                    uploadStatus.style.display = 'none';
-                    progressBar.style.width = '0%';
-                    progressText.textContent = '0%';
-                });
-            }
-        });
-    </script>
+                // --- CSV Upload functionality ---
+                const csvUploadForm = document.getElementById('csvUploadForm');
+                if (csvUploadForm) {
+                    const uploadProgress = document.getElementById('uploadProgress');
+                    const uploadStatus = document.getElementById('uploadStatus');
+                    const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+                    const progressBar = uploadProgress.querySelector('.progress-bar');
+                    const progressText = uploadProgress.querySelector('.progress-text');
+
+                    csvUploadForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+
+                        uploadProgress.style.display = 'block';
+                        uploadStatus.style.display = 'none';
+                        uploadCsvBtn.disabled = true;
+                        uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+                        let progress = 0;
+                        const progressInterval = setInterval(() => {
+                            progress += 5;
+                            if (progress <= 100) {
+                                progressBar.style.width = progress + '%';
+                                progressBar.setAttribute('aria-valuenow', progress);
+                                progressText.textContent = progress + '%';
+                            }
+                        }, 100);
+
+                        fetch(this.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                clearInterval(progressInterval);
+                                progressBar.style.width = '100%';
+                                progressText.textContent = '100%';
+                                if (data.success) {
+                                    showUploadStatus('success', data.message);
+                                    setTimeout(() => window.location.reload(), 2000);
+                                } else {
+                                    showUploadStatus('danger', data.message || 'Upload failed.');
+                                }
+                            })
+                            .catch(err => {
+                                clearInterval(progressInterval);
+                                showUploadStatus('danger', 'Upload failed: ' + err.message);
+                            })
+                            .finally(() => {
+                                uploadCsvBtn.disabled = false;
+                                uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
+                            });
+
+                        function showUploadStatus(type, message) {
+                            uploadStatus.className = `alert alert-${type}`;
+                            uploadStatus.innerHTML = message;
+                            uploadStatus.style.display = 'block';
+                        }
+                    });
+
+                    document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
+                        csvUploadForm.reset();
+                        uploadProgress.style.display = 'none';
+                        uploadStatus.style.display = 'none';
+                        progressBar.style.width = '0%';
+                        progressText.textContent = '0%';
+                    });
+                }
+            });
+        </script>
     @endpush
 @endsection
