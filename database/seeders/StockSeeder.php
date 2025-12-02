@@ -2,10 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\StockIn;
-use App\Models\StockOut;
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\Warehouse;
 use App\Models\Supplier;
 use App\Models\StockChecker;
@@ -52,114 +48,5 @@ class StockSeeder extends Seeder
             );
         }
         
-        $baseDate = Carbon::now()->subMonths(5);
-        $products = Product::all();
-        
-        // Create initial stock ins (received from suppliers at start)
-        foreach ($products as $product) {
-            $initialQuantity = rand(20, 100);
-            
-            StockIn::create([
-                'product_id' => $product->id,
-                'product_variant_id' => null,
-                'warehouse_id' => $warehouse->id,
-                'supplier_id' => $suppliers[rand(0, count($suppliers) - 1)]->id,
-                'stock_checker_id' => $checkers[rand(0, count($checkers) - 1)]->id,
-                'quantity' => $initialQuantity,
-                'remaining_quantity' => $initialQuantity,
-                'reason' => 'Initial stock setup',
-                'is_archived' => false,
-                'created_at' => $baseDate->copy(),
-                'updated_at' => $baseDate->copy(),
-            ]);
-            
-            // Create stock ins for variants if they exist
-            $variants = ProductVariant::where('product_id', $product->id)->get();
-            foreach ($variants as $variant) {
-                $variantQuantity = rand(10, 50);
-                
-                StockIn::create([
-                    'product_id' => null,
-                    'product_variant_id' => $variant->id,
-                    'warehouse_id' => $warehouse->id,
-                    'supplier_id' => $suppliers[rand(0, count($suppliers) - 1)]->id,
-                    'stock_checker_id' => $checkers[rand(0, count($checkers) - 1)]->id,
-                    'quantity' => $variantQuantity,
-                    'remaining_quantity' => $variantQuantity,
-                    'reason' => 'Initial variant stock',
-                    'is_archived' => false,
-                    'created_at' => $baseDate->copy(),
-                    'updated_at' => $baseDate->copy(),
-                ]);
-            }
-        }
-        
-        // Create additional stock ins during the 5-month period (restocking)
-        for ($i = 0; $i < 80; $i++) {
-            $restockDate = $baseDate->copy()->addDays(rand(5, 150));
-            $product = $products->random();
-            $quantity = rand(10, 50);
-            
-            StockIn::create([
-                'product_id' => $product->id,
-                'product_variant_id' => null,
-                'warehouse_id' => $warehouse->id,
-                'supplier_id' => $suppliers[rand(0, count($suppliers) - 1)]->id,
-                'stock_checker_id' => $checkers[rand(0, count($checkers) - 1)]->id,
-                'quantity' => $quantity,
-                'remaining_quantity' => $quantity,
-                'reason' => 'Restocking',
-                'is_archived' => false,
-                'created_at' => $restockDate,
-                'updated_at' => $restockDate,
-            ]);
-        }
-        
-        // Create stock outs based on orders (simulating order fulfillment) - 150 outs for 320 orders
-        for ($i = 0; $i < 150; $i++) {
-            $outDate = $baseDate->copy()->addDays(rand(0, 150));
-            $product = $products->random();
-            $quantity = rand(1, 5);
-            
-            StockOut::create([
-                'product_id' => $product->id,
-                'product_variant_id' => null,
-                'quantity' => $quantity,
-                'reason' => 'Order fulfillment',
-                'created_at' => $outDate,
-                'updated_at' => $outDate,
-            ]);
-            
-            // Occasional stock outs for variants
-            if (rand(0, 1)) {
-                $variant = ProductVariant::inRandomOrder()->first();
-                if ($variant) {
-                    StockOut::create([
-                        'product_id' => null,
-                        'product_variant_id' => $variant->id,
-                        'quantity' => rand(1, 3),
-                        'reason' => 'Variant order fulfillment',
-                        'created_at' => $outDate->copy()->addHours(rand(1, 12)),
-                        'updated_at' => $outDate->copy()->addHours(rand(1, 12)),
-                    ]);
-                }
-            }
-        }
-        
-        // Create damage/adjustment stock outs
-        for ($i = 0; $i < 20; $i++) {
-            $product = $products->random();
-            
-            StockOut::create([
-                'product_id' => $product->id,
-                'product_variant_id' => null,
-                'quantity' => rand(1, 3),
-                'reason' => 'Damaged goods write-off',
-                'created_at' => $baseDate->copy()->addDays(rand(0, 150)),
-                'updated_at' => $baseDate->copy()->addDays(rand(0, 150)),
-            ]);
-        }
-        
-        $this->command->info('Stock In/Out data created successfully! 80 restocks + 150 order outs + 20 damage adjustments over 5 months!');
     }
 }

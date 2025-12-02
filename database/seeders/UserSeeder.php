@@ -78,6 +78,28 @@ class UserSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'rocky@gmail.com'],
+            [
+                'first_name' => 'Rocky',
+                'middle_name' => 'B.',
+                'last_name' => 'Adaya',
+                'password' => Hash::make('12345678'),
+                'role' => 'customer',
+                'phone' => '123-456-7890',
+                'address' => 'Catalunan Grande',
+                'city' => 'Davao City',
+                'state' => 'Davao del Sur',
+                'zip_code' => '8000',
+                'country' => 'Philippines',
+                'is_archived' => false,
+                'vehicle_type' => null,
+                'vehicle_number' => null,
+                'license_number' => null,
+                'is_active' => true,
+            ]
+        );
+
         // Create additional customer users for orders and ratings
         $customers = [
             ['email' => 'maria.garcia@gmail.com', 'first_name' => 'Maria', 'last_name' => 'Garcia', 'phone' => '09161234567'],
