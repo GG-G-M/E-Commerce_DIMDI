@@ -132,6 +132,18 @@
         background: linear-gradient(135deg, #E55A2B, #FF7B3A) !important;
         color: white;
     }
+    .details-section {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    .details-section h3 {
+        color: #2C8F0C;
+        border-bottom: 2px solid #2C8F0C;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
 </style>
 
 <div class="container py-4">
@@ -162,7 +174,7 @@
         <div class="col-lg-6">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
             
-            <!-- Display Brand - FIXED -->
+            <!-- Display Brand -->
             @if($product->brand_id && $product->brand)
                 <div class="mb-2">
                     <span class="badge bg-light text-dark border px-3 py-2">
@@ -183,8 +195,6 @@
                 @endif
             </div>
 
-            <p class="mb-4">{{ $product->description }}</p>
-
             <!-- Variant Selection -->
             @if($product->has_variants && $product->variants->count() > 0)
             <div class="mb-4">
@@ -192,13 +202,14 @@
                 <div class="d-flex flex-wrap gap-2">
                     @foreach($product->variants as $variant)
                         @php
-                            $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                            $variantName = $variant->display_name;
                             $variantPrice = $variant->current_price;
                             $variantStock = $variant->stock_quantity ?? 0;
                             $isInStock = $variantStock > 0;
                             $isFirstInStock = $loop->first && $isInStock;
-                            $hasVariantDiscount = !is_null($variant->sale_price) && $variant->sale_price < $variant->price;
-                            $variantDiscountPercent = $hasVariantDiscount ? round((($variant->price - $variant->sale_price) / $variant->price) * 100) : 0;
+                            $hasVariantDiscount = $variant->has_discount;
+                            $variantDiscountPercent = $variant->discount_percentage;
+                            $variantDescription = $variant->variant_description;
                         @endphp
                         <div class="form-check p-0">
                             <input class="form-check-input d-none" type="radio" name="selected_variant" 
@@ -209,6 +220,10 @@
                                    data-variant-original-price="{{ $variant->price }}"
                                    data-variant-has-discount="{{ $hasVariantDiscount ? 'true' : 'false' }}"
                                    data-variant-discount-percent="{{ $variantDiscountPercent }}"
+                                   data-variant-sku="{{ $variant->sku }}"
+                                   data-variant-stock="{{ $variantStock }}"
+                                   data-variant-in-stock="{{ $isInStock ? 'true' : 'false' }}"
+                                   data-variant-description="{{ $variantDescription }}"
                                    {{ $isFirstInStock ? 'checked' : '' }}
                                    {{ !$isInStock ? 'disabled' : '' }}>
                             <label class="form-check-label variant-option {{ $isFirstInStock ? 'selected' : '' }} {{ !$isInStock ? 'disabled' : '' }}" 
@@ -238,10 +253,10 @@
             @endif
 
             <div class="mb-4">
-                <span class="badge bg-{{ $product->in_stock ? 'success' : 'danger' }}">
+                <span class="badge bg-{{ $product->in_stock ? 'success' : 'danger' }}" id="stock-badge">
                     {{ $product->in_stock ? 'In Stock' : 'Out of Stock' }}
                 </span>
-                <small class="text-muted ms-2">Total: {{ $product->total_stock }} units available</small>
+                <small class="text-muted ms-2" id="stock-text">Total: {{ $product->total_stock }} units available</small>
             </div>
 
             @if($product->in_stock)
@@ -253,7 +268,7 @@
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="quantity" value="1" id="buy-now-quantity">
                         <input type="hidden" name="selected_size" id="buy-now-variant-input" 
-                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
+                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->display_name ?? 'Standard') : 'Standard' }}">
                         <input type="hidden" name="direct_checkout" value="true">
                         <button type="submit" class="btn btn-buy-now btn-lg w-100" id="buy-now-btn">
                             <i class="fas fa-bolt me-2"></i>Buy Now
@@ -268,7 +283,7 @@
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="quantity" value="1" id="quantity-input">
                         <input type="hidden" name="selected_size" id="selected_variant_input" 
-                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->size ?? $product->variants->where('stock_quantity', '>', 0)->first()->variant_name ?? 'Standard') : 'Standard' }}">
+                               value="{{ $product->has_variants && $product->variants->count() > 0 ? ($product->variants->where('stock_quantity', '>', 0)->first()->display_name ?? 'Standard') : 'Standard' }}">
                         <button type="submit" class="btn btn-primary btn-lg w-100 add-to-cart-btn" id="add-to-cart-btn">
                             <i class="fas fa-cart-plus me-2"></i>Add to Cart
                         </button>
@@ -297,32 +312,66 @@
             @else
             <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
             @endif
+        </div>
+    </div>
 
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h6 class="card-title text-success fw-bold">Product Details</h6>
-                    <ul class="list-unstyled mb-0">
-                        <li><strong>SKU:</strong> {{ $product->sku }}</li>
-                        <li><strong>Category:</strong> {{ $product->category->name }}</li>
-                        <!-- Brand Display - FIXED -->
-                        @if($product->brand_id && $product->brand)
-                        <li><strong>Brand:</strong> {{ $product->brand->name }}</li>
-                        @endif
-                        <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
-                        @if($product->has_variants && $product->variants->count() > 0)
-                        <li><strong>Available Options:</strong> 
-                            @foreach($product->variants as $variant)
-                                @php
-                                    $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
-                                    $variantStock = $variant->stock_quantity ?? 0;
-                                @endphp
-                                <span class="badge bg-{{ $variantStock > 0 ? 'primary' : 'secondary' }} me-1">
-                                    {{ $variantName }} ({{ $variantStock }})
-                                </span>
-                            @endforeach
-                        </li>
-                        @endif
-                    </ul>
+    <!-- Product Description & Details Section -->
+    <div class="details-section">
+        <h3><i class="fas fa-info-circle me-2"></i>Product Information</h3>
+        
+        <div class="row">
+            <!-- Description Column -->
+            <div class="col-lg-6">
+                <h5 class="text-success mb-3">Description</h5>
+                <p class="mb-0" id="product-description">{{ $product->description }}</p>
+            </div>
+            
+            <!-- Details Column -->
+            <div class="col-lg-6">
+                <h5 class="text-success mb-3">Product Details</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th width="35%">SKU:</th>
+                                <td id="product-sku">{{ $product->sku }}</td>
+                            </tr>
+                            <tr>
+                                <th>Category:</th>
+                                <td>{{ $product->category->name }}</td>
+                            </tr>
+                            @if($product->brand_id && $product->brand)
+                            <tr>
+                                <th>Brand:</th>
+                                <td>{{ $product->brand->name }}</td>
+                            </tr>
+                            @endif
+                            <tr>
+                                <th>Availability:</th>
+                                <td>
+                                    <span class="badge bg-{{ $product->in_stock ? 'success' : 'danger' }}" id="availability-badge">
+                                        {{ $product->in_stock ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
+                                    <span class="ms-2" id="availability-text">{{ $product->total_stock }} units available</span>
+                                </td>
+                            </tr>
+                            @if($product->has_variants && $product->variants->count() > 0)
+                            <tr>
+                                <th>Selected Option:</th>
+                                <td id="selected-option">
+                                    @php
+                                        $firstAvailableVariant = $product->variants->where('stock_quantity', '>', 0)->first();
+                                    @endphp
+                                    @if($firstAvailableVariant)
+                                        {{ $firstAvailableVariant->display_name }}
+                                    @else
+                                        {{ $product->variants->first()->display_name ?? 'Standard' }}
+                                    @endif
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -340,7 +389,7 @@
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
                         
-                        <!-- Display Brand for Related Products - FIXED -->
+                        <!-- Display Brand for Related Products -->
                         @if($relatedProduct->brand_id && $relatedProduct->brand)
                             <small class="text-muted d-block mb-2">
                                 <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand->name }}
@@ -353,7 +402,7 @@
                             <small class="text-muted">Options: 
                                 @foreach($relatedProduct->variants as $variant)
                                     @php
-                                        $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                        $variantName = $variant->display_name;
                                         $variantStock = $variant->stock_quantity ?? 0;
                                     @endphp
                                     <span class="badge bg-light text-dark border me-1 {{ $variantStock <= 0 ? 'text-decoration-line-through text-muted' : '' }}">
@@ -497,9 +546,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainImage = document.getElementById('product-main-image');
     const productPrice = document.getElementById('product-price');
     const productOriginalPrice = document.getElementById('product-original-price');
+    const productSku = document.getElementById('product-sku');
+    const availabilityBadge = document.getElementById('availability-badge');
+    const availabilityText = document.getElementById('availability-text');
+    const selectedOption = document.getElementById('selected-option');
+    const stockBadge = document.getElementById('stock-badge');
+    const stockText = document.getElementById('stock-text');
+    const productDescription = document.getElementById('product-description');
     const variantInput = document.getElementById('selected_variant_input');
     const buyNowVariantInput = document.getElementById('buy-now-variant-input');
     const variantRadios = document.querySelectorAll('input[name="selected_variant"]');
+    
+    // Store original product data
+    const originalProductData = {
+        sku: productSku ? productSku.textContent : '{{ $product->sku }}',
+        description: productDescription ? productDescription.textContent : '{{ $product->description }}',
+        inStock: {{ $product->in_stock ? 'true' : 'false' }},
+        totalStock: {{ $product->total_stock }}
+    };
     
     // Update selected variant when user clicks on a variant option
     variantRadios.forEach(radio => {
@@ -510,6 +574,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const variantOriginalPrice = this.getAttribute('data-variant-original-price');
                 const hasDiscount = this.getAttribute('data-variant-has-discount') === 'true';
                 const discountPercent = this.getAttribute('data-variant-discount-percent');
+                const variantSku = this.getAttribute('data-variant-sku');
+                const variantStock = parseInt(this.getAttribute('data-variant-stock'));
+                const variantInStock = this.getAttribute('data-variant-in-stock') === 'true';
+                const variantDescription = this.getAttribute('data-variant-description');
                 
                 // Update selected variant value for both forms
                 variantInput.value = this.value;
@@ -534,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         productOriginalPrice.style.display = 'inline';
                     }
                     
-                    // Update image discount badge (the one in position-absolute)
+                    // Update image discount badge
                     let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
                     if (hasDiscount) {
                         if (!imageDiscountBadge) {
@@ -547,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         imageDiscountBadge.remove();
                     }
 
-                    // Update price discount badge (the one next to price)
+                    // Update price discount badge
                     let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
                     if (hasDiscount) {
                         if (!priceDiscountBadge) {
@@ -558,12 +626,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         priceDiscountBadge.textContent = discountPercent + '% OFF';
                     } else if (priceDiscountBadge) {
                         priceDiscountBadge.remove();
-                    }
-                    
-                    // Remove discount badge if exists
-                    const discountBadge = document.querySelector('.badge.bg-danger');
-                    if (discountBadge && !discountBadge.closest('.position-absolute')) {
-                        discountBadge.remove();
                     }
                 } else {
                     productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
@@ -583,6 +645,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (priceDiscountBadge) {
                         priceDiscountBadge.remove();
                     }
+                }
+                
+                // Update product information
+                if (productSku) {
+                    productSku.textContent = variantSku || originalProductData.sku;
+                }
+                
+                if (productDescription && variantDescription) {
+                    productDescription.textContent = variantDescription || originalProductData.description;
+                }
+                
+                if (availabilityBadge) {
+                    const inStock = variantInStock;
+                    availabilityBadge.textContent = inStock ? 'In Stock' : 'Out of Stock';
+                    availabilityBadge.className = `badge bg-${inStock ? 'success' : 'danger'}`;
+                }
+                
+                if (availabilityText) {
+                    availabilityText.textContent = variantStock > 0 ? `${variantStock} units available` : 'Out of stock';
+                }
+                
+                if (selectedOption) {
+                    selectedOption.textContent = this.value;
+                }
+                
+                if (stockBadge) {
+                    stockBadge.textContent = variantInStock ? 'In Stock' : 'Out of Stock';
+                    stockBadge.className = `badge bg-${variantInStock ? 'success' : 'danger'}`;
+                }
+                
+                if (stockText) {
+                    stockText.textContent = variantStock > 0 ? `${variantStock} available` : 'Out of stock';
                 }
                 
                 // Update selected style
@@ -724,7 +818,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
             
             // Allow form to submit normally (redirect to orders create page)
-            // The form will handle the redirect
         });
     }
     
@@ -788,16 +881,6 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.display = count > 0 ? 'inline-block' : 'none';
         });
     }
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const stars = document.querySelectorAll('.star-rating-input input');
-        stars.forEach(star => {
-            star.addEventListener('change', function() {
-                const rating = this.value;
-            
-            });
-        });
-    });
 });
 </script>
 @endpush
