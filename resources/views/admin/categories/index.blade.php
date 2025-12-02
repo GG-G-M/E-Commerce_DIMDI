@@ -86,7 +86,7 @@
         </a>
     </div>
 
-    <!-- Search -->
+    <!-- Search --> 
     <div class="card card-custom mb-4">
         {{-- <div class="card-header card-header-custom">
             <i class="fas fa-search me-2"></i> Search Categories
