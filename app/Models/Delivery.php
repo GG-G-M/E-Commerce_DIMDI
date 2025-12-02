@@ -1,5 +1,4 @@
 <?php
-// app/Models/Delivery.php
 
 namespace App\Models;
 
@@ -35,27 +34,54 @@ class Delivery extends Authenticatable
         'is_active' => 'boolean',
     ];
 
-    // UPDATE THIS RELATIONSHIP
+    // KEEP: Direct orders relationship (if you still want it)
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
 
-    // ADD: Scope for active delivery personnel
+    // ADD: Relationship with OrderDeliveries (delivery tracking)
+    public function orderDeliveries()
+    {
+        return $this->hasMany(OrderDelivery::class, 'delivery_personnel_id');
+    }
+
+    // ADD: Get active delivery assignments
+    public function activeDeliveries()
+    {
+        return $this->orderDeliveries()->whereIn('status', ['assigned', 'picked_up', 'in_transit']);
+    }
+
+    // ADD: Get completed deliveries
+    public function completedDeliveries()
+    {
+        return $this->orderDeliveries()->where('status', 'delivered');
+    }
+
+    // Scope for active delivery personnel
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    // ADD: Get delivered orders count
+    // ADD: Get delivered orders count through order_deliveries
     public function getDeliveredOrdersCountAttribute()
     {
-        return $this->orders()->where('order_status', 'delivered')->count();
+        return $this->orderDeliveries()->where('status', 'delivered')->count();
     }
 
-    // ADD: Get pending delivery orders count
+    // ADD: Get pending delivery orders count through order_deliveries
     public function getPendingDeliveryOrdersCountAttribute()
     {
-        return $this->orders()->whereIn('order_status', ['out_for_delivery', 'confirmed'])->count();
+        return $this->orderDeliveries()->whereIn('status', ['assigned', 'picked_up', 'in_transit'])->count();
+    }
+
+    // ADD: Get success rate
+    public function getSuccessRateAttribute()
+    {
+        $total = $this->orderDeliveries()->count();
+        $delivered = $this->orderDeliveries()->where('status', 'delivered')->count();
+        
+        return $total > 0 ? round(($delivered / $total) * 100, 2) : 0;
     }
 }

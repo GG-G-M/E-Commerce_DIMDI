@@ -2,21 +2,6 @@
 
 @section('content')
 <style>
-    /* === Green Theme and Card Styling === */
-    .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-
-    .page-header h1 {
-        color: #2C8F0C;
-        font-weight: 700;
-    }
-
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -35,6 +20,15 @@
         font-weight: 600;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
     }
 
     .btn-primary {
@@ -44,15 +38,6 @@
 
     .btn-primary:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #28a745, #20c997);
-        border: none;
-    }
-
-    .btn-success:hover {
-        background: linear-gradient(135deg, #1e7e34, #1a9368);
     }
 
     .btn-info {
@@ -111,26 +96,38 @@
         font-weight: 600;
     }
 
-    .csv-instructions {
-        background: #f8f9fa;
-        border-left: 4px solid #2C8F0C;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
     }
 
-    .csv-instructions h6 {
+    .position-relative {
+        position: relative;
+    }
+
+    .btn-outline-success {
+        border-color: #2C8F0C;
         color: #2C8F0C;
-        margin-bottom: 10px;
     }
 
-    .template-download {
-        background: #e8f5e9;
-        border: 1px dashed #2C8F0C;
-        padding: 15px;
-        text-align: center;
-        border-radius: 8px;
-        margin-bottom: 20px;
+    .btn-outline-success:hover {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+        color: white;
+    }
+
+    .btn-outline-warning {
+        border-color: #FBC02D;
+        color: #FBC02D;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: #FBC02D;
+        border-color: #FBC02D;
+        color: white;
     }
 </style>
 
@@ -149,7 +146,7 @@
                 <div class="modal-body">
                     
                     <!-- Template Download Section -->
-                    <div class="template-download">
+                    <div class="template-download" style="background: #e8f5e9; border: 1px dashed #2C8F0C; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
                         <h6 class="text-success mb-3">
                             <i class="fas fa-download me-2"></i>Download CSV Template
                         </h6>
@@ -162,7 +159,7 @@
                     </div>
 
                     <!-- Instructions -->
-                    <div class="csv-instructions">
+                    <div class="csv-instructions" style="background: #f8f9fa; border-left: 4px solid #2C8F0C; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
                         <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
                         <ul class="small mb-0">
                             <li>File must be in CSV format (Comma Separated Values)</li>
@@ -229,36 +226,21 @@
     </div>
 </div>
 
-<!-- Header -->
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h3 mb-1">Product Management</h1>
-        <p class="text-muted mb-0">Manage your products, categories, and inventory here.</p>
-    </div>
-    <div class="btn-group">
-        <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-            <i class="fas fa-file-csv me-1"></i> Import CSV
-        </button>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i> Add Product
-        </a>
-    </div>
-</div>
-
-<!-- Rest of your existing code remains the same -->
 <!-- Filters and Search -->
 <div class="card card-custom mb-4">
-    {{-- <div class="card-header card-header-custom">
-        <i class="fas fa-filter me-2"></i> Product Filters
-    </div> --}}
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.products.index') }}">
+        <form method="GET" action="{{ route('admin.products.index') }}" id="filterForm">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Products</label>
                         <input type="text" class="form-control" id="search" name="search" 
                             value="{{ request('search') }}" placeholder="Search by name, description, or SKU...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -295,22 +277,14 @@
                 </div>
                 <div class="col-md-2">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-check me-1"></i> Apply
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-1">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">&nbsp;</label>
-                        <div class="d-grid">
-                            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-refresh"></i>
-                            </a>
-                        </div>
+                        <label for="per_page" class="form-label fw-bold">Items per page</label>
+                        <select class="form-select" id="per_page" name="per_page">
+                            @foreach([5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
             </div>
@@ -320,12 +294,20 @@
 
 <!-- Product Table -->
 <div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <div>
-            <i class="fas fa-boxes me-2"></i> Product List
-        </div>
-        <div class="text-muted small">
-            Total: {{ $products->total() }} products
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Product List</h5>
+        <div class="d-flex align-items-center">
+            <span class="text-white me-3 small d-none d-md-block">
+                Total: {{ $products->total() }} products
+            </span>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info me-2" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                    <i class="fas fa-file-csv me-1"></i> Import CSV
+                </button>
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i> Add Product
+                </a>
+            </div>
         </div>
     </div>
     <div class="card-body">
@@ -481,8 +463,60 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const brandInput = document.getElementById('brand');
+    const categorySelect = document.getElementById('category_id');
+    const statusSelect = document.getElementById('status');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    let searchTimeout;
+
+    // Auto-submit search with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800); // 800ms delay after typing stops
+    });
+
+    // Auto-submit brand filter with delay
+    brandInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800);
+    });
+
+    // Auto-submit category filter immediately
+    categorySelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit status filter immediately
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit per page selection immediately
+    perPageSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
+
+    // CSV Upload functionality
     const csvUploadForm = document.getElementById('csvUploadForm');
     const uploadProgress = document.getElementById('uploadProgress');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -490,76 +524,79 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = uploadProgress.querySelector('.progress-bar');
     const progressText = uploadProgress.querySelector('.progress-text');
 
-    csvUploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        
-        // Show progress bar
-        uploadProgress.style.display = 'block';
-        uploadStatus.style.display = 'none';
-        uploadCsvBtn.disabled = true;
-        uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
-        
-        // Simulate progress (in real implementation, you'd use AJAX with progress events)
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += 5;
-            if (progress <= 100) {
-                progressBar.style.width = progress + '%';
-                progressBar.setAttribute('aria-valuenow', progress);
-                progressText.textContent = progress + '%';
-            }
-        }, 100);
-        
-        // Submit the form
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            clearInterval(progressInterval);
-            progressBar.style.width = '100%';
-            progressText.textContent = '100%';
+    if (csvUploadForm) {
+        csvUploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            if (data.success) {
-                showUploadStatus('success', data.message);
-                // Refresh the page after 2 seconds to show new products
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-            } else {
-                showUploadStatus('danger', data.message || 'Upload failed. Please check your CSV file.');
-            }
-        })
-        .catch(error => {
-            clearInterval(progressInterval);
-            showUploadStatus('danger', 'Upload failed: ' + error.message);
-        })
-        .finally(() => {
-            uploadCsvBtn.disabled = false;
-            uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
+            const formData = new FormData(this);
+            
+            // Show progress bar
+            uploadProgress.style.display = 'block';
+            uploadStatus.style.display = 'none';
+            uploadCsvBtn.disabled = true;
+            uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+            
+            // Simulate progress (in real implementation, you'd use AJAX with progress events)
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + '%';
+                    progressBar.setAttribute('aria-valuenow', progress);
+                    progressText.textContent = progress + '%';
+                }
+            }, 100);
+            
+            // Submit the form
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+                
+                if (data.success) {
+                    showUploadStatus('success', data.message);
+                    // Refresh the page after 2 seconds to show new products
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showUploadStatus('danger', data.message || 'Upload failed. Please check your CSV file.');
+                }
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                showUploadStatus('danger', 'Upload failed: ' + error.message);
+            })
+            .finally(() => {
+                uploadCsvBtn.disabled = false;
+                uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
+            });
         });
-    });
-    
-    function showUploadStatus(type, message) {
-        uploadStatus.className = `alert alert-${type}`;
-        uploadStatus.innerHTML = message;
-        uploadStatus.style.display = 'block';
+        
+        function showUploadStatus(type, message) {
+            uploadStatus.className = `alert alert-${type}`;
+            uploadStatus.innerHTML = message;
+            uploadStatus.style.display = 'block';
+        }
+        
+        // Reset form when modal is closed
+        document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
+            csvUploadForm.reset();
+            uploadProgress.style.display = 'none';
+            uploadStatus.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+        });
     }
-    
-    // Reset form when modal is closed
-    document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
-        csvUploadForm.reset();
-        uploadProgress.style.display = 'none';
-        uploadStatus.style.display = 'none';
-        progressBar.style.width = '0%';
-        progressText.textContent = '0%';
-    });
 });
 </script>
+@endpush
 @endsection

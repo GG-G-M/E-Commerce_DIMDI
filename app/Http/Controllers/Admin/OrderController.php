@@ -13,17 +13,17 @@ class OrderController extends Controller
     {
         $search = $request->get('search');
         $status = $request->get('status', 'active');
-        
-        $orders = Order::with(['user', 'delivery']) // ADD DELIVERY RELATIONSHIP
-            ->when($search, function($query) use ($search) {
-                return $query->where(function($q) use ($search) {
+
+        $orders = Order::with(['user', 'delivery'])
+            ->when($search, function ($query) use ($search) {
+                return $query->where(function ($q) use ($search) {
                     $q->where('order_number', 'like', "%{$search}%")
-                      ->orWhere('customer_name', 'like', "%{$search}%")
-                      ->orWhere('customer_email', 'like', "%{$search}%")
-                      ->orWhere('customer_phone', 'like', "%{$search}%");
+                        ->orWhere('customer_name', 'like', "%{$search}%")
+                        ->orWhere('customer_email', 'like', "%{$search}%")
+                        ->orWhere('customer_phone', 'like', "%{$search}%");
                 });
             })
-            ->when($status, function($query) use ($status) {
+            ->when($status, function ($query) use ($status) {
                 if ($status === 'active') {
                     return $query->whereNotIn('order_status', ['cancelled', 'completed', 'delivered']);
                 } elseif ($status !== 'all') {
@@ -41,7 +41,7 @@ class OrderController extends Controller
             'confirmed' => 'Confirmed',
             'processing' => 'Processing',
             'shipped' => 'Shipped',
-            'out_for_delivery' => 'Out for Delivery', // ADD THIS
+            'out_for_delivery' => 'Out for Delivery',
             'delivered' => 'Delivered',
             'completed' => 'Completed',
             'cancelled' => 'Cancelled',
@@ -56,16 +56,16 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['items.product', 'delivery']); // ADD DELIVERY RELATIONSHIP
-        $deliveries = Delivery::active()->get(); // GET DELIVERY PERSONNEL FOR ASSIGNMENT
-        
+        $order->load(['items.product', 'delivery']);
+        $deliveries = Delivery::active()->get();
+
         return view('admin.orders.show', compact('order', 'deliveries'));
     }
 
     public function updateStatus(Request $request, Order $order)
     {
         $validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered', 'completed', 'cancelled'];
-        
+
         $request->validate([
             'order_status' => 'required|in:' . implode(',', $validStatuses),
             'status_notes' => 'nullable|string|max:500'
@@ -77,6 +77,19 @@ class OrderController extends Controller
 
         // Use the new updateStatus method from Order model
         $order->updateStatus($newStatus, $notes);
+
+        // AUTO STOCK-OUT WHEN ORDER BECOMES SHIPPED
+        if ($newStatus === 'shipped') {
+            foreach ($order->items as $item) {
+                app(\App\Http\Controllers\Admin\StockOutController::class)
+                    ->autoStockOut(
+                        $item->product_id,
+                        $item->product_variant_id,
+                        $item->quantity,
+                        'Order #' . $order->id . ' shipped'
+                    );
+            }
+        }
 
         return redirect()->back()->with('success', "Order status updated from " . ucfirst($oldStatus) . " to " . ucfirst($newStatus) . " successfully!");
     }
@@ -101,7 +114,7 @@ class OrderController extends Controller
 
         try {
             $order->assignToDelivery($request->delivery_id);
-            
+
             return redirect()->back()->with('success', 'Order successfully assigned to ' . $delivery->name . '!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to assign delivery: ' . $e->getMessage());
@@ -160,7 +173,7 @@ class OrderController extends Controller
 
         foreach ($request->order_ids as $orderId) {
             $order = Order::find($orderId);
-            
+
             // Check if order is ready for delivery assignment
             if (in_array($order->order_status, ['confirmed', 'processing', 'shipped']) && !$order->delivery_id) {
                 $order->assignToDelivery($request->delivery_id);
@@ -289,7 +302,6 @@ class OrderController extends Controller
 
             return redirect()->route('admin.orders.index')
                 ->with('success', 'Refund processed successfully for order #' . $order->order_number . '!');
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to process refund: ' . $e->getMessage())

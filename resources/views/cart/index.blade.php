@@ -88,6 +88,44 @@
             transform: translate(-50%, -50%);
             z-index: 10;
         }
+
+        .cart-item-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #2C8F0C;
+        }
+
+        .cart-item.selected {
+            border-color: #2C8F0C !important;
+            background-color: #f0fdf4 !important;
+        }
+
+        .selection-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .selected-badge {
+            background: #2C8F0C;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
     </style>
 
     <div class="container py-4">
@@ -99,6 +137,15 @@
                 </div>
 
                 @if ($cartItems->count() > 0)
+                    <!-- Selection Controls -->
+                    <div class="selection-controls">
+                        <div class="selection-info">
+                            <input type="checkbox" id="select-all" class="cart-item-checkbox">
+                            <label for="select-all" class="mb-0"><strong>Select All</strong></label>
+                            <span class="selected-badge"><span id="selected-count">0</span> selected</span>
+                        </div>
+                    </div>
+
                     @foreach ($cartItems as $item)
                         @php
                             // Check if product has variants
@@ -142,7 +189,7 @@
                             $itemTotalPrice = $unitPrice * $item->quantity;
                         @endphp
 
-                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}">
+                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}" data-item-id="{{ $item->id }}">
                             <div class="loading-spinner" id="loading-{{ $item->id }}">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
@@ -150,11 +197,14 @@
                             </div>
 
                             <div class="row align-items-center">
+                                <div class="col-md-1 d-flex align-items-center">
+                                    <input type="checkbox" class="cart-item-checkbox item-checkbox" data-item-id="{{ $item->id }}">
+                                </div>
                                 <div class="col-md-2">
                                     <img src="{{ $displayImage }}" alt="{{ $item->product->name }}" class="cart-item-image"
                                         id="item-image-{{ $item->id }}">
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <h5 class="mb-1">{{ $item->product->name }}</h5>
                                     <p class="text-muted mb-1 small">{{ Str::limit($item->product->description, 50) }}</p>
 
@@ -297,13 +347,13 @@
                         <h4 class="mb-4">Order Summary</h4>
 
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal ({{ $cartItems->sum('quantity') }} items):</span>
-                            <span>₱{{ number_format($subtotal, 2) }}</span>
+                            <span>Subtotal (<span id="summary-quantity">{{ $cartItems->sum('quantity') }}</span> items):</span>
+                            <span id="summary-subtotal">₱{{ number_format($subtotal, 2) }}</span>
                         </div>
 
                         <div class="d-flex justify-content-between mb-2">
                             <span>Tax (10%):</span>
-                            <span>₱{{ number_format($tax, 2) }}</span>
+                            <span id="summary-tax">₱{{ number_format($tax, 2) }}</span>
                         </div>
 
                      
@@ -312,7 +362,7 @@
 
                         <div class="d-flex justify-content-between mb-4">
                             <strong>Total:</strong>
-                            <strong class="text-success">₱{{ number_format($total, 2) }}</strong>
+                            <strong class="text-success" id="summary-total">₱{{ number_format($total, 2) }}</strong>
                         </div>
 
                         @if ($subtotal < 100)
@@ -355,9 +405,9 @@
                                 <i class="fas fa-lock me-2"></i>Update Cart to Checkout
                             </button>
                         @else
-                            <a href="{{ route('orders.create') }}" class="btn btn-primary w-100 btn-lg">
+                            <button type="button" id="proceed-checkout-btn" class="btn btn-primary w-100 btn-lg">
                                 <i class="fas fa-lock me-2"></i>Proceed to Checkout
-                            </a>
+                            </button>
                         @endif
                     </div>
                 </div>
@@ -522,5 +572,130 @@
                 toast.remove();
             });
         }
+
+        // Multi-select cart functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+            const checkoutBtn = document.getElementById('proceed-checkout-btn');
+            const selectedCountSpan = document.getElementById('selected-count');
+
+            function updateSelection() {
+                const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+                const checkedCount = checkedItems.length;
+
+                // Update count
+                selectedCountSpan.textContent = checkedCount;
+
+                // Calculate totals for selected items
+                let selectedSubtotal = 0;
+                checkedItems.forEach(checkbox => {
+                    const itemId = checkbox.getAttribute('data-item-id');
+                    const cartItem = document.getElementById(`cart-item-${itemId}`);
+                    const totalPriceElement = cartItem.querySelector('.item-total');
+                    if (totalPriceElement) {
+                        // Extract price from text (e.g., "₱1,234.56" -> 1234.56)
+                        const priceText = totalPriceElement.textContent.replace(/[₱,]/g, '');
+                        selectedSubtotal += parseFloat(priceText) || 0;
+                    }
+                });
+
+                // Update summary display
+                const selectedQuantity = Array.from(checkedItems).reduce((sum, checkbox) => {
+                    const itemId = checkbox.getAttribute('data-item-id');
+                    const cartItem = document.getElementById(`cart-item-${itemId}`);
+                    const quantityElement = cartItem.querySelector('.quantity-input');
+                    return sum + (parseInt(quantityElement?.textContent) || 0);
+                }, 0);
+
+                const selectedTax = selectedSubtotal * 0.10;
+                const selectedShipping = selectedSubtotal > 100 ? 0 : 10;
+                const selectedTotal = selectedSubtotal + selectedTax + selectedShipping;
+
+                document.getElementById('summary-quantity').textContent = selectedQuantity;
+                document.getElementById('summary-subtotal').textContent = '₱' + selectedSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('summary-tax').textContent = '₱' + selectedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('summary-total').textContent = '₱' + selectedTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                // Disable/enable checkout button based on selection
+                checkoutBtn.disabled = checkedCount === 0;
+
+                // Update select all checkbox
+                if (checkedCount === itemCheckboxes.length && itemCheckboxes.length > 0) {
+                    selectAllCheckbox.checked = true;
+                    selectAllCheckbox.indeterminate = false;
+                } else if (checkedCount > 0) {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = true;
+                } else {
+                    selectAllCheckbox.checked = false;
+                    selectAllCheckbox.indeterminate = false;
+                }
+
+                // Highlight selected items
+                itemCheckboxes.forEach(checkbox => {
+                    const itemId = checkbox.getAttribute('data-item-id');
+                    const cartItem = document.getElementById(`cart-item-${itemId}`);
+                    if (checkbox.checked) {
+                        cartItem.classList.add('selected');
+                    } else {
+                        cartItem.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Select all handler
+            selectAllCheckbox.addEventListener('change', function() {
+                itemCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateSelection();
+            });
+
+            // Individual checkbox handlers
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelection);
+            });
+
+            // Proceed to checkout handler
+            checkoutBtn.addEventListener('click', function() {
+                const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+                    .map(cb => cb.getAttribute('data-item-id'));
+
+                // Only proceed if items are selected (button should be disabled if not, but just in case)
+                if (selectedIds.length === 0) {
+                    return;
+                }
+
+                // Send selected items to server
+                checkoutBtn.disabled = true;
+                checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+                fetch('{{ route("cart.checkout-selected") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ selected_items: selectedIds })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '{{ route("orders.create") }}';
+                    } else {
+                        showToast('error', data.message || 'Error processing selection');
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('error', 'An error occurred');
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
+                });
+            });
+        });
     </script>
 @endsection

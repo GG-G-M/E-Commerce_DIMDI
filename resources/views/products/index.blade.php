@@ -2,272 +2,320 @@
 
 @section('content')
 <style>
+    /* 🌿 Enhanced Green Theme */
     .category-slider-full {
-        background-color: #2C8F0C !important;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50) !important;
         width: 100vw;
         position: relative;
         left: 50%;
         right: 50%;
         margin-left: -50vw;
         margin-right: -50vw;
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
     }
 
     .category-slider-full .nav-pills .nav-link {
         color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
         transition: all 0.3s ease;
         white-space: nowrap;
-        margin: 0 8px;
+        margin: 0 6px;
+        padding: 8px 20px;
+        font-weight: 500;
     }
 
     .category-slider-full .nav-pills .nav-link.active {
-        background-color: white !important;
-        color: black !important;
-        font-weight: bold;
+        background: white !important;
+        color: #2C8F0C !important;
+        font-weight: 600;
         border-color: white;
+        box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
     }
 
     .category-slider-full .nav-pills .nav-link:hover:not(.active) {
-        background-color: #2C8F0C !important;
-        color: white !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+    }
+
+    /* Enhanced Product Cards */
+    .product-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        background: white;
+    }
+
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .product-image {
+        height: 220px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
     }
 
     .discount-badge {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 1;
+        top: 12px;
+        left: 12px;
+        z-index: 2;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .product-card-body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .product-title {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-brand {
+        color: #2C8F0C;
         font-size: 0.8rem;
-        padding: 0.25rem 0.5rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
     }
 
-    .product-image {
-        height: 250px;
-        object-fit: cover;
-    }
-    
-    .btn {
-        background-color: #2C8F0C !important;
-        color: white !important;
-        border: none;
-    }
-
-    .btn:hover {
-        background-color: #247a0a !important;
-        color: white !important;
+    .product-description {
+        color: #718096;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
-    .btn-outline-primary {
-        background-color: transparent !important;
-        color: #2C8F0C !important;
-        border: 1px solid #2C8F0C !important;
+    .variant-badge {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        color: #4a5568;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 8px;
+        margin: 2px;
+        display: inline-block;
     }
 
-    .btn-outline-primary:hover {
-        background-color: #2C8F0C !important;
-        color: white !important;
+    .variant-badge.out-of-stock {
+        background: #fed7d7;
+        border-color: #feb2b2;
+        color: #c53030;
     }
 
-    .category-header {
-        border-bottom: 3px solid #2C8F0C;
-        padding-bottom: 10px;
-        margin: 30px 0 20px 0;
-        color: #2C8F0C;
+    .price-section {
+        margin-bottom: 1rem;
     }
 
-    #loading-indicator {
-        display: none;
-        text-align: center;
-        padding: 20px;
-    }
-
-    #end-of-results {
-        display: none;
-        text-align: center;
-        padding: 20px;
-        color: #6c757d;
-    }
-
-    .no-products-modal .modal-content {
-        border-radius: 15px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    .no-products-modal .modal-header {
-        border-bottom: 2px solid #E8F5E6;
-        background: #F8FDF8;
-        border-radius: 15px 15px 0 0;
-        padding: 1.5rem;
-    }
-
-    .no-products-modal .modal-title {
-        color: #2C8F0C;
+    .current-price {
         font-weight: 700;
-        font-size: 1.5rem;
-    }
-
-    .no-products-modal .modal-body {
-        padding: 2rem;
-        text-align: center;
-    }
-
-    .no-products-image {
-        max-width: 200px;
-        height: auto;
-        margin-bottom: 20px;
-        border-radius: 10px;
-    }
-
-    .no-products-title {
-        color: #2C8F0C;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
-
-    .no-products-text {
-        color: #6c757d;
-        font-size: 1rem;
-        margin-bottom: 25px;
-        line-height: 1.6;
-    }
-
-    .search-suggestions {
-        background: #F8FDF8;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 4px solid #2C8F0C;
-        margin: 20px 0;
-    }
-
-    .suggestion-title {
-        color: #2C8F0C;
-        font-weight: 600;
-        margin-bottom: 15px;
         font-size: 1.1rem;
+        color: #2C8F0C;
     }
 
-    .suggestion-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        text-align: left;
+    .original-price {
+        font-size: 0.85rem;
+        color: #a0aec0;
+        text-decoration: line-through;
+        margin-left: 0.5rem;
     }
 
-    .suggestion-list li {
-        padding: 8px 0;
-        border-bottom: 1px solid #E8F5E6;
-    }
-
-    .suggestion-list li:last-child {
-        border-bottom: none;
-    }
-
-    .suggestion-list a {
-        color: #495057;
-        text-decoration: none;
-        transition: color 0.3s ease;
+    .rating-section {
         display: flex;
         align-items: center;
-    }
-
-    .suggestion-list a:hover {
-        color: #2C8F0C;
-    }
-
-    .suggestion-list i {
-        margin-right: 10px;
-        color: #2C8F0C;
-        width: 20px;
-    }
-
-    .no-products-modal .modal-footer {
-        border-top: 2px solid #E8F5E6;
-        background: #F8FDF8;
-        border-radius: 0 0 15px 15px;
-        padding: 1.5rem;
-    }
-
-    .btn-continue-shopping {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-continue-shopping:hover {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+        margin-bottom: 1rem;
     }
 
     .star-rating {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
     }
 
-    .star-rating .fas,
-    .star-rating .far {
-        color: #ffc107;
+    .rating-count {
+        font-size: 0.8rem;
+        color: #718096;
     }
 
-    .product-rating {
-        margin-bottom: 8px;
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: auto;
     }
 
+    .btn-view-details {
+        flex: 2;
+        background: transparent;
+        color: #2C8F0C;
+        border: 2px solid #2C8F0C;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-view-details:hover {
+        background: #2C8F0C;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-add-cart {
+        flex: 1;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 8px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-add-cart:hover:not(:disabled) {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+    }
+
+    .btn-add-cart:disabled {
+        background: #cbd5e0;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Enhanced Category Headers */
+    .category-header {
+        border-bottom: 3px solid #2C8F0C;
+        padding-bottom: 12px;
+        margin: 40px 0 25px 0;
+        position: relative;
+    }
+
+    .category-header::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #4CAF50;
+    }
+
+    .category-title {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    /* Enhanced Filter Panel - Updated */
     .floating-filter {
         position: fixed;
-        top: 45%;
+        top: 15%;
         right: 20px;
         transform: translateY(-50%);
         z-index: 1000;
     }
 
     .filter-bubble {
-        width: 50px;
-        height: 50px;
+        width: 56px;
+        height: 56px;
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(44, 143, 12, 0.3);
+        box-shadow: 0 6px 20px rgba(44, 143, 12, 0.4);
         transition: all 0.3s ease;
         border: none;
+        position: relative;
     }
 
     .filter-bubble:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(44, 143, 12, 0.4);
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: 0 8px 25px rgba(44, 143, 12, 0.5);
+    }
+
+    .filter-bubble::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.4;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.4; }
+        50% { transform: scale(1.1); opacity: 0.2; }
+        100% { transform: scale(1); opacity: 0.4; }
     }
 
     .filter-panel {
         position: absolute;
         top: 0;
-        right: 60px;
+        right: 70px;
         background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        padding: 20px;
-        width: 300px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        padding: 25px;
+        width: 320px; /* Slightly reduced width */
         display: none;
         z-index: 1001;
+        border: 1px solid #e2e8f0;
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
     .filter-panel.show {
         display: block;
-        animation: slideInRight 0.3s ease;
+        animation: slideInRight 0.4s ease;
     }
 
     @keyframes slideInRight {
         from {
             opacity: 0;
-            transform: translateX(20px);
+            transform: translateX(30px);
         }
         to {
             opacity: 1;
@@ -275,173 +323,286 @@
         }
     }
 
-    .filter-header {
-        border-bottom: 2px solid #E8F5E6;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
+    /* Brand Dropdown Filter - Replaced Search */
+    .brand-dropdown-container {
+        margin-bottom: 1rem;
+        position: relative;
     }
 
-    .filter-title {
-        color: #2C8F0C;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin: 0;
-    }
-
-    .filter-section {
-        margin-bottom: 20px;
-    }
-
-    .filter-section-title {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .filter-options {
-        max-height: 150px;
-        overflow-y: auto;
-    }
-
-    .filter-option {
+    .brand-dropdown-header {
         display: flex;
         align-items: center;
-        padding: 8px 0;
-        border-bottom: 1px solid #f0f0f0;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .brand-dropdown-header:hover {
+        border-color: #2C8F0C;
+        background: #f8fff8;
+    }
+
+    .brand-dropdown-header.active {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
+    }
+
+    .dropdown-placeholder {
+        color: #718096;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .dropdown-arrow {
+        color: #2C8F0C;
+        transition: transform 0.3s ease;
+    }
+
+    .brand-dropdown-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        margin-top: 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1002;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .brand-dropdown-options.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
         cursor: pointer;
         transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f1f1;
     }
 
-    .filter-option:hover {
-        background-color: #F8FDF8;
-        padding-left: 5px;
-    }
-
-    .filter-option:last-child {
+    .brand-dropdown-item:last-child {
         border-bottom: none;
     }
 
-    .filter-checkbox {
+    .brand-dropdown-item:hover {
+        background: rgba(44, 143, 12, 0.05);
+    }
+
+    .brand-dropdown-item input[type="checkbox"] {
         margin-right: 10px;
-        width: 16px;
-        height: 16px;
-        border: 2px solid #2C8F0C;
-        border-radius: 3px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
+        border-radius: 4px;
+        border: 2px solid #cbd5e0;
+    }
+
+    .brand-dropdown-item input[type="checkbox"]:checked {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+    }
+
+    .brand-dropdown-label {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: #4a5568;
+    }
+
+    .brand-dropdown-name {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 8px;
     }
 
-    .filter-checkbox.checked {
-        background-color: #2C8F0C;
-    }
-
-    .filter-checkbox.checked::after {
-        content: '✓';
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .filter-label {
-        flex: 1;
-        font-size: 0.9rem;
-        color: #555;
-    }
-
-    .filter-count {
-        background: #E8F5E6;
-        color: #2C8F0C;
+    .brand-dropdown-count {
+        background: #f7fafc;
         padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        font-weight: 600;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        color: #718096;
+        min-width: 30px;
+        text-align: center;
     }
 
-    .price-range {
+    /* Compact Price Range Filter */
+    .price-range-container {
         padding: 10px 0;
     }
 
-   .price-inputs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-    align-items: center;
-}
+    .price-inputs {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Reduced gap */
+        margin-bottom: 1rem;
+    }
 
-.price-input {
-    flex: 1;
-    padding: 6px 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    text-align: center;
-    max-width: 80px;
-    min-width: 60px;
-}
+    .price-input {
+        flex: 1;
+        max-width: 130px; /* Limited max width */
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 8px 10px; /* Reduced padding */
+        font-size: 0.85rem; /* Smaller font */
+        transition: all 0.3s ease;
+    }
 
-.price-input:focus {
-    outline: none;
-    border-color: #2C8F0C;
-    box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.1);
-}
+    .price-input:focus {
+        outline: none;
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
+    }
 
-.price-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-    font-size: 0.7rem;
-    color: #666;
-}
+    .price-separator {
+        color: #718096;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .price-slider-container {
+        margin: 1.5rem 0;
+        padding: 0 5px;
+    }
 
     .price-slider {
         width: 100%;
-        height: 4px;
-        background: #ddd;
-        border-radius: 2px;
-        outline: none;
+        height: 6px;
         -webkit-appearance: none;
+        appearance: none;
+        background: linear-gradient(to right, #2C8F0C, #4CAF50);
+        border-radius: 3px;
+        outline: none;
     }
 
     .price-slider::-webkit-slider-thumb {
         -webkit-appearance: none;
-        width: 18px;
+        appearance: none;
+        width: 18px; /* Slightly smaller */
         height: 18px;
-        background: #2C8F0C;
         border-radius: 50%;
+        background: white;
+        border: 2px solid #2C8F0C;
         cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
-    .price-slider::-moz-range-thumb {
-        width: 18px;
-        height: 18px;
-        background: #2C8F0C;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .price-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.8rem; /* Smaller font */
+        color: #718096;
     }
 
+    /* Selected Brands Display - Compact */
+    .selected-brands-container {
+        background: #f8fff8;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px; /* Reduced padding */
+        margin-top: 1rem;
+    }
+
+    .selected-brands-title {
+        font-size: 0.8rem; /* Smaller font */
+        color: #2C8F0C;
+        font-weight: 600;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .selected-brands-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px; /* Reduced gap */
+    }
+
+    .brand-tag {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        padding: 3px 8px; /* Reduced padding */
+        border-radius: 12px;
+        font-size: 0.75rem; /* Smaller font */
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 1px 3px rgba(44, 143, 12, 0.2);
+    }
+
+    .remove-brand-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 14px; /* Smaller */
+        height: 14px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        padding: 0;
+        line-height: 1;
+    }
+
+    /* Filter Actions */
     .filter-actions {
         display: flex;
         gap: 10px;
-        margin-top: 20px;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
     }
 
     .btn-filter {
         flex: 1;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 8px;
+        padding: 10px;
+        border-radius: 10px;
         font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
         cursor: pointer;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-clear {
+        background: #f8f9fa;
+        color: #718096;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-clear:hover {
+        background: #e9ecef;
+        color: #4a5568;
+        transform: translateY(-1px);
     }
 
     .btn-apply {
@@ -451,172 +612,201 @@
 
     .btn-apply:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.3);
     }
 
-    .btn-clear {
-        background: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #dee2e6;
+    /* Empty State */
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f8fff8, #f0f9f0);
+        border-radius: 20px;
+        margin: 2rem 0;
     }
 
-    .btn-clear:hover {
-        background: #e9ecef;
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #2C8F0C;
+        margin-bottom: 1.5rem;
+        opacity: 0.7;
     }
 
-    /* Ultra Compact Banner Styles */
-    .banner-card-compact {
-        border-radius: 6px;
+    .empty-state-title {
+        color: #2C8F0C;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-text {
+        color: #718096;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    /* Banner */
+    .banner-container {
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        margin-bottom: 15px;
-        border: 1px solid #dee2e6;
-        max-height: 300px !important;
-        height: 300px !important;
-        padding: 0 !important;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        border: 1px solid #e2e8f0;
     }
-    
-    .carousel-compact {
-        height: 350px !important;
-        max-height: 350px !important;
-    }
-    
-    .carousel-inner-compact {
-        height: 350px !important;
-        max-height: 350px !important;
-    }
-    
-    .carousel-item-compact {
-        height: 350px !important;
-        max-height: 350px !important;
-    }
-    
-    .carousel-image-compact {
+
+    .carousel-image {
         width: 100%;
-        height: 350px !important;
+        height: 400px;
         object-fit: cover;
         object-position: center;
-        max-height: 350px !important;
     }
-    
-    /* Hide all captions and controls for ultra compact */
-    .carousel-caption,
-    .carousel-indicators,
-    .carousel-control-prev,
-    .carousel-control-next {
-        display: none !important;
+
+    /* Loading Animation */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
     }
-    .brand-dropdown-container {
-    margin-bottom: 10px;
-}
 
-.brand-dropdown-container {
-    margin-bottom: 10px;
-}
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
 
-.brand-dropdown-menu {
-    max-height: 200px;
-    overflow-y: auto;
-    width: 100%;
-}
+    /* Custom Scrollbar */
+    .brand-dropdown-options::-webkit-scrollbar,
+    .filter-panel::-webkit-scrollbar {
+        width: 6px;
+    }
 
-.brand-dropdown-menu .form-check {
-    padding: 0.5rem 1rem;
-    margin: 0;
-}
+    .brand-dropdown-options::-webkit-scrollbar-track,
+    .filter-panel::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
 
-.brand-dropdown-menu .form-check-input {
-    margin-right: 8px;
-}
+    .brand-dropdown-options::-webkit-scrollbar-thumb,
+    .filter-panel::-webkit-scrollbar-thumb {
+        background: #2C8F0C;
+        border-radius: 3px;
+    }
 
-.brand-dropdown-menu .form-check-label {
-    cursor: pointer;
-    font-size: 0.9rem;
-}
+    .brand-dropdown-options::-webkit-scrollbar-thumb:hover,
+    .filter-panel::-webkit-scrollbar-thumb:hover {
+        background: #1E6A08;
+    }
 
-.selected-brands {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    font-size: 0.8rem;
-}
-
-.brand-tag {
-    background: #E8F5E6;
-    color: #2C8F0C;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.brand-tag .remove-brand {
-    cursor: pointer;
-    font-size: 0.7rem;
-    padding: 0;
-    background: none;
-    border: none;
-    color: #2C8F0C;
-}
-
-.brand-tag .remove-brand:hover {
-    color: #1E6A08;
-}
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .floating-filter {
-            right: 10px;
-            bottom: 80px;
-            top: auto;
-            transform: none;
-        }
-
         .filter-panel {
+            width: 300px;
             right: 60px;
-            bottom: 0;
-            top: auto;
-            width: 280px;
-        }
-
-        .banner-card-compact {
-            height: 35px !important;
-            max-height: 35px !important;
+            padding: 20px;
         }
         
-        .carousel-compact,
-        .carousel-inner-compact,
-        .carousel-item-compact {
-            width: 100%;
-            aspect-ratio: 16 / 9; /* Maintains 16:9 ratio */
-            max-height: 400px;
+        .filter-bubble {
+            width: 50px;
+            height: 50px;
+            font-size: 1.1rem;
         }
+        
+        .carousel-image {
+            height: 200px;
+        }
+        
+        .price-input {
+            max-width: 110px;
+        }
+    }
 
-        .carousel-image-compact {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+    @media (max-width: 576px) {
+        .filter-panel {
+            width: 280px;
+            right: 50px;
+            padding: 15px;
         }
+        
+        .filter-bubble {
+            width: 45px;
+            height: 45px;
+            font-size: 1rem;
+            right: 10px;
+        }
+        
+        .price-input {
+            max-width: 100px;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+        }
+        
+        .price-inputs {
+            gap: 5px;
+        }
+    }
 
-        /* Mobile adjustments */
-        @media (max-width: 768px) {
-            .carousel-compact,
-            .carousel-inner-compact,
-            .carousel-item-compact {
-                aspect-ratio: 16 / 9;
-                max-height: 250px;
-            }
-        }
+    /* No Products Modal Styling */
+    .no-products-image {
+        max-width: 200px;
+        margin: 0 auto 20px;
+        display: block;
+    }
 
-        @media (max-width: 576px) {
-            .carousel-compact,
-            .carousel-inner-compact,
-            .carousel-item-compact {
-                aspect-ratio: 16 / 9;
-                max-height: 180px;
-            }
-        }
-            }
+    .no-products-title {
+        color: #2C8F0C;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .no-products-text {
+        color: #718096;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-suggestions {
+        background: #f8fff8;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .suggestion-title {
+        color: #2C8F0C;
+        margin-bottom: 10px;
+    }
+
+    .suggestion-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .suggestion-list li {
+        margin-bottom: 8px;
+    }
+
+    .suggestion-list a {
+        color: #4a5568;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s ease;
+    }
+
+    .suggestion-list a:hover {
+        color: #2C8F0C;
+    }
+
+    .btn-continue-shopping {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        border: none;
+    }
+
+    .btn-continue-shopping:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        color: white;
+    }
 </style>
 
 <!-- No Products Found Modal -->
@@ -679,86 +869,131 @@
     </div>
 </div>
 
-<!-- Floating Filter Bubble -->
+<!-- Floating Filter Panel with Dropdown Brand Filter -->
 <div class="floating-filter">
     <button class="filter-bubble" id="filterBubble">
         <i class="fas fa-filter"></i>
     </button>
     <div class="filter-panel" id="filterPanel">
-        <div class="filter-header">
-            <h4 class="filter-title"><i class="fas fa-sliders-h me-2"></i>Filters</h4>
+        <div class="filter-header mb-4">
+            <h4 class="filter-title text-success mb-0">
+                <i class="fas fa-sliders-h me-2"></i>Filters
+                <span class="badge bg-success ms-2" id="activeFilterCount">0</span>
+            </h4>
         </div>
         
-        <!-- Brand Filter -->
-<div class="filter-section">
-    <h6 class="filter-section-title">Brands</h6>
-    <div class="brand-dropdown-container">
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="brandDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                Select Brands
-            </button>
-            <ul class="dropdown-menu brand-dropdown-menu" aria-labelledby="brandDropdown">
-                @foreach($brands as $brand)
-                    <li>
-                        <div class="form-check dropdown-item">
-                            <input class="form-check-input brand-checkbox" type="checkbox" value="{{ $brand->name }}" id="brand{{ $brand->id }}"
-                                {{ in_array($brand->name, explode(',', request('brands', ''))) ? 'checked' : '' }}>
-                            <label class="form-check-label w-100" for="brand{{ $brand->id }}">
-                                {{ $brand->name }}
-                            </label>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-        <div id="selectedBrands" class="selected-brands mt-2"></div>
-    </div>
-</div>
-
-        <!-- Price Range Filter -->
+        <!-- Brand Filter Section - UPDATED with Dropdown -->
         <div class="filter-section">
-            <h6 class="filter-section-title">Price Range</h6>
-            <div class="price-range">
-                <div class="price-inputs">
-                    <input type="number" class="price-input" id="minPrice" placeholder="Min" min="0">
-                    <span class="align-self-center">-</span>
-                    <input type="number" class="price-input" id="maxPrice" placeholder="Max" min="0">
+            <h6 class="filter-section-title">
+                <i class="fas fa-tags"></i>Brands
+            </h6>
+            
+            <!-- Brand Dropdown -->
+            <div class="brand-dropdown-container">
+                <div class="brand-dropdown-header" id="brandDropdownHeader">
+                    <div class="dropdown-placeholder" id="dropdownPlaceholder">
+                        <i class="fas fa-tag text-success"></i>
+                        <span>Select brands...</span>
+                    </div>
+                    <i class="fas fa-chevron-down dropdown-arrow" id="dropdownArrow"></i>
                 </div>
-                <input type="range" class="price-slider" id="priceSlider" min="0" max="10000" step="100">
-                <div class="price-labels">
-                    <span>₱0</span>
-                    <span>₱10,000</span>
+                
+                <div class="brand-dropdown-options" id="brandDropdownOptions">
+                    @foreach($brands as $brand)
+                    <div class="brand-dropdown-item" data-brand="{{ $brand->name }}">
+                        <input type="checkbox" 
+                               class="brand-checkbox" 
+                               value="{{ $brand->name }}" 
+                               id="brand{{ $brand->id }}"
+                               {{ in_array($brand->name, explode(',', request('brands', ''))) ? 'checked' : '' }}>
+                        <label for="brand{{ $brand->id }}" class="brand-dropdown-label">
+                            <span class="brand-dropdown-name">
+                                {{ $brand->name }}
+                            </span>
+                            <span class="brand-dropdown-count">{{ $brand->products_count ?? 0 }}</span>
+                        </label>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            
+            <!-- Selected Brands Display -->
+            <div class="selected-brands-container" id="selectedBrandsContainer" style="display: none;">
+                <div class="selected-brands-title">
+                    <i class="fas fa-check-circle"></i>
+                    Selected Brands:
+                </div>
+                <div class="selected-brands-list" id="selectedBrandsList"></div>
+            </div>
+        </div>
+        
+        <!-- Price Range Filter - COMPACT -->
+        <div class="filter-section">
+            <h6 class="filter-section-title">
+                <i class="fas fa-money-bill-wave"></i>Price Range
+            </h6>
+            
+            <div class="price-range-container">
+                <div class="price-inputs">
+                    <input type="number" 
+                           class="price-input" 
+                           id="minPrice" 
+                           placeholder="Min ₱" 
+                           min="0"
+                           value="{{ request('min_price', '') }}">
+                    <span class="price-separator">to</span>
+                    <input type="number" 
+                           class="price-input" 
+                           id="maxPrice" 
+                           placeholder="Max ₱" 
+                           min="0"
+                           value="{{ request('max_price', '') }}">
+                </div>
+                
+                <div class="price-slider-container">
+                    <input type="range" 
+                           class="price-slider" 
+                           id="priceSlider" 
+                           min="0" 
+                           max="10000" 
+                           step="100"
+                           value="{{ request('max_price', 10000) }}">
+                    <div class="price-labels">
+                        <span>₱0</span>
+                        <span>₱10,000</span>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class="filter-actions">
+        
+        <!-- Filter Actions -->
+        <div class="filter-actions" style="position: sticky; bottom: 0; background: white; padding-top: 15px;">
             <button class="btn-filter btn-clear" id="clearFilters">
-                Clear
+                <i class="fas fa-times"></i>Clear
             </button>
             <button class="btn-filter btn-apply" id="applyFilters">
-                Apply
+                <i class="fas fa-check"></i>Apply
             </button>
         </div>
     </div>
 </div>
 
-<!-- Clean Auto-sliding Carousel (No Visible Controls) -->
+<!-- Clean Auto-sliding Carousel -->
 @if(isset($banners) && count($banners) > 0)
-<div class="card banner-card-compact">
-    <div id="heroCarousel" class="carousel slide carousel-compact" data-bs-ride="carousel" data-bs-interval="4000">
-        <div class="carousel-inner carousel-inner-compact">
+<div class="banner-container">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+        <div class="carousel-inner">
             @foreach($banners as $index => $banner)
-                <div class="carousel-item carousel-item-compact {{ $index === 0 ? 'active' : '' }}">
+                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                     @if(!empty($banner['target_url']))
                         <a href="{{ $banner['target_url'] }}" target="_blank" class="banner-link">
                             <img src="{{ $banner['image'] }}" 
-                                 class="d-block w-100 carousel-image-compact" 
+                                 class="d-block w-100 carousel-image" 
                                  alt="{{ $banner['alt'] }}">
                         </a>
                     @else
                         <img src="{{ $banner['image'] }}" 
-                             class="d-block w-100 carousel-image-compact" 
+                             class="d-block w-100 carousel-image" 
                              alt="{{ $banner['alt'] }}">
                     @endif
                 </div>
@@ -794,7 +1029,7 @@
     <!-- Products Container -->
     <div id="products-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Products</h2>
+            <h2 class="category-title">Featured Products</h2>
             <span class="text-muted" id="products-count">{{ $products->count() }} products found</span>
         </div>
 
@@ -810,33 +1045,33 @@
                 @endphp
                 <!-- Category Header -->
                 <div class="category-header">
-                    <h3 class="mb-0">{{ $category ? $category->name : 'Uncategorized' }}</h3>
+                    <h3 class="category-title">{{ $category ? $category->name : 'Uncategorized' }}</h3>
                 </div>
                 
                 <!-- Products for this category -->
                 <div class="row">
                     @foreach($categoryProducts as $product)
                     <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="card product-card h-100 shadow-sm">
+                        <div class="card product-card h-100">
                             @if($product->has_discount)
-                            <span class="badge bg-danger position-absolute top-0 end-0 m-2">{{ $product->discount_percentage }}% OFF</span>
+                            <span class="discount-badge">{{ $product->discount_percentage }}% OFF</span>
                             @endif
                             
                             <img src="{{ $product->image_url }}" class="card-img-top product-image" alt="{{ $product->name }}">
                             
-                            <div class="card-body d-flex flex-column">
-                                <h6 class="card-title">{{ $product->name }}</h6>
+                            <div class="product-card-body">
+                                <h6 class="product-title">{{ $product->name }}</h6>
                                 
                                 <!-- Display Brand -->
                                 @if($product->brand_id && $product->brand)
-                                    <small class="text-muted d-block mb-2">
+                                    <div class="product-brand">
                                         <i class="fas fa-tag me-1"></i>{{ $product->brand->name }}
-                                    </small>
+                                    </div>
                                 @endif
                                 
-                                <p class="card-text text-muted small">{{ Str::limit($product->description, 60) }}</p>
+                                <p class="product-description">{{ Str::limit($product->description, 60) }}</p>
                                 
-                                <!-- Display Available Variants (View Only) -->
+                                <!-- Display Available Variants -->
                                 @if($product->has_variants && $product->variants->count() > 0)
                                 <div class="mb-2">
                                     <small class="text-muted">Available Options:</small>
@@ -847,7 +1082,7 @@
                                                 $variantStock = $variant->stock_quantity ?? 0;
                                                 $isInStock = $variantStock > 0;
                                             @endphp
-                                            <span class="badge {{ $isInStock ? 'bg-light text-dark border' : 'bg-secondary' }} me-1 mb-1 small">
+                                            <span class="variant-badge {{ !$isInStock ? 'out-of-stock' : '' }}">
                                                 {{ $variantName }}
                                                 @if(!$isInStock)
                                                 <small class="text-muted">(OOS)</small>
@@ -860,50 +1095,45 @@
                                 
                                 <div class="mt-auto">
                                     <!-- Price Display -->
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="price-section">
                                         @if($product->has_discount)
-                                        <span class="text-danger fw-bold">₱{{ number_format($product->sale_price, 2) }}</span>
-                                        <span class="text-muted text-decoration-line-through small">₱{{ number_format($product->price, 2) }}</span>
+                                        <span class="current-price">₱{{ number_format($product->sale_price, 2) }}</span>
+                                        <span class="original-price">₱{{ number_format($product->price, 2) }}</span>
                                         @else
-                                        <span class="text-primary fw-bold">₱{{ number_format($product->price, 2) }}</span>
+                                        <span class="current-price">₱{{ number_format($product->price, 2) }}</span>
                                         @endif
                                     </div>
 
                                     <!-- Rating Display -->
-                                    <div class="product-rating mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="star-rating me-1">
-                                                @for($i = 1; $i <= 5; $i++)
-                                                    @if($i <= floor($product->average_rating))
-                                                        <i class="fas fa-star text-warning" style="font-size: 0.7rem;"></i>
-                                                    @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
-                                                        <i class="fas fa-star-half-alt text-warning" style="font-size: 0.7rem;"></i>
-                                                    @else
-                                                        <i class="far fa-star text-warning" style="font-size: 0.7rem;"></i>
-                                                    @endif
-                                                @endfor
-                                            </div>
-                                            <small class="text-muted">
-                                                ({{ $product->total_ratings }})
-                                            </small>
+                                    <div class="rating-section">
+                                        <div class="star-rating">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                @if($i <= floor($product->average_rating))
+                                                    <i class="fas fa-star text-warning"></i>
+                                                @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
+                                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                                @else
+                                                    <i class="far fa-star text-warning"></i>
+                                                @endif
+                                            @endfor
                                         </div>
+                                        <span class="rating-count">({{ $product->total_ratings }})</span>
                                     </div>
 
-                                    <!-- Buttons -->
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary btn-sm flex-fill">
+                                    <!-- Action Buttons -->
+                                    <div class="action-buttons">
+                                        <a href="{{ route('products.show', $product) }}" class="btn btn-view-details">
                                             View Details
                                         </a>
                                         
                                         @if($product->in_stock)
-                                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form">
+                                        <form action="{{ route('cart.store') }}" method="POST" class="add-to-cart-form m-0">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                                             <input type="hidden" name="quantity" value="1">
                                             
                                             @if($product->has_variants && $product->variants->count() > 0)
                                                 @php
-                                                    // Get the first IN STOCK variant
                                                     $firstInStockVariant = $product->variants->where('stock_quantity', '>', 0)->first();
                                                 @endphp
                                                 @if($firstInStockVariant)
@@ -915,14 +1145,16 @@
                                                 <input type="hidden" name="selected_size" value="Standard">
                                             @endif
                                             
-                                            <button type="submit" class="btn btn-primary btn-sm w-100 add-to-cart-btn" 
+                                            <button type="submit" class="btn btn-add-cart" 
                                                     {{ $product->has_variants && !$firstInStockVariant ? 'disabled' : '' }}
                                                     title="{{ $product->has_variants && !$firstInStockVariant ? 'No variants in stock' : 'Add to Cart' }}">
                                                 <i class="fas fa-cart-plus"></i>
                                             </button>
                                         </form>
                                         @else
-                                        <button class="btn btn-secondary btn-sm flex-fill" disabled>Out of Stock</button>
+                                        <button class="btn btn-add-cart" disabled>
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                         @endif
                                     </div>
                                 </div>
@@ -933,26 +1165,37 @@
                 </div>
             @endforeach
         @else
-            <!-- Show empty state with message -->
-            <div class="text-center py-5">
-                <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                <h4 class="text-muted">No products available</h4>
-                <p class="text-muted">Try browsing different categories or check back later for new arrivals.</p>
+            <!-- Enhanced Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-state-title">No Products Available</h3>
+                <p class="empty-state-text">
+                    We're currently updating our inventory. Please check back later for new arrivals 
+                    or try browsing different categories.
+                </p>
+                <a href="{{ route('products.index') }}" class="btn btn-primary">
+                    <i class="fas fa-store me-2"></i>Browse All Categories
+                </a>
             </div>
         @endif
     </div>
 
     <!-- Loading indicator -->
-    <div id="loading-indicator">
-        <div class="spinner-border text-success" role="status">
+    <div id="loading-indicator" class="text-center py-4" style="display: none;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-2">Loading more products...</p>
+        <p class="mt-3 text-muted">Loading more amazing products...</p>
     </div>
 
     <!-- End of results message -->
-    <div id="end-of-results">
-        <p>No more products to load.</p>
+    <div id="end-of-results" class="text-center py-4" style="display: none;">
+        <div class="text-muted">
+            <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+            <p class="mb-0">You've reached the end of our product collection!</p>
+        </div>
     </div>
 </div>
 
@@ -966,10 +1209,38 @@ document.addEventListener('DOMContentLoaded', function() {
     const productsContainer = document.getElementById('products-container');
     const productsCount = document.getElementById('products-count');
     
-    // Get current category from URL
+    // Filter elements
+    const filterBubble = document.getElementById('filterBubble');
+    const filterPanel = document.getElementById('filterPanel');
+    const brandDropdownHeader = document.getElementById('brandDropdownHeader');
+    const brandDropdownOptions = document.getElementById('brandDropdownOptions');
+    const dropdownPlaceholder = document.getElementById('dropdownPlaceholder');
+    const dropdownArrow = document.getElementById('dropdownArrow');
+    const selectedBrandsContainer = document.getElementById('selectedBrandsContainer');
+    const selectedBrandsList = document.getElementById('selectedBrandsList');
+    const minPriceInput = document.getElementById('minPrice');
+    const maxPriceInput = document.getElementById('maxPrice');
+    const priceSlider = document.getElementById('priceSlider');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const activeFilterCount = document.getElementById('activeFilterCount');
+    
+    // Get current filters from URL
     const urlParams = new URLSearchParams(window.location.search);
     const currentCategory = urlParams.get('category') || '';
     const searchQuery = urlParams.get('search') || '';
+    
+    // Initialize price slider
+    if (priceSlider && maxPriceInput) {
+        const maxPriceValue = urlParams.get('max_price') || 10000;
+        priceSlider.value = maxPriceValue;
+        maxPriceInput.value = maxPriceValue;
+    }
+    
+    // Initialize brand dropdown placeholder
+    updateBrandDropdownPlaceholder();
+    updateSelectedBrands();
+    updateActiveFilterCount();
     
     // Show modal if no products found and there was a search
     @if($products->count() === 0 && request()->has('search'))
@@ -977,98 +1248,178 @@ document.addEventListener('DOMContentLoaded', function() {
         noProductsModal.show();
     @endif
     
-    // Floating Filter Functionality
-    const filterBubble = document.getElementById('filterBubble');
-    const filterPanel = document.getElementById('filterPanel');
-    const minPriceInput = document.getElementById('minPrice');
-    const maxPriceInput = document.getElementById('maxPrice');
-    const priceSlider = document.getElementById('priceSlider');
-    const applyFilters = document.getElementById('applyFilters');
-    const clearFilters = document.getElementById('clearFilters');
-
     // Brand dropdown functionality
-    function updateBrandDropdown() {
-        const brandCheckboxes = document.querySelectorAll('.brand-checkbox:checked');
-        const dropdownButton = document.getElementById('brandDropdown');
-        const selectedBrandsContainer = document.getElementById('selectedBrands');
-        
-        const selectedBrands = Array.from(brandCheckboxes).map(cb => cb.value);
-        
-        // Update dropdown button text
-        if (selectedBrands.length === 0) {
-            dropdownButton.textContent = 'Select Brands';
-        } else if (selectedBrands.length === 1) {
-            dropdownButton.textContent = selectedBrands[0];
-        } else {
-            dropdownButton.textContent = `${selectedBrands.length} brands selected`;
-        }
-        
-        // Update selected brands display
-        selectedBrandsContainer.innerHTML = '';
-        selectedBrands.forEach(brand => {
-            const tag = document.createElement('span');
-            tag.className = 'brand-tag';
-            tag.innerHTML = `
-                ${brand}
-                <button type="button" class="remove-brand" data-brand="${brand}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            selectedBrandsContainer.appendChild(tag);
+    if (brandDropdownHeader) {
+        brandDropdownHeader.addEventListener('click', function(e) {
+            e.stopPropagation();
+            brandDropdownOptions.classList.toggle('show');
+            brandDropdownHeader.classList.toggle('active');
+            dropdownArrow.style.transform = brandDropdownOptions.classList.contains('show') 
+                ? 'rotate(180deg)' 
+                : 'rotate(0deg)';
         });
         
-        // Add event listeners to remove buttons
-        document.querySelectorAll('.remove-brand').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const brand = this.getAttribute('data-brand');
-                const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
-                if (checkbox) {
-                    checkbox.checked = false;
-                    updateBrandDropdown();
-                }
-            });
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!brandDropdownHeader.contains(e.target) && !brandDropdownOptions.contains(e.target)) {
+                brandDropdownOptions.classList.remove('show');
+                brandDropdownHeader.classList.remove('active');
+                dropdownArrow.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Prevent closing when clicking inside dropdown
+        brandDropdownOptions.addEventListener('click', function(e) {
+            e.stopPropagation();
         });
     }
-
-    // Get selected brands
+    
+    // Brand selection management
+    document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateBrandDropdownPlaceholder();
+            updateSelectedBrands();
+            updateActiveFilterCount();
+        });
+    });
+    
+    // Price slider sync
+    if (priceSlider && maxPriceInput) {
+        priceSlider.addEventListener('input', function() {
+            maxPriceInput.value = this.value;
+            updateActiveFilterCount();
+        });
+        
+        maxPriceInput.addEventListener('input', function() {
+            let value = parseInt(this.value) || 0;
+            if (value > 10000) value = 10000;
+            if (value < 0) value = 0;
+            priceSlider.value = value;
+            updateActiveFilterCount();
+        });
+        
+        minPriceInput.addEventListener('input', function() {
+            let value = parseInt(this.value) || 0;
+            if (value < 0) value = 0;
+            this.value = value;
+            updateActiveFilterCount();
+        });
+    }
+    
+    // Toggle filter panel
+    filterBubble.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterPanel.classList.toggle('show');
+    });
+    
+    // Close filter panel when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!filterPanel.contains(e.target) && !filterBubble.contains(e.target)) {
+            filterPanel.classList.remove('show');
+        }
+    });
+    
+    // Apply filters
+    applyFiltersBtn.addEventListener('click', function() {
+        applyBrandFilters();
+    });
+    
+    // Clear filters
+    clearFiltersBtn.addEventListener('click', function() {
+        clearAllFilters();
+    });
+    
+    // Functions
+    function updateBrandDropdownPlaceholder() {
+        const selectedBrands = getSelectedBrands();
+        const placeholderSpan = dropdownPlaceholder.querySelector('span');
+        
+        if (selectedBrands.length === 0) {
+            placeholderSpan.innerHTML = 'Select brands...';
+        } else if (selectedBrands.length === 1) {
+            placeholderSpan.innerHTML = `${selectedBrands[0]}`;
+        } else {
+            placeholderSpan.innerHTML = `${selectedBrands.length} brands selected`;
+        }
+    }
+    
+    function updateSelectedBrands() {
+        const selectedBrands = getSelectedBrands();
+        
+        if (selectedBrandsList) {
+            selectedBrandsList.innerHTML = '';
+            
+            selectedBrands.forEach(brand => {
+                const brandTag = document.createElement('span');
+                brandTag.className = 'brand-tag';
+                brandTag.innerHTML = `
+                    ${brand}
+                    <button type="button" class="remove-brand-btn" data-brand="${brand}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                selectedBrandsList.appendChild(brandTag);
+            });
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-brand-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const brand = this.getAttribute('data-brand');
+                    const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        updateBrandDropdownPlaceholder();
+                        updateSelectedBrands();
+                        updateActiveFilterCount();
+                    }
+                });
+            });
+        }
+        
+        // Show/hide container
+        if (selectedBrandsContainer) {
+            if (selectedBrands.length > 0) {
+                selectedBrandsContainer.style.display = 'block';
+            } else {
+                selectedBrandsContainer.style.display = 'none';
+            }
+        }
+    }
+    
+    function updateActiveFilterCount() {
+        const selectedBrands = getSelectedBrands();
+        const minPrice = minPriceInput ? minPriceInput.value : '';
+        const maxPrice = maxPriceInput ? maxPriceInput.value : '';
+        
+        let count = selectedBrands.length;
+        if (minPrice || maxPrice) {
+            count += 1;
+        }
+        
+        if (activeFilterCount) {
+            activeFilterCount.textContent = count;
+            
+            // Add/remove badge from filter bubble
+            const filterBubble = document.getElementById('filterBubble');
+            if (count > 0) {
+                filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
+                filterBubble.innerHTML += `<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${count}</span>`;
+            } else {
+                filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
+            }
+        }
+    }
+    
     function getSelectedBrands() {
         const brandCheckboxes = document.querySelectorAll('.brand-checkbox:checked');
         return Array.from(brandCheckboxes).map(cb => cb.value);
     }
-
-    // Set current filters from URL
-    function setCurrentFilters() {
-        const urlBrands = urlParams.get('brands')?.split(',') || [];
-        const urlMinPrice = urlParams.get('min_price') || '';
-        const urlMaxPrice = urlParams.get('max_price') || '';
-        
-        // Set brand filters
-        urlBrands.forEach(brand => {
-            const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
-            if (checkbox) {
-                checkbox.checked = true;
-            }
-        });
-        
-        // Update dropdown display
-        updateBrandDropdown();
-        
-        // Set price filters
-        if (urlMinPrice) {
-            minPriceInput.value = urlMinPrice;
-        }
-        if (urlMaxPrice) {
-            maxPriceInput.value = urlMaxPrice;
-            priceSlider.value = urlMaxPrice;
-        }
-    }
-
-    // Apply filters
-    applyFilters.addEventListener('click', function() {
+    
+    function applyBrandFilters() {
         const selectedBrands = getSelectedBrands();
-        const minPrice = minPriceInput.value || '';
-        const maxPrice = maxPriceInput.value || '';
+        const minPrice = minPriceInput ? minPriceInput.value : '';
+        const maxPrice = maxPriceInput ? maxPriceInput.value : '';
         
         let url = new URL(window.location.href);
         
@@ -1094,72 +1445,39 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset to first page when applying filters
         url.searchParams.set('page', '1');
         
+        // Close filter panel
+        filterPanel.classList.remove('show');
+        
+        // Navigate to new URL
         window.location.href = url.toString();
-    });
-
-    // Clear filters
-    clearFilters.addEventListener('click', function() {
+    }
+    
+    function clearAllFilters() {
         // Clear brand selection
         document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
             checkbox.checked = false;
         });
-        updateBrandDropdown();
         
         // Clear price inputs
-        minPriceInput.value = '';
-        maxPriceInput.value = '';
-        priceSlider.value = 10000;
+        if (minPriceInput) minPriceInput.value = '';
+        if (maxPriceInput) maxPriceInput.value = '';
+        if (priceSlider) priceSlider.value = 10000;
         
-        let url = new URL(window.location.href);
-        url.searchParams.delete('brands');
-        url.searchParams.delete('min_price');
-        url.searchParams.delete('max_price');
-        url.searchParams.set('page', '1');
+        // Update displays
+        updateBrandDropdownPlaceholder();
+        updateSelectedBrands();
+        updateActiveFilterCount();
         
-        window.location.href = url.toString();
-    });
-
-    // Price range functionality
-    priceSlider.addEventListener('input', function() {
-        const maxPrice = this.value;
-        maxPriceInput.value = maxPrice;
-    });
-
-    maxPriceInput.addEventListener('input', function() {
-        let value = parseInt(this.value) || 0;
-        if (value > 10000) value = 10000;
-        if (value < 0) value = 0;
-        priceSlider.value = value;
-        this.value = value;
-    });
-
-    minPriceInput.addEventListener('input', function() {
-        let value = parseInt(this.value) || 0;
-        if (value < 0) value = 0;
-        this.value = value;
-    });
-
-    // Toggle filter panel
-    filterBubble.addEventListener('click', function(e) {
-        e.stopPropagation();
-        filterPanel.classList.toggle('show');
-    });
-
-    // Close filter panel when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!filterPanel.contains(e.target) && !filterBubble.contains(e.target)) {
-            filterPanel.classList.remove('show');
-        }
-    });
-
-    // Initialize brand dropdown
-    document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateBrandDropdown);
-    });
-
-    // Set current filters on page load
-    setCurrentFilters();
-
+        // Close dropdown
+        brandDropdownOptions.classList.remove('show');
+        brandDropdownHeader.classList.remove('active');
+        dropdownArrow.style.transform = 'rotate(0deg)';
+        
+        // Apply cleared filters
+        applyBrandFilters();
+    }
+    
+    // Infinite scroll functionality
     const hasProducts = {{ $products->count() > 0 ? 'true' : 'false' }};
     
     if (hasProducts) {
@@ -1181,8 +1499,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Add filter parameters
             const selectedBrands = getSelectedBrands();
-            const minPrice = minPriceInput.value || '';
-            const maxPrice = maxPriceInput.value || '';
+            const minPrice = minPriceInput ? minPriceInput.value : '';
+            const maxPrice = maxPriceInput ? maxPriceInput.value : '';
             
             if (selectedBrands.length > 0) {
                 url += `&brands=${selectedBrands.join(',')}`;

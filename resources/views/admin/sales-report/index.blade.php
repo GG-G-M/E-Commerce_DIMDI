@@ -82,108 +82,153 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Smaller stat cards */
-    .stat-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fdf8 100%);
-        border-radius: 8px;
-        padding: 1rem;
-        border-left: 3px solid #2C8F0C;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        height: 100%;
+    /* Combined Stats Card */
+    .stats-card-combined {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        border-top: 4px solid #2C8F0C;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .stat-item:not(:last-child):after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 1px;
+        background: linear-gradient(to bottom, transparent, #e0e0e0, transparent);
     }
 
     .stat-value {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-size: 2rem;
+        font-weight: 800;
         color: #2C8F0C;
         margin-bottom: 0.25rem;
+        line-height: 1;
     }
 
     .stat-label {
         color: #6c757d;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
     }
 
-   /* Enhanced Chart Styles */
-.chart-container-enhanced {
-    position: relative;
-    height: 280px;
-    width: 100%;
-    background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
-    border-radius: 8px;
-    padding: 1rem;
-}
+    .stat-change {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
 
-.chart-container-pie {
-    position: relative;
-    height: 220px;
-    width: 100%;
-    margin-bottom: 1rem;
-}
+    .stat-change.positive {
+        color: #2C8F0C;
+    }
 
-.chart-stats {
-    background: #f8fdf8;
-    border-radius: 8px;
-    padding: 1rem;
-    border-left: 3px solid #2C8F0C;
-}
+    .stat-change.negative {
+        color: #dc3545;
+    }
 
-.chart-actions .btn {
-    border-radius: 20px;
-    font-size: 0.8rem;
-    padding: 0.25rem 0.75rem;
-}
-
-.payment-item {
-    background: #f8f9fa;
-    transition: all 0.3s ease;
-}
-
-.payment-item:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
-}
-
-.color-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-/* Chart tooltip improvements */
-.chartjs-tooltip {
-    background: rgba(44, 143, 12, 0.9) !important;
-    border: none !important;
-    border-radius: 8px !important;
-    color: white !important;
-    padding: 8px 12px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Animation for chart loading */
-.chart-loading {
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-}
-
-/* Responsive chart adjustments */
-@media (max-width: 768px) {
+    /* Enhanced Chart Styles */
     .chart-container-enhanced {
-        height: 250px;
+        position: relative;
+        height: 280px;
+        width: 100%;
+        background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
+        border-radius: 8px;
+        padding: 1rem;
     }
-    
+
     .chart-container-pie {
-        height: 200px;
+        position: relative;
+        height: 220px;
+        width: 100%;
+        margin-bottom: 1rem;
     }
-}
+
+    .chart-stats {
+        background: #f8fdf8;
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 3px solid #2C8F0C;
+    }
+
+    .chart-actions .btn {
+        border-radius: 20px;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .payment-item {
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .payment-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+
+    .color-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Chart tooltip improvements */
+    .chartjs-tooltip {
+        background: rgba(44, 143, 12, 0.9) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        color: white !important;
+        padding: 8px 12px !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Animation for chart loading */
+    .chart-loading {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+
+    /* Responsive chart adjustments */
+    @media (max-width: 768px) {
+        .chart-container-enhanced {
+            height: 250px;
+        }
+        
+        .chart-container-pie {
+            height: 200px;
+        }
+        
+        .stat-item:not(:last-child):after {
+            display: none;
+        }
+        
+        .stat-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+        }
+    }
 
     .badge-success {
         background-color: #2C8F0C;
@@ -208,47 +253,99 @@
         font-size: 0.7rem;
     }
 
-    .small-card {
-        height: 100%;
+    .export-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .export-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 0.5rem 0;
+        min-width: 180px;
+        z-index: 1000;
+    }
+
+    .export-dropdown.show {
+        display: block;
+    }
+
+    .export-dropdown-item {
+        padding: 0.5rem 1rem;
+        color: #333;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .export-dropdown-item:hover {
+        background-color: #f8fdf8;
+        color: #2C8F0C;
     }
 </style>
 
-<!-- Add this button in the page-header div, next to the existing Export PDF button -->
+<!-- Page Header with Export Actions -->
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Sales Reports</h1>
         <p class="text-muted mb-0">Track and analyze your sales performance</p>
     </div>
-    <div>
+    <div class="export-actions position-relative">
         <a href="{{ route('admin.sales-report.comparison') }}" class="btn btn-outline-success me-2">
             <i class="fas fa-chart-line me-1"></i> Year Comparison
         </a>
-        <button type="button" class="btn btn-success" onclick="exportReport('pdf')">
-            <i class="fas fa-download me-1"></i> Export PDF
+        <button type="button" class="btn btn-success" onclick="exportAllCharts()">
+            <i class="fas fa-download me-1"></i> Export Report
         </button>
     </div>
 </div>
 
-
-<!-- Summary Cards - Smaller and more compact -->
-{{-- Simple 3-column layout without the redundant cards --}}
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
-            <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
-            <div class="stat-label">Total Sales</div>
+<!-- Combined Stats Card -->
+<div class="stats-card-combined">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="stat-item">
+                <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
+                <div class="stat-label">Total Sales</div>
+                @if(isset($salesData['salesChange']))
+                    <div class="stat-change {{ $salesData['salesChange'] >= 0 ? 'positive' : 'negative' }}">
+                        <i class="fas fa-arrow-{{ $salesData['salesChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
+                        {{ abs($salesData['salesChange']) }}% vs previous period
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
-            <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
-            <div class="stat-label">Total Orders</div>
+        <div class="col-md-4">
+            <div class="stat-item">
+                <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
+                <div class="stat-label">Total Orders</div>
+                @if(isset($salesData['ordersChange']))
+                    <div class="stat-change {{ $salesData['ordersChange'] >= 0 ? 'positive' : 'negative' }}">
+                        <i class="fas fa-arrow-{{ $salesData['ordersChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
+                        {{ abs($salesData['ordersChange']) }}%
+                    </div>
+                @endif
+            </div>
         </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
-            <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
-            <div class="stat-label">Avg Order Value</div>
+        <div class="col-md-4">
+            <div class="stat-item">
+                <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
+                <div class="stat-label">Avg Order Value</div>
+                @if(isset($salesData['aovChange']))
+                    <div class="stat-change {{ $salesData['aovChange'] >= 0 ? 'positive' : 'negative' }}">
+                        <i class="fas fa-arrow-{{ $salesData['aovChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
+                        {{ abs($salesData['aovChange']) }}%
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -466,6 +563,8 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // Enhanced Sales Report Charts JavaScript
 let salesTrendChart = null;
@@ -679,6 +778,123 @@ function getEnhancedChartOptions(label) {
     };
 }
 
+// Consolidated Export Functionality
+async function exportAllCharts() {
+    try {
+        // Show loading state
+        const exportBtn = document.querySelector('.export-actions .btn-success');
+        const originalHtml = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Exporting...';
+        exportBtn.disabled = true;
+
+        // Create a temporary container to capture all charts and stats
+        const exportContainer = document.createElement('div');
+        exportContainer.style.cssText = `
+            position: fixed;
+            top: -10000px;
+            left: -10000px;
+            width: 1200px;
+            background: white;
+            padding: 20px;
+            z-index: 10000;
+        `;
+
+        // Clone the elements we want to export
+        const statsCard = document.querySelector('.stats-card-combined').cloneNode(true);
+        const salesChartCard = document.querySelector('#salesTrendChart').closest('.card').cloneNode(true);
+        const paymentChartCard = document.querySelector('#paymentMethodChart').closest('.card').cloneNode(true);
+        
+        // Remove interactive elements
+        statsCard.querySelectorAll('.btn, .dropdown').forEach(el => el.remove());
+        salesChartCard.querySelectorAll('.chart-actions, .btn').forEach(el => el.remove());
+        paymentChartCard.querySelectorAll('.btn').forEach(el => el.remove());
+
+        // Add report header
+        const reportHeader = document.createElement('div');
+        reportHeader.style.cssText = `
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #2C8F0C;
+        `;
+        reportHeader.innerHTML = `
+            <h1 style="color: #2C8F0C; margin: 0;">Sales Report</h1>
+            <p style="color: #666; margin: 5px 0 0 0;">
+                Period: {{ $salesData['dateRangeText'] }} | Generated: ${new Date().toLocaleDateString()}
+            </p>
+        `;
+
+        exportContainer.appendChild(reportHeader);
+        exportContainer.appendChild(statsCard);
+        exportContainer.appendChild(salesChartCard);
+        exportContainer.appendChild(paymentChartCard);
+        
+        document.body.appendChild(exportContainer);
+
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(exportContainer, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        // Clean up
+        document.body.removeChild(exportContainer);
+
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL('image/png');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        // Add image to PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        
+        // Save the PDF
+        pdf.save(`sales-report-{{ date('Y-m-d') }}.pdf`);
+
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Error exporting report. Please try again.');
+    } finally {
+        // Restore button state
+        const exportBtn = document.querySelector('.export-actions .btn-success');
+        if (exportBtn) {
+            exportBtn.innerHTML = originalHtml;
+            exportBtn.disabled = false;
+        }
+    }
+}
+
+function exportReport(type) {
+    const form = document.getElementById('filterForm');
+    const action = "{{ route('admin.sales-report.export') }}";
+    
+    const exportForm = document.createElement('form');
+    exportForm.method = 'GET';
+    exportForm.action = action;
+    
+    const inputs = form.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.name) {
+            const clone = input.cloneNode(true);
+            exportForm.appendChild(clone);
+        }
+    });
+    
+    const exportTypeInput = document.createElement('input');
+    exportTypeInput.type = 'hidden';
+    exportTypeInput.name = 'export_type';
+    exportTypeInput.value = type;
+    exportForm.appendChild(exportTypeInput);
+    
+    document.body.appendChild(exportForm);
+    exportForm.submit();
+    document.body.removeChild(exportForm);
+}
+
 // Interactive Features
 function toggleChartType() {
     currentChartType = currentChartType === 'line' ? 'bar' : 'line';
@@ -693,27 +909,7 @@ function toggleChartType() {
     }
 }
 
-function exportChartAsImage(chartId, filename) {
-    const chartCanvas = document.getElementById(chartId);
-    const link = document.createElement('a');
-    link.download = filename + '.png';
-    link.href = chartCanvas.toDataURL('image/png');
-    link.click();
-}
-
 // Filter Form Functions
-function toggleCustomDate() {
-    const dateRange = document.querySelector('select[name="date_range"]').value;
-    const customDateRange = document.getElementById('customDateRange');
-    
-    if (dateRange === 'custom') {
-        customDateRange.style.display = 'block';
-    } else {
-        customDateRange.style.display = 'none';
-        submitFormWithDelay();
-    }
-}
-
 function handleDateRangeChange() {
     const dateRange = document.getElementById('dateRangeSelect').value;
     
@@ -756,33 +952,6 @@ function submitFormWithDelay() {
     formSubmissionTimer = setTimeout(() => {
         document.getElementById('filterForm').submit();
     }, 300);
-}
-
-function exportReport(type) {
-    const form = document.getElementById('filterForm');
-    const action = "{{ route('admin.sales-report.export') }}";
-    
-    const exportForm = document.createElement('form');
-    exportForm.method = 'GET';
-    exportForm.action = action;
-    
-    const inputs = form.querySelectorAll('input, select');
-    inputs.forEach(input => {
-        if (input.name) {
-            const clone = input.cloneNode(true);
-            exportForm.appendChild(clone);
-        }
-    });
-    
-    const exportTypeInput = document.createElement('input');
-    exportTypeInput.type = 'hidden';
-    exportTypeInput.name = 'export_type';
-    exportTypeInput.value = type;
-    exportForm.appendChild(exportTypeInput);
-    
-    document.body.appendChild(exportForm);
-    exportForm.submit();
-    document.body.removeChild(exportForm);
 }
 
 // Utility Functions
@@ -833,15 +1002,21 @@ function showNoDataMessage(canvasId, title, message) {
     `;
 }
 
-// Real-time Data Updates (Optional)
-function refreshChartData() {
-    // This function can be extended to fetch real-time data
-    console.log('Refreshing chart data...');
+// Event Listeners and Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
     initializeSalesTrendChart();
     initializePaymentMethodChart();
-}
+    
+    // Add resize debouncing
+    const debouncedResize = debounce(function() {
+        initializeSalesTrendChart();
+        initializePaymentMethodChart();
+    }, 250);
+    
+    window.addEventListener('resize', debouncedResize);
+});
 
-// Chart Performance Optimization
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -853,83 +1028,5 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-
-// Event Listeners and Initialization
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize charts
-    initializeSalesTrendChart();
-    initializePaymentMethodChart();
-    
-    // Add chart export buttons
-    addChartExportButtons();
-    
-    // Add real-time refresh (optional)
-    // setInterval(refreshChartData, 300000); // Refresh every 5 minutes
-    
-    // Add resize debouncing
-    const debouncedResize = debounce(function() {
-        initializeSalesTrendChart();
-        initializePaymentMethodChart();
-    }, 250);
-    
-    window.addEventListener('resize', debouncedResize);
-});
-
-// Add export buttons to charts
-function addChartExportButtons() {
-    const salesChartHeader = document.querySelector('#salesTrendChart').closest('.card').querySelector('.card-header');
-    const paymentChartHeader = document.querySelector('#paymentMethodChart').closest('.card').querySelector('.card-header');
-    
-    if (salesChartHeader && !salesChartHeader.querySelector('.export-btn')) {
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'btn btn-sm btn-outline-success export-btn ms-2';
-        exportBtn.innerHTML = '<i class="fas fa-download me-1"></i> Export';
-        exportBtn.onclick = () => exportChartAsImage('salesTrendChart', 'sales-trend');
-        salesChartHeader.appendChild(exportBtn);
-    }
-    
-    if (paymentChartHeader && !paymentChartHeader.querySelector('.export-btn')) {
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'btn btn-sm btn-outline-success export-btn ms-2';
-        exportBtn.innerHTML = '<i class="fas fa-download me-1"></i> Export';
-        exportBtn.onclick = () => exportChartAsImage('paymentMethodChart', 'payment-methods');
-        paymentChartHeader.appendChild(exportBtn);
-    }
-}
-
-// Data Analysis Functions
-function calculateTrend() {
-    const dailyData = {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!};
-    if (dailyData.length < 2) return 0;
-    
-    const firstValue = dailyData[0];
-    const lastValue = dailyData[dailyData.length - 1];
-    return ((lastValue - firstValue) / firstValue) * 100;
-}
-
-function getPeakPerformance() {
-    const dailyData = {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!};
-    const dailyLabels = {!! json_encode($salesData['dailySales']->pluck('date')->toArray()) !!};
-    
-    if (dailyData.length === 0) return { value: 0, date: 'N/A' };
-    
-    const maxValue = Math.max(...dailyData);
-    const maxIndex = dailyData.indexOf(maxValue);
-    
-    return {
-        value: maxValue,
-        date: dailyLabels[maxIndex] || 'N/A'
-    };
-}
-
-// Initialize trend analysis on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const trend = calculateTrend();
-    const peak = getPeakPerformance();
-    
-    // You can display these values in your UI
-    console.log('Sales Trend:', trend.toFixed(2) + '%');
-    console.log('Peak Performance:', '₱' + peak.value.toLocaleString() + ' on ' + peak.date);
-});
 </script>
 @endpush

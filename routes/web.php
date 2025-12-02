@@ -53,6 +53,7 @@ Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout-selected');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
 // Payment Routes - UPDATED SECTION
@@ -114,6 +115,7 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
+
 // Admin Routes (Role checking in controllers)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Dashboard

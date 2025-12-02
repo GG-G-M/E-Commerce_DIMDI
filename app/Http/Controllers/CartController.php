@@ -450,6 +450,39 @@ class CartController extends Controller
     }
 
     /**
+     * Handle checkout of selected items
+     */
+    public function checkoutSelected(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|array',
+            'selected_items.*' => 'required|string'
+        ]);
+
+        $cartIdentifier = $this->getCartIdentifier();
+        
+        // Validate that all selected items belong to user
+        $selectedItems = Cart::where($cartIdentifier)
+            ->whereIn('id', $request->selected_items)
+            ->get();
+
+        if ($selectedItems->count() !== count($request->selected_items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid item selection'
+            ], 422);
+        }
+
+        // Store selected items in session for OrderController to use
+        session(['selected_cart_items' => $request->selected_items]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Selection saved. Redirecting to checkout...'
+        ]);
+    }
+
+    /**
      * Remove selected items from cart (after successful checkout)
      */
     public function removeSelectedItems(Request $request)

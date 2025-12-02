@@ -217,7 +217,7 @@
             <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-sm btn-outline-success">
                 <i class="fas fa-box me-1"></i> Available Orders
             </a>
-            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-primary">
+            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-success">
                 <i class="fas fa-list me-1"></i> My Orders
             </a>
         </div>
@@ -275,9 +275,6 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
                                     
                                     @if(is_null($order->delivery_id) && $order->order_status == 'processing')
                                     <form action="{{ route('delivery.orders.pickup-order', $order) }}" method="POST" class="d-inline">

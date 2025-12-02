@@ -2,38 +2,120 @@
 
 @section('content')
 <style>
-    .page-header {
-        background: white;
+    .card-custom {
+        border: none;
         border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
     }
-    .page-header h1 { color: #2C8F0C; font-weight: 700; }
-    .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease; }
-    .card-custom:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
-    .card-header-custom { background: linear-gradient(135deg, #2C8F0C, #4CAF50); color: white; font-weight: 600; border-top-left-radius: 12px; border-top-right-radius: 12px; }
-    .btn-primary { background: linear-gradient(135deg, #2C8F0C, #4CAF50); border: none; }
-    .btn-primary:hover { background: linear-gradient(135deg, #1E6A08, #2C8F0C); }
-    .btn-warning { background: #FBC02D; border: none; color: #fff; }
-    .btn-danger { background: #C62828; border: none; }
-    .table th { background-color: #E8F5E6; color: #2C8F0C; font-weight: 600; border-bottom: 2px solid #2C8F0C; }
-    .table tbody tr:hover { background-color: #F8FDF8; transition: background-color 0.2s ease; }
-    .modal-header { background: linear-gradient(135deg, #2C8F0C, #4CAF50); color: white; }
-    .form-label { font-weight: 600; color: #2C8F0C; }
+    .card-custom:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+    .card-header-custom {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        font-weight: 600;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+    .table th {
+        background-color: #E8F5E6;
+        color: #2C8F0C;
+        font-weight: 600;
+        border-bottom: 2px solid #2C8F0C;
+    }
+    .table tbody tr:hover {
+        background-color: #F8FDF8;
+        transition: background-color 0.2s ease;
+    }
+    .modal-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #2C8F0C;
+    }
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+    .position-relative {
+        position: relative;
+    }
+    .batch-info {
+        font-size: 0.875em;
+    }
+    .batch-item {
+        padding: 2px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .batch-item:last-child {
+        border-bottom: none;
+    }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">Stock-Out Management</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockOutModal">
-        <i class="bi bi-plus-circle"></i> Stock-Out
-    </button>
+<!-- Search -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.stock_out.index') }}" id="filterForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3 position-relative">
+                        <label for="search" class="form-label fw-bold">Search Stock-Out</label>
+                        <input type="text" class="form-control" id="search" name="search"
+                            value="{{ request('search') }}" placeholder="Search by product, variant, or reason...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="per_page" class="form-label fw-bold">Items per page</label>
+                        <select class="form-select" id="per_page" name="per_page">
+                            @foreach([5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Stock-Out Table -->
 <div class="card card-custom">
-    <div class="card-header card-header-custom">Stock-Out List</div>
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Stock-Out List</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+            <i class="bi bi-plus-circle"></i> Stock-Out
+        </button>
+    </div>
     <div class="card-body">
         <table class="table table-bordered align-middle w-100">
             <thead>
@@ -44,7 +126,6 @@
                     <th>Stock-In Batches (FIFO)</th>
                     <th>Reason</th>
                     <th>Date</th>
-                    {{-- <th>Actions</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -61,36 +142,19 @@
                     <td>{{ $stock->quantity }}</td>
                     <td>
                         @if($stock->stockInBatches->count() > 0)
-                            <ul class="mb-0">
+                            <div class="batch-info">
                                 @foreach($stock->stockInBatches as $batch)
-                                    <li>
+                                    <div class="batch-item">
                                         Batch #{{ $batch->id }}: {{ $batch->pivot->deducted_quantity }} pcs
-                                    </li>
+                                    </div>
                                 @endforeach
-                            </ul>
+                            </div>
                         @else
                             <span class="text-muted">No batch info</span>
                         @endif
                     </td>
                     <td>{{ $stock->reason }}</td>
                     <td>{{ $stock->created_at->format('Y-m-d H:i') }}</td>
-                    {{-- <td>
-                        <button 
-                            class="btn btn-warning btn-sm me-1 editStockBtn"
-                            data-id="{{ $stock->id }}"
-                            data-product-id="{{ $stock->product_id }}"
-                            data-variant-id="{{ $stock->product_variant_id }}"
-                            data-quantity="{{ $stock->quantity }}"
-                            data-reason="{{ $stock->reason }}"
-                        >
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <form action="{{ route('admin.stock_out.destroy', $stock) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                        </form>
-                    </td> --}}
                 </tr>
                 @endforeach
             </tbody>
@@ -153,9 +217,38 @@
     </div>
 </div>
 
-<!-- JavaScript for editing on same page -->
+@push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-search functionality
+        const filterForm = document.getElementById('filterForm');
+        const searchInput = document.getElementById('search');
+        const perPageSelect = document.getElementById('per_page');
+        const searchLoading = document.getElementById('searchLoading');
+        
+        let searchTimeout;
+
+        // Auto-submit search with delay
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchLoading.style.display = 'block';
+            
+            searchTimeout = setTimeout(() => {
+                filterForm.submit();
+            }, 800); // 800ms delay after typing stops
+        });
+
+        // Auto-submit per page selection immediately
+        perPageSelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+
+        // Clear loading indicator when form submits
+        filterForm.addEventListener('submit', function() {
+            searchLoading.style.display = 'none';
+        });
+
+        // Edit functionality
         const stockModal = new bootstrap.Modal(document.getElementById('stockOutModal'));
         const form = document.getElementById('stockOutForm');
         const modalTitle = document.getElementById('modalTitle');
@@ -190,4 +283,5 @@
         });
     });
 </script>
+@endpush
 @endsection
