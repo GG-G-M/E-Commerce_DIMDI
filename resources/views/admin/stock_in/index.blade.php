@@ -413,13 +413,13 @@
                                         <span class="text-muted">#{{ $stock->id }}</span>
                                     </td>
                                     <td>
-                                        @if ($stock->product)
+                         @if ($stock->product)
                                             <div class="product-name">{{ $stock->product->name }}</div>
                                             <div class="text-muted small">Main Product</div>
                                         @elseif($stock->variant)
                                             <div class="product-name">{{ $stock->variant->product->name }}</div>
                                             <div class="variant-name">{{ $stock->variant->variant_name }}</div>
-                                        @endif
+
                                     </td>
                                     <td>
                                         <span class="text-dark">{{ $stock->warehouse->name }}</span>
