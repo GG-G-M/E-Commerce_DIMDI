@@ -156,16 +156,18 @@ class StockOutController extends Controller
 
 
     public function autoStockOut($productId, $variantId, $quantity, $reason = 'Order Shipped')
-{
-    $request = new \Illuminate\Http\Request([
-        'product_id' => $productId,
-        'product_variant_id' => $variantId,
-        'quantity' => $quantity,
-        'reason' => $reason,
-    ]);
+    {
+        $request = new \Illuminate\Http\Request([
+            'product_id' => $productId,
+            'product_variant_id' => $variantId,
+            'quantity' => $quantity,
+            'reason' => $reason,
+        ]);
 
-    return $this->store($request);
-}
+<<<<<<< HEAD
 
-
+=======
+        return $this->store($request);
+    }
+>>>>>>> fd6f028 (stock product/variant fields)
 }
