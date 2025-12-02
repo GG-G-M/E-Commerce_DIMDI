@@ -132,6 +132,18 @@
         background: linear-gradient(135deg, #E55A2B, #FF7B3A) !important;
         color: white;
     }
+    .details-section {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    .details-section h3 {
+        color: #2C8F0C;
+        border-bottom: 2px solid #2C8F0C;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
 </style>
 
 <div class="container py-4">
@@ -162,7 +174,7 @@
         <div class="col-lg-6">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
             
-            <!-- Display Brand - FIXED -->
+            <!-- Display Brand -->
             @if($product->brand_id && $product->brand)
                 <div class="mb-2">
                     <span class="badge bg-light text-dark border px-3 py-2">
@@ -182,8 +194,6 @@
                     <span class="h3 text-success fw-bold" id="product-price">₱{{ number_format($product->price, 2) }}</span>
                 @endif
             </div>
-
-            <p class="mb-4">{{ $product->description }}</p>
 
             <!-- Variant Selection -->
             @if($product->has_variants && $product->variants->count() > 0)
@@ -297,32 +307,67 @@
             @else
             <button class="btn btn-secondary btn-lg w-100" disabled>Out of Stock</button>
             @endif
+        </div>
+    </div>
 
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h6 class="card-title text-success fw-bold">Product Details</h6>
-                    <ul class="list-unstyled mb-0">
-                        <li><strong>SKU:</strong> {{ $product->sku }}</li>
-                        <li><strong>Category:</strong> {{ $product->category->name }}</li>
-                        <!-- Brand Display - FIXED -->
-                        @if($product->brand_id && $product->brand)
-                        <li><strong>Brand:</strong> {{ $product->brand->name }}</li>
-                        @endif
-                        <li><strong>Availability:</strong> {{ $product->total_stock }} in stock</li>
-                        @if($product->has_variants && $product->variants->count() > 0)
-                        <li><strong>Available Options:</strong> 
-                            @foreach($product->variants as $variant)
-                                @php
-                                    $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
-                                    $variantStock = $variant->stock_quantity ?? 0;
-                                @endphp
-                                <span class="badge bg-{{ $variantStock > 0 ? 'primary' : 'secondary' }} me-1">
-                                    {{ $variantName }} ({{ $variantStock }})
-                                </span>
-                            @endforeach
-                        </li>
-                        @endif
-                    </ul>
+    <!-- Product Description & Details Section -->
+    <div class="details-section">
+        <h3><i class="fas fa-info-circle me-2"></i>Product Information</h3>
+        
+        <div class="row">
+            <!-- Description Column -->
+            <div class="col-lg-6">
+                <h5 class="text-success mb-3">Description</h5>
+                <p class="mb-0">{{ $product->description }}</p>
+            </div>
+            
+            <!-- Details Column -->
+            <div class="col-lg-6">
+                <h5 class="text-success mb-3">Product Details</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th width="35%">SKU:</th>
+                                <td>{{ $product->sku }}</td>
+                            </tr>
+                            <tr>
+                                <th>Category:</th>
+                                <td>{{ $product->category->name }}</td>
+                            </tr>
+                            @if($product->brand_id && $product->brand)
+                            <tr>
+                                <th>Brand:</th>
+                                <td>{{ $product->brand->name }}</td>
+                            </tr>
+                            @endif
+                            <tr>
+                                <th>Availability:</th>
+                                <td>
+                                    <span class="badge bg-{{ $product->in_stock ? 'success' : 'danger' }}">
+                                        {{ $product->in_stock ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
+                                    <span class="ms-2">{{ $product->total_stock }} units available</span>
+                                </td>
+                            </tr>
+                            @if($product->has_variants && $product->variants->count() > 0)
+                            <tr>
+                                <th>Available Options:</th>
+                                <td>
+                                    @foreach($product->variants as $variant)
+                                        @php
+                                            $variantName = $variant->size ?? $variant->variant_name ?? 'Option';
+                                            $variantStock = $variant->stock_quantity ?? 0;
+                                        @endphp
+                                        <span class="badge bg-{{ $variantStock > 0 ? 'primary' : 'secondary' }} me-1 mb-1">
+                                            {{ $variantName }} ({{ $variantStock }})
+                                        </span>
+                                    @endforeach
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -340,7 +385,7 @@
                     <div class="card-body d-flex flex-column">
                         <h6 class="card-title fw-semibold">{{ $relatedProduct->name }}</h6>
                         
-                        <!-- Display Brand for Related Products - FIXED -->
+                        <!-- Display Brand for Related Products -->
                         @if($relatedProduct->brand_id && $relatedProduct->brand)
                             <small class="text-muted d-block mb-2">
                                 <i class="fas fa-tag me-1"></i>{{ $relatedProduct->brand->name }}
