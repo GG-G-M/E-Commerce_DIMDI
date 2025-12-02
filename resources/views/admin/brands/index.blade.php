@@ -2,15 +2,6 @@
 
 @section('content')
 <style>
-    .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -23,6 +14,24 @@
         font-weight: 600;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
     .status-active {
@@ -34,25 +43,119 @@
         color: #6c757d;
         font-weight: 600;
     }
+
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    .btn-outline-success {
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #2C8F0C;
+        border-color: #2C8F0C;
+        color: white;
+    }
+
+    .btn-outline-danger {
+        border-color: #C62828;
+        color: #C62828;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #C62828;
+        border-color: #C62828;
+        color: white;
+    }
+
+    .table th {
+        background-color: #E8F5E6;
+        color: #2C8F0C;
+        font-weight: 600;
+        border-bottom: 2px solid #2C8F0C;
+    }
+
+    .table tbody tr:hover {
+        background-color: #F8FDF8;
+        transition: background-color 0.2s ease;
+    }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h3 mb-1">Brand Management</h1>
-        <p class="text-muted mb-0">Manage your product brands here.</p>
+<!-- Search and Filters -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.brands.index') }}" id="filterForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3 position-relative">
+                        <label for="search" class="form-label fw-bold">Search Brands</label>
+                        <input type="text" class="form-control" id="search" name="search"
+                            value="{{ request('search') }}" placeholder="Search by name or description...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="status" class="form-label fw-bold">Filter by Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All Status</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        <label for="sort_by" class="form-label fw-bold">Sort By</label>
+                        <select class="form-select" id="sort_by" name="sort_by">
+                            <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
+                            <option value="sort_order" {{ request('sort_by') == 'sort_order' ? 'selected' : '' }}>Sort Order</option>
+                            <option value="products_count" {{ request('sort_by') == 'products_count' ? 'selected' : '' }}>Product Count</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label for="per_page" class="form-label fw-bold">Items per page</label>
+                        <select class="form-select" id="per_page" name="per_page">
+                            @foreach([5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-    <a href="{{ route('admin.brands.create') }}" style="background-color: #2C8F0C" class="btn btn-primary">
-        <i class="fas fa-plus me-1"></i> Add Brand
-    </a>
 </div>
 
+<!-- Brands Table -->
 <div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <div>
-            <i class="fas fa-tags me-2"></i> Brand List
-        </div>
-        <div class="text-muted small">
-            Total: {{ $brands->total() }} brands
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Brand List</h5>
+        <div class="d-flex align-items-center">
+            <span class="text-white me-3 small d-none d-md-block">
+                Total: {{ $brands->total() }} brands
+            </span>
+            <a href="{{ route('admin.brands.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Add Brand
+            </a>
         </div>
     </div>
     <div class="card-body">
@@ -130,4 +233,49 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterForm = document.getElementById('filterForm');
+        const searchInput = document.getElementById('search');
+        const statusSelect = document.getElementById('status');
+        const sortBySelect = document.getElementById('sort_by');
+        const perPageSelect = document.getElementById('per_page');
+        const searchLoading = document.getElementById('searchLoading');
+        
+        let searchTimeout;
+
+        // Auto-submit search with delay
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchLoading.style.display = 'block';
+            
+            searchTimeout = setTimeout(() => {
+                filterForm.submit();
+            }, 800); // 800ms delay after typing stops
+        });
+
+        // Auto-submit status filter immediately
+        statusSelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+
+        // Auto-submit sort by selection immediately
+        sortBySelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+
+        // Auto-submit per page selection immediately
+        perPageSelect.addEventListener('change', function() {
+            filterForm.submit();
+        });
+
+        // Clear loading indicator when form submits
+        filterForm.addEventListener('submit', function() {
+            searchLoading.style.display = 'none';
+        });
+    });
+</script>
+@endpush
 @endsection

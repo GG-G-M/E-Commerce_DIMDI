@@ -54,7 +54,7 @@ class SessionController extends Controller
                     } catch (\Throwable $e) {
                         // ignore
                     }
-                }   
+                }
             }
 
             return [

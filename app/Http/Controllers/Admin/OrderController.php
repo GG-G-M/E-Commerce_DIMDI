@@ -82,56 +82,7 @@ class OrderController extends Controller
     }
 
     // NEW METHOD: Assign order to delivery
-    public function assignToDelivery(Request $request, Order $order)
-    {
-        $request->validate([
-            'delivery_id' => 'required|exists:deliveries,id'
-        ]);
-
-        // Check if order is ready for delivery assignment
-        if (!in_array($order->order_status, ['confirmed', 'processing', 'shipped'])) {
-            return redirect()->back()->with('error', 'Order must be in confirmed, processing, or shipped status to assign for delivery.');
-        }
-
-        // Check if delivery person is active
-        $delivery = Delivery::find($request->delivery_id);
-        if (!$delivery->is_active) {
-            return redirect()->back()->with('error', 'Selected delivery person is not active.');
-        }
-
-        try {
-            $order->assignToDelivery($request->delivery_id);
-            
-            return redirect()->back()->with('success', 'Order successfully assigned to ' . $delivery->name . '!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to assign delivery: ' . $e->getMessage());
-        }
-    }
-
-    // NEW METHOD: Unassign delivery from order
-    public function unassignDelivery(Order $order)
-    {
-        if (!$order->delivery_id) {
-            return redirect()->back()->with('error', 'Order is not assigned to any delivery person.');
-        }
-
-        try {
-            $deliveryName = $order->delivery->name;
-            $order->update([
-                'delivery_id' => null,
-                'assigned_at' => null
-            ]);
-
-            // Update status back to shipped if it was out for delivery
-            if ($order->order_status === 'out_for_delivery') {
-                $order->updateStatus('shipped', 'Delivery assignment removed');
-            }
-
-            return redirect()->back()->with('success', 'Delivery assignment removed from ' . $deliveryName . ' successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to remove delivery assignment: ' . $e->getMessage());
-        }
-    }
+    
 
     // NEW METHOD: Get orders ready for delivery assignment
     public function getOrdersForDelivery()
@@ -196,42 +147,150 @@ class OrderController extends Controller
     }
 
     // NEW METHOD: Mark order as picked up
-    public function markAsPickedUp(Order $order)
-    {
-        if (!$order->delivery_id) {
-            return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
-        }
-
-        if ($order->order_status !== 'out_for_delivery') {
-            return redirect()->back()->with('error', 'Order must be out for delivery to mark as picked up.');
-        }
-
-        try {
-            $order->markAsPickedUp();
-            return redirect()->back()->with('success', 'Order marked as picked up successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
-        }
+    // FIXED: Mark order as picked up
+public function markAsPickedUp(Order $order)
+{
+    if (!$order->delivery_id) {
+        return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
     }
 
-    // NEW METHOD: Mark order as delivered
-    public function markAsDelivered(Order $order)
-    {
-        if (!$order->delivery_id) {
-            return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
+    try {
+        // Use the new OrderDelivery system
+        if ($order->currentDelivery) {
+            $order->currentDelivery->update([
+                'status' => 'picked_up',
+                'picked_up_at' => now()
+            ]);
+        } else {
+            // Create new delivery record if none exists
+            \App\Models\OrderDelivery::create([
+                'order_id' => $order->id,
+                'delivery_personnel_id' => $order->delivery_id,
+                'status' => 'picked_up',
+                'picked_up_at' => now(),
+                'assigned_at' => now()
+            ]);
         }
 
-        if (!in_array($order->order_status, ['out_for_delivery', 'shipped'])) {
-            return redirect()->back()->with('error', 'Order must be out for delivery or shipped to mark as delivered.');
-        }
+        // Update order status so admin/users can see it
+        $order->updateStatus('out_for_delivery', 'Order picked up by delivery personnel');
 
-        try {
-            $order->markAsDelivered();
-            return redirect()->back()->with('success', 'Order marked as delivered successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to mark order as delivered: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('success', 'Order marked as picked up successfully! Status updated to "Out for Delivery".');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
     }
+}
+
+// FIXED: Mark order as delivered
+public function markAsDelivered(Order $order)
+{
+    if (!$order->delivery_id) {
+        return redirect()->back()->with('error', 'Order must be assigned to a delivery person first.');
+    }
+
+    try {
+        // Use the new OrderDelivery system
+        if ($order->currentDelivery) {
+            $order->currentDelivery->update([
+                'status' => 'delivered',
+                'delivered_at' => now()
+            ]);
+        } else {
+            // Create new delivery record if none exists
+            \App\Models\OrderDelivery::create([
+                'order_id' => $order->id,
+                'delivery_personnel_id' => $order->delivery_id,
+                'status' => 'delivered',
+                'delivered_at' => now(),
+                'assigned_at' => now()
+            ]);
+        }
+
+        // Update order status so admin/users can see it
+        $order->updateStatus('delivered', 'Order successfully delivered to customer');
+
+        return redirect()->back()->with('success', 'Order marked as delivered successfully! Status updated to "Delivered".');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to mark order as delivered: ' . $e->getMessage());
+    }
+}
+
+// FIXED: Assign order to delivery
+public function assignToDelivery(Request $request, Order $order)
+{
+    $request->validate([
+        'delivery_id' => 'required|exists:deliveries,id'
+    ]);
+
+    // Check if order is ready for delivery assignment
+    if (!in_array($order->order_status, ['confirmed', 'processing', 'shipped'])) {
+        return redirect()->back()->with('error', 'Order must be in confirmed, processing, or shipped status to assign for delivery.');
+    }
+
+    // Check if delivery person is active
+    $delivery = Delivery::find($request->delivery_id);
+    if (!$delivery->is_active) {
+        return redirect()->back()->with('error', 'Selected delivery person is not active.');
+    }
+
+    try {
+        // Create delivery record in order_deliveries table
+        \App\Models\OrderDelivery::create([
+            'order_id' => $order->id,
+            'delivery_personnel_id' => $request->delivery_id,
+            'status' => 'assigned',
+            'assigned_at' => now()
+        ]);
+
+        // Update order with delivery assignment
+        $order->update([
+            'delivery_id' => $request->delivery_id,
+            'assigned_at' => now()
+        ]);
+
+        // Update order status if it was shipped
+        if ($order->order_status === 'shipped') {
+            $order->updateStatus('out_for_delivery', 'Assigned to delivery personnel');
+        }
+
+        return redirect()->back()->with('success', 'Order successfully assigned to ' . $delivery->name . '!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to assign delivery: ' . $e->getMessage());
+    }
+}
+
+// FIXED: Unassign delivery from order
+public function unassignDelivery(Order $order)
+{
+    if (!$order->delivery_id) {
+        return redirect()->back()->with('error', 'Order is not assigned to any delivery person.');
+    }
+
+    try {
+        $deliveryName = $order->delivery->name;
+        
+        // Also update any active OrderDelivery records
+        if ($order->currentDelivery) {
+            $order->currentDelivery->update([
+                'status' => 'cancelled'
+            ]);
+        }
+
+        $order->update([
+            'delivery_id' => null,
+            'assigned_at' => null
+        ]);
+
+        // Update status back to shipped if it was out for delivery
+        if ($order->order_status === 'out_for_delivery') {
+            $order->updateStatus('shipped', 'Delivery assignment removed');
+        }
+
+        return redirect()->back()->with('success', 'Delivery assignment removed from ' . $deliveryName . ' successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Failed to remove delivery assignment: ' . $e->getMessage());
+    }
+}
 
     // REFUND METHODS (keep your existing refund methods)
     public function showRefund(Order $order)

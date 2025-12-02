@@ -35,6 +35,15 @@
         font-weight: 600;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
     }
 
     .btn-primary {
@@ -93,13 +102,6 @@
     }
 </style>
 
-<div class="page-header d-flex justify-content-between align-items-center">
-    <h1 class="mb-0">Customer Management</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-        <i class="bi bi-person-plus"></i> Add Customer
-    </button>
-</div>
-
 <!-- Filters and Search -->
 <div class="card card-custom mb-4">
     <div class="card-body">
@@ -150,7 +152,12 @@
 </div>
 
 <div class="card card-custom">
-    <div class="card-header card-header-custom">Customer List</div>
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Customer List</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="bi bi-person-plus"></i> Add Customer
+        </button>
+    </div>
     <div class="card-body">
         <table class="table table-bordered align-middle" id="customerTable">
             <thead>
