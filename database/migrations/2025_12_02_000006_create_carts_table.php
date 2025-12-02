@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
@@ -16,13 +16,12 @@ return new class extends Migration
             $table->string('selected_size')->default('One Size');
             $table->integer('quantity')->default(1);
             $table->timestamps();
-            
             $table->unique(['session_id', 'product_id', 'selected_size']);
             $table->unique(['user_id', 'product_id', 'selected_size']);
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('carts');
     }
