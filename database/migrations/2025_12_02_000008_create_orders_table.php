@@ -6,12 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('delivery_id')->nullable()->constrained('deliveries')->onDelete('set null');
+            $table->timestamp('assigned_at')->nullable();
             $table->string('customer_email');
             $table->string('customer_name');
             $table->string('customer_phone')->nullable();
@@ -26,12 +28,14 @@ return new class extends Migration
             $table->string('order_status')->default('pending');
             $table->string('cancellation_reason')->nullable();
             $table->timestamp('cancelled_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
             $table->text('notes')->nullable();
+            $table->json('status_history')->nullable();
             $table->timestamps();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('orders');
     }

@@ -259,7 +259,8 @@ class CommerceSeeder extends Seeder
                 'is_featured' => $productData['is_featured'],
                 'is_active' => $productData['is_active'],
                 'is_archived' => false,
-                'category_id' => $productData['category_id']
+                'category_id' => $productData['category_id'],
+                'brand_id' => null
             ]);
 
             // Create product variants if the product has variants

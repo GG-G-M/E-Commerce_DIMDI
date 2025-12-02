@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->enum('role', ['customer', 'admin'])->default('customer');
+            $table->string('role', 20)->default('customer'); // Modified to accommodate 'delivery' role
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
@@ -26,6 +23,11 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('country')->nullable();
+            $table->boolean('is_archived')->default(false);
+            $table->string('vehicle_type')->nullable();
+            $table->string('vehicle_number')->nullable();
+            $table->string('license_number')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -46,13 +48,10 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };

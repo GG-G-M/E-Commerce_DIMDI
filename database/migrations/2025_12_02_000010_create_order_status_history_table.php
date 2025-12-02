@@ -6,20 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('order_status_history', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->string('status'); // pending, confirmed, shipped, delivered, cancelled
+            $table->string('status');
             $table->text('notes')->nullable();
             $table->timestamp('created_at');
-            
             $table->index(['order_id', 'created_at']);
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('order_status_history');
     }

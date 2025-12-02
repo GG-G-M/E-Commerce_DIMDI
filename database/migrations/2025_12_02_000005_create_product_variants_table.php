@@ -6,25 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('variant_name'); // e.g., "Pro Model", "Standard Edition"
+            $table->string('variant_name');
             $table->text('variant_description')->nullable();
-            $table->string('image')->nullable(); // Variant-specific image
-            $table->string('sku')->nullable(); // Unique SKU for each variant
+            $table->string('image')->nullable();
+            $table->string('sku')->nullable();
             $table->integer('stock_quantity')->default(0);
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('sale_price', 10, 2)->nullable();
             $table->timestamps();
-            
-            $table->unique(['product_id', 'variant_name']); // Unique by product and variant name
+            $table->unique(['product_id', 'variant_name']);
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('product_variants');
     }
