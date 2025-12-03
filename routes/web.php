@@ -114,6 +114,7 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
+
 // Admin Routes (Role checking in controllers)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Dashboard
@@ -242,3 +243,55 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Developer: Authentication Sessions
     Route::get('/sessions', [SessionController::class, 'index'])->name('sessions.index');
 });
+
+// =============================================
+// SUPER ADMIN ROUTES (ADDED HERE)
+// =============================================
+Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', function () {
+        // Check if user is super admin
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+            return redirect('/')->with('error', 'Unauthorized access.');
+        }
+        return view('superadmin.dashboard');
+    })->name('dashboard');
+
+    // User Management (can create admin accounts)
+    Route::get('/users', [App\Http\Controllers\SuperAdmin\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [App\Http\Controllers\SuperAdmin\UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\SuperAdmin\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\SuperAdmin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'destroy'])->name('users.destroy');
+    
+    // User actions
+    Route::post('/users/{user}/reset-password', [App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::post('/users/{user}/toggle-status', [App\Http\Controllers\SuperAdmin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    
+    // Bulk actions
+    Route::post('/users/bulk-activate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkActivate'])->name('users.bulk-activate');
+    Route::post('/users/bulk-deactivate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDeactivate'])->name('users.bulk-deactivate');
+    Route::post('/users/bulk-delete', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDelete'])->name('users.bulk-delete');
+    
+    // System Settings
+    Route::get('/settings', function () {
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+            return redirect('/')->with('error', 'Unauthorized access.');
+        }
+        return view('superadmin.settings');
+    })->name('settings');
+    
+    // Super Admin Profile
+    Route::get('/profile', function () {
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+            return redirect('/')->with('error', 'Unauthorized access.');
+        }
+        return view('superadmin.profile');
+    })->name('profile');
+});
+
+// =============================================
+// END OF SUPER ADMIN ROUTES
+// =============================================
