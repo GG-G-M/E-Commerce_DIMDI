@@ -337,8 +337,8 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.inventory-report.*') ? 'active' : '' }}"
-                                href="{{ route('admin.inventory-report.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.inventory-reports.*') ? 'active' : '' }}"
+                                href="{{ route('admin.inventory-reports.index') }}">
                                 <i class="fas fa-boxes me-2"></i>Inventory Reports
                             </a>
                         </li>

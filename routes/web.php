@@ -231,7 +231,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
 
     // INVENTORY REPORTS
-    Route::prefix('inventory-report')->name('inventory-report.')->group(function () {
+    Route::prefix('inventory-reports')->name('inventory-reports.')->group(function () {
         Route::get('/', [InventoryReportController::class, 'index'])->name('index');
     });
 
