@@ -34,8 +34,10 @@ class LoginController extends Controller
 
             $user = Auth::user();
             
-            // FIXED: Added delivery role check and proper role hierarchy
-            if ($user->role === 'admin') {
+            // FIXED: Added super_admin role check FIRST (before admin)
+            if ($user->role === 'super_admin') {
+                return redirect()->route('superadmin.dashboard')->with('success', 'Welcome back, Super Admin!');
+            } elseif ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
             } elseif ($user->role === 'delivery') {
                 return redirect()->route('delivery.dashboard')->with('success', 'Welcome back!');
