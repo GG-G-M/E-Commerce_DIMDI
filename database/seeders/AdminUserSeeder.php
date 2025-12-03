@@ -10,27 +10,37 @@ class AdminUserSeeder extends Seeder
 {
     public function run()
     {
-        User::create([
-            'first_name' => 'G',
-            'middle_name' => 'G',
-            'last_name' => 'M',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('12345678'),
-            'role' => 'admin',
-            'phone' => '123-456-7890',
-            'address' => 'Admin Address',
-            'city' => 'Admin City',
-            'state' => 'Admin State',
-            'zip_code' => '12345',
-            'country' => 'Admin Country',
-            'is_archived' => false,
-            'vehicle_type' => null,
-            'vehicle_number' => null,
-            'license_number' => null,
-            'is_active' => true
-        ]);
+        // ------------------------------
+        // Create Admin User
+        // ------------------------------
+        User::updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'first_name' => 'G',
+                'middle_name' => 'G',
+                'last_name' => 'M',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('12345678'),
+                'role' => 'admin',
+                'phone' => '123-456-7890',
 
-        $this->command->info('Admin user created successfully!');
+                // ✅ Correct address fields
+                'region' => 'Admin Region',
+                'province' => 'Admin Province',
+                'city' => 'Admin City',
+                'barangay' => 'Admin Barangay',
+                'street_address' => 'Admin Street Address',
+                'country' => 'Admin Country',
+
+                'is_archived' => false,
+                'vehicle_type' => null,
+                'vehicle_number' => null,
+                'license_number' => null,
+                'is_active' => true,
+            ]
+        );
+
+        $this->command->info('Admin user created/updated successfully!');
         $this->command->info('Email: admin@gmail.com');
         $this->command->info('Password: 12345678');
     }
