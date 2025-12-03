@@ -11,7 +11,9 @@ use App\Models\StockOut;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+
 use Illuminate\Support\Collection;
+
 
 class InventoryReportController extends Controller
 {
@@ -42,6 +44,7 @@ class InventoryReportController extends Controller
         if ($search) $productsQuery->where('name', 'like', '%' . $search . '%');
         if ($productId) $productsQuery->where('id', $productId);
 
+
         $filteredProductIds = $productsQuery->pluck('id')->toArray();
 
         // -------------------------
@@ -68,6 +71,7 @@ class InventoryReportController extends Controller
             'variant_name' => $row->variant?->variant_name,
             'quantity' => $row->quantity,
             'created_at' => $row->created_at,
+            'date' => $row->created_at->format('Y-m-d')
         ]);
 
         $stockOuts = $stockOutQuery->get()->map(fn($row) => [
@@ -78,6 +82,7 @@ class InventoryReportController extends Controller
             'variant_name' => $row->variant?->variant_name,
             'quantity' => $row->quantity,
             'created_at' => $row->created_at,
+            'date' => $row->created_at->format('Y-m-d')
         ]);
 
         // -------------------------
@@ -85,10 +90,13 @@ class InventoryReportController extends Controller
         // -------------------------
         $merged = collect($stockIns)->merge($stockOuts)->sortByDesc('created_at');
 
+
         $inventoryGrouped = $merged->groupBy(fn($item) => $item['product_id'] . '-' . $item['variant_name']);
 
         $inventoryTable = $inventoryGrouped->map(function ($items) {
+
             $items = collect($items); // <-- make sure it’s a collection
+
             $first = $items->first();
             $stockIn = $items->where('type', 'in')->sum('quantity');
             $stockOut = $items->where('type', 'out')->sum('quantity');
@@ -131,7 +139,7 @@ class InventoryReportController extends Controller
         ];
 
         // -------------------------
-        // 7. CHARTS
+        // 7. CHARTS - FIXED
         // -------------------------
         // INVENTORY TREND (cumulative stock by day)
         $trendGrouped = $merged->groupBy(fn($item) => Carbon::parse($item['created_at'])->format('Y-m-d'));
@@ -159,20 +167,27 @@ class InventoryReportController extends Controller
         $categoryGrouped = collect($inventoryTable)->groupBy('category_name');
         $categoryLabels = $categoryGrouped->keys()->toArray();
         $categoryData = $categoryGrouped->map(fn($items) => collect($items)->sum('current_stock'))->values()->toArray();
-
         $charts = [
-            'trend' => ['labels' => $trendLabels, 'data' => $trendData],
-            'in_out' => ['labels' => $trendLabels, 'stock_in' => $inOutStockIn, 'stock_out' => $inOutStockOut],
-            'low_stock' => ['labels' => $lowStockLabels, 'data' => $lowStockData],
-            'categories' => ['labels' => $categoryLabels, 'data' => $categoryData],
+            'trend' => ['labels' => [], 'data' => []],
+            'in_out' => ['labels' => [], 'stock_in' => [], 'stock_out' => []],
+            'low_stock' => ['labels' => [], 'data' => []],
+            'categories' => ['labels' => [], 'data' => []],
         ];
 
-        $categories = Category::all();
+        // Generate all dates in the range for consistent charts
+        $dateRange = [];
+        $currentDate = Carbon::parse($startDate);
+        while ($currentDate <= Carbon::parse($endDate)) {
+            $dateRange[] = $currentDate->format('Y-m-d');
+            $currentDate->addDay();
+        }
 
         // -------------------------
         // 8. RENDER VIEW
         // -------------------------
-        return view('admin.inventory_reports.index', compact(
+        $categories = Category::all();
+        
+        return view('admin.inventory-reports.index', compact(
             'paginatedInventory',
             'overview',
             'charts',

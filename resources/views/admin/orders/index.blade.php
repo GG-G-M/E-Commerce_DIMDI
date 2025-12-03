@@ -54,6 +54,14 @@
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
@@ -61,16 +69,25 @@
         transition: background-color 0.2s ease;
     }
 
-    .status-pending { color: #FF9800; font-weight: 600; }
-    .status-confirmed { color: #2196F3; font-weight: 600; }
-    .status-processing { color: #9C27B0; font-weight: 600; }
-    .status-shipped { color: #673AB7; font-weight: 600; }
-    .status-delivered { color: #2C8F0C; font-weight: 600; }
-    .status-cancelled { color: #C62828; font-weight: 600; }
+    /* Simplified status text styling */
+    .status-text {
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    
+    .status-pending { color: #FF9800; }
+    .status-confirmed { color: #2196F3; }
+    .status-processing { color: #9C27B0; }
+    .status-shipped { color: #673AB7; }
+    .status-delivered { color: #2C8F0C; }
+    .status-cancelled { color: #C62828; }
 
     .btn-outline-primary {
         color: #2C8F0C;
         border-color: #2C8F0C;
+        border-radius: 6px;
     }
 
     .btn-outline-primary:hover {
@@ -93,27 +110,48 @@
     .order-number {
         font-weight: 700;
         color: #2C8F0C;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
     }
 
     .customer-name {
         font-weight: 600;
         color: #333;
+        font-size: 0.9rem;
+        margin-bottom: 0.1rem;
     }
 
     .customer-email {
         color: #6c757d;
-        font-size: 0.875em;
+        font-size: 0.8rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 180px;
+        display: block;
+    }
+
+    .customer-contact {
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.9rem;
     }
 
     .total-amount {
         font-weight: 700;
         color: #2C8F0C;
-        font-size: 1.1em;
+        font-size: 1rem;
     }
 
     .order-date {
         color: #6c757d;
-        font-size: 0.875em;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .order-time {
+        color: #adb5bd;
+        font-size: 0.8rem;
     }
 
     .empty-state {
@@ -146,6 +184,92 @@
         font-size: 0.875rem;
         color: #6c757d;
         font-weight: 600;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+    }
+
+    .cancellation-reason {
+        font-size: 0.8rem;
+        color: #dc3545;
+        background: #f8d7da;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-top: 0.25rem;
+        display: inline-block;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .table thead th:first-child,
+    .table tbody td:first-child {
+        padding-left: 1.5rem;
+    }
+
+    .table thead th:last-child,
+    .table tbody td:last-child {
+        padding-right: 1.5rem;
+    }
+
+    /* Alternating row colors for better readability */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Better column widths */
+    .order-col { min-width: 140px; }
+    .customer-col { min-width: 200px; }
+    .contact-col { min-width: 130px; }
+    .total-col { min-width: 120px; }
+    .status-col { min-width: 140px; }
+    .date-col { min-width: 130px; }
+    .action-col { min-width: 120px; text-align: center; }
+    
+    /* Pagination styling */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8F5E6;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+    
+    .pagination-info {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
     }
 </style>
 
@@ -199,11 +323,11 @@
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
                             <option value="">All Statuses</option>
-                            @foreach($statuses as $key => $label)
-                            <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                            @endforeach
+                            <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                            <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                            <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>All Active</option>
+                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                         </select>
                     </div>
                 </div>
@@ -240,19 +364,19 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Orders List</h5>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         @if($orders->count() > 0)
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
+        <div class="table-container">
+            <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Order #</th>
-                        <th>Customer</th>
-                        <th>Contact</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
+                        <th class="order-col">Order #</th>
+                        <th class="customer-col">Customer</th>
+                        <th class="contact-col">Contact</th>
+                        <th class="total-col">Total</th>
+                        <th class="status-col">Status</th>
+                        <th class="date-col">Date</th>
+                        <th class="action-col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -263,11 +387,13 @@
                         </td>
                         <td>
                             <div class="customer-name">{{ $order->customer_name }}</div>
-                            <div class="customer-email">{{ $order->customer_email }}</div>
+                            <a href="mailto:{{ $order->customer_email }}" class="customer-email" title="{{ $order->customer_email }}">
+                                {{ $order->customer_email }}
+                            </a>
                         </td>
                         <td>
                             @if($order->customer_phone)
-                                <div class="text-dark">{{ $order->customer_phone }}</div>
+                                <div class="customer-contact">{{ $order->customer_phone }}</div>
                             @else
                                 <span class="text-muted">-</span>
                             @endif
@@ -276,12 +402,12 @@
                             <div class="total-amount">₱{{ number_format($order->total_amount, 2) }}</div>
                         </td>
                         <td>
-                            <span class="status-{{ $order->order_status }}">
+                            <span class="status-text status-{{ $order->order_status }}">
                                 {{ ucfirst($order->order_status) }}
                             </span>
                             @if($order->order_status == 'cancelled' && $order->cancellation_reason)
-                            <div class="text-muted small mt-1">
-                                {{ Str::limit($order->cancellation_reason, 25) }}
+                            <div class="cancellation-reason" title="{{ $order->cancellation_reason }}">
+                                {{ Str::limit($order->cancellation_reason, 30) }}
                             </div>
                             @endif
                         </td>
@@ -289,13 +415,13 @@
                             <div class="order-date">
                                 {{ $order->created_at->format('M j, Y') }}
                             </div>
-                            <div class="text-muted smaller">
-                                {{ $order->created_at->format('H:i') }}
+                            <div class="order-time">
+                                {{ $order->created_at->format('h:i A') }}
                             </div>
                         </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary" title="View Order">
+                        <td class="text-center">
+                            <div class="action-buttons justify-content-center">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary" title="View Order Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @if($order->order_status == 'cancelled' && !$order->refund_processed)
@@ -312,8 +438,13 @@
         </div>
 
         @if($orders->hasPages())
-        <div class="d-flex justify-content-center mt-4">
-            {{ $orders->links('pagination::bootstrap-5') }}
+        <div class="d-flex flex-column align-items-center p-4">
+            <nav aria-label="Page navigation">
+                {{ $orders->links('pagination::bootstrap-5') }}
+            </nav>
+            <div class="pagination-info text-center mt-2">
+                Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries
+            </div>
         </div>
         @endif
 

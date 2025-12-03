@@ -123,14 +123,16 @@
         color: #ffc107;
     }
     .btn-buy-now {
-        background: linear-gradient(135deg, #FF6B35, #FF8E53) !important;
-        border: none;
-        color: white;
+        background-color: white !important;
+        border: 2px solid #2C8F0C !important;
+        color: #2C8F0C !important;
         font-weight: 600;
+        transition: all 0.3s ease;
     }
     .btn-buy-now:hover {
-        background: linear-gradient(135deg, #E55A2B, #FF7B3A) !important;
-        color: white;
+        background-color: #2C8F0C !important;
+        color: white !important;
+        border-color: #25750A !important;
     }
     .details-section {
         background-color: #f8f9fa;
@@ -165,7 +167,7 @@
                      style="width: 100%; height: 400px; object-fit: cover;">
                 <div class="position-absolute top-0 start-0 mt-2 ms-2">
                     @if($product->has_discount)
-                    <span class="badge bg-danger fs-6">{{ $product->discount_percentage }}% OFF</span>
+                    <span class="badge bg-success fs-6">{{ $product->discount_percentage }}% OFF</span>
                     @endif
                 </div>
             </div>
@@ -187,9 +189,8 @@
             
             <div class="mb-3">
                 @if($product->has_discount)
-                    <span class="h3 text-danger me-2" id="product-price">₱{{ number_format($product->sale_price, 2) }}</span>
+                    <span class="h3 text-success me-2" id="product-price">₱{{ number_format($product->sale_price, 2) }}</span>
                     <span class="h5 text-muted text-decoration-line-through" id="product-original-price">₱{{ number_format($product->price, 2) }}</span>
-                    <span class="badge bg-danger ms-2">{{ $product->discount_percentage }}% OFF</span>
                 @else
                     <span class="h3 text-success fw-bold" id="product-price">₱{{ number_format($product->price, 2) }}</span>
                 @endif
@@ -227,9 +228,8 @@
                                     <div class="fw-semibold">{{ $variantName }}</div>
                                     
                                     @if($hasVariantDiscount)
-                                        <div class="text-danger fw-bold">₱{{ number_format($variant->sale_price, 2) }}</div>
+                                        <div class="text-success fw-bold">₱{{ number_format($variant->sale_price, 2) }}</div>
                                         <div class="text-muted text-decoration-line-through small">₱{{ number_format($variant->price, 2) }}</div>
-                                        <span class="badge bg-danger small">{{ $variantDiscountPercent }}% OFF</span>
                                     @else
                                         <div class="text-success fw-bold">₱{{ number_format($variant->price, 2) }}</div>
                                     @endif
@@ -572,19 +572,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update price display
                 if (hasDiscount) {
                     productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
-                    productPrice.className = 'h3 text-danger me-2';
+                    productPrice.className = 'h3 text-success me-2';
                     
                     if (productOriginalPrice) {
                         productOriginalPrice.textContent = '₱' + parseFloat(variantOriginalPrice).toFixed(2);
                         productOriginalPrice.style.display = 'inline';
                     }
                     
-                    // Update image discount badge (the one in position-absolute)
-                    let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    // Update image discount badge (green badge)
+                    let imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-success');
+
                     if (hasDiscount) {
                         if (!imageDiscountBadge) {
                             imageDiscountBadge = document.createElement('span');
-                            imageDiscountBadge.className = 'badge bg-danger fs-6';
+                            imageDiscountBadge.className = 'badge bg-success fs-6';
                             document.querySelector('.position-absolute').appendChild(imageDiscountBadge);
                         }
                         imageDiscountBadge.textContent = discountPercent + '% OFF';
@@ -592,24 +593,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         imageDiscountBadge.remove();
                     }
 
-                    // Update price discount badge (the one next to price)
-                    let priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
-                    if (hasDiscount) {
-                        if (!priceDiscountBadge) {
-                            priceDiscountBadge = document.createElement('span');
-                            priceDiscountBadge.className = 'badge bg-danger ms-2';
-                            productPrice.parentNode.appendChild(priceDiscountBadge);
-                        }
-                        priceDiscountBadge.textContent = discountPercent + '% OFF';
-                    } else if (priceDiscountBadge) {
-                        priceDiscountBadge.remove();
-                    }
-                    
-                    // Remove discount badge if exists
-                    const discountBadge = document.querySelector('.badge.bg-danger');
-                    if (discountBadge && !discountBadge.closest('.position-absolute')) {
-                        discountBadge.remove();
-                    }
                 } else {
                     productPrice.textContent = '₱' + parseFloat(variantPrice).toFixed(2);
                     productPrice.className = 'h3 text-success fw-bold';
@@ -618,15 +601,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         productOriginalPrice.style.display = 'none';
                     }
                     
-                    // Remove discount badges
-                    const imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-danger');
+                    // Remove image discount badge if no discount
+                    const imageDiscountBadge = document.querySelector('.position-absolute .badge.bg-success');
                     if (imageDiscountBadge) {
                         imageDiscountBadge.remove();
-                    }
-                    
-                    const priceDiscountBadge = document.querySelector('.mb-3 .badge.bg-danger');
-                    if (priceDiscountBadge) {
-                        priceDiscountBadge.remove();
                     }
                 }
                 

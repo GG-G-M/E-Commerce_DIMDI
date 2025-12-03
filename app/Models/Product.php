@@ -373,4 +373,21 @@ class Product extends Model
     {
         return $this->ratings()->where('user_id', $user->id)->exists();
     }
+    // Add these methods to your Product model:
+
+public function stockIns()
+{
+    return $this->hasMany(StockIn::class);
+}
+
+public function stockOuts()
+{
+    return $this->hasMany(StockOut::class);
+}
+
+public function stockMovements()
+{
+    // This combines both stock in and out
+    return $this->stockIns->merge($this->stockOuts);
+}
 }

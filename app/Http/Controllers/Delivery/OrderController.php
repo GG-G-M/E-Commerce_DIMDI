@@ -19,7 +19,8 @@ class OrderController extends Controller
                       ->whereIn('order_status', ['shipped', 'out_for_delivery']);
             })
             ->orWhere(function($query) {
-                $query->where('order_status', 'processing')
+                // CHANGE: From 'processing' to 'confirmed'
+                $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id');
             })
             ->with(['user', 'orderItems.product'])
@@ -31,7 +32,8 @@ class OrderController extends Controller
 
     public function pickup()
     {
-        $orders = Order::where('order_status', 'processing')
+        // CHANGE: From 'processing' to 'confirmed'
+        $orders = Order::where('order_status', 'confirmed')
             ->whereNull('delivery_id')
             ->with(['user', 'orderItems.product'])
             ->orderBy('created_at', 'desc')
@@ -200,7 +202,8 @@ class OrderController extends Controller
                 ->whereIn('order_status', ['shipped', 'out_for_delivery'])
                 ->count(),
                 
-            'available_for_pickup' => Order::where('order_status', 'processing')
+            // CHANGE: From 'processing' to 'confirmed'
+            'available_for_pickup' => Order::where('order_status', 'confirmed')
                 ->whereNull('delivery_id')
                 ->count(),
                 
@@ -232,7 +235,8 @@ class OrderController extends Controller
                       });
             })
             ->orWhere(function($query) use ($search) {
-                $query->where('order_status', 'processing')
+                // CHANGE: From 'processing' to 'confirmed'
+                $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id')
                       ->where(function($q) use ($search) {
                           $q->where('order_number', 'like', "%{$search}%")
