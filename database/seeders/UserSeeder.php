@@ -5,48 +5,32 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class UserSeeder extends Seeder
 {
     public function run()
     {
-        // Create or Update Admin User
-        User::updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'first_name' => 'System',
-                'last_name' => 'Admin',
-                'password' => Hash::make('12345678'),
-                'role' => 'admin',
-                'phone' => '0912-345-6789',
-                'address' => 'Admin Building',
-                'city' => 'Davao City',
-                'state' => 'Davao del Sur',
-                'zip_code' => '8000',
-                'country' => 'Philippines',
-                'is_archived' => false,
-                'vehicle_type' => null,
-                'vehicle_number' => null,
-                'license_number' => null,
-                'is_active' => true,
-            ]
-        );
-
-        // Create or Update Delivery User
+        // ------------------------------
+        // Create Delivery User
+        // ------------------------------
         User::updateOrCreate(
             ['email' => 'delivery@example.com'],
             [
                 'first_name' => 'Juan',
+                'middle_name' => null,
                 'last_name' => 'Delivery',
                 'password' => Hash::make('12345678'),
                 'role' => 'delivery',
                 'phone' => '0917-123-4567',
-                'address' => '123 Delivery Street',
+
+                // ✅ Correct address fields
+                'region' => 'Davao Region',
+                'province' => 'Davao del Sur',
                 'city' => 'Davao City',
-                'state' => 'Davao del Sur',
-                'zip_code' => '8000',
+                'barangay' => 'Barangay 2',
+                'street_address' => '123 Delivery Street',
                 'country' => 'Philippines',
+
                 'is_archived' => false,
                 'vehicle_type' => 'Motorcycle',
                 'vehicle_number' => 'MC-1234',
@@ -55,29 +39,9 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // Create or Update Your Customer User
-        User::updateOrCreate(
-            ['email' => 'gilgregenemantilla@gmail.com'],
-            [
-                'first_name' => 'Gilgre Gene',
-                'middle_name' => 'G',
-                'last_name' => 'Mantilla',
-                'password' => Hash::make('12345678'),
-                'role' => 'customer',
-                'phone' => '123-456-7890',
-                'address' => 'Bankal Skibidi',
-                'city' => 'Davao City',
-                'state' => 'Davao State',
-                'zip_code' => '12345',
-                'country' => 'Philippines',
-                'is_archived' => false,
-                'vehicle_type' => null,
-                'vehicle_number' => null,
-                'license_number' => null,
-                'is_active' => true,
-            ]
-        );
-
+        // ------------------------------
+        // Create Customer Users
+        // ------------------------------
         // Create additional customer users for orders and ratings
         $customers = [
             ['email' => 'maria.garcia@gmail.com', 'first_name' => 'Maria', 'last_name' => 'Garcia', 'phone' => '09161234567'],
@@ -120,6 +84,7 @@ class UserSeeder extends Seeder
             ['email' => 'enrique.molina@gmail.com', 'first_name' => 'Enrique', 'last_name' => 'Molina', 'phone' => '09531234567'],
             ['email' => 'laura.acosta@gmail.com', 'first_name' => 'Laura', 'last_name' => 'Acosta', 'phone' => '09541234567'],
             ['email' => 'felipe.dominguez@gmail.com', 'first_name' => 'Felipe', 'last_name' => 'Dominguez', 'phone' => '09551234567'],
+
         ];
 
         foreach ($customers as $customer) {
@@ -127,14 +92,16 @@ class UserSeeder extends Seeder
                 ['email' => $customer['email']],
                 [
                     'first_name' => $customer['first_name'],
+                    'middle_name' => $customer['middle_name'] ?? null,
                     'last_name' => $customer['last_name'],
                     'password' => Hash::make('12345678'),
                     'role' => 'customer',
                     'phone' => $customer['phone'],
-                    'address' => rand(100, 999) . ' ' . ['Main', 'Oak', 'Elm', 'Pine', 'Maple'][rand(0, 4)] . ' Street',
-                    'city' => 'Davao City',
-                    'state' => 'Davao del Sur',
-                    'zip_code' => '8000',
+                    'region' => $customer['region'],
+                    'province' => $customer['province'],
+                    'city' => $customer['city'],
+                    'barangay' => $customer['barangay'],
+                    'street_address' => $customer['street_address'],
                     'country' => 'Philippines',
                     'is_archived' => false,
                     'vehicle_type' => null,
@@ -145,10 +112,6 @@ class UserSeeder extends Seeder
             );
         }
 
-        $this->command->info('Users created/updated successfully!');
-        $this->command->info('Admin: admin@example.com / 12345678');
-        $this->command->info('Delivery: delivery@example.com / 12345678');
-        $this->command->info('Customer: gilgregenemantilla@gmail.com / 12345678');
-        $this->command->info('Additional 40 customers created for 5-month operations');
+        $this->command->info('Customer users created/updated successfully!');
     }
 }

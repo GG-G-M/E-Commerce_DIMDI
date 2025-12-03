@@ -3,6 +3,20 @@
 @section('title', 'Inventory Reports')
 
 @section('content')
+<style>
+    /* Add this to your existing styles */
+    .card-body canvas {
+        width: 100% !important;
+        height: 140px !important;
+        display: block !important;
+    }
+    
+    /* Make sure chart containers have proper dimensions */
+    .card-body {
+        position: relative;
+        min-height: 160px;
+    }
+</style>
     <div class="container-fluid px-4">
 
         {{-- Page Title --}}
@@ -285,239 +299,313 @@
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-     <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing charts...');
-            
-            /* ================== INVENTORY TREND CHART ================== */
-            const trendCtx = document.getElementById('inventoryTrendChart');
-            if (trendCtx) {
-                const trendLabels = @json($charts['trend']['labels'] ?? []);
-                const trendData = @json($charts['trend']['data'] ?? []);
+<script>
+    // Debug: Check PHP data BEFORE charts
+    console.log('=== INVENTORY REPORT DATA DEBUG ===');
+    console.log('Trend data:', @json($charts['trend']));
+    console.log('In/Out data:', @json($charts['in_out']));
+    console.log('Low stock data:', @json($charts['low_stock']));
+    console.log('Category data:', @json($charts['categories']));
+    
+    // Check if data arrays are empty
+    const trendData = @json($charts['trend']['data'] ?? []);
+    console.log('Trend data length:', trendData.length);
+    
+    // If data is empty, show message
+    if (trendData.length === 0) {
+        console.log('WARNING: No trend data available. Charts will not render.');
+    }
+    
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, checking canvas elements...');
+        
+        // Check all canvas elements
+        const canvasIds = [
+            'inventoryTrendChart',
+            'stockInOutChart',
+            'lowStockChart',
+            'categoryDistributionChart'
+        ];
+        
+        canvasIds.forEach(id => {
+            const canvas = document.getElementById(id);
+            if (canvas) {
+                console.log(`✓ ${id}: Found, dimensions: ${canvas.offsetWidth}x${canvas.offsetHeight}`);
                 
-                console.log('Trend Data:', trendLabels, trendData);
-                
-                if (trendLabels.length > 0 && trendData.length > 0) {
-                    new Chart(trendCtx, {
-                        type: 'line',
-                        data: {
-                            labels: trendLabels,
-                            datasets: [{
-                                label: 'Stock Level',
-                                data: trendData,
-                                borderColor: 'rgba(40, 167, 69, 1)',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top'
-                                },
-                                tooltip: {
-                                    mode: 'index',
-                                    intersect: false
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Stock Level'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'Date'
-                                    },
-                                    ticks: {
-                                        maxTicksLimit: 10
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    console.warn('No trend data available');
-                }
-            }
-
-            /* ================== STOCK-IN VS STOCK-OUT ================== */
-            const inOutCtx = document.getElementById('stockInOutChart');
-            if (inOutCtx) {
-                const inOutLabels = @json($charts['in_out']['labels'] ?? []);
-                const stockInData = @json($charts['in_out']['stock_in'] ?? []);
-                const stockOutData = @json($charts['in_out']['stock_out'] ?? []);
-                
-                console.log('In/Out Data:', inOutLabels, stockInData, stockOutData);
-                
-                if (inOutLabels.length > 0) {
-                    new Chart(inOutCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: inOutLabels,
-                            datasets: [
-                                {
-                                    label: 'Stock-In',
-                                    data: stockInData,
-                                    backgroundColor: 'rgba(0, 123, 255, 0.7)',
-                                },
-                                {
-                                    label: 'Stock-Out',
-                                    data: stockOutData,
-                                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top'
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    stacked: false,
-                                    title: {
-                                        display: true,
-                                        text: 'Quantity'
-                                    }
-                                },
-                                x: {
-                                    stacked: false,
-                                    title: {
-                                        display: true,
-                                        text: 'Date'
-                                    },
-                                    ticks: {
-                                        maxTicksLimit: 10
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-
-            /* ================== LOW STOCK CHART ================== */
-            const lowCtx = document.getElementById('lowStockChart');
-            if (lowCtx) {
-                const lowLabels = @json($charts['low_stock']['labels'] ?? []);
-                const lowData = @json($charts['low_stock']['data'] ?? []);
-                
-                console.log('Low Stock Data:', lowLabels, lowData);
-                
-                if (lowLabels.length > 0 && lowData.length > 0) {
-                    new Chart(lowCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: lowLabels,
-                            datasets: [{
-                                label: 'Current Stock',
-                                data: lowData,
-                                backgroundColor: function(context) {
-                                    const value = context.raw;
-                                    if (value <= 0) return 'rgba(220, 53, 69, 0.8)';
-                                    if (value <= 5) return 'rgba(255, 193, 7, 0.8)';
-                                    return 'rgba(40, 167, 69, 0.8)';
-                                },
-                                borderWidth: 1,
-                                borderColor: '#333'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return `Stock: ${context.raw} units`;
-                                        }
-                                    }
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Stock Quantity'
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-
-            /* ================== CATEGORY DISTRIBUTION CHART ================== */
-            const catCtx = document.getElementById('categoryDistributionChart');
-            if (catCtx) {
-                const catLabels = @json($charts['categories']['labels'] ?? []);
-                const catData = @json($charts['categories']['data'] ?? []);
-                
-                console.log('Category Data:', catLabels, catData);
-                
-                if (catLabels.length > 0 && catData.length > 0) {
-                    new Chart(catCtx, {
-                        type: 'pie',
-                        data: {
-                            labels: catLabels,
-                            datasets: [{
-                                data: catData,
-                                backgroundColor: [
-                                    '#0d6efd', '#198754', '#ffc107', '#dc3545',
-                                    '#0dcaf0', '#6f42c1', '#fd7e14', '#6c757d',
-                                    '#20c997', '#e83e8c', '#6610f2', '#d63384'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'right',
-                                    labels: {
-                                        padding: 15,
-                                        usePointStyle: true,
-                                    }
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.raw || 0;
-                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                            const percentage = Math.round((value / total) * 100);
-                                            return `${label}: ${value} products (${percentage}%)`;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
+                // Check if canvas is visible
+                const style = window.getComputedStyle(canvas);
+                console.log(`  Display: ${style.display}, Visibility: ${style.visibility}`);
+            } else {
+                console.log(`✗ ${id}: NOT FOUND`);
             }
         });
-    </script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing charts...');
+        
+        // Debug: Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('ERROR: Chart.js is not loaded!');
+            alert('Chart.js library failed to load. Please refresh the page.');
+            return;
+        }
+        
+        console.log('Chart.js loaded successfully, version:', Chart.version);
+        
+        /* ================== INVENTORY TREND CHART ================== */
+        const trendCtx = document.getElementById('inventoryTrendChart');
+        if (trendCtx) {
+            console.log('Found trend chart canvas');
+            
+            const trendLabels = @json($charts['trend']['labels'] ?? []);
+            const trendData = @json($charts['trend']['data'] ?? []);
+            
+            console.log('Trend Labels:', trendLabels);
+            console.log('Trend Data:', trendData);
+            
+            if (trendLabels.length > 0 && trendData.length > 0) {
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: trendLabels,
+                        datasets: [{
+                            label: 'Stock Level',
+                            data: trendData,
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Stock Level'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                ticks: {
+                                    maxTicksLimit: 10
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Trend chart created successfully');
+            } else {
+                console.warn('No trend data available');
+            }
+        } else {
+            console.error('Trend chart canvas not found!');
+        }
+
+        /* ================== STOCK-IN VS STOCK-OUT ================== */
+        const inOutCtx = document.getElementById('stockInOutChart');
+        if (inOutCtx) {
+            console.log('Found stock in/out chart canvas');
+            
+            const inOutLabels = @json($charts['in_out']['labels'] ?? []);
+            const stockInData = @json($charts['in_out']['stock_in'] ?? []);
+            const stockOutData = @json($charts['in_out']['stock_out'] ?? []);
+            
+            console.log('In/Out Labels:', inOutLabels);
+            console.log('Stock-In Data:', stockInData);
+            console.log('Stock-Out Data:', stockOutData);
+            
+            if (inOutLabels.length > 0) {
+                new Chart(inOutCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: inOutLabels,
+                        datasets: [
+                            {
+                                label: 'Stock-In',
+                                data: stockInData,
+                                backgroundColor: 'rgba(0, 123, 255, 0.7)',
+                            },
+                            {
+                                label: 'Stock-Out',
+                                data: stockOutData,
+                                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stacked: false,
+                                title: {
+                                    display: true,
+                                    text: 'Quantity'
+                                }
+                            },
+                            x: {
+                                stacked: false,
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                },
+                                ticks: {
+                                    maxTicksLimit: 10
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Stock in/out chart created successfully');
+            } else {
+                console.warn('No stock in/out data available');
+            }
+        }
+
+        /* ================== LOW STOCK CHART ================== */
+        const lowCtx = document.getElementById('lowStockChart');
+        if (lowCtx) {
+            console.log('Found low stock chart canvas');
+            
+            const lowLabels = @json($charts['low_stock']['labels'] ?? []);
+            const lowData = @json($charts['low_stock']['data'] ?? []);
+            
+            console.log('Low Stock Labels:', lowLabels);
+            console.log('Low Stock Data:', lowData);
+            
+            if (lowLabels.length > 0 && lowData.length > 0) {
+                new Chart(lowCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: lowLabels,
+                        datasets: [{
+                            label: 'Current Stock',
+                            data: lowData,
+                            backgroundColor: function(context) {
+                                const value = context.raw;
+                                if (value <= 0) return 'rgba(220, 53, 69, 0.8)';
+                                if (value <= 5) return 'rgba(255, 193, 7, 0.8)';
+                                return 'rgba(40, 167, 69, 0.8)';
+                            },
+                            borderWidth: 1,
+                            borderColor: '#333'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Stock: ${context.raw} units`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Stock Quantity'
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Low stock chart created successfully');
+            } else {
+                console.warn('No low stock data available');
+            }
+        }
+
+        /* ================== CATEGORY DISTRIBUTION CHART ================== */
+        const catCtx = document.getElementById('categoryDistributionChart');
+        if (catCtx) {
+            console.log('Found category distribution chart canvas');
+            
+            const catLabels = @json($charts['categories']['labels'] ?? []);
+            const catData = @json($charts['categories']['data'] ?? []);
+            
+            console.log('Category Labels:', catLabels);
+            console.log('Category Data:', catData);
+            
+            if (catLabels.length > 0 && catData.length > 0) {
+                new Chart(catCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: catLabels,
+                        datasets: [{
+                            data: catData,
+                            backgroundColor: [
+                                '#0d6efd', '#198754', '#ffc107', '#dc3545',
+                                '#0dcaf0', '#6f42c1', '#fd7e14', '#6c757d',
+                                '#20c997', '#e83e8c', '#6610f2', '#d63384'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    padding: 15,
+                                    usePointStyle: true,
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} products (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('Category distribution chart created successfully');
+            } else {
+                console.warn('No category data available');
+            }
+        }
+        
+        console.log('All charts initialized successfully');
+    });
+</script>
 @endsection

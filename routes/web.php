@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\SalesReportController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
@@ -63,6 +64,12 @@ Route::post('/payment/{order}/process', [PaymentController::class, 'createIntent
 Route::post('/payment/create-source', [PaymentController::class, 'createSource'])->name('payment.create-source');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+
+// Address Routes
+Route::get('/address/provinces', [AddressController::class, 'provinces']);
+Route::get('/address/cities/{provinceCode}', [AddressController::class, 'cities']);
+Route::get('/address/barangays/{cityCode}', [AddressController::class, 'barangays']);
+
 
 // Authenticated User Routes (All logged-in users)
 Route::middleware('auth')->group(function () {

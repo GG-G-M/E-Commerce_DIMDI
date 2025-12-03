@@ -16,6 +16,9 @@ class InventoryReportController extends Controller
 {
     public function index(Request $request)
     {
+
+
+        
         // -------------------------
         // 1. FILTERS
         // -------------------------

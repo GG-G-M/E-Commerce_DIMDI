@@ -82,153 +82,108 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Combined Stats Card */
-    .stats-card-combined {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 2rem;
-        border-top: 4px solid #2C8F0C;
-    }
-
-    .stat-item {
-        text-align: center;
-        padding: 1.5rem;
-        position: relative;
-    }
-
-    .stat-item:not(:last-child):after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 20%;
-        height: 60%;
-        width: 1px;
-        background: linear-gradient(to bottom, transparent, #e0e0e0, transparent);
+    /* Smaller stat cards */
+    .stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fdf8 100%);
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 3px solid #2C8F0C;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        height: 100%;
     }
 
     .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
+        font-size: 1.25rem;
+        font-weight: 700;
         color: #2C8F0C;
         margin-bottom: 0.25rem;
-        line-height: 1;
     }
 
     .stat-label {
         color: #6c757d;
         font-weight: 500;
         text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
+        font-size: 0.75rem;
     }
 
-    .stat-change {
-        font-size: 0.8rem;
-        margin-top: 0.25rem;
-    }
+   /* Enhanced Chart Styles */
+.chart-container-enhanced {
+    position: relative;
+    height: 280px;
+    width: 100%;
+    background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
+    border-radius: 8px;
+    padding: 1rem;
+}
 
-    .stat-change.positive {
-        color: #2C8F0C;
-    }
+.chart-container-pie {
+    position: relative;
+    height: 220px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
 
-    .stat-change.negative {
-        color: #dc3545;
-    }
+.chart-stats {
+    background: #f8fdf8;
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 3px solid #2C8F0C;
+}
 
-    /* Enhanced Chart Styles */
+.chart-actions .btn {
+    border-radius: 20px;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.payment-item {
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.payment-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.color-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Chart tooltip improvements */
+.chartjs-tooltip {
+    background: rgba(44, 143, 12, 0.9) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Animation for chart loading */
+.chart-loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Responsive chart adjustments */
+@media (max-width: 768px) {
     .chart-container-enhanced {
-        position: relative;
-        height: 280px;
-        width: 100%;
-        background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
-        border-radius: 8px;
-        padding: 1rem;
+        height: 250px;
     }
-
+    
     .chart-container-pie {
-        position: relative;
-        height: 220px;
-        width: 100%;
-        margin-bottom: 1rem;
+        height: 200px;
     }
-
-    .chart-stats {
-        background: #f8fdf8;
-        border-radius: 8px;
-        padding: 1rem;
-        border-left: 3px solid #2C8F0C;
-    }
-
-    .chart-actions .btn {
-        border-radius: 20px;
-        font-size: 0.8rem;
-        padding: 0.25rem 0.75rem;
-    }
-
-    .payment-item {
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-    }
-
-    .payment-item:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-    }
-
-    .color-indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    /* Chart tooltip improvements */
-    .chartjs-tooltip {
-        background: rgba(44, 143, 12, 0.9) !important;
-        border: none !important;
-        border-radius: 8px !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    /* Animation for chart loading */
-    .chart-loading {
-        animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
-
-    /* Responsive chart adjustments */
-    @media (max-width: 768px) {
-        .chart-container-enhanced {
-            height: 250px;
-        }
-        
-        .chart-container-pie {
-            height: 200px;
-        }
-        
-        .stat-item:not(:last-child):after {
-            display: none;
-        }
-        
-        .stat-item {
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .stat-value {
-            font-size: 1.75rem;
-        }
-    }
+}
 
     .badge-success {
         background-color: #2C8F0C;
@@ -253,99 +208,47 @@
         font-size: 0.7rem;
     }
 
-    .export-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .export-dropdown {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 100%;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        padding: 0.5rem 0;
-        min-width: 180px;
-        z-index: 1000;
-    }
-
-    .export-dropdown.show {
-        display: block;
-    }
-
-    .export-dropdown-item {
-        padding: 0.5rem 1rem;
-        color: #333;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-    }
-
-    .export-dropdown-item:hover {
-        background-color: #f8fdf8;
-        color: #2C8F0C;
+    .small-card {
+        height: 100%;
     }
 </style>
 
-<!-- Page Header with Export Actions -->
+<!-- Add this button in the page-header div, next to the existing Export PDF button -->
 <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Sales Reports</h1>
         <p class="text-muted mb-0">Track and analyze your sales performance</p>
     </div>
-    <div class="export-actions position-relative">
+    <div>
         <a href="{{ route('admin.sales-report.comparison') }}" class="btn btn-outline-success me-2">
             <i class="fas fa-chart-line me-1"></i> Year Comparison
         </a>
-        <button type="button" class="btn btn-success" onclick="exportTextReport()">
-            <i class="fas fa-download me-1"></i> Export Report
+        <button type="button" class="btn btn-success" onclick="exportReport('pdf')">
+            <i class="fas fa-download me-1"></i> Export PDF
         </button>
     </div>
 </div>
 
-<!-- Combined Stats Card -->
-<div class="stats-card-combined">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="stat-item">
-                <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
-                <div class="stat-label">Total Sales</div>
-                @if(isset($salesData['salesChange']))
-                    <div class="stat-change {{ $salesData['salesChange'] >= 0 ? 'positive' : 'negative' }}">
-                        <i class="fas fa-arrow-{{ $salesData['salesChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
-                        {{ abs($salesData['salesChange']) }}% vs previous period
-                    </div>
-                @endif
-            </div>
+
+<!-- Summary Cards - Smaller and more compact -->
+{{-- Simple 3-column layout without the redundant cards --}}
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
+            <div class="stat-label">Total Sales</div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-item">
-                <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
-                <div class="stat-label">Total Orders</div>
-                @if(isset($salesData['ordersChange']))
-                    <div class="stat-change {{ $salesData['ordersChange'] >= 0 ? 'positive' : 'negative' }}">
-                        <i class="fas fa-arrow-{{ $salesData['ordersChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
-                        {{ abs($salesData['ordersChange']) }}%
-                    </div>
-                @endif
-            </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
+            <div class="stat-label">Total Orders</div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-item">
-                <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
-                <div class="stat-label">Avg Order Value</div>
-                @if(isset($salesData['aovChange']))
-                    <div class="stat-change {{ $salesData['aovChange'] >= 0 ? 'positive' : 'negative' }}">
-                        <i class="fas fa-arrow-{{ $salesData['aovChange'] >= 0 ? 'up' : 'down' }} me-1"></i>
-                        {{ abs($salesData['aovChange']) }}%
-                    </div>
-                @endif
-            </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="stat-card">
+            <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
+            <div class="stat-label">Avg Order Value</div>
         </div>
     </div>
 </div>
@@ -563,7 +466,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // Enhanced Sales Report Charts JavaScript
 let salesTrendChart = null;
@@ -777,380 +679,6 @@ function getEnhancedChartOptions(label) {
     };
 }
 
-// Consolidated Export Functionality - TEXT ONLY VERSION
-async function exportTextReport() {
-    try {
-        // Show loading state
-        const exportBtn = document.querySelector('.export-actions .btn-success');
-        const originalHtml = exportBtn.innerHTML;
-        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Generating...';
-        exportBtn.disabled = true;
-
-        // Get current date and time
-        const now = new Date();
-        const timestamp = now.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        // Create PDF
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        // Set margins
-        const margin = 15;
-        let yPos = margin;
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const contentWidth = pageWidth - (2 * margin);
-        
-        // Add header
-        pdf.setFillColor(44, 143, 12);
-        pdf.rect(margin, yPos, contentWidth, 8, 'F');
-        
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('SALES REPORT', pageWidth / 2, yPos + 5, { align: 'center' });
-        
-        yPos += 15;
-        
-        // Report info
-        pdf.setTextColor(100, 100, 100);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`Period: {{ $salesData['dateRangeText'] }}`, margin, yPos);
-        pdf.text(`Generated: ${timestamp}`, pageWidth - margin, yPos, { align: 'right' });
-        
-        yPos += 10;
-        
-        // Add separator
-        pdf.setDrawColor(44, 143, 12);
-        pdf.setLineWidth(0.5);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        
-        yPos += 10;
-        
-        // 1. KEY METRICS SECTION
-        pdf.setTextColor(44, 143, 12);
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('KEY METRICS', margin, yPos);
-        yPos += 8;
-        
-        pdf.setDrawColor(200, 200, 200);
-        pdf.setLineWidth(0.2);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 10;
-        
-        // Key metrics in table format
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'bold');
-        
-        const metrics = [
-            ['Total Sales', `₱{{ number_format($salesData['totalSales'], 2) }}`, 
-             @if(isset($salesData['salesChange']))
-                `{{ $salesData['salesChange'] >= 0 ? '+' : '' }}{{ $salesData['salesChange'] }}%`
-             @else
-                'N/A'
-             @endif],
-            ['Total Orders', `{{ $salesData['totalOrders'] }}`, 
-             @if(isset($salesData['ordersChange']))
-                `{{ $salesData['ordersChange'] >= 0 ? '+' : '' }}{{ $salesData['ordersChange'] }}%`
-             @else
-                'N/A'
-             @endif],
-            ['Average Order Value', `₱{{ number_format($salesData['averageOrderValue'], 2) }}`, 
-             @if(isset($salesData['aovChange']))
-                `{{ $salesData['aovChange'] >= 0 ? '+' : '' }}{{ $salesData['aovChange'] }}%`
-             @else
-                'N/A'
-             @endif]
-        ];
-        
-        metrics.forEach(metric => {
-            if (yPos > 250) {
-                pdf.addPage();
-                yPos = margin;
-            }
-            
-            pdf.text(metric[0], margin, yPos);
-            pdf.text(metric[1], margin + 70, yPos);
-            
-            // Color code percentage changes
-            const percentage = metric[2];
-            if (percentage.includes('+')) {
-                pdf.setTextColor(44, 143, 12);
-            } else if (percentage.includes('-')) {
-                pdf.setTextColor(220, 53, 69);
-            } else {
-                pdf.setTextColor(100, 100, 100);
-            }
-            
-            pdf.text(metric[2], pageWidth - margin, yPos, { align: 'right' });
-            pdf.setTextColor(0, 0, 0);
-            
-            yPos += 8;
-        });
-        
-        yPos += 10;
-        
-        // 2. SALES TREND DATA
-        if (yPos > 240) {
-            pdf.addPage();
-            yPos = margin;
-        }
-        
-        pdf.setTextColor(44, 143, 12);
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('SALES TREND', margin, yPos);
-        yPos += 8;
-        
-        pdf.setDrawColor(200, 200, 200);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 10;
-        
-        // Determine which trend data to show
-        const dateRange = "{{ request('date_range', 'this_month') }}";
-        let trendTitle = '';
-        let trendData = [];
-        
-        if (dateRange === 'this_year' || dateRange === 'custom' && isLongRange()) {
-            trendTitle = 'MONTHLY SALES';
-            trendData = {!! json_encode($salesData['monthlySales']->map(function($item) {
-                return [
-                    $item['month'],
-                    '₱' . number_format($item['total'], 2)
-                ];
-            })) !!};
-        } else if (dateRange === 'this_week' || (dateRange === 'custom' && isMediumRange())) {
-            trendTitle = 'WEEKLY SALES';
-            trendData = {!! json_encode($salesData['weeklySales']->map(function($item) {
-                return [
-                    $item['week_range'],
-                    '₱' . number_format($item['total'], 2)
-                ];
-            })) !!};
-        } else {
-            trendTitle = 'DAILY SALES';
-            trendData = {!! json_encode($salesData['dailySales']->map(function($item) {
-                return [
-                    $item['date'],
-                    '₱' . number_format($item['total'], 2)
-                ];
-            })) !!};
-        }
-        
-        pdf.setTextColor(100, 100, 100);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'italic');
-        pdf.text(trendTitle, margin, yPos);
-        yPos += 6;
-        
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        
-        if (trendData.length > 0) {
-            // Add trend statistics
-            const peakDay = `₱{{ number_format($salesData['dailySales']->max('total') ?? 0, 2) }}`;
-            const dailyAvg = `₱{{ number_format($salesData['dailySales']->avg('total') ?? 0, 2) }}`;
-            
-            pdf.text(`Peak Day: ${peakDay}`, margin, yPos);
-            pdf.text(`Daily Average: ${dailyAvg}`, margin + 70, yPos);
-            yPos += 8;
-            
-            // Show top 10 data points to avoid overcrowding
-            const displayData = trendData.slice(0, 10);
-            
-            displayData.forEach(item => {
-                if (yPos > 250) {
-                    pdf.addPage();
-                    yPos = margin;
-                }
-                
-                pdf.text(item[0], margin, yPos);
-                pdf.text(item[1], pageWidth - margin, yPos, { align: 'right' });
-                yPos += 6;
-            });
-            
-            if (trendData.length > 10) {
-                if (yPos > 250) {
-                    pdf.addPage();
-                    yPos = margin;
-                }
-                pdf.setFont('helvetica', 'italic');
-                pdf.text(`... and ${trendData.length - 10} more periods`, margin, yPos);
-                pdf.setFont('helvetica', 'normal');
-                yPos += 8;
-            }
-        } else {
-            pdf.text('No trend data available', margin, yPos);
-            yPos += 8;
-        }
-        
-        yPos += 10;
-        
-        // 3. PAYMENT DISTRIBUTION
-        if (yPos > 240) {
-            pdf.addPage();
-            yPos = margin;
-        }
-        
-        pdf.setTextColor(44, 143, 12);
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('PAYMENT DISTRIBUTION', margin, yPos);
-        yPos += 8;
-        
-        pdf.setDrawColor(200, 200, 200);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 10;
-        
-        @if($salesData['salesByPayment']->count() > 0)
-            pdf.setTextColor(0, 0, 0);
-            pdf.setFontSize(11);
-            
-            @foreach($salesData['salesByPayment'] as $method => $data)
-                if (yPos > 250) {
-                    pdf.addPage();
-                    yPos = margin;
-                }
-                
-                const methodName = '{{ ucfirst($method) }}';
-                const amount = '₱{{ number_format($data['total'], 2) }}';
-                const orderCount = '{{ $data['count'] }} orders';
-                const percentage = '{{ number_format($data['percentage'], 1) }}%';
-                
-                pdf.setFont('helvetica', 'bold');
-                pdf.text(methodName, margin, yPos);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(amount, margin + 40, yPos);
-                pdf.text(orderCount, margin + 100, yPos);
-                pdf.text(percentage, pageWidth - margin, yPos, { align: 'right' });
-                yPos += 7;
-            @endforeach
-        @else
-            pdf.text('No payment method data available', margin, yPos);
-            yPos += 8;
-        @endif
-        
-        yPos += 10;
-        
-        // 4. RECENT ORDERS SUMMARY
-        if (yPos > 220) {
-            pdf.addPage();
-            yPos = margin;
-        }
-        
-        pdf.setTextColor(44, 143, 12);
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('RECENT ORDERS SUMMARY', margin, yPos);
-        yPos += 8;
-        
-        pdf.setDrawColor(200, 200, 200);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 10;
-        
-        // Order statistics
-        pdf.setTextColor(0, 0, 0);
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`Total Orders in Period: {{ $salesData['totalOrders'] }}`, margin, yPos);
-        yPos += 7;
-        pdf.text(`Orders Displayed: {{ $orders->count() }}`, margin, yPos);
-        yPos += 10;
-        
-        // Show first 10 orders for summary
-        @php
-            $summaryOrders = $orders->take(10);
-        @endphp
-        
-        @if($summaryOrders->count() > 0)
-            @foreach($summaryOrders as $order)
-                if (yPos > 250) {
-                    pdf.addPage();
-                    yPos = margin;
-                }
-                
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('{{ $order->order_number }}', margin, yPos);
-                pdf.setFont('helvetica', 'normal');
-                
-                const customerLine = `Customer: {{ $order->customer_name }}`;
-                const amountLine = `Amount: ₱{{ number_format($order->total_amount, 2) }}`;
-                const paymentLine = `Payment: {{ $order->payment_method }}`;
-                
-                pdf.text(customerLine, margin + 30, yPos);
-                pdf.text(amountLine, margin + 30, yPos + 5);
-                pdf.text(paymentLine, margin + 30, yPos + 10);
-                
-                yPos += 15;
-            @endforeach
-            
-            @if($orders->count() > 10)
-                if (yPos > 250) {
-                    pdf.addPage();
-                    yPos = margin;
-                }
-                pdf.setFont('helvetica', 'italic');
-                pdf.text(`... and {{ $orders->count() - 10 }} more orders`, margin, yPos);
-                pdf.setFont('helvetica', 'normal');
-                yPos += 8;
-            @endif
-        @else
-            pdf.text('No orders found for the selected filters', margin, yPos);
-            yPos += 8;
-        @endif
-        
-        // 5. FILTERS USED
-        if (yPos > 230) {
-            pdf.addPage();
-            yPos = margin;
-        }
-        
-        yPos += 10;
-        pdf.setTextColor(100, 100, 100);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'italic');
-        pdf.text('Report Filters Applied:', margin, yPos);
-        yPos += 6;
-        
-        pdf.setFontSize(9);
-        const dateRangeText = "{{ request('date_range', 'this_month') }}".replace('_', ' ');
-        const paymentMethod = "{{ request('payment_method', 'all') }}";
-        const startDate = "{{ request('start_date', '') }}";
-        const endDate = "{{ request('end_date', '') }}";
-        
-        let filtersText = `Date Range: ${dateRangeText}`;
-        if (dateRangeText === 'custom' && startDate && endDate) {
-            filtersText += ` (${startDate} to ${endDate})`;
-        }
-        filtersText += ` | Payment Method: ${paymentMethod}`;
-        
-        pdf.text(filtersText, margin, yPos, { maxWidth: contentWidth });
-        
-        // Save the PDF
-        pdf.save(`sales-report-{{ date('Y-m-d') }}-{{ time() }}.pdf`);
-
-    } catch (error) {
-        console.error('Export error:', error);
-        alert('Error generating report. Please try again.');
-    } finally {
-        // Restore button state
-        const exportBtn = document.querySelector('.export-actions .btn-success');
-        if (exportBtn) {
-            exportBtn.innerHTML = originalHtml;
-            exportBtn.disabled = false;
-        }
-    }
-}
-
 // Interactive Features
 function toggleChartType() {
     currentChartType = currentChartType === 'line' ? 'bar' : 'line';
@@ -1165,7 +693,27 @@ function toggleChartType() {
     }
 }
 
+function exportChartAsImage(chartId, filename) {
+    const chartCanvas = document.getElementById(chartId);
+    const link = document.createElement('a');
+    link.download = filename + '.png';
+    link.href = chartCanvas.toDataURL('image/png');
+    link.click();
+}
+
 // Filter Form Functions
+function toggleCustomDate() {
+    const dateRange = document.querySelector('select[name="date_range"]').value;
+    const customDateRange = document.getElementById('customDateRange');
+    
+    if (dateRange === 'custom') {
+        customDateRange.style.display = 'block';
+    } else {
+        customDateRange.style.display = 'none';
+        submitFormWithDelay();
+    }
+}
+
 function handleDateRangeChange() {
     const dateRange = document.getElementById('dateRangeSelect').value;
     
@@ -1208,6 +756,33 @@ function submitFormWithDelay() {
     formSubmissionTimer = setTimeout(() => {
         document.getElementById('filterForm').submit();
     }, 300);
+}
+
+function exportReport(type) {
+    const form = document.getElementById('filterForm');
+    const action = "{{ route('admin.sales-report.export') }}";
+    
+    const exportForm = document.createElement('form');
+    exportForm.method = 'GET';
+    exportForm.action = action;
+    
+    const inputs = form.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.name) {
+            const clone = input.cloneNode(true);
+            exportForm.appendChild(clone);
+        }
+    });
+    
+    const exportTypeInput = document.createElement('input');
+    exportTypeInput.type = 'hidden';
+    exportTypeInput.name = 'export_type';
+    exportTypeInput.value = type;
+    exportForm.appendChild(exportTypeInput);
+    
+    document.body.appendChild(exportForm);
+    exportForm.submit();
+    document.body.removeChild(exportForm);
 }
 
 // Utility Functions
@@ -1258,21 +833,15 @@ function showNoDataMessage(canvasId, title, message) {
     `;
 }
 
-// Event Listeners and Initialization
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize charts
+// Real-time Data Updates (Optional)
+function refreshChartData() {
+    // This function can be extended to fetch real-time data
+    console.log('Refreshing chart data...');
     initializeSalesTrendChart();
     initializePaymentMethodChart();
-    
-    // Add resize debouncing
-    const debouncedResize = debounce(function() {
-        initializeSalesTrendChart();
-        initializePaymentMethodChart();
-    }, 250);
-    
-    window.addEventListener('resize', debouncedResize);
-});
+}
 
+// Chart Performance Optimization
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -1284,5 +853,83 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+
+// Event Listeners and Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    initializeSalesTrendChart();
+    initializePaymentMethodChart();
+    
+    // Add chart export buttons
+    addChartExportButtons();
+    
+    // Add real-time refresh (optional)
+    // setInterval(refreshChartData, 300000); // Refresh every 5 minutes
+    
+    // Add resize debouncing
+    const debouncedResize = debounce(function() {
+        initializeSalesTrendChart();
+        initializePaymentMethodChart();
+    }, 250);
+    
+    window.addEventListener('resize', debouncedResize);
+});
+
+// Add export buttons to charts
+function addChartExportButtons() {
+    const salesChartHeader = document.querySelector('#salesTrendChart').closest('.card').querySelector('.card-header');
+    const paymentChartHeader = document.querySelector('#paymentMethodChart').closest('.card').querySelector('.card-header');
+    
+    if (salesChartHeader && !salesChartHeader.querySelector('.export-btn')) {
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'btn btn-sm btn-outline-success export-btn ms-2';
+        exportBtn.innerHTML = '<i class="fas fa-download me-1"></i> Export';
+        exportBtn.onclick = () => exportChartAsImage('salesTrendChart', 'sales-trend');
+        salesChartHeader.appendChild(exportBtn);
+    }
+    
+    if (paymentChartHeader && !paymentChartHeader.querySelector('.export-btn')) {
+        const exportBtn = document.createElement('button');
+        exportBtn.className = 'btn btn-sm btn-outline-success export-btn ms-2';
+        exportBtn.innerHTML = '<i class="fas fa-download me-1"></i> Export';
+        exportBtn.onclick = () => exportChartAsImage('paymentMethodChart', 'payment-methods');
+        paymentChartHeader.appendChild(exportBtn);
+    }
+}
+
+// Data Analysis Functions
+function calculateTrend() {
+    const dailyData = {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!};
+    if (dailyData.length < 2) return 0;
+    
+    const firstValue = dailyData[0];
+    const lastValue = dailyData[dailyData.length - 1];
+    return ((lastValue - firstValue) / firstValue) * 100;
+}
+
+function getPeakPerformance() {
+    const dailyData = {!! json_encode($salesData['dailySales']->pluck('total')->toArray()) !!};
+    const dailyLabels = {!! json_encode($salesData['dailySales']->pluck('date')->toArray()) !!};
+    
+    if (dailyData.length === 0) return { value: 0, date: 'N/A' };
+    
+    const maxValue = Math.max(...dailyData);
+    const maxIndex = dailyData.indexOf(maxValue);
+    
+    return {
+        value: maxValue,
+        date: dailyLabels[maxIndex] || 'N/A'
+    };
+}
+
+// Initialize trend analysis on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const trend = calculateTrend();
+    const peak = getPeakPerformance();
+    
+    // You can display these values in your UI
+    console.log('Sales Trend:', trend.toFixed(2) + '%');
+    console.log('Peak Performance:', '₱' + peak.value.toLocaleString() + ' on ' + peak.date);
+});
 </script>
 @endpush

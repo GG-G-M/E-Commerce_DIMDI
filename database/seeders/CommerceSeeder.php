@@ -33,15 +33,17 @@ class CommerceSeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::create([
-                'name' => $category['name'],
-                'slug' => Str::slug($category['name']),
-                'description' => $category['description'],
-                'is_active' => true
-            ]);
+            Category::updateOrCreate(
+                ['slug' => Str::slug($category['name'])], // check by unique slug
+                [
+                    'name' => $category['name'],
+                    'description' => $category['description'],
+                    'is_active' => true
+                ]
+            );
         }
-        
-        $this->command->info('Categories Created'); 
+
+        $this->command->info('Categories Created');
 
         // Create Products for Appliance Store
         $products = [
@@ -247,42 +249,47 @@ class CommerceSeeder extends Seeder
         ];
 
         foreach ($products as $productData) {
-            $product = Product::create([
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']),
-                'description' => $productData['description'],
-                'price' => $productData['price'],
-                'sale_price' => $productData['sale_price'],
-                'stock_quantity' => $productData['stock_quantity'],
-                'sku' => $productData['sku'],
-                'image' => $productData['image'],
-                'is_featured' => $productData['is_featured'],
-                'is_active' => $productData['is_active'],
-                'is_archived' => false,
-                'category_id' => $productData['category_id'],
-                'brand_id' => null
-            ]);
+            $product = Product::updateOrCreate(
+                ['slug' => Str::slug($productData['name'])], // check by unique slug
+                [
+                    'name' => $productData['name'],
+                    'description' => $productData['description'],
+                    'price' => $productData['price'],
+                    'sale_price' => $productData['sale_price'],
+                    'stock_quantity' => $productData['stock_quantity'],
+                    'sku' => $productData['sku'],
+                    'image' => $productData['image'],
+                    'is_featured' => $productData['is_featured'],
+                    'is_active' => $productData['is_active'],
+                    'is_archived' => false,
+                    'category_id' => $productData['category_id'],
+                    'brand_id' => null
+                ]
+            );
 
-            // Create product variants if the product has variants
+            // Create/update product variants
             if ($productData['has_variants'] && !empty($productData['variants'])) {
                 foreach ($productData['variants'] as $variantData) {
-                    ProductVariant::create([
-                        'product_id' => $product->id,
-                        'variant_name' => $variantData['variant_name'],
-                        'variant_description' => $variantData['variant_description'],
-                        'image' => $variantData['image'],
-                        'sku' => $variantData['sku'],
-                        'stock_quantity' => $variantData['stock'],
-                        'price' => $variantData['price'],
-                        'sale_price' => $variantData['sale_price'],
-                    ]);
+                    ProductVariant::updateOrCreate(
+                        [
+                            'sku' => $variantData['sku'] // use SKU as unique identifier
+                        ],
+                        [
+                            'product_id' => $product->id,
+                            'variant_name' => $variantData['variant_name'],
+                            'variant_description' => $variantData['variant_description'],
+                            'image' => $variantData['image'],
+                            'stock_quantity' => $variantData['stock'],
+                            'price' => $variantData['price'],
+                            'sale_price' => $variantData['sale_price'],
+                        ]
+                    );
                 }
-                
-                // Update product stock to sum of variants
+
                 $product->updateTotalStock();
             }
         }
-        
-        $this->command->info('Appliances and Variants Created Successfully!'); 
+
+        $this->command->info('Appliances and Variants Created Successfully!');
     }
 }

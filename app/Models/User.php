@@ -19,10 +19,11 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
-        'address',
+        'street_address',
+        'barangay',
         'city',
-        'state',
-        'zip_code',
+        'province',
+        'region',
         'country',
         'vehicle_type',
         'vehicle_number',
@@ -35,15 +36,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
-        ];
-    }
-
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_active' => 'boolean',
+    ];
     // Role constants
     const ROLE_SUPER_ADMIN = 'super_admin';
     const ROLE_ADMIN = 'admin';
@@ -51,19 +48,23 @@ class User extends Authenticatable
     const ROLE_CUSTOMER = 'customer';
 
     // Add accessor for full name
+
+    // Accessor for full name
+
     public function getNameAttribute()
     {
         $names = [$this->first_name];
-        
+
         if ($this->middle_name) {
             $names[] = $this->middle_name;
         }
-        
+
         $names[] = $this->last_name;
-        
+
         return implode(' ', $names);
     }
 
+    // Relationships
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
@@ -80,17 +81,19 @@ class User extends Authenticatable
         return $this->role === self::ROLE_SUPER_ADMIN;
     }
 
-    public function isAdmin()
+    // Role checks
+    public function isAdmin(): bool
+
     {
         return $this->role === self::ROLE_ADMIN;
     }
 
-    public function isDelivery()
+    public function isDelivery(): bool
     {
         return $this->role === self::ROLE_DELIVERY;
     }
 
-    public function isCustomer()
+    public function isCustomer(): bool
     {
         return $this->role === self::ROLE_CUSTOMER || empty($this->role);
     }
