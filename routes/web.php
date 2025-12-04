@@ -185,12 +185,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
 
-
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
+    Route::get('/admin/stock-in/products/modal', [StockInController::class, 'productModal'])->name('stock_in.products.modal');
 
     // CSV
     Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');
