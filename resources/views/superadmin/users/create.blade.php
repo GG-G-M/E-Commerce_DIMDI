@@ -344,43 +344,84 @@
                             </div>
                         </div>
 
-                        <!-- Address Information -->
-                        <div class="mb-5">
-                            <div class="d-flex align-items-center mb-4">
-                                <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
-                                    <i class="fas fa-map-marker-alt text-success"></i>
-                                </div>
-                                <h6 class="mb-0 text-dark fw-bold fs-5">Address Information (Optional)</h6>
-                            </div>
-                            
-                            <div class="row g-4">
-                                <div class="col-lg-8">
-                                    <label for="address" class="form-label fw-medium">Street Address</label>
-                                    <input type="text" class="form-control form-control-lg" name="address" 
-                                           value="{{ old('address') }}" placeholder="123 Main Street">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="city" class="form-label fw-medium">City</label>
-                                    <input type="text" class="form-control form-control-lg" name="city" 
-                                           value="{{ old('city') }}" placeholder="New York">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="state" class="form-label fw-medium">State/Province</label>
-                                    <input type="text" class="form-control form-control-lg" name="state" 
-                                           value="{{ old('state') }}" placeholder="NY">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="zip_code" class="form-label fw-medium">ZIP/Postal Code</label>
-                                    <input type="text" class="form-control form-control-lg" name="zip_code" 
-                                           value="{{ old('zip_code') }}" placeholder="10001">
-                                </div>
-                                <div class="col-lg-4">
-                                    <label for="country" class="form-label fw-medium">Country</label>
-                                    <input type="text" class="form-control form-control-lg" name="country" 
-                                           value="{{ old('country') }}" placeholder="United States">
-                                </div>
-                            </div>
-                        </div>
+                       <!-- Address Information -->
+<div class="mb-5">
+    <div class="d-flex align-items-center mb-4">
+        <div class="bg-success bg-opacity-10 p-2 rounded-circle me-3">
+            <i class="fas fa-map-marker-alt text-success"></i>
+        </div>
+        <h6 class="mb-0 text-dark fw-bold fs-5">Address Information (Optional)</h6>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Street Address -->
+        <div class="col-lg-8">
+            <label for="street_address" class="form-label fw-medium">Street Address</label>
+            <input type="text" class="form-control form-control-lg" name="street_address" 
+                   value="{{ old('street_address') }}" placeholder="123 Main Street">
+            @error('street_address')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- Barangay -->
+        <div class="col-lg-4">
+            <label for="barangay" class="form-label fw-medium">Barangay</label>
+            <input type="text" class="form-control form-control-lg" name="barangay" 
+                   value="{{ old('barangay') }}" placeholder="Barangay Name">
+            @error('barangay')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- City -->
+        <div class="col-lg-4">
+            <label for="city" class="form-label fw-medium">City</label>
+            <input type="text" class="form-control form-control-lg" name="city" 
+                   value="{{ old('city') }}" placeholder="City Name">
+            @error('city')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- Province -->
+        <div class="col-lg-4">
+            <label for="province" class="form-label fw-medium">Province</label>
+            <input type="text" class="form-control form-control-lg" name="province" 
+                   value="{{ old('province') }}" placeholder="Province Name">
+            @error('province')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- Region -->
+        <div class="col-lg-4">
+            <label for="region" class="form-label fw-medium">Region</label>
+            <input type="text" class="form-control form-control-lg" name="region" 
+                   value="{{ old('region') }}" placeholder="Region Name">
+            @error('region')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- Country -->
+        <div class="col-lg-4">
+            <label for="country" class="form-label fw-medium">Country</label>
+            <input type="text" class="form-control form-control-lg" name="country" 
+                   value="{{ old('country', 'Philippines') }}" placeholder="Country">
+            @error('country')
+                <div class="text-danger small mt-2">{{ $message }}</div>
+            @enderror
+        </div>
+        
+        <!-- ZIP/Postal Code (if you want to keep it) -->
+        <div class="col-lg-4">
+            <label for="zip_code" class="form-label fw-medium">ZIP/Postal Code</label>
+            <input type="text" class="form-control form-control-lg" name="zip_code" 
+                   value="{{ old('zip_code') }}" placeholder="10001">
+        </div>
+    </div>
+</div>
 
                         <!-- Status Toggle -->
                         <div class="mb-4">
