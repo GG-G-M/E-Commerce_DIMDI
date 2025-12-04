@@ -10,8 +10,17 @@ return new class extends Migration
     {
         Schema::create('order_deliveries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('delivery_personnel_id')->constrained('deliveries')->onDelete('cascade'); // Changed to 'deliveries'
+            
+            // Make sure orders table exists before this migration
+            $table->foreignId('order_id')
+                  ->constrained('orders')
+                  ->onDelete('cascade');
+            
+            // Make sure deliveries table exists before this migration
+            $table->foreignId('delivery_personnel_id')
+                  ->constrained('deliveries')
+                  ->onDelete('cascade');
+            
             $table->string('status')->default('assigned'); // assigned, picked_up, in_transit, delivered, failed
             $table->timestamp('assigned_at')->nullable();
             $table->timestamp('picked_up_at')->nullable();

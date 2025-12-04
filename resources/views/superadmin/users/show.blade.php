@@ -222,53 +222,78 @@
                 </div>
             </div>
             
-            <!-- Contact Information Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">
-                            <i class="fas fa-map-marker-alt me-2 text-success"></i>Contact Information
-                        </h5>
-                        <span class="badge bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-address-book me-1"></i>Location
-                        </span>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-12">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Address</label>
-                                <p class="fs-5 mb-0">{{ $user->address ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">City</label>
-                                <p class="fs-5 mb-0">{{ $user->city ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">State/Province</label>
-                                <p class="fs-5 mb-0">{{ $user->state ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">ZIP/Postal Code</label>
-                                <p class="fs-5 mb-0">{{ $user->zip_code ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Country</label>
-                                <p class="fs-5 mb-0">{{ $user->country ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
-                        </div>
-                    </div>
+<!-- Contact Information Card -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="fas fa-map-marker-alt me-2 text-success"></i>Contact Information
+            </h5>
+            <span class="badge bg-success bg-opacity-10 text-success">
+                <i class="fas fa-address-book me-1"></i>Location
+            </span>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row g-4">
+            <!-- Street Address -->
+            <div class="col-12">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">Street Address</label>
+                    <p class="fs-5 mb-0">{{ $user->street_address ?? '<span class="text-muted">Not provided</span>' }}</p>
                 </div>
             </div>
+            
+            <!-- Barangay -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">Barangay</label>
+                    <p class="fs-5 mb-0">{{ $user->barangay ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+            
+            <!-- City -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">City</label>
+                    <p class="fs-5 mb-0">{{ $user->city ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+            
+            <!-- Province -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">Province</label>
+                    <p class="fs-5 mb-0">{{ $user->province ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+            
+            <!-- Region -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">Region</label>
+                    <p class="fs-5 mb-0">{{ $user->region ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+            
+            <!-- Country -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">Country</label>
+                    <p class="fs-5 mb-0">{{ $user->country ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+            
+            <!-- ZIP Code (Optional) -->
+            <div class="col-md-4">
+                <div class="detail-item">
+                    <label class="form-label text-muted small mb-1">ZIP/Postal Code</label>
+                    <p class="fs-5 mb-0">{{ $user->zip_code ?? '<span class="text-muted">Not provided</span>' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             
             <!-- Delivery Information Card (if applicable) -->
             @if($user->role == 'delivery')

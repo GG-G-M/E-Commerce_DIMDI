@@ -63,47 +63,59 @@ class UserController extends Controller
     /**
      * Store a newly created user.
      */
-    public function store(Request $request)
-    {
-        // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
+    // In your SuperAdmin UserController
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:8|confirmed',
+        'role' => 'required|string|in:super_admin,admin,delivery,customer',
+        'phone' => 'nullable|string|max:20',
+        
+        // Address fields (optional)
+        'street_address' => 'nullable|string|max:255',
+        'barangay' => 'nullable|string|max:100',
+        'city' => 'nullable|string|max:100',
+        'province' => 'nullable|string|max:100',
+        'region' => 'nullable|string|max:100',
+        'country' => 'nullable|string|max:100',
+        
+        // Delivery specific fields
+        'vehicle_type' => 'nullable|required_if:role,delivery|string|max:50',
+        'vehicle_number' => 'nullable|required_if:role,delivery|string|max:50',
+        'license_number' => 'nullable|required_if:role,delivery|string|max:50',
+    ]);
 
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:' . implode(',', [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_DELIVERY, User::ROLE_CUSTOMER]),
-            'phone' => 'nullable|string|max:20',
-            'is_active' => 'boolean',
-        ]);
+    // Create user
+    $user = User::create([
+        'first_name' => $validated['first_name'],
+        'middle_name' => $request->middle_name,
+        'last_name' => $validated['last_name'],
+        'email' => $validated['email'],
+        'password' => Hash::make($validated['password']),
+        'role' => $validated['role'],
+        'phone' => $validated['phone'],
+        
+        // Address fields
+        'street_address' => $validated['street_address'] ?? null,
+        'barangay' => $validated['barangay'] ?? null,
+        'city' => $validated['city'] ?? null,
+        'province' => $validated['province'] ?? null,
+        'region' => $validated['region'] ?? null,
+        'country' => $validated['country'] ?? null,
+        
+        // Delivery fields
+        'vehicle_type' => $validated['vehicle_type'] ?? null,
+        'vehicle_number' => $validated['vehicle_number'] ?? null,
+        'license_number' => $validated['license_number'] ?? null,
+        'is_active' => $request->has('is_active'),
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'phone' => $request->phone,
-            'is_active' => $request->boolean('is_active', true),
-        ]);
-
-        return redirect()->route('superadmin.users.index')
-            ->with('success', 'User created successfully!');
-    }
-
-    /**
-     * Display the specified user.
-     */
+    return redirect()->route('superadmin.users.index')
+        ->with('success', 'User created successfully!');
+}
     public function show(User $user)
     {
         // Check if user is super admin
