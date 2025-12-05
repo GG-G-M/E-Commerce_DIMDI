@@ -52,6 +52,14 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// GOOGLE LOGIN
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+
+// FACEBOOK LOGIN
+Route::get('/auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('login.facebook');
+Route::get('/auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
