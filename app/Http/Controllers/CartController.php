@@ -402,6 +402,117 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Cart cleared successfully!');
     }
 
+    /**
+     * Get selected cart items for checkout
+     */
+    public function getSelectedItems(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|array',
+            'selected_items.*' => 'exists:carts,id'
+        ]);
+
+        $cartIdentifier = $this->getCartIdentifier();
+        
+        // Get only the selected cart items
+        $selectedItems = Cart::with(['product.variants'])
+            ->where($cartIdentifier)
+            ->whereIn('id', $request->selected_items)
+            ->get();
+
+        // Calculate totals for selected items only
+        $subtotal = $selectedItems->sum('total_price');
+        $tax = $subtotal * 0.10;
+        $shipping = $subtotal > 100 ? 0 : 10;
+        $total = $subtotal + $tax + $shipping;
+
+        // Store selected items in session for checkout process
+        session()->put('checkout_items', $selectedItems->pluck('id')->toArray());
+        session()->put('checkout_summary', [
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'shipping' => $shipping,
+            'total' => $total,
+            'item_count' => $selectedItems->sum('quantity')
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'selected_items' => $selectedItems,
+            'summary' => [
+                'subtotal' => number_format($subtotal, 2),
+                'tax' => number_format($tax, 2),
+                'shipping' => number_format($shipping, 2),
+                'total' => number_format($total, 2),
+                'item_count' => $selectedItems->sum('quantity')
+            ]
+        ]);
+    }
+
+    /**
+     * Handle checkout of selected items
+     */
+    public function checkoutSelected(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|array',
+            'selected_items.*' => 'required|string'
+        ]);
+
+        $cartIdentifier = $this->getCartIdentifier();
+        
+        // Validate that all selected items belong to user
+        $selectedItems = Cart::where($cartIdentifier)
+            ->whereIn('id', $request->selected_items)
+            ->get();
+
+        if ($selectedItems->count() !== count($request->selected_items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid item selection'
+            ], 422);
+        }
+
+        // Store selected items in session for OrderController to use
+        session(['selected_cart_items' => $request->selected_items]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Selection saved. Redirecting to checkout...'
+        ]);
+    }
+
+    /**
+     * Remove selected items from cart (after successful checkout)
+     */
+    public function removeSelectedItems(Request $request)
+    {
+        $request->validate([
+            'selected_items' => 'required|array',
+            'selected_items.*' => 'exists:carts,id'
+        ]);
+
+        $cartIdentifier = $this->getCartIdentifier();
+        
+        Cart::where($cartIdentifier)
+            ->whereIn('id', $request->selected_items)
+            ->delete();
+
+        // Clear checkout session
+        session()->forget(['checkout_items', 'checkout_summary']);
+
+        if ($request->ajax()) {
+            $cartCount = Cart::where($cartIdentifier)->sum('quantity');
+            return response()->json([
+                'success' => true,
+                'message' => 'Selected items removed from cart!',
+                'cart_count' => $cartCount
+            ]);
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Selected items removed from cart!');
+    }
+
     private function authorizeCartItem(Cart $cart)
     {
         if (Auth::check()) {

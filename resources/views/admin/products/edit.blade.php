@@ -179,10 +179,31 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <label for="brand_id" class="form-label">Brand *</label>
+                                <select class="form-control @error('brand_id') is-invalid @enderror"
+                                        id="brand_id" name="brand_id" required>
+                                    <option value="">Select Brand</option>
+                                    @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('brand_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Select the product brand</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror"
                                        id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" 
-                                       {{ $product->has_variants ? 'disabled' : 'required' }}>
+                                       {{ $product->has_variants ? 'disabled' : 'required' }} readonly @disabled(true)>
                                 @error('stock_quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

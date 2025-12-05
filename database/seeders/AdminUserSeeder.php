@@ -22,7 +22,12 @@ class AdminUserSeeder extends Seeder
             'city' => 'Admin City',
             'state' => 'Admin State',
             'zip_code' => '12345',
-            'country' => 'Admin Country'
+            'country' => 'Admin Country',
+            'is_archived' => false,
+            'vehicle_type' => null,
+            'vehicle_number' => null,
+            'license_number' => null,
+            'is_active' => true
         ]);
 
         $this->command->info('Admin user created successfully!');

@@ -45,9 +45,19 @@ class OrderController extends Controller
             return redirect()->route('login')->with('info', 'Please login or register to complete your order.');
         }
 
-        $cartItems = Cart::with('product')
-            ->where('user_id', Auth::id())
-            ->get();
+        // Check if there are selected items from multi-select checkout
+        $selectedItemIds = session()->get('selected_cart_items');
+
+        $cartItemsQuery = Cart::with('product')
+            ->where('user_id', Auth::id());
+
+        // If selected items exist, load only those
+        if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+            $cartItems = $cartItemsQuery->whereIn('id', $selectedItemIds)->get();
+        } else {
+            // Otherwise load all cart items (backward compatibility)
+            $cartItems = $cartItemsQuery->get();
+        }
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
@@ -79,7 +89,7 @@ class OrderController extends Controller
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10;
         $shipping = $subtotal > 100 ? 0 : 10;
-        $total = $subtotal + $tax + $shipping;
+        $total = $subtotal + $shipping;
 
         $user = Auth::user();
 
@@ -99,9 +109,19 @@ class OrderController extends Controller
             'customer_phone' => 'sometimes|string|max:20'
         ]);
 
-        $cartItems = Cart::with(['product.variants'])
-            ->where('user_id', Auth::id())
-            ->get();
+        // Check if there are selected items from multi-select checkout
+        $selectedItemIds = session()->get('selected_cart_items');
+
+        $cartItemsQuery = Cart::with(['product.variants'])
+            ->where('user_id', Auth::id());
+
+        // If selected items exist, load only those
+        if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+            $cartItems = $cartItemsQuery->whereIn('id', $selectedItemIds)->get();
+        } else {
+            // Otherwise load all cart items (backward compatibility)
+            $cartItems = $cartItemsQuery->get();
+        }
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty.');
@@ -134,7 +154,7 @@ class OrderController extends Controller
         $subtotal = $cartItems->sum('total_price');
         $tax = $subtotal * 0.10;
         $shipping = $subtotal > 100 ? 0 : 10;
-        $total = $subtotal + $tax + $shipping;
+        $total = $subtotal + $shipping;
 
         $user = Auth::user();
 
@@ -149,7 +169,7 @@ class OrderController extends Controller
                 'shipping_address' => $request->shipping_address,
                 'billing_address' => $request->billing_address,
                 'subtotal' => $subtotal,
-                'tax_amount' => $tax,
+                // 'tax_amount' => $tax,
                 'shipping_cost' => $shipping,
                 'total_amount' => $total,
                 'payment_method' => $request->payment_method,
@@ -197,8 +217,16 @@ class OrderController extends Controller
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
                 $order->reduceStock(); // Reduce stock for confirmed orders
                 
-                // Clear cart
-                Cart::where('user_id', Auth::id())->delete();
+                // Clear selected items from cart if multi-select was used
+                if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+                    Cart::where('user_id', Auth::id())
+                        ->whereIn('id', $selectedItemIds)
+                        ->delete();
+                    session()->forget('selected_cart_items');
+                } else {
+                    // Otherwise clear entire cart (backward compatibility)
+                    Cart::where('user_id', Auth::id())->delete();
+                }
                 
                 return redirect()->route('orders.show', $order)
                     ->with('success', 'Order placed successfully! Your order number is: ' . $order->order_number);
@@ -272,8 +300,18 @@ class OrderController extends Controller
                 $order->updateStatus('confirmed', 'Payment received via ' );
                 $order->reduceStock(); // Reduce stock for confirmed orders
                 
-                // Clear cart
-                Cart::where('user_id', $order->user_id)->delete();
+                // Clear selected items from cart if multi-select was used
+                $selectedItemIds = session()->get('selected_cart_items');
+                if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+                    Cart::where('user_id', $order->user_id)
+                        ->whereIn('id', $selectedItemIds)
+                        ->delete();
+                    session()->forget('selected_cart_items');
+                } else {
+                    // Otherwise clear entire cart (backward compatibility)
+                    Cart::where('user_id', $order->user_id)->delete();
+                }
+                
                 session()->forget('last_order_id');
                 
                 return redirect()->route('orders.show', $order)

@@ -196,6 +196,31 @@
                         </div>
                     </div>
 
+                    <!-- Brand Dropdown -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="brand_id" class="form-label">Brand</label>
+                                <select class="form-select @error('brand_id') is-invalid @enderror" 
+                                        id="brand_id" name="brand_id">
+                                    <option value="">Select Brand</option>
+                                    @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('brand_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Select the product brand (optional)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- You can add more fields here if needed -->
+                        </div>
+                    </div>
+
                     <!-- Variants Toggle -->
                     <div class="mb-4">
                         <div class="form-check form-switch">
