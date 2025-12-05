@@ -31,7 +31,7 @@ return new class extends Migration
             DB::statement("
                 UPDATE orders o
                 JOIN deliveries d ON o.delivery_id = d.id
-                JOIN users u ON d.user_id = u.id OR d.email = u.email
+                JOIN users u ON d.email = u.email
                 SET o.delivery_id = u.id
                 WHERE o.delivery_id IS NOT NULL
             ");
@@ -40,9 +40,9 @@ return new class extends Migration
         // Add new foreign key to reference users table
         Schema::table('orders', function (Blueprint $table) {
             $table->foreign('delivery_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
         });
     }
 
@@ -52,7 +52,7 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             $table->dropForeign(['delivery_id']);
         });
-        
+
         // You can't easily revert the data changes, but at least remove the FK
     }
 };
