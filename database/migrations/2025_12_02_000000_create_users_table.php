@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('role', 20)->default('customer'); // Modified to accommodate 'delivery' role
+            $table->string('role', 20)->default('customer');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
@@ -18,15 +18,21 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone')->nullable();
-            $table->text('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('state')->nullable();
-            $table->string('zip_code')->nullable();
+
+            // ✅ Correct Philippine Address Structure
+            $table->string('region')->nullable();
+            $table->string('province')->nullable();
+            $table->string('city')->nullable();       // or municipality
+            $table->string('barangay')->nullable();
+            $table->text('street_address')->nullable(); // house, purok, subdivision, etc.
             $table->string('country')->nullable();
+
             $table->boolean('is_archived')->default(false);
+
             $table->string('vehicle_type')->nullable();
             $table->string('vehicle_number')->nullable();
             $table->string('license_number')->nullable();
+
             $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();

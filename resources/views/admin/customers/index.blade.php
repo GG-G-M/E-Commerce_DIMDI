@@ -66,16 +66,37 @@
         border: none;
     }
 
+    .table {
+        margin-bottom: 0;
+    }
+
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
         background-color: #F8FDF8;
         transition: background-color 0.2s ease;
+    }
+
+    /* Alternating row colors for better readability */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
     }
 
     .modal-header {
@@ -99,6 +120,122 @@
 
     .position-relative {
         position: relative;
+    }
+
+    /* Improved table cell styling */
+    .customer-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .customer-email {
+        color: #2C8F0C;
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+
+    .customer-phone {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .customer-address {
+        color: #6c757d;
+        font-size: 0.85rem;
+        max-width: 200px;
+        word-break: break-word;
+    }
+
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 80px;
+    }
+
+    .status-active {
+        background-color: #D4EDDA;
+        color: #155724;
+        border: 1px solid #C3E6CB;
+    }
+
+    .status-archived {
+        background-color: #FFF3CD;
+        color: #856404;
+        border: 1px solid #FFEAA7;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-outline-success {
+        color: #2C8F0C;
+        border-color: #2C8F0C;
+        border-radius: 6px;
+    }
+
+    .btn-outline-success:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+
+    .btn-outline-warning {
+        color: #FBC02D;
+        border-color: #FBC02D;
+        border-radius: 6px;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: #FBC02D;
+        color: white;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    /* Column width control */
+    .id-col { min-width: 80px; }
+    .name-col { min-width: 180px; }
+    .email-col { min-width: 200px; }
+    .phone-col { min-width: 120px; }
+    .address-col { min-width: 200px; max-width: 250px; }
+    .status-col { min-width: 100px; }
+    .action-col { min-width: 140px; }
+
+    /* Pagination styling */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8F5E6;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
     }
 </style>
 
@@ -155,59 +292,87 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Customer List</h5>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            <i class="bi bi-person-plus"></i> Add Customer
+            <i class="fas fa-user-plus me-1"></i> Add Customer
         </button>
     </div>
-    <div class="card-body">
-        <table class="table table-bordered align-middle" id="customerTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($customers as $customer)
-                <tr data-id="{{ $customer->id }}">
-                    <td>{{ $customer->id }}</td>
-                    <td>{{ $customer->first_name }} {{ $customer->last_name }}</td>
-                    <td>{{ $customer->email }}</td>
-                    <td>{{ $customer->phone }}</td>
-                    <td>{{ $customer->address }}</td>
-                    <td>
-                        @if ($customer->is_archived)
-                            <span class="badge bg-warning text-dark">Archived</span>
-                        @else
-                            <span class="">Active</span>
-                        @endif
-                    </td>
-                    <td>
-                        <button class="btn btn-outline-success btn-sm editBtn me-2" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        @if ($customer->is_archived)
-                            <button class="btn btn-outline-success btn-sm unarchiveBtn" data-id="{{ $customer->id }}">
-                               <i class="fas fa-box-open"></i>
-                            </button>
-                        @else
-                            <button class="btn btn-outline-warning btn-sm archiveBtn" data-id="{{ $customer->id }}">
-                                <i class="fas fa-archive"></i>
-                            </button>
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    <div class="card-body p-0">
+        <div class="table-container">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="id-col">ID</th>
+                        <th class="name-col">Full Name</th>
+                        <th class="email-col">Email</th>
+                        <th class="phone-col">Phone</th>
+                        <th class="address-col">Address</th>
+                        <th class="status-col">Status</th>
+                        <th class="action-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($customers as $customer)
+                    <tr data-id="{{ $customer->id }}">
+                        <td>
+                            <span class="text-muted">#{{ $customer->id }}</span>
+                        </td>
+                        <td>
+                            <div class="customer-name">{{ $customer->first_name }} {{ $customer->last_name }}</div>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ $customer->email }}" class="customer-email" title="{{ $customer->email }}">
+                                {{ $customer->email }}
+                            </a>
+                        </td>
+                        <td>
+                            @if($customer->phone)
+                                <div class="customer-phone">{{ $customer->phone }}</div>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($customer->address)
+                                <div class="customer-address" title="{{ $customer->address }}">
+                                    {{ Str::limit($customer->address, 40) }}
+                                </div>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($customer->is_archived)
+                                <span class="status-badge status-archived">Archived</span>
+                            @else
+                                <span class="status-badge status-active">Active</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-success editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                @if ($customer->is_archived)
+                                    <button class="btn btn-sm btn-outline-success unarchiveBtn" data-id="{{ $customer->id }}" title="Unarchive Customer">
+                                       <i class="fas fa-box-open"></i>
+                                    </button>
+                                @else
+                                    <button class="btn btn-sm btn-outline-warning archiveBtn" data-id="{{ $customer->id }}" title="Archive Customer">
+                                        <i class="fas fa-archive"></i>
+                                    </button>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-        <div class="mt-3 d-flex justify-content-center">
+        @if($customers->hasPages())
+        <div class="d-flex justify-content-center p-4">
             {{ $customers->links('pagination::bootstrap-5') }}
         </div>
+        @endif
 
     </div>
 </div>
@@ -226,6 +391,7 @@
                     @include('admin.customers.form-fields')
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Customer</button>
                 </div>
             </div>
@@ -248,6 +414,7 @@
                     @include('admin.customers.form-fields')
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Update Customer</button>
                 </div>
             </div>
@@ -297,6 +464,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const form = e.target;
         const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
 
         fetch('{{ route("admin.customers.store") }}', {
             method: 'POST',
@@ -305,46 +478,100 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) location.reload();
-            else alert('Error adding customer.');
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error adding customer: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         });
     });
 
     /* === Edit Customer === */
     document.querySelectorAll('.editBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const c = JSON.parse(this.dataset.customer);
+            const customer = JSON.parse(this.dataset.customer);
             const form = document.getElementById('editCustomerForm');
-            form.action = `/admin/customers/${c.id}`;
-            for (const key in c) {
+            
+            // Set form action
+            form.action = `/admin/customers/${customer.id}`;
+            
+            // Fill form fields
+            for (const key in customer) {
                 const input = form.querySelector(`[name="${key}"]`);
-                if (input) input.value = c[key];
+                if (input) {
+                    if (input.type === 'checkbox') {
+                        input.checked = customer[key];
+                    } else {
+                        input.value = customer[key];
+                    }
+                }
             }
         });
     });
 
     document.getElementById('editCustomerForm').addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const form = e.target;
         const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
 
         fetch(form.action, {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-HTTP-Method-Override': 'PUT' },
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'X-HTTP-Method-Override': 'PUT' 
+            },
             body: formData
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) location.reload();
-            else alert('Error updating customer.');
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error updating customer: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         });
     });
 
     /* === Archive Customer === */
     document.querySelectorAll('.archiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to archive this customer?')) return;
+            if (!confirm('Are you sure you want to archive this customer? This will make them inactive but preserve their data.')) return;
+            
             const id = this.dataset.id;
+            const row = this.closest('tr');
+
+            // Disable button during processing
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             fetch(`/admin/customers/${id}/archive`, {
                 method: 'POST',
@@ -352,8 +579,17 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) location.reload();
-                else alert('Failed to archive customer.');
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to archive customer: ' + (data.message || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                location.reload();
             });
         });
     });
@@ -361,8 +597,13 @@ document.addEventListener('DOMContentLoaded', function() {
     /* === Unarchive Customer === */
     document.querySelectorAll('.unarchiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to unarchive this customer?')) return;
+            if (!confirm('Are you sure you want to unarchive this customer? They will become active again.')) return;
+            
             const id = this.dataset.id;
+
+            // Disable button during processing
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             fetch(`/admin/customers/${id}/unarchive`, {
                 method: 'POST',
@@ -370,8 +611,17 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) location.reload();
-                else alert('Failed to unarchive customer.');
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to unarchive customer: ' + (data.message || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                location.reload();
             });
         });
     });

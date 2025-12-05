@@ -44,7 +44,7 @@
         .sidebar::-webkit-scrollbar-thumb {
             background-color: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
-             margin-right: 8px;
+            margin-right: 8px;
         }
 
         .sidebar::-webkit-scrollbar-thumb:hover {
@@ -107,8 +107,9 @@
         }
 
         main {
-        margin-left: 270px !important;
-        padding-left: 20px; /* Add extra padding on the left */
+            margin-left: 270px !important;
+            padding-left: 20px;
+            /* Add extra padding on the left */
         }
 
         /* Ensure content doesn't get too close to sidebar */
@@ -142,7 +143,8 @@
 
         .sidebar .nav-link span {
             flex: 1;
-            min-width: 0; /* Allow text truncation */
+            min-width: 0;
+            /* Allow text truncation */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -162,11 +164,11 @@
                 height: auto;
                 position: relative;
             }
-            
+
             main {
                 margin-left: 0 !important;
             }
-            
+
             .navbar-nav .dropdown-menu {
                 right: auto;
                 left: 0;
@@ -274,7 +276,7 @@
                         </li>
 
 
-                        
+
 
                         <!-- INVENTORY DROPDOWN -->
                         <li class="nav-item">
@@ -333,6 +335,14 @@
                                 <i class="fas fa-shopping-cart me-2"></i>Orders
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.inventory-reports.*') ? 'active' : '' }}"
+                                href="{{ route('admin.inventory-reports.index') }}">
+                                <i class="fas fa-boxes me-2"></i>Inventory Reports
+                            </a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}"
                                 href="{{ route('admin.sales-report.index') }}">

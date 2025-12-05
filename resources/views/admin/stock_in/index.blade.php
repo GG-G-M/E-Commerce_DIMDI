@@ -596,6 +596,22 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text" id="productSearch" class="form-control"
+                                placeholder="Search by name or SKU">
+                        </div>
+                        <div class="col-md-3">
+                            <select id="productFilter" class="form-select">
+                                <option value="active" selected>Active</option>
+                                <option value="archived">Archived</option>
+                                <option value="all">All</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover align-middle" id="productTable">
                             <thead class="table-light">
@@ -608,9 +624,9 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="productTableBody">
                                 @foreach ($products as $product)
-                                    <tr>
+                                    <tr data-archived="{{ $product->is_archived ? '1' : '0' }}">
                                         <td>
                                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                                                 class="img-thumbnail"
@@ -638,6 +654,12 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    <nav>
+                        <ul class="pagination" id="pagination"></ul>
+                    </nav>
+
                 </div>
             </div>
         </div>
@@ -799,6 +821,83 @@
                         progressText.textContent = '0%';
                     });
                 }
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const tableBody = document.getElementById('productTableBody');
+                const searchInput = document.getElementById('productSearch');
+                const filterSelect = document.getElementById('productFilter');
+                const pagination = document.getElementById('pagination');
+
+                const rowsPerPage = 5; // adjust as needed
+                let currentPage = 1;
+
+                const allRows = Array.from(tableBody.querySelectorAll('tr'));
+
+                function renderTable() {
+                    let filteredRows = allRows;
+
+                    // Search filter
+                    const searchTerm = searchInput.value.toLowerCase();
+                    if (searchTerm) {
+                        filteredRows = filteredRows.filter(row => {
+                            const name = row.children[1].textContent.toLowerCase();
+                            const sku = row.children[2].textContent.toLowerCase();
+                            return name.includes(searchTerm) || sku.includes(searchTerm);
+                        });
+                    }
+
+                    // is_archived filter
+                    const filter = filterSelect.value;
+                    if (filter === 'active') {
+                        filteredRows = filteredRows.filter(row => row.dataset.archived === '0');
+                    } else if (filter === 'archived') {
+                        filteredRows = filteredRows.filter(row => row.dataset.archived === '1');
+                    }
+
+                    // Pagination
+                    const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+                    const start = (currentPage - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+                    const paginatedRows = filteredRows.slice(start, end);
+
+                    // Render table
+                    tableBody.innerHTML = '';
+                    paginatedRows.forEach(row => tableBody.appendChild(row));
+
+                    renderPagination(totalPages);
+                }
+
+                function renderPagination(totalPages) {
+                    pagination.innerHTML = '';
+                    for (let i = 1; i <= totalPages; i++) {
+                        const li = document.createElement('li');
+                        li.className = 'page-item' + (i === currentPage ? ' active' : '');
+                        const a = document.createElement('a');
+                        a.className = 'page-link';
+                        a.href = '#';
+                        a.textContent = i;
+                        a.addEventListener('click', e => {
+                            e.preventDefault();
+                            currentPage = i;
+                            renderTable();
+                        });
+                        li.appendChild(a);
+                        pagination.appendChild(li);
+                    }
+                }
+
+                searchInput.addEventListener('input', () => {
+                    currentPage = 1;
+                    renderTable();
+                });
+
+                filterSelect.addEventListener('change', () => {
+                    currentPage = 1;
+                    renderTable();
+                });
+
+                renderTable();
             });
         </script>
     @endpush
