@@ -87,6 +87,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    
+    // ADD THESE RECEIPT ROUTES:
+    Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloadReceipt'])->name('orders.receipt.download');
+    Route::get('/orders/{order}/receipt/preview', [OrderController::class, 'previewReceipt'])->name('orders.receipt.preview');
+
+    // ADD ALIASES FOR COMPATIBILITY:
+    Route::get('/orders/{order}/download-receipt', [OrderController::class, 'downloadReceipt'])->name('orders.download-receipt');
+    Route::get('/orders/{order}/preview-receipt', [OrderController::class, 'previewReceipt'])->name('orders.preview-receipt');
 
     // NEW PAYMENT ROUTES FOR ORDERS
     Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');

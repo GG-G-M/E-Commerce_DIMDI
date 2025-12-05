@@ -9,11 +9,13 @@ use App\Models\Product;
 use App\Notifications\OrderPlaced;
 use App\Notifications\OrderStatusUpdated;
 use App\Notifications\PaymentReceived;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+
+// Add this import for PDF
+use PDF;
 
 class OrderController extends Controller
 {
@@ -309,10 +311,33 @@ class OrderController extends Controller
                 $order->updateStatus('confirmed', 'Payment received via ' . $order->payment_method);
                 $order->reduceStock(); // Reduce stock for confirmed orders
                 
-                // Send status update notification + receipt link
+                // Create notification for payment success
                 if ($order->user) {
-                    $order->user->notify(new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
-                    $order->user->notify(new PaymentReceived($order));
+                    $notificationData = [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'message' => "Payment received for Order #{$order->order_number}. Your order is now being processed.",
+                        'icon' => 'fas fa-credit-card',
+                        'color' => 'success',
+                        'url' => route('orders.show', $order),
+                        'receipt_view_url' => route('orders.receipt.preview', $order),
+                        'receipt_download_url' => route('orders.receipt.download', $order),
+                        'status_display' => 'Payment Received',
+                        'amount' => '₱' . number_format($order->total_amount, 2),
+                        'time_ago' => 'Just now'
+                    ];
+                    
+                    // Create the notification record
+                    $order->user->notifications()->create([
+                        'type' => 'App\Notifications\PaymentReceived',
+                        'data' => $notificationData,
+                        'read_at' => null
+                    ]);
+                    
+                    // Also trigger the OrderStatusUpdated notification if you have it
+                    if (class_exists('App\Notifications\OrderStatusUpdated')) {
+                        $order->user->notify(new \App\Notifications\OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
+                    }
                 }
                 
                 // Clear selected items from cart if multi-select was used
@@ -330,7 +355,12 @@ class OrderController extends Controller
                 session()->forget('last_order_id');
                 
                 return redirect()->route('orders.show', $order)
-                    ->with('success', 'Payment completed successfully! Your order is now confirmed.');
+                    ->with('success', 'Payment completed successfully! Your order is now confirmed.')
+                    ->with('notification', [
+                        'type' => 'success',
+                        'message' => 'Payment successful! Check your notifications for details.',
+                        'order_number' => $order->order_number
+                    ]);
             }
         }
         
@@ -391,8 +421,8 @@ class OrderController extends Controller
 
         $order->load(['items.product', 'user']);
 
-        // Generate PDF
-        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        // Generate PDF using the alias
+        $pdf = PDF::loadView('receipt.pdf', compact('order'));
         
         return $pdf->download("receipt-{$order->order_number}.pdf");
     }
@@ -407,8 +437,8 @@ class OrderController extends Controller
 
         $order->load(['items.product', 'user']);
 
-        // Generate PDF
-        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        // Generate PDF using the alias
+        $pdf = PDF::loadView('receipt.pdf', compact('order'));
         
         return $pdf->stream("receipt-{$order->order_number}.pdf");
     }
