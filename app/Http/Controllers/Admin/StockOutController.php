@@ -8,7 +8,6 @@ use App\Models\ProductVariant;
 use App\Models\StockIn;
 use App\Models\StockOut;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class StockOutController extends Controller
 {
@@ -24,7 +23,7 @@ class StockOutController extends Controller
         return view('admin.stock_out.index', compact('stockOuts', 'products', 'variants'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $isAuto = false)
     {
         $request->validate([
             'product_id' => 'nullable|exists:products,id',
@@ -34,13 +33,14 @@ class StockOutController extends Controller
         ]);
 
         // If variant is selected, force product_id to match variant
+        $variant = null;
         if ($request->product_variant_id) {
             $variant = ProductVariant::find($request->product_variant_id);
             $request->merge(['product_id' => $variant->product_id]);
         }
 
-        // Prevent selecting ONLY product with variant stock-in existing
-        if ($request->product_id && !$request->product_variant_id) {
+        // Prevent selecting only product if variant stock exists (manual mode)
+        if (!$isAuto && $request->product_id && !$request->product_variant_id) {
             $variantStockExists = StockIn::where('product_id', $request->product_id)
                 ->whereNotNull('product_variant_id')
                 ->exists();
@@ -52,7 +52,7 @@ class StockOutController extends Controller
             }
         }
 
-        // Create Stock Out
+        // Create Stock Out record
         $stockOut = StockOut::create($request->only([
             'product_id',
             'product_variant_id',
@@ -62,14 +62,12 @@ class StockOutController extends Controller
 
         $quantityToDeduct = $request->quantity;
 
-        // Strict batch matching logic
+        // FIFO batch deduction
         $stockInBatches = StockIn::where('product_id', $request->product_id)
-            ->when($request->product_variant_id, fn($q) =>
-                $q->where('product_variant_id', $request->product_variant_id)
-            )
-            ->when(!$request->product_variant_id, fn($q) =>
-                $q->whereNull('product_variant_id') // Product-level-only stock-in
-            )
+            ->when($request->product_variant_id, fn($q) => $q->where('product_variant_id', $request->product_variant_id))
+            ->when(!$request->product_variant_id, fn($q) => $q->where(function ($q2) {
+                $q2->whereNull('product_variant_id')->orWhereNotNull('product_variant_id');
+            }))
             ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -81,6 +79,13 @@ class StockOutController extends Controller
 
             $batch->decrement('remaining_quantity', $deducted);
 
+            // Deduct stock from variant or main product
+            if ($request->product_variant_id) {
+                $variant->decrement('stock_quantity', $deducted);
+            } else {
+                Product::where('id', $request->product_id)->decrement('stock_quantity', $deducted);
+            }
+
             $stockOut->stockInBatches()->attach($batch->id, [
                 'deducted_quantity' => $deducted
             ]);
@@ -90,20 +95,20 @@ class StockOutController extends Controller
 
         if ($quantityToDeduct > 0) {
             $stockOut->delete();
+            if ($isAuto) {
+                throw new \Exception('Not enough stock available (FIFO).');
+            }
             return back()->withErrors(['quantity' => 'Not enough stock available (FIFO).']);
         }
 
-        // Final product/variant stock update
+        // Update parent product stock as sum of its variants
         if ($request->product_variant_id) {
-            $variant->update([
-                'stock_quantity' => StockIn::where('product_variant_id', $request->product_variant_id)->sum('remaining_quantity')
-            ]);
-        } else {
-            Product::find($request->product_id)->update([
-                'stock_quantity' => StockIn::where('product_id', $request->product_id)
-                    ->whereNull('product_variant_id')
-                    ->sum('remaining_quantity')
-            ]);
+            Product::where('id', $variant->product_id)
+                ->update(['stock_quantity' => ProductVariant::where('product_id', $variant->product_id)->sum('stock_quantity')]);
+        }
+
+        if ($isAuto) {
+            return $stockOut;
         }
 
         return redirect()->route('admin.stock_out.index')
@@ -119,30 +124,33 @@ class StockOutController extends Controller
             'reason' => 'nullable|string|max:255',
         ]);
 
+        $variant = null;
         if ($request->product_variant_id) {
             $variant = ProductVariant::find($request->product_variant_id);
             $request->merge(['product_id' => $variant->product_id]);
         }
 
-        // Restore previous deductions
+        // Restore previous stock
         foreach ($stockOut->stockInBatches as $batch) {
             $batch->increment('remaining_quantity', $batch->pivot->deducted_quantity);
         }
         $stockOut->stockInBatches()->detach();
 
         $stockOut->update($request->only([
-            'product_id', 'product_variant_id', 'quantity', 'reason'
+            'product_id',
+            'product_variant_id',
+            'quantity',
+            'reason'
         ]));
 
         $quantityToDeduct = $request->quantity;
 
+        // FIFO batch deduction
         $stockInBatches = StockIn::where('product_id', $request->product_id)
-            ->when($request->product_variant_id, fn($q) =>
-                $q->where('product_variant_id', $request->product_variant_id)
-            )
-            ->when(!$request->product_variant_id, fn($q) =>
-                $q->whereNull('product_variant_id')
-            )
+            ->when($request->product_variant_id, fn($q) => $q->where('product_variant_id', $request->product_variant_id))
+            ->when(!$request->product_variant_id, fn($q) => $q->where(function ($q2) {
+                $q2->whereNull('product_variant_id')->orWhereNotNull('product_variant_id');
+            }))
             ->where('remaining_quantity', '>', 0)
             ->orderBy('created_at', 'asc')
             ->get();
@@ -153,6 +161,12 @@ class StockOutController extends Controller
             $deducted = min($batch->remaining_quantity, $quantityToDeduct);
 
             $batch->decrement('remaining_quantity', $deducted);
+
+            if ($request->product_variant_id) {
+                $variant->decrement('stock_quantity', $deducted);
+            } else {
+                Product::where('id', $request->product_id)->decrement('stock_quantity', $deducted);
+            }
 
             $stockOut->stockInBatches()->attach($batch->id, [
                 'deducted_quantity' => $deducted
@@ -165,17 +179,10 @@ class StockOutController extends Controller
             return back()->withErrors(['quantity' => 'Not enough stock available (FIFO).']);
         }
 
-        // Update final stocks
+        // Update parent product stock as sum of its variants
         if ($request->product_variant_id) {
-            $variant->update([
-                'stock_quantity' => StockIn::where('product_variant_id', $request->product_variant_id)->sum('remaining_quantity')
-            ]);
-        } else {
-            Product::find($request->product_id)->update([
-                'stock_quantity' => StockIn::where('product_id', $request->product_id)
-                    ->whereNull('product_variant_id')
-                    ->sum('remaining_quantity')
-            ]);
+            Product::where('id', $variant->product_id)
+                ->update(['stock_quantity' => ProductVariant::where('product_id', $variant->product_id)->sum('stock_quantity')]);
         }
 
         return redirect()->route('admin.stock_out.index')
@@ -190,19 +197,17 @@ class StockOutController extends Controller
 
         $stockOut->stockInBatches()->detach();
 
-        // Update stock totals
+        // Restore stock
         if ($stockOut->product_variant_id) {
             $variant = ProductVariant::find($stockOut->product_variant_id);
-            $variant->update([
-                'stock_quantity' => StockIn::where('product_variant_id', $stockOut->product_variant_id)->sum('remaining_quantity')
-            ]);
+            $variant->increment('stock_quantity', $stockOut->quantity);
+
+            // Update parent product stock
+            Product::where('id', $variant->product_id)
+                ->update(['stock_quantity' => ProductVariant::where('product_id', $variant->product_id)->sum('stock_quantity')]);
         } else {
             $product = Product::find($stockOut->product_id);
-            $product->update([
-                'stock_quantity' => StockIn::where('product_id', $stockOut->product_id)
-                    ->whereNull('product_variant_id')
-                    ->sum('remaining_quantity')
-            ]);
+            $product->increment('stock_quantity', $stockOut->quantity);
         }
 
         $stockOut->delete();
@@ -221,7 +226,7 @@ class StockOutController extends Controller
             'reason' => $reason,
         ]);
 
-        return $this->store($request);
+        return $this->store($request, true);
     }
 
 }
