@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Notifications\OrderPlaced;
 use App\Notifications\OrderStatusUpdated;
+use App\Notifications\PaymentReceived;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -222,8 +223,9 @@ class OrderController extends Controller
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
                 $order->reduceStock(); // Reduce stock for confirmed orders
                 
-                // Send status update notification
+                // Send status update + receipt notification
                 $user->notify(new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment received via ' . ucfirst($request->payment_method)));
+                $user->notify(new PaymentReceived($order));
                 
                 // Clear selected items from cart if multi-select was used
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -307,9 +309,10 @@ class OrderController extends Controller
                 $order->updateStatus('confirmed', 'Payment received via ' . $order->payment_method);
                 $order->reduceStock(); // Reduce stock for confirmed orders
                 
-                // Send status update notification
+                // Send status update notification + receipt link
                 if ($order->user) {
                     $order->user->notify(new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
+                    $order->user->notify(new PaymentReceived($order));
                 }
                 
                 // Clear selected items from cart if multi-select was used

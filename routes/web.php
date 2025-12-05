@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::get('/{notification}/receipt', [NotificationController::class, 'viewReceipt'])->name('receipt.view');
+        Route::get('/{notification}/receipt/download', [NotificationController::class, 'downloadReceipt'])->name('receipt.download');
+        Route::get('/{notification}/receipt/preview', [NotificationController::class, 'previewReceipt'])->name('receipt.preview');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'clearAll'])->name('clearAll');
         Route::get('/list', [NotificationController::class, 'list'])->name('list');

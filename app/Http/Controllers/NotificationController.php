@@ -12,7 +12,7 @@ class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Auth::user()->notifications()->paginate(20);
+        $notifications = Auth::user()->notifications()->latest()->paginate(20);
         
         // Mark all as read when viewing all notifications
         Auth::user()->unreadNotifications->markAsRead();
@@ -52,7 +52,7 @@ class NotificationController extends Controller
 
     public function list()
     {
-        $notifications = Auth::user()->notifications()->take(5)->get();
+        $notifications = Auth::user()->notifications()->latest()->take(5)->get();
         
         return view('partials.notification-list', compact('notifications'))->render();
     }
