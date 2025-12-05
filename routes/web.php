@@ -32,6 +32,9 @@ use App\Http\Controllers\Delivery\DashboardController as DeliveryDashboardContro
 use App\Http\Controllers\Delivery\OrderController as DeliveryOrderController;
 use App\Http\Controllers\Delivery\ProfileController as DeliveryProfileController;
 
+// ADD THIS: Notification Controller
+use App\Http\Controllers\NotificationController;
+
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
@@ -92,6 +95,18 @@ Route::middleware('auth')->group(function () {
     // Rating
     Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+
+    // ADD THIS: Notification Routes
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [NotificationController::class, 'clearAll'])->name('clearAll');
+        Route::get('/list', [NotificationController::class, 'list'])->name('list');
+        Route::get('/check-new', [NotificationController::class, 'checkNew'])->name('checkNew');
+        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
+    });
 });
 
 // DELIVERY ROUTES (First come, first served system)
