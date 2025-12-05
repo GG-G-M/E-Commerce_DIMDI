@@ -52,6 +52,15 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// GOOGLE LOGIN
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+
+// FACEBOOK LOGIN
+Route::get('/auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('login.facebook');
+Route::get('/auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+
+
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -61,12 +70,14 @@ Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear')
 Route::post('/cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout-selected');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
+
 // Payment Routes - UPDATED SECTION
 Route::get('/payment/{order}/pay', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
 Route::post('/payment/{order}/process', [PaymentController::class, 'createIntent'])->name('payment.create-intent');
 Route::post('/payment/create-source', [PaymentController::class, 'createSource'])->name('payment.create-source');
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+
 
 // Address Routes
 Route::get('/address/provinces', [AddressController::class, 'provinces']);
@@ -109,6 +120,7 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+
 // DELIVERY ROUTES (First come, first served system)
 Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function () {
     // Dashboard
@@ -138,6 +150,7 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
+
 
 // Admin Routes (Role checking in controllers)
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
@@ -273,6 +286,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Developer: Authentication Sessions
     Route::get('/sessions', [SessionController::class, 'index'])->name('sessions.index');
 });
+
 
 // =============================================
 // SUPER ADMIN ROUTES (ADDED HERE)
