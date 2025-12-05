@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NotificationController extends Controller
 {
@@ -78,5 +80,98 @@ class NotificationController extends Controller
     {
         $count = Auth::user()->unreadNotifications()->count();
         return response()->json(['count' => $count]);
+    }
+
+    /**
+     * View receipt for an order notification
+     */
+    public function viewReceipt($notificationId)
+    {
+        $notification = Auth::user()->notifications()->where('id', $notificationId)->first();
+        
+        if (!$notification) {
+            abort(404);
+        }
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Get order from notification data
+        $orderId = $notification->data['order_id'] ?? null;
+        
+        if (!$orderId) {
+            abort(404);
+        }
+        
+        $order = Order::with(['items.product', 'user'])
+            ->where('id', $orderId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        return view('receipt.view', compact('order', 'notification'));
+    }
+
+    /**
+     * Download receipt PDF
+     */
+    public function downloadReceipt($notificationId)
+    {
+        $notification = Auth::user()->notifications()->where('id', $notificationId)->first();
+        
+        if (!$notification) {
+            abort(404);
+        }
+        
+        $orderId = $notification->data['order_id'] ?? null;
+        
+        if (!$orderId) {
+            abort(404);
+        }
+        
+        $order = Order::with(['items.product', 'user'])
+            ->where('id', $orderId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        // Generate PDF
+        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Download PDF
+        return $pdf->download("receipt-{$order->order_number}.pdf");
+    }
+
+    /**
+     * Preview receipt PDF in browser
+     */
+    public function previewReceipt($notificationId)
+    {
+        $notification = Auth::user()->notifications()->where('id', $notificationId)->first();
+        
+        if (!$notification) {
+            abort(404);
+        }
+        
+        $orderId = $notification->data['order_id'] ?? null;
+        
+        if (!$orderId) {
+            abort(404);
+        }
+        
+        $order = Order::with(['items.product', 'user'])
+            ->where('id', $orderId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+        
+        // Generate PDF
+        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Preview in browser
+        return $pdf->stream("receipt-{$order->order_number}.pdf");
     }
 }
