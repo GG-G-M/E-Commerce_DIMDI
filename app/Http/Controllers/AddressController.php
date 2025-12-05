@@ -125,4 +125,32 @@ class AddressController extends Controller
             return $code;
         }
     }
+
+    public static function getRegionName($provinceCode)
+    {
+        try {
+            // 1. Fetch province details
+            $res = Http::timeout(10)->get("https://psgc.gitlab.io/api/provinces/$provinceCode");
+
+            if ($res->successful()) {
+                $json = $res->json();
+
+                // The province JSON contains `regionCode`, not region object
+                $regionCode = $json['regionCode'] ?? null;
+
+                if ($regionCode) {
+                    // 2. Fetch region details
+                    $regionRes = Http::timeout(10)->get("https://psgc.gitlab.io/api/regions/$regionCode");
+
+                    if ($regionRes->successful()) {
+                        return $regionRes->json()['name'] ?? null;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Handle silently
+        }
+
+        return null;
+    }
 }

@@ -51,7 +51,7 @@ class RegisterController extends Controller
         // Fetch region name from province code if not provided
         $regionName = $request->region;
         if (!$regionName) {
-            $regionName = $this->getRegionFromProvince($request->province);
+            $regionName = AddressController::getRegionName($request->province);
         }
 
         // Create user
@@ -98,10 +98,17 @@ class RegisterController extends Controller
      */
     private function getRegionFromProvince($provinceCode)
     {
-        $res = Http::get("https://psgc.gitlab.io/api/provinces/$provinceCode");
-        if ($res->successful()) {
-            return $res->json()['region'] ?? '';
+        try {
+            $res = Http::timeout(10)->get("https://psgc.gitlab.io/api/provinces/$provinceCode");
+
+            if ($res->successful()) {
+                $data = $res->json();
+                return $data['region']['name'] ?? ''; // Correct field
+            }
+        } catch (\Exception $e) {
+            // optional: log
         }
+
         return '';
     }
 }
