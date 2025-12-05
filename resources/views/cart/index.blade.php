@@ -126,6 +126,23 @@
             font-size: 0.9rem;
             font-weight: 600;
         }
+
+        /* Price styling */
+        .sale-price {
+            color: #2C8F0C;
+            font-weight: bold;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .savings-text {
+            color: #dc3545;
+            font-weight: 600;
+        }
     </style>
 
     <div class="container py-4">
@@ -173,23 +190,45 @@
 
                                 // Calculate price based on actual variant
                                 $unitPrice = $currentVariant
-                                    ? $currentVariant->current_price
-                                    : $item->product->current_price;
+                                    ? ($currentVariant->has_discount ? $currentVariant->sale_price : $currentVariant->current_price)
+                                    : ($item->product->has_discount ? $item->product->sale_price : $item->product->current_price);
+                                
+                                // Store original price for summary calculation
+                                $originalUnitPrice = $currentVariant
+                                    ? $currentVariant->price
+                                    : $item->product->price;
+                                
+                                $hasDiscount = $currentVariant
+                                    ? $currentVariant->has_discount
+                                    : $item->product->has_discount;
+                                
+                                $discountPercent = $currentVariant
+                                    ? $currentVariant->discount_percentage
+                                    : $item->product->discount_percentage;
                             } else {
                                 // For products without variants, use product's own stock and price
-    $currentVariant = null;
-    $currentStock = $item->product->stock_quantity;
-    $variantName = 'Standard';
+                                $currentVariant = null;
+                                $currentStock = $item->product->stock_quantity;
+                                $variantName = 'Standard';
                                 $isVariantAvailable = $currentStock > 0;
                                 $maxQuantity = $currentStock;
                                 $displayImage = $item->product->image_url;
-                                $unitPrice = $item->product->current_price;
+                                $unitPrice = $item->product->has_discount ? $item->product->sale_price : $item->product->current_price;
+                                $originalUnitPrice = $item->product->price;
+                                $hasDiscount = $item->product->has_discount;
+                                $discountPercent = $item->product->discount_percentage;
                             }
 
                             $itemTotalPrice = $unitPrice * $item->quantity;
+                            $itemOriginalTotalPrice = $originalUnitPrice * $item->quantity;
                         @endphp
 
-                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}" data-item-id="{{ $item->id }}">
+                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}" data-item-id="{{ $item->id }}"
+                             data-unit-price="{{ $unitPrice }}"
+                             data-original-unit-price="{{ $originalUnitPrice }}"
+                             data-has-discount="{{ $hasDiscount ? '1' : '0' }}"
+                             data-discount-percent="{{ $discountPercent }}"
+                             data-quantity="{{ $item->quantity }}">
                             <div class="loading-spinner" id="loading-{{ $item->id }}">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
@@ -223,12 +262,18 @@
                                                         $variantNameOption =
                                                             $variant->size ?? ($variant->variant_name ?? 'Option');
                                                         $variantStock = $variant->stock_quantity ?? 0;
-                                                        $variantPrice =
-                                                            $variant->current_price ?? ($variant->price ?? 0);
+                                                        $variantPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
+                                                        $variantOriginalPrice = $variant->price;
+                                                        $variantHasDiscount = $variant->has_discount;
+                                                        $variantDiscountPercent = $variant->discount_percentage;
                                                         $variantImage = $variant->image_url;
                                                     @endphp
                                                     <option value="{{ $variantNameOption }}"
-                                                        data-price="{{ $variantPrice }}" data-image="{{ $variantImage }}"
+                                                        data-price="{{ $variantPrice }}"
+                                                        data-original-price="{{ $variantOriginalPrice }}"
+                                                        data-has-discount="{{ $variantHasDiscount ? 'true' : 'false' }}"
+                                                        data-discount-percent="{{ $variantDiscountPercent }}"
+                                                        data-image="{{ $variantImage }}"
                                                         data-stock="{{ $variantStock }}"
                                                         {{ $item->selected_size == $variantNameOption ? 'selected' : '' }}
                                                         {{ $variantStock <= 0 ? 'disabled' : '' }}>
@@ -236,8 +281,12 @@
                                                         @if ($variantStock <= 0)
                                                             (Out of Stock)
                                                         @else
-                                                            - ₱{{ number_format($variantPrice, 2) }} ({{ $variantStock }}
-                                                            available)
+                                                            @if($variantHasDiscount)
+                                                                - ₱{{ number_format($variantPrice, 2) }} <small class="text-muted"><del>₱{{ number_format($variantOriginalPrice, 2) }}</del></small>
+                                                            @else
+                                                                - ₱{{ number_format($variantPrice, 2) }}
+                                                            @endif
+                                                            ({{ $variantStock }} available)
                                                         @endif
                                                     </option>
                                                 @endforeach
@@ -294,14 +343,19 @@
                                     @endif
                                 </div>
                                 <div class="col-md-2 text-center">
-                                    <strong class="text-success item-total"
-                                        id="item-total-{{ $item->id }}">₱{{ number_format($itemTotalPrice, 2) }}</strong>
-                                    @if ($item->product->has_variants)
-                                        <br>
-                                        <small class="text-muted item-unit-price"
-                                            id="item-unit-{{ $item->id }}">₱{{ number_format($unitPrice, 2) }}
-                                            each</small>
-                                    @endif
+                                    <div class="d-flex flex-column align-items-center">
+                                        <!-- Only show current price on product card -->
+                                        <strong class="sale-price" id="item-total-{{ $item->id }}">
+                                            ₱{{ number_format($itemTotalPrice, 2) }}
+                                        </strong>
+                                        
+                                        @if($item->product->has_variants || $hasDiscount)
+                                            <br>
+                                            <small class="text-muted item-unit-price" id="item-unit-{{ $item->id }}">
+                                                ₱{{ number_format($unitPrice, 2) }} each
+                                            </small>
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="col-md-1 text-end">
                                     <form action="{{ route('cart.destroy', $item) }}" method="POST"
@@ -347,32 +401,46 @@
                         <h4 class="mb-4">Order Summary</h4>
 
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Subtotal (<span id="summary-quantity">{{ $cartItems->sum('quantity') }}</span> items):</span>
-                            <span id="summary-subtotal">₱{{ number_format($subtotal, 2) }}</span>
+                            <span>Subtotal (<span id="summary-quantity">0</span> items):</span>
+                            <span id="summary-subtotal">₱0.00</span>
                         </div>
 
+                        <!-- Original Total Price (if any discounts) -->
+                        <div id="original-price-row" style="display: none;">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Original Price:</span>
+                                <span class="original-price" id="summary-original">₱0.00</span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Discount Savings:</span>
+                                <span class="savings-text" id="summary-savings">-₱0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Fee -->
                         <div class="d-flex justify-content-between mb-2">
-                            <span>Tax (10%):</span>
-                            <span id="summary-tax">₱{{ number_format($tax, 2) }}</span>
+                            <span>Shipping:</span>
+                            <span id="summary-shipping">
+                                ₱10.00
+                            </span>
                         </div>
-
-                     
 
                         <hr>
 
                         <div class="d-flex justify-content-between mb-4">
                             <strong>Total:</strong>
-                            <strong class="text-success" id="summary-total">₱{{ number_format($total, 2) }}</strong>
+                            <strong class="text-success" id="summary-total">
+                                ₱0.00
+                            </strong>
                         </div>
 
-                        @if ($subtotal < 100)
-                            <div class="alert alert-info">
-                                <small>
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Add ₱{{ number_format(100 - $subtotal, 2) }} more for free shipping!
-                                </small>
-                            </div>
-                        @endif
+                        <div id="free-shipping-alert" class="alert alert-info" style="display: none;">
+                            <small>
+                                <i class="fas fa-info-circle me-2"></i>
+                                Add ₱<span id="remaining-amount">0.00</span> more for free shipping!
+                            </small>
+                        </div>
 
                         <!-- Check if any items are out of stock -->
                         @php
@@ -380,14 +448,12 @@
                                 $hasVariants = $item->product->has_variants && $item->product->variants->count() > 0;
 
                                 if ($hasVariants) {
-                                    // For products with variants, check the selected variant's stock
-        $variant = $item->product->variants->first(function ($v) use ($item) {
-            return $v->size === $item->selected_size ||
-                $v->variant_name === $item->selected_size;
-        });
-        return !$variant || ($variant->stock_quantity ?? 0) <= 0;
-    } else {
-        // For products without variants, check the product's stock
+                                    $variant = $item->product->variants->first(function ($v) use ($item) {
+                                        return $v->size === $item->selected_size ||
+                                            $v->variant_name === $item->selected_size;
+                                    });
+                                    return !$variant || ($variant->stock_quantity ?? 0) <= 0;
+                                } else {
                                     return ($item->product->stock_quantity ?? 0) <= 0;
                                 }
                             });
@@ -405,7 +471,7 @@
                                 <i class="fas fa-lock me-2"></i>Update Cart to Checkout
                             </button>
                         @else
-                            <button type="button" id="proceed-checkout-btn" class="btn btn-primary w-100 btn-lg">
+                            <button type="button" id="proceed-checkout-btn" class="btn btn-primary w-100 btn-lg" disabled>
                                 <i class="fas fa-lock me-2"></i>Proceed to Checkout
                             </button>
                         @endif
@@ -433,6 +499,9 @@
                 }
 
                 const variantPrice = parseFloat(selectedOption.getAttribute('data-price'));
+                const variantOriginalPrice = parseFloat(selectedOption.getAttribute('data-original-price'));
+                const variantHasDiscount = selectedOption.getAttribute('data-has-discount') === 'true';
+                const variantDiscountPercent = selectedOption.getAttribute('data-discount-percent');
                 const variantImage = selectedOption.getAttribute('data-image');
                 const variantStock = parseInt(selectedOption.getAttribute('data-stock'));
 
@@ -440,14 +509,28 @@
                 const quantityElement = document.querySelector(`#cart-item-${itemId} .quantity-input`);
                 const quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
 
-                // Update price display immediately
+                // Calculate totals
                 const itemTotal = variantPrice * quantity;
-                document.getElementById(`item-total-${itemId}`).textContent = `$${itemTotal.toFixed(2)}`;
 
+                // Update price display immediately
+                const itemTotalElement = document.getElementById(`item-total-${itemId}`);
                 const unitPriceElement = document.getElementById(`item-unit-${itemId}`);
+
+                // Update sale price
+                itemTotalElement.textContent = `₱${itemTotal.toFixed(2)}`;
+                
+                // Update unit price
                 if (unitPriceElement) {
-                    unitPriceElement.textContent = `$${variantPrice.toFixed(2)} each`;
+                    unitPriceElement.textContent = `₱${variantPrice.toFixed(2)} each`;
                 }
+
+                // Update cart item data attributes
+                const cartItem = document.getElementById(`cart-item-${itemId}`);
+                cartItem.setAttribute('data-unit-price', variantPrice);
+                cartItem.setAttribute('data-original-unit-price', variantOriginalPrice);
+                cartItem.setAttribute('data-has-discount', variantHasDiscount ? '1' : '0');
+                cartItem.setAttribute('data-discount-percent', variantDiscountPercent);
+                cartItem.setAttribute('data-quantity', quantity);
 
                 // Update image immediately if variant has specific image
                 const itemImage = document.getElementById(`item-image-${itemId}`);
@@ -479,7 +562,6 @@
                             if (data.success) {
                                 // Update cart count if provided
                                 if (data.cart_count !== undefined) {
-                                    // Update cart count in header if you have one
                                     const cartCountElements = document.querySelectorAll('.cart-count');
                                     cartCountElements.forEach(el => {
                                         el.textContent = data.cart_count;
@@ -494,7 +576,6 @@
                                 // Show error message
                                 if (data.message) {
                                     showToast('error', data.message);
-                                    // Revert the selection on error
                                     location.reload();
                                 }
                             }
@@ -536,7 +617,6 @@
 
         // Toast notification function
         function showToast(type, message) {
-            // Create toast container if it doesn't exist
             let toastContainer = document.getElementById('toast-container');
             if (!toastContainer) {
                 toastContainer = document.createElement('div');
@@ -567,7 +647,6 @@
             const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
 
-            // Remove toast from DOM after it's hidden
             toast.addEventListener('hidden.bs.toast', () => {
                 toast.remove();
             });
@@ -579,46 +658,116 @@
             const itemCheckboxes = document.querySelectorAll('.item-checkbox');
             const checkoutBtn = document.getElementById('proceed-checkout-btn');
             const selectedCountSpan = document.getElementById('selected-count');
+            
+            // Summary elements
+            const summaryQuantity = document.getElementById('summary-quantity');
+            const summarySubtotal = document.getElementById('summary-subtotal');
+            const summaryOriginal = document.getElementById('summary-original');
+            const summarySavings = document.getElementById('summary-savings');
+            const summaryShipping = document.getElementById('summary-shipping');
+            const summaryTotal = document.getElementById('summary-total');
+            const originalPriceRow = document.getElementById('original-price-row');
+            const freeShippingAlert = document.getElementById('free-shipping-alert');
+            const remainingAmount = document.getElementById('remaining-amount');
+
+            // Function to calculate summary for selected items
+            function calculateSummary(selectedIds) {
+                let subtotal = 0;
+                let originalTotal = 0;
+                let quantity = 0;
+                let hasDiscount = false;
+
+                // If no items selected, return all zeros
+                if (selectedIds.length === 0) {
+                    return {
+                        subtotal: 0,
+                        originalTotal: 0,
+                        quantity: 0,
+                        hasDiscount: false,
+                        savings: 0,
+                        shipping: 10,
+                        total: 10
+                    };
+                }
+
+                // Calculate based on selected items
+                selectedIds.forEach(itemId => {
+                    const cartItem = document.getElementById(`cart-item-${itemId}`);
+                    if (cartItem) {
+                        const unitPrice = parseFloat(cartItem.getAttribute('data-unit-price')) || 0;
+                        const originalUnitPrice = parseFloat(cartItem.getAttribute('data-original-unit-price')) || 0;
+                        const itemHasDiscount = cartItem.getAttribute('data-has-discount') === '1';
+                        const itemQuantity = parseInt(cartItem.getAttribute('data-quantity')) || 1;
+                        
+                        quantity += itemQuantity;
+                        subtotal += unitPrice * itemQuantity;
+                        originalTotal += originalUnitPrice * itemQuantity;
+                        
+                        if (itemHasDiscount) {
+                            hasDiscount = true;
+                        }
+                    }
+                });
+
+                const savings = originalTotal - subtotal;
+                const shipping = subtotal >= 100 ? 0 : 10;
+                const total = subtotal + shipping;
+
+                return {
+                    subtotal,
+                    originalTotal,
+                    quantity,
+                    hasDiscount,
+                    savings,
+                    shipping,
+                    total
+                };
+            }
+
+            // Function to update summary display
+            function updateSummary(selectedIds) {
+                const summary = calculateSummary(selectedIds);
+                
+                // Update display
+                summaryQuantity.textContent = summary.quantity;
+                summarySubtotal.textContent = '₱' + summary.subtotal.toFixed(2);
+                
+                // Show/hide original price and savings
+                if (summary.hasDiscount && summary.savings > 0) {
+                    originalPriceRow.style.display = 'block';
+                    summaryOriginal.textContent = '₱' + summary.originalTotal.toFixed(2);
+                    summarySavings.textContent = '-₱' + summary.savings.toFixed(2);
+                } else {
+                    originalPriceRow.style.display = 'none';
+                }
+                
+                // Update shipping
+                if (summary.subtotal >= 100) {
+                    summaryShipping.innerHTML = '<span class="text-success">FREE</span>';
+                    freeShippingAlert.style.display = 'none';
+                } else {
+                    summaryShipping.textContent = '₱10.00';
+                    freeShippingAlert.style.display = 'block';
+                    remainingAmount.textContent = (100 - summary.subtotal).toFixed(2);
+                }
+                
+                // Update total
+                summaryTotal.textContent = '₱' + summary.total.toFixed(2);
+                
+                // Update checkout button
+                checkoutBtn.disabled = selectedIds.length === 0;
+            }
 
             function updateSelection() {
                 const checkedItems = document.querySelectorAll('.item-checkbox:checked');
                 const checkedCount = checkedItems.length;
+                const selectedIds = Array.from(checkedItems).map(cb => cb.getAttribute('data-item-id'));
 
                 // Update count
                 selectedCountSpan.textContent = checkedCount;
 
-                // Calculate totals for selected items
-                let selectedSubtotal = 0;
-                checkedItems.forEach(checkbox => {
-                    const itemId = checkbox.getAttribute('data-item-id');
-                    const cartItem = document.getElementById(`cart-item-${itemId}`);
-                    const totalPriceElement = cartItem.querySelector('.item-total');
-                    if (totalPriceElement) {
-                        // Extract price from text (e.g., "₱1,234.56" -> 1234.56)
-                        const priceText = totalPriceElement.textContent.replace(/[₱,]/g, '');
-                        selectedSubtotal += parseFloat(priceText) || 0;
-                    }
-                });
-
-                // Update summary display
-                const selectedQuantity = Array.from(checkedItems).reduce((sum, checkbox) => {
-                    const itemId = checkbox.getAttribute('data-item-id');
-                    const cartItem = document.getElementById(`cart-item-${itemId}`);
-                    const quantityElement = cartItem.querySelector('.quantity-input');
-                    return sum + (parseInt(quantityElement?.textContent) || 0);
-                }, 0);
-
-                const selectedTax = selectedSubtotal * 0.10;
-                const selectedShipping = selectedSubtotal > 100 ? 0 : 10;
-                const selectedTotal = selectedSubtotal + selectedTax + selectedShipping;
-
-                document.getElementById('summary-quantity').textContent = selectedQuantity;
-                document.getElementById('summary-subtotal').textContent = '₱' + selectedSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                document.getElementById('summary-tax').textContent = '₱' + selectedTax.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                document.getElementById('summary-total').textContent = '₱' + selectedTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-                // Disable/enable checkout button based on selection
-                checkoutBtn.disabled = checkedCount === 0;
+                // Update summary based on selected items
+                updateSummary(selectedIds);
 
                 // Update select all checkbox
                 if (checkedCount === itemCheckboxes.length && itemCheckboxes.length > 0) {
@@ -644,7 +793,7 @@
                 });
             }
 
-            // Select all handler
+            // Select all handler - selects ALL items when checked
             selectAllCheckbox.addEventListener('change', function() {
                 itemCheckboxes.forEach(checkbox => {
                     checkbox.checked = this.checked;
@@ -662,7 +811,6 @@
                 const selectedIds = Array.from(document.querySelectorAll('.item-checkbox:checked'))
                     .map(cb => cb.getAttribute('data-item-id'));
 
-                // Only proceed if items are selected (button should be disabled if not, but just in case)
                 if (selectedIds.length === 0) {
                     return;
                 }
@@ -696,6 +844,9 @@
                     checkoutBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
                 });
             });
+            
+            // Initialize with no items selected
+            updateSelection();
         });
     </script>
 @endsection

@@ -41,7 +41,6 @@ class User extends Authenticatable
         'password' => 'hashed',
         'is_active' => 'boolean',
     ];
-
     // Role constants
     const ROLE_SUPER_ADMIN = 'super_admin';
     const ROLE_ADMIN = 'admin';
@@ -49,6 +48,9 @@ class User extends Authenticatable
     const ROLE_CUSTOMER = 'customer';
 
     // Add accessor for full name
+
+    // Accessor for full name
+
     public function getNameAttribute()
     {
         $names = [$this->first_name];
@@ -79,7 +81,9 @@ class User extends Authenticatable
         return $this->role === self::ROLE_SUPER_ADMIN;
     }
 
-    public function isAdmin()
+    // Role checks
+    public function isAdmin(): bool
+
     {
         return $this->role === self::ROLE_ADMIN;
     }
