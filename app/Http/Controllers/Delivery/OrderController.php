@@ -19,7 +19,8 @@ class OrderController extends Controller
                       ->whereIn('order_status', ['shipped', 'out_for_delivery']);
             })
             ->orWhere(function($query) {
-                $query->where('order_status', 'processing')
+                // CHANGE: From 'processing' to 'confirmed'
+                $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id');
             })
             ->with(['user', 'orderItems.product'])
@@ -31,7 +32,8 @@ class OrderController extends Controller
 
     public function pickup()
     {
-        $orders = Order::where('order_status', 'processing')
+        // CHANGE: From 'processing' to 'confirmed'
+        $orders = Order::where('order_status', 'confirmed')
             ->whereNull('delivery_id')
             ->with(['user', 'orderItems.product'])
             ->orderBy('created_at', 'desc')
@@ -54,17 +56,29 @@ class OrderController extends Controller
     }
 
     public function myOrders()
-    {
-        $deliveryUserId = Auth::id();
-        
-        $orders = Order::where('delivery_id', $deliveryUserId)
-            ->whereIn('order_status', ['shipped', 'out_for_delivery'])
-            ->with(['user', 'orderItems.product'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(9);
-
+{
+    $deliveryUser = Auth::user();
+    
+    // Get deliveries table ID by email
+    $deliveryEntry = DB::table('deliveries')->where('email', $deliveryUser->email)->first();
+    
+    if (!$deliveryEntry) {
+        // Return empty if not found in deliveries table
+        $orders = collect([]);
         return view('delivery.orders.my-orders', compact('orders'));
     }
+    
+    $deliveriesTableId = $deliveryEntry->id;
+    
+    // Get orders assigned to this delivery person (using deliveries table ID)
+    $orders = Order::where('delivery_id', $deliveriesTableId)
+        ->whereIn('order_status', ['shipped', 'out_for_delivery'])
+        ->with(['user', 'orderItems.product'])
+        ->orderBy('created_at', 'desc')
+        ->paginate(9);
+
+    return view('delivery.orders.my-orders', compact('orders'));
+}
 
     public function show(Order $order)
     {
@@ -82,36 +96,53 @@ class OrderController extends Controller
         return view('delivery.orders.show', compact('order'));
     }
 
-    public function markAsPickedUp(Order $order, Request $request)
-    {
-        $deliveryUserId = Auth::id();
-        
-        // Check if order can be picked up using model method
-        if (!$order->canBePickedUp()) {
-            return redirect()->back()->with('error', 'This order is no longer available for pickup.');
-        }
-
-        try {
-            // ✅ FIX: Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
-            DB::transaction(function () use ($order, $deliveryUserId) {
-                // First assign delivery person and update timestamps
-                $order->update([
-                    'delivery_id' => $deliveryUserId,
-                    'picked_up_at' => now(),
-                    'assigned_at' => now(),
-                ]);
-                
-                // ✅ USE updateStatus (same as admin) - This creates timeline entries!
-                $order->updateStatus('shipped', 'Order picked up by delivery personnel');
-            });
-
-            return redirect()->route('delivery.orders.index')
-                ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
-        }
+   // In app/Http\Controllers\Delivery\OrderController.php
+public function markAsPickedUp(Order $order, Request $request)
+{
+    $deliveryUser = Auth::user();
+    
+    // Get the deliveries table ID by email (since there's no user_id column)
+    $deliveryEntry = DB::table('deliveries')->where('email', $deliveryUser->email)->first();
+    
+    if (!$deliveryEntry) {
+        \Log::error('Delivery staff not found in deliveries table', [
+            'user_id' => $deliveryUser->id,
+            'email' => $deliveryUser->email
+        ]);
+        return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
     }
+    
+    $deliveriesTableId = $deliveryEntry->id;
+    
+    // Check if order can be picked up using model method
+    if (!$order->canBePickedUp()) {
+        return redirect()->back()->with('error', 'This order is no longer available for pickup.');
+    }
+
+    try {
+        DB::transaction(function () use ($order, $deliveriesTableId) {
+            // Use deliveries table ID
+            $order->update([
+                'delivery_id' => $deliveriesTableId, // This is from deliveries table
+                'picked_up_at' => now(),
+                'assigned_at' => now(),
+            ]);
+            
+            $order->updateStatus('shipped', 'Order picked up by delivery personnel');
+        });
+
+        return redirect()->route('delivery.orders.index')
+            ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
+
+    } catch (\Exception $e) {
+        \Log::error('Failed to mark order as picked up', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+    }
+}
+    
 
     public function markAsDelivered(Order $order, Request $request)
     {
@@ -200,7 +231,8 @@ class OrderController extends Controller
                 ->whereIn('order_status', ['shipped', 'out_for_delivery'])
                 ->count(),
                 
-            'available_for_pickup' => Order::where('order_status', 'processing')
+            // CHANGE: From 'processing' to 'confirmed'
+            'available_for_pickup' => Order::where('order_status', 'confirmed')
                 ->whereNull('delivery_id')
                 ->count(),
                 
@@ -232,7 +264,8 @@ class OrderController extends Controller
                       });
             })
             ->orWhere(function($query) use ($search) {
-                $query->where('order_status', 'processing')
+                // CHANGE: From 'processing' to 'confirmed'
+                $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id')
                       ->where(function($q) use ($search) {
                           $q->where('order_number', 'like', "%{$search}%")

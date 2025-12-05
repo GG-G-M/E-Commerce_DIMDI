@@ -84,7 +84,8 @@ class Order extends Model
     // Scopes
     public function scopeReadyForDelivery($query)
     {
-        return $query->whereIn('order_status', ['confirmed', 'processing', 'shipped'])
+        // CHANGED: Removed 'processing', now only 'confirmed' and 'shipped'
+        return $query->whereIn('order_status', ['confirmed', 'shipped'])
                     ->whereNull('delivery_id');
     }
 
@@ -210,7 +211,8 @@ class Order extends Model
             $this->restoreStock();
         }
 
-        if (in_array($status, ['confirmed', 'processing'])) {
+        // CHANGED: Now only reduces stock on 'confirmed' status
+        if ($status === 'confirmed') {
             $this->reduceStock();
         }
 
@@ -347,7 +349,8 @@ class Order extends Model
      */
     public function canAssignToDelivery(): bool
     {
-        return in_array($this->order_status, ['confirmed', 'processing', 'shipped']) 
+        // CHANGED: Removed 'processing', now only 'confirmed' and 'shipped'
+        return in_array($this->order_status, ['confirmed', 'shipped']) 
                && !$this->delivery_id;
     }
 
@@ -365,7 +368,8 @@ class Order extends Model
      */
     public function canBeCancelled(): bool
     {
-        return in_array($this->order_status, ['pending', 'confirmed', 'processing']);
+        // CHANGED: Removed 'processing', now only 'pending' and 'confirmed'
+        return in_array($this->order_status, ['pending', 'confirmed']);
     }
 
     /**
@@ -477,7 +481,8 @@ class Order extends Model
      */
     public function canBePickedUp(): bool
     {
-        return $this->order_status === 'processing' && is_null($this->delivery_id);
+        // CHANGED: From 'processing' to 'confirmed'
+        return $this->order_status === 'confirmed' && is_null($this->delivery_id);
     }
 
     /**
@@ -546,7 +551,8 @@ class Order extends Model
      */
     public function scopeAvailableForPickup($query)
     {
-        return $query->where('order_status', 'processing')
+        // CHANGED: From 'processing' to 'confirmed'
+        return $query->where('order_status', 'confirmed')
                     ->whereNull('delivery_id');
     }
 
@@ -567,6 +573,7 @@ class Order extends Model
         return $query->where('delivery_id', $deliveryId)
                     ->whereIn('order_status', ['shipped', 'out_for_delivery']);
     }
+    
     // Add this to your Order model
     public function deliveryRecords()
     {
