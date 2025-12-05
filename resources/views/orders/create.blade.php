@@ -16,6 +16,11 @@
             $fullAddress = !empty($addressParts) ? implode(', ', $addressParts) : '';
             $hasAddress = !empty($fullAddress);
             $hasPhone = !empty($user->phone);
+            
+            // Calculate totals
+            $subtotal = $cartItems->sum('total_price');
+            $shipping = $subtotal >= 100 ? 0 : 10;
+            $total = $subtotal + $shipping;
         @endphp
 
         <!-- Address Warning Alert -->
@@ -223,19 +228,31 @@
 
                                 <div class="d-flex justify-content-between mb-3">
                                     <span>Shipping:</span>
-                                    <span class="text-success">₱{{ number_format($shipping, 2) }}</span>
+                                    <span class="text-success">
+                                        @if ($subtotal >= 100)
+                                            <span class="text-success">FREE</span>
+                                        @else
+                                            ₱{{ number_format($shipping, 2) }}
+                                        @endif
+                                    </span>
                                 </div>
                                 
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Tax (10%):</span>
-                                    <span class="text-success">₱{{ number_format($subtotal * 0.10, 2) }}</span>
-                                </div>
+                                <!-- REMOVED TAX SECTION -->
                                 
                                 <hr class="my-3">
                                 <div class="d-flex justify-content-between mb-3">
                                     <strong class="fs-5">Total:</strong>
-                                    <strong class="text-success fs-5">₱{{ number_format($subtotal + $shipping + ($subtotal * 0.10), 2) }}</strong>
+                                    <strong class="text-success fs-5">₱{{ number_format($total, 2) }}</strong>
                                 </div>
+                                
+                                @if ($subtotal < 100)
+                                    <div class="alert alert-info py-2">
+                                        <small>
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Add ₱{{ number_format(100 - $subtotal, 2) }} more for free shipping!
+                                        </small>
+                                    </div>
+                                @endif
                             </div>
 
                             <button type="submit" class="btn w-100 btn-lg text-white" style="background-color: #2C8F0C;"
@@ -400,6 +417,18 @@
         
         .border-success {
             border-color: #2C8F0C !important;
+        }
+        
+        /* Discount styling for original price */
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .savings-text {
+            color: #dc3545;
+            font-weight: 600;
         }
     </style>
 @endsection

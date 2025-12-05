@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Cart;
+use App\Notifications\PaymentReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -119,6 +120,11 @@ class PaymentController extends Controller
             
             // Use the Order model's updateStatus method to properly update status and timeline
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
+            
+            // Notify customer with receipt links
+            if ($order->user) {
+                $order->user->notify(new PaymentReceived($order));
+            }
             
             // Reduce stock for confirmed orders
             $order->reduceStock();
