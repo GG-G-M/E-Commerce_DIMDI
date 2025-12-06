@@ -317,11 +317,50 @@ class Order extends Model
      */
     public function reduceStock(): self
     {
+        // Load items with product and variants relationships if not already loaded
+        if (!$this->relationLoaded('items')) {
+            $this->load('items.product.variants');
+        } else {
+            // If items are loaded but product/variants aren't, load them
+            foreach ($this->items as $item) {
+                if (!$item->relationLoaded('product')) {
+                    $item->load('product.variants');
+                } elseif ($item->product && !$item->product->relationLoaded('variants')) {
+                    $item->product->load('variants');
+                }
+            }
+        }
+
         foreach ($this->items as $item) {
-            if ($item->product) {
-                // Make sure we don't reduce below 0
-                $newStock = max(0, $item->product->stock - $item->quantity);
-                $item->product->update(['stock' => $newStock]);
+            if (!$item->product) {
+                continue;
+            }
+
+            $product = $item->product;
+            $quantity = $item->quantity;
+
+            // Check if this item has a variant (selected_size)
+            if ($item->selected_size && $product->has_variants) {
+                // Find the variant by matching selected_size with variant_name
+                $variant = $product->variants->first(function($v) use ($item) {
+                    return ($v->variant_name === $item->selected_size) || 
+                           (isset($v->size) && $v->size === $item->selected_size);
+                });
+
+                if ($variant) {
+                    // Deduct from variant stock only
+                    $newVariantStock = max(0, $variant->stock_quantity - $quantity);
+                    $variant->update(['stock_quantity' => $newVariantStock]);
+                    
+                    // Update base product stock to reflect the sum of all variants (if method exists)
+                    if (method_exists($product, 'updateTotalStock')) {
+                        $product->updateTotalStock();
+                    }
+                }
+            } else {
+                // For products without variants, deduct from base product stock_quantity
+                $newStock = max(0, $product->stock_quantity - $quantity);
+                $product->update(['stock_quantity' => $newStock]);
             }
         }
 
@@ -333,9 +372,48 @@ class Order extends Model
      */
     public function restoreStock(): self
     {
+        // Load items with product and variants relationships if not already loaded
+        if (!$this->relationLoaded('items')) {
+            $this->load('items.product.variants');
+        } else {
+            // If items are loaded but product/variants aren't, load them
+            foreach ($this->items as $item) {
+                if (!$item->relationLoaded('product')) {
+                    $item->load('product.variants');
+                } elseif ($item->product && !$item->product->relationLoaded('variants')) {
+                    $item->product->load('variants');
+                }
+            }
+        }
+
         foreach ($this->items as $item) {
-            if ($item->product) {
-                $item->product->increment('stock', $item->quantity);
+            if (!$item->product) {
+                continue;
+            }
+
+            $product = $item->product;
+            $quantity = $item->quantity;
+
+            // Check if this item has a variant (selected_size)
+            if ($item->selected_size && $product->has_variants) {
+                // Find the variant by matching selected_size with variant_name
+                $variant = $product->variants->first(function($v) use ($item) {
+                    return ($v->variant_name === $item->selected_size) || 
+                           (isset($v->size) && $v->size === $item->selected_size);
+                });
+
+                if ($variant) {
+                    // Restore variant stock only
+                    $variant->increment('stock_quantity', $quantity);
+                    
+                    // Update base product stock to reflect the sum of all variants (if method exists)
+                    if (method_exists($product, 'updateTotalStock')) {
+                        $product->updateTotalStock();
+                    }
+                }
+            } else {
+                // For products without variants, restore base product stock_quantity
+                $product->increment('stock_quantity', $quantity);
             }
         }
 

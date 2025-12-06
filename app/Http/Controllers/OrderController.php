@@ -222,8 +222,8 @@ class OrderController extends Controller
                 
             } else {
                 // For card/bank transfer, update status and reduce stock immediately
+                // Note: updateStatus('confirmed') already calls reduceStock() internally
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
-                $order->reduceStock(); // Reduce stock for confirmed orders
                 
                 // Send status update + receipt notification
                 $user->notify(new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment received via ' . ucfirst($request->payment_method)));
@@ -308,8 +308,8 @@ class OrderController extends Controller
                 ]);
                 
                 // Use the model's updateStatus method to update order status and create timeline
+                // Note: updateStatus('confirmed') already calls reduceStock() internally
                 $order->updateStatus('confirmed', 'Payment received via ' . $order->payment_method);
-                $order->reduceStock(); // Reduce stock for confirmed orders
                 
                 // Create notification for payment success
                 if ($order->user) {
