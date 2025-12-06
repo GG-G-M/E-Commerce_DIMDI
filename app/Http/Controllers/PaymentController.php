@@ -122,11 +122,14 @@ class PaymentController extends Controller
             // Note: updateStatus('confirmed') already calls reduceStock() internally
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
             
+<<<<<<< HEAD
             // Notify customer with receipt links
             if ($order->user) {
                 $order->user->notify(new PaymentReceived($order));
             }
             
+=======
+>>>>>>> 8e0195a (fixed products stocks count (with minimal error))
             // Clear selected items from cart if multi-select was used
             $selectedItemIds = session()->get('selected_cart_items');
             if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {

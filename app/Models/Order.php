@@ -332,6 +332,7 @@ class Order extends Model
         }
 
         foreach ($this->items as $item) {
+<<<<<<< HEAD
             if (!$item->product) {
                 continue;
             }
@@ -361,6 +362,31 @@ class Order extends Model
                 // For products without variants, deduct from base product stock_quantity
                 $newStock = max(0, $product->stock_quantity - $quantity);
                 $product->update(['stock_quantity' => $newStock]);
+=======
+            if ($item->product) {
+                // If a variant was selected, deduct from variant stock
+                if ($item->selected_size) {
+                    $variant = $item->product->variants()
+                        ->where('variant_name', $item->selected_size)
+                        ->first();
+
+                    if ($variant) {
+                        // Deduct from variant stock
+                        $newVariantStock = max(0, $variant->stock_quantity - $item->quantity);
+                        $variant->update(['stock_quantity' => $newVariantStock]);
+
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
+                    }
+                } else {
+                    // No variant selected, deduct from main product stock
+                    $newStock = max(0, $item->product->stock_quantity - $item->quantity);
+                    $item->product->update(['stock_quantity' => $newStock]);
+                }
+>>>>>>> 8e0195a (fixed products stocks count (with minimal error))
             }
         }
 
@@ -387,6 +413,7 @@ class Order extends Model
         }
 
         foreach ($this->items as $item) {
+<<<<<<< HEAD
             if (!$item->product) {
                 continue;
             }
@@ -414,6 +441,29 @@ class Order extends Model
             } else {
                 // For products without variants, restore base product stock_quantity
                 $product->increment('stock_quantity', $quantity);
+=======
+            if ($item->product) {
+                // If a variant was selected, restore to variant stock
+                if ($item->selected_size) {
+                    $variant = $item->product->variants()
+                        ->where('variant_name', $item->selected_size)
+                        ->first();
+
+                    if ($variant) {
+                        // Restore to variant stock
+                        $variant->increment('stock_quantity', $item->quantity);
+
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
+                    }
+                } else {
+                    // No variant selected, restore to main product stock
+                    $item->product->increment('stock_quantity', $item->quantity);
+                }
+>>>>>>> 8e0195a (fixed products stocks count (with minimal error))
             }
         }
 

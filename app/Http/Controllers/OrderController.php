@@ -224,10 +224,13 @@ class OrderController extends Controller
                 // For card/bank transfer, update status and reduce stock immediately
                 // Note: updateStatus('confirmed') already calls reduceStock() internally
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
+<<<<<<< HEAD
                 
                 // Send status update + receipt notification
                 $user->notify(new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment received via ' . ucfirst($request->payment_method)));
                 $user->notify(new PaymentReceived($order));
+=======
+>>>>>>> 8e0195a (fixed products stocks count (with minimal error))
                 
                 // Clear selected items from cart if multi-select was used
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -308,6 +311,7 @@ class OrderController extends Controller
                 ]);
                 
                 // Use the model's updateStatus method to update order status and create timeline
+<<<<<<< HEAD
                 // Note: updateStatus('confirmed') already calls reduceStock() internally
                 $order->updateStatus('confirmed', 'Payment received via ' . $order->payment_method);
                 
@@ -339,6 +343,9 @@ class OrderController extends Controller
                         $order->user->notify(new \App\Notifications\OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
                     }
                 }
+=======
+                $order->updateStatus('confirmed', 'Payment received via ' );
+>>>>>>> 8e0195a (fixed products stocks count (with minimal error))
                 
                 // Clear selected items from cart if multi-select was used
                 $selectedItemIds = session()->get('selected_cart_items');
