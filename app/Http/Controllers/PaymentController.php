@@ -120,9 +120,6 @@ class PaymentController extends Controller
             // Use the Order model's updateStatus method to properly update status and timeline
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
             
-            // Reduce stock for confirmed orders
-            $order->reduceStock();
-            
             // Clear selected items from cart if multi-select was used
             $selectedItemIds = session()->get('selected_cart_items');
             if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {

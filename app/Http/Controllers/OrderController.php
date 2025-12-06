@@ -215,7 +215,6 @@ class OrderController extends Controller
             } else {
                 // For card/bank transfer, update status and reduce stock immediately
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
-                $order->reduceStock(); // Reduce stock for confirmed orders
                 
                 // Clear selected items from cart if multi-select was used
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -298,7 +297,6 @@ class OrderController extends Controller
                 
                 // Use the model's updateStatus method to update order status and create timeline
                 $order->updateStatus('confirmed', 'Payment received via ' );
-                $order->reduceStock(); // Reduce stock for confirmed orders
                 
                 // Clear selected items from cart if multi-select was used
                 $selectedItemIds = session()->get('selected_cart_items');

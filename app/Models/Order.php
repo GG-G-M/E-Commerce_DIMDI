@@ -319,9 +319,28 @@ class Order extends Model
     {
         foreach ($this->items as $item) {
             if ($item->product) {
-                // Make sure we don't reduce below 0
-                $newStock = max(0, $item->product->stock - $item->quantity);
-                $item->product->update(['stock' => $newStock]);
+                // If a variant was selected, deduct from variant stock
+                if ($item->selected_size) {
+                    $variant = $item->product->variants()
+                        ->where('variant_name', $item->selected_size)
+                        ->first();
+
+                    if ($variant) {
+                        // Deduct from variant stock
+                        $newVariantStock = max(0, $variant->stock_quantity - $item->quantity);
+                        $variant->update(['stock_quantity' => $newVariantStock]);
+
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
+                    }
+                } else {
+                    // No variant selected, deduct from main product stock
+                    $newStock = max(0, $item->product->stock_quantity - $item->quantity);
+                    $item->product->update(['stock_quantity' => $newStock]);
+                }
             }
         }
 
@@ -335,7 +354,26 @@ class Order extends Model
     {
         foreach ($this->items as $item) {
             if ($item->product) {
-                $item->product->increment('stock', $item->quantity);
+                // If a variant was selected, restore to variant stock
+                if ($item->selected_size) {
+                    $variant = $item->product->variants()
+                        ->where('variant_name', $item->selected_size)
+                        ->first();
+
+                    if ($variant) {
+                        // Restore to variant stock
+                        $variant->increment('stock_quantity', $item->quantity);
+
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
+                    }
+                } else {
+                    // No variant selected, restore to main product stock
+                    $item->product->increment('stock_quantity', $item->quantity);
+                }
             }
         }
 
