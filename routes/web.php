@@ -75,6 +75,10 @@ Route::post('/payment/create-source', [PaymentController::class, 'createSource']
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
 
+// Order receipt routes (preview and download) - public but controller will authorize access
+Route::get('/orders/{order}/receipt/preview', [OrderController::class, 'previewReceipt'])->name('orders.receipt.preview');
+Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloadReceipt'])->name('orders.receipt.download');
+
 // Address Routes
 Route::get('/address/provinces', [AddressController::class, 'provinces']);
 Route::get('/address/cities/{provinceCode}', [AddressController::class, 'cities']);

@@ -166,62 +166,68 @@
         }
 
         .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: auto;
-    align-items: stretch; /* ensure buttons have equal height */
-}
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+            align-items: stretch;
+            /* ensure buttons have equal height */
+        }
 
-.btn-view-details {
-    flex: 2;
-    background: transparent;
-    color: #2C8F0C;
-    border: 2px solid #2C8F0C;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box; /* include border in height */
-    min-height: 40px; /* explicit height */
-}
+        .btn-view-details {
+            flex: 2;
+            background: transparent;
+            color: #2C8F0C;
+            border: 2px solid #2C8F0C;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            /* include border in height */
+            min-height: 40px;
+            /* explicit height */
+        }
 
-.btn-view-details:hover {
-    background: #2C8F0C;
-    color: white;
-    transform: translateY(-1px);
-}
+        .btn-view-details:hover {
+            background: #2C8F0C;
+            color: white;
+            transform: translateY(-1px);
+        }
 
-.btn-add-cart {
-    flex: 1;
-    background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-    color: white;
-    border: 2px solid transparent; /* match border thickness */
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box; /* include border in height */
-    min-height: 40px; /* match view-details height exactly */
-}
+        .btn-add-cart {
+            flex: 1;
+            background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+            color: white;
+            border: 2px solid transparent;
+            /* match border thickness */
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            /* include border in height */
+            min-height: 40px;
+            /* match view-details height exactly */
+        }
 
-.btn-add-cart:hover:not(:disabled) {
-    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
-}
+        .btn-add-cart:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+        }
 
-.btn-add-cart:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-    transform: none;
-}
+        .btn-add-cart:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
 
 
 
@@ -862,68 +868,95 @@
             background: linear-gradient(135deg, #1E6A08, #2C8F0C);
             color: white;
         }
+
+        .btn-success-hover {
+            background: transparent;
+            /* initially transparent */
+            color: #28a745;
+            /* Bootstrap success green */
+            border: 2px solid #28a745;
+            /* match the color */
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-hover:hover {
+            background: #28a745;
+            /* green on hover */
+            color: white;
+            /* text becomes white */
+            transform: translateY(-1px);
+            /* optional hover effect */
+        }
     </style>
 
     <!-- No Products Found Modal -->
-    <div class="modal fade no-products-modal" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="noProductsModal" tabindex="-1" aria-labelledby="noProductsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="noProductsModalLabel">
-                        <i class="fas fa-search me-2"></i>No Products Found
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <!-- Modal Header -->
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title d-flex align-items-center" id="noProductsModalLabel">
+                        <i class="fas fa-search me-2 text-success"></i> No Products Found
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <img src="{{ asset('images/noproduct.png') }}" alt="No products found" class="no-products-image">
-                    <h3 class="no-products-title">Oops! No Matching Products</h3>
-                    <p class="no-products-text">
+
+                <!-- Modal Body -->
+                <div class="modal-body text-center pt-0">
+                    <img src="{{ asset('images/noproduct.png') }}" alt="No products found" class="img-fluid mb-3"
+                        style="max-height: 200px;">
+                    <h3 class="fw-bold mb-2">Oops! No Matching Products</h3>
+                    <p class="text-muted mb-4">
                         We couldn't find any products matching your search criteria.
                         Don't worry, we have plenty of other amazing products for you to explore!
                     </p>
 
-                    <div class="search-suggestions">
-                        <h5 class="suggestion-title">💡 Try These Suggestions:</h5>
-                        <ul class="suggestion-list">
-                            <li>
-                                <a href="{{ route('products.index') }}">
-                                    <i class="fas fa-store"></i>
-                                    Browse All Products
-                                </a>
-                            </li>
+                    <!-- Search Suggestions -->
+                    <div class="search-suggestions text-center mx-auto mb-4" style="max-width: 500px;">
+                        <h6 class="fw-semibold mb-3">Try These Suggestions:</h6>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                                Browse All Products
+                            </a>
+
                             @foreach ($categories->take(4) as $category)
-                                <li>
-                                    <a href="{{ route('products.index', ['category' => $category->slug]) }}">
-                                        <i class="fas fa-tag"></i>
-                                        Explore {{ $category->name }}
-                                    </a>
-                                </li>
+                                <a href="{{ route('products.index', ['category' => $category->slug]) }}"
+                                    class="btn btn-outline-secondary btn-sm rounded-pill">
+                                    Explore {{ $category->name }}
+                                </a>
                             @endforeach
-                            <li>
-                                <a href="{{ route('products.index', ['sort' => 'featured']) }}">
-                                    <i class="fas fa-star"></i>
-                                    Check Featured Products
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('products.index', ['sort' => 'newest']) }}">
-                                    <i class="fas fa-rocket"></i>
-                                    See New Arrivals
-                                </a>
-                            </li>
-                        </ul>
+
+                            <a href="{{ route('products.index', ['sort' => 'featured']) }}"
+                                class="btn btn-outline-secondary btn-sm rounded-pill">
+                                Check Featured Products
+                            </a>
+
+                            <a href="{{ route('products.index', ['sort' => 'newest']) }}"
+                                class="btn btn-outline-secondary btn-sm rounded-pill">
+                                See New Arrivals
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a href="{{ route('products.index') }}" class="btn btn-continue-shopping">
-                        <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+
+                <!-- Modal Footer -->
+                {{-- <div class="modal-footer border-0 justify-content-center pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <a href="{{ route('products.index') }}"
+                        class="btn btn-success-hover rounded-pill px-4 d-flex align-items-center">
+                        Continue Shopping
                     </a>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
+
 
     <!-- Floating Filter Panel with Dropdown Brand Filter -->
     <div class="floating-filter">
@@ -1227,7 +1260,7 @@
                         We're currently updating our inventory. Please check back later for new arrivals
                         or try browsing different categories.
                     </p>
-                    <a href="{{ route('products.index') }}" class="btn btn-primary">
+                    <a href="{{ route('products.index') }}" class="btn btn-success-hover">
                         <i class="fas fa-store me-2"></i>Browse All Categories
                     </a>
                 </div>
@@ -1245,7 +1278,7 @@
         <!-- End of results message -->
         <div id="end-of-results" class="text-center py-4" style="display: none;">
             <div class="text-muted">
-                <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                {{-- <i class="fas fa-check-circle fa-2x mb-3 text-success"></i> --}}
                 <p class="mb-0">You've reached the end of our product collection!</p>
             </div>
         </div>
