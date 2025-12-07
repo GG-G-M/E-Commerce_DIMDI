@@ -166,54 +166,64 @@
         }
 
         .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: auto;
-        }
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    align-items: stretch; /* ensure buttons have equal height */
+}
 
-        .btn-view-details {
-            flex: 2;
-            background: transparent;
-            color: #2C8F0C;
-            border: 2px solid #2C8F0C;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
+.btn-view-details {
+    flex: 2;
+    background: transparent;
+    color: #2C8F0C;
+    border: 2px solid #2C8F0C;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box; /* include border in height */
+    min-height: 40px; /* explicit height */
+}
 
-        .btn-view-details:hover {
-            background: #2C8F0C;
-            color: white;
-            transform: translateY(-1px);
-        }
+.btn-view-details:hover {
+    background: #2C8F0C;
+    color: white;
+    transform: translateY(-1px);
+}
 
-        .btn-add-cart {
-            flex: 1;
-            background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.btn-add-cart {
+    flex: 1;
+    background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+    color: white;
+    border: 2px solid transparent; /* match border thickness */
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box; /* include border in height */
+    min-height: 40px; /* match view-details height exactly */
+}
 
-        .btn-add-cart:hover:not(:disabled) {
-            background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
-        }
+.btn-add-cart:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+}
 
-        .btn-add-cart:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-            transform: none;
-        }
+.btn-add-cart:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
 
         /* Enhanced Category Headers */
         .category-header {
@@ -250,15 +260,18 @@
         }
 
         .filter-bubble {
-            width: 56px;
-            height: 56px;
+            width: 50px;
+            /* smaller width */
+            height: 50px;
+            /* smaller height */
+            font-size: 1rem;
+            /* smaller icon */
             background: linear-gradient(135deg, #2C8F0C, #4CAF50);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.3rem;
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(44, 143, 12, 0.4);
             transition: all 0.3s ease;
@@ -379,18 +392,23 @@
 
         .brand-dropdown-options {
             position: absolute;
+            /* already absolute */
             top: 100%;
+            /* just below header */
             left: 0;
-            right: 0;
-            background: white;
+            width: 100%;
+            /* full width of container */
+            max-height: 250px;
+            /* enough for multiple brands */
+            overflow-y: auto;
+            z-index: 1100;
+            /* higher than filter panel */
+            display: none;
+            /* hidden initially */
+            background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
-            margin-top: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1002;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            display: none;
         }
 
         .brand-dropdown-options.show {
@@ -1296,7 +1314,7 @@
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
                     if (!brandDropdownHeader.contains(e.target) && !brandDropdownOptions.contains(e
-                        .target)) {
+                            .target)) {
                         brandDropdownOptions.classList.remove('show');
                         brandDropdownHeader.classList.remove('active');
                         dropdownArrow.style.transform = 'rotate(0deg)';
