@@ -6,8 +6,11 @@ Oct 5, 2025
 
 <h3>The Program</h3>
 
-![Sample](PicForGithub/HomePage.png)
-![Sample](PicForGithub/Featured.png)
-![Sample](PicForGithub/ProductPage.png)
-![Sample](PicForGithub/Product.png)    
-![Sample](PicForGithub/Orders.png)
+![HomePage](PicForGithub/HomePage.png)
+![Feaured](PicForGithub/Featured.png)
+![Product](PicForGithub/Product.png)    
+![ProductPage](PicForGithub/ProductPage.png)
+![Cart](PicForGithub/Cart.png)
+![CartConfirmation](PicForGithub/CartConfirmation.png)
+![Orders](PicForGithub/Orders.png)
+![OrdersPage](PicForGithub/OrdersPage.png)
