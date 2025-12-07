@@ -167,7 +167,7 @@
                      style="width: 100%; height: 400px; object-fit: cover;">
                 <div class="position-absolute top-0 start-0 mt-2 ms-2">
                     @if($product->has_discount)
-                    <span class="badge bg-success fs-6">{{ $product->discount_percentage }}% OFF</span>
+                    <span class="badge bg-danger fs-6">{{ $product->discount_percentage }}% OFF</span>
                     @endif
                 </div>
             </div>
@@ -485,7 +485,7 @@
                                         <i class="fas fa-check-circle me-2"></i>You have already rated this product. Thank you!
                                     </div>
                                 @else
-                                    <div class="alert alert-warning">
+                                    <div>
                                         <i class="fas fa-info-circle me-2"></i>You can rate this product after purchase and delivery.
                                     </div>
                                 @endif
