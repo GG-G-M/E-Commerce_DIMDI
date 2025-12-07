@@ -16,46 +16,117 @@
                 <div class="card-header text-white" style="background: #2C8F0C;">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Order Items</h5>
-                        <span class="badge bg-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'cancelled' ? 'danger' : ($order->order_status === 'shipped' ? 'primary' : ($order->order_status === 'confirmed' ? 'info' : 'warning'))) }}">
+                        <span class="-{{ $order->order_status === 'delivered' ? 'success' : ($order->order_status === 'cancelled' ? 'danger' : ($order->order_status === 'shipped' ? 'primary' : ($order->order_status === 'confirmed' ? 'info' : 'warning'))) }} ">
                             {{ ucfirst($order->order_status) }}
                         </span>
                     </div>
                 </div>
                 <div class="card-body">
                     @foreach($order->items as $item)
-                    <div class="row align-items-center mb-3 pb-3 border-bottom">
-                        <div class="col-md-2">
-                            @php
-                                $itemImage = $item->product->image_url;
-                                if ($item->selected_size && $item->selected_size !== 'Standard') {
-                                    $variant = $item->product->variants->first(function($v) use ($item) {
-                                        return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
-                                    });
-                                    if ($variant && $variant->image) {
+                        @php
+                            // Get product and variant information
+                            $product = $item->product;
+                            $hasVariants = $product && $product->has_variants && $product->variants->count() > 0;
+                            
+                            // Get item image
+                            $itemImage = $product ? $product->image_url : 'https://picsum.photos/400/300?random=' . uniqid();
+                            
+                            if ($hasVariants && $item->selected_size && $item->selected_size !== 'Standard') {
+                                // Get the variant for this order item
+                                $variant = $product->variants->first(function ($v) use ($item) {
+                                    return ($v->size === $item->selected_size) || 
+                                           ($v->variant_name === $item->selected_size);
+                                });
+                                
+                                if ($variant) {
+                                    if ($variant->image) {
                                         $itemImage = $variant->image_url;
                                     }
+                                    $unitPrice = $variant->current_price;
+                                    $originalUnitPrice = $variant->price;
+                                    $hasDiscount = $variant->has_discount;
+                                    $discountPercent = $variant->discount_percentage;
+                                    $variantName = $variant->size ?? $variant->variant_name ?? $item->selected_size;
+                                } else {
+                                    // Fallback if variant not found
+                                    $unitPrice = $product->current_price;
+                                    $originalUnitPrice = $product->price;
+                                    $hasDiscount = $product->has_discount;
+                                    $discountPercent = $product->discount_percentage;
+                                    $variantName = $item->selected_size;
                                 }
-                            @endphp
-                            <img src="{{ $itemImage }}" 
-                                alt="{{ $item->product_name }}" 
-                                class="img-fluid rounded" style="height: 80px; object-fit: cover;">
+                            } else {
+                                // Product without variants
+                                $variant = null;
+                                $unitPrice = $product ? $product->current_price : $item->unit_price;
+                                $originalUnitPrice = $product ? $product->price : $item->unit_price;
+                                $hasDiscount = $product ? $product->has_discount : false;
+                                $discountPercent = $product ? $product->discount_percentage : 0;
+                                $variantName = 'Standard';
+                            }
+                            
+                            // Use stored unit_price from order item if product is not available
+                            if (!$product) {
+                                $unitPrice = $item->unit_price;
+                                $originalUnitPrice = $item->unit_price;
+                                $hasDiscount = false;
+                                $discountPercent = 0;
+                            }
+                            
+                            $itemTotalPrice = $unitPrice * $item->quantity;
+                            $itemOriginalTotalPrice = $originalUnitPrice * $item->quantity;
+                            $itemSavings = $itemOriginalTotalPrice - $itemTotalPrice;
+                        @endphp
+                        
+                        <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                            <div class="d-flex align-items-start" style="flex: 1;">
+                                <div class="me-3">
+                                    <img src="{{ $itemImage }}" 
+                                        alt="{{ $item->product_name }}" 
+                                        class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">{{ $item->product_name }}</h6>
+                                    
+                                    @if ($hasVariants && $variantName !== 'Standard')
+                                        <small class="text-muted d-block mb-1">
+                                            <i class="fas fa-tag me-1"></i>Variant: {{ $variantName }}
+                                        </small>
+                                    @endif
+                                    
+                                    <div class="mb-1">
+                                        <small class="text-muted">Qty: {{ $item->quantity }} × </small>
+                                        @if ($hasDiscount && $originalUnitPrice > $unitPrice)
+                                            <span class="sale-price">₱{{ number_format($unitPrice, 2) }}</span>
+                                            <small class="original-price ms-1">₱{{ number_format($originalUnitPrice, 2) }}</small>
+                                            @if ($discountPercent > 0)
+                                                <span class="badge bg-danger ms-1">-{{ $discountPercent }}%</span>
+                                            @endif
+                                        @else
+                                            <span class="text-success fw-semibold">₱{{ number_format($unitPrice, 2) }}</span>
+                                        @endif
+                                    </div>
+                                    
+                                    @if ($hasDiscount && $itemSavings > 0)
+                                        <small class="savings-text">
+                                            <i></i>You save ₱{{ number_format($itemSavings, 2) }}
+                                        </small>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="text-end ms-3">
+                                @if ($hasDiscount && $itemOriginalTotalPrice > $itemTotalPrice)
+                                    <div>
+                                        <span class="text-success fw-bold">₱{{ number_format($itemTotalPrice, 2) }}</span>
+                                        <div>
+                                            <small class="original-price">₱{{ number_format($itemOriginalTotalPrice, 2) }}</small>
+                                        </div>
+                                    </div>
+                                @else
+                                    <span class="text-success fw-bold">₱{{ number_format($item->total_price, 2) }}</span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <h6 class="mb-1">{{ $item->product_name }}</h6>
-                            <p class="text-muted mb-0">₱{{ number_format($item->unit_price, 2) }}</p>
-                            @if($item->selected_size && $item->selected_size !== 'Standard')
-                            <p class="text-muted mb-0">
-                                <strong>Variant:</strong> {{ $item->selected_size }}
-                            </p>
-                            @endif
-                        </div>
-                        <div class="col-md-3">
-                            <p class="mb-0">Quantity: {{ $item->quantity }}</p>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            <strong>₱{{ number_format($item->total_price, 2) }}</strong>
-                        </div>
-                    </div>
                     @endforeach
                 </div>
             </div>
@@ -69,7 +140,10 @@
                     @if($order->statusHistory->count() > 0)
                     <div class="timeline">
                         @foreach($order->statusHistory as $history)
-                        <div class="timeline-item {{ $loop->first ? 'current' : '' }}">
+                        @php
+                            $isCurrentStatus = $history->status === $order->order_status;
+                        @endphp
+                        <div class="timeline-item {{ $isCurrentStatus ? 'current' : '' }}">
                             <div class="timeline-marker 
                                 {{ $history->status === 'cancelled' ? 'bg-danger' : 
                                    ($history->status === 'delivered' ? 'bg-success' : 
@@ -82,7 +156,7 @@
                                    ($history->status === 'shipped' ? 'primary' : 
                                    ($history->status === 'confirmed' ? 'info' : 'warning'))) }}">
                                     {{ ucfirst($history->status) }}
-                                    @if($loop->first)
+                                    @if($isCurrentStatus)
                                     <small class="text-muted">(Current)</small>
                                     @endif
                                 </h6>
@@ -117,10 +191,10 @@
                         <span>Subtotal:</span>
                         <span>₱{{ number_format($order->subtotal, 2) }}</span>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
+                    {{-- <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
                         <span>₱{{ number_format($order->tax_amount, 2) }}</span>
-                    </div>
+                    </div> --}}
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
                         <span>₱{{ number_format($order->shipping_cost, 2) }}</span>
@@ -274,6 +348,28 @@
     0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
     100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
+}
+
+/* Discount styling for order items */
+.sale-price {
+    color: #2C8F0C;
+    font-weight: bold;
+}
+
+.price {
+    color: #2C8F0C;
+    font-weight: 300;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.savings-text {
+    color: #000000;
+    font-weight: 100;
 }
 </style>
 @endsection

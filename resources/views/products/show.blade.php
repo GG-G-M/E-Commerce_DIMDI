@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data.success) {
-                    showToast('Product added to cart successfully! 🎉', 'success');
+                    showToast('Product added to cart successfully!', 'success');
                     if (data.cart_count !== undefined) {
                         updateCartCount(data.cart_count);
                     }
