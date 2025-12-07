@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\StockCheckerController as AdminStockCheckerController;
 use App\Http\Controllers\Admin\LowStockController;
 use App\Http\Controllers\Admin\StockInController;
@@ -168,6 +169,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
     Route::post('/deliveries/{delivery}/toggle-status', [DeliveryController::class, 'toggleStatus'])->name('deliveries.toggle-status');
 
+    // Abouts
+    Route::get('/abouts', [AboutController::class, 'index'])->name('abouts.index');
+    Route::post('/abouts', [AboutController::class, 'store'])->name('abouts.store');
+    Route::put('/abouts/{id}', [AboutController::class, 'update'])->name('abouts.update');
+    Route::post('/abouts/{id}/archive', [AboutController::class, 'archive'])->name('abouts.archive');
+    Route::post('/abouts/{id}/unarchive', [AboutController::class, 'unarchive'])->name('abouts.unarchive');
+    Route::delete('/abouts/{id}', [AboutController::class, 'destroy'])->name('abouts.destroy');
+
     // Warehouses
     Route::get('/warehouses', [AdminWarehouseController::class, 'index'])->name('warehouses.index');
     Route::post('/warehouses', [AdminWarehouseController::class, 'store'])->name('warehouses.store');
@@ -302,16 +311,16 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
     Route::get('/users/{user}/edit', [App\Http\Controllers\SuperAdmin\UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'destroy'])->name('users.destroy');
-    
+
     // User actions
     Route::post('/users/{user}/reset-password', [App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::post('/users/{user}/toggle-status', [App\Http\Controllers\SuperAdmin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    
+
     // Bulk actions
     Route::post('/users/bulk-activate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkActivate'])->name('users.bulk-activate');
     Route::post('/users/bulk-deactivate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDeactivate'])->name('users.bulk-deactivate');
     Route::post('/users/bulk-delete', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDelete'])->name('users.bulk-delete');
-    
+
     // System Settings
     Route::get('/settings', function () {
         if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
@@ -319,7 +328,7 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
         }
         return view('superadmin.settings');
     })->name('settings');
-    
+
     // Super Admin Profile
     Route::get('/profile', function () {
         if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
