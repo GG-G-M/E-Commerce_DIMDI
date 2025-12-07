@@ -17,9 +17,9 @@
             $hasAddress = !empty($fullAddress);
             $hasPhone = !empty($user->phone);
             
-            // Calculate totals
+            // Calculate totals (shipping will be updated dynamically via JavaScript)
             $subtotal = $cartItems->sum('total_price');
-            $shipping = $subtotal >= 100 ? 0 : 10;
+            $shipping = 100; // Default placeholder; will be calculated from coordinates
             $total = $subtotal + $shipping;
         @endphp
 
@@ -223,26 +223,22 @@
                             <div class="mt-3 pt-3 border-top">
                                 <div class="d-flex justify-content-between mb-2">
                                     <span>Subtotal:</span>
-                                    <span class="text-success">₱{{ number_format($subtotal, 2) }}</span>
+                                    <span class="text-success" id="display-subtotal">₱{{ number_format($subtotal, 2) }}</span>
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-3">
                                     <span>Shipping:</span>
-                                    <span class="text-success">
-                                        @if ($subtotal >= 100)
-                                            <span class="text-success">FREE</span>
-                                        @else
-                                            ₱{{ number_format($shipping, 2) }}
-                                        @endif
-                                    </span>
+                                    <span class="text-success" id="display-shipping">₱100.00</span>
                                 </div>
-                                
-                                <!-- REMOVED TAX SECTION -->
+                                <small class="text-muted d-block mb-3" id="shipping-info">
+                                    <i class="fas fa-truck me-1"></i>
+                                    Calculating distance-based shipping fee from your address...
+                                </small>
                                 
                                 <hr class="my-3">
                                 <div class="d-flex justify-content-between mb-3">
                                     <strong class="fs-5">Total:</strong>
-                                    <strong class="text-success fs-5">₱{{ number_format($total, 2) }}</strong>
+                                    <strong class="text-success fs-5" id="display-total">₱{{ number_format($total, 2) }}</strong>
                                 </div>
                                 
                                 @if ($subtotal < 100)
@@ -296,7 +292,76 @@
     <!-- PayMongo Script -->
     <script src="https://js.paymongo.com/v1/paymongo.js"></script>
     <script>
+        // Constants for calculations
+        const SUBTOTAL = {{ $subtotal }};
+
+        // Calculate and display shipping fee based on address
+        function calculateShippingFromAddress() {
+            const address = document.querySelector('input[name="shipping_address"]').value;
+            
+            if (!address) {
+                updateShippingDisplay(100, 'Unable to estimate', 'No address provided');
+                return;
+            }
+
+            // Use the estimated coordinates endpoint to get approximate location
+            // The server will calculate shipping based on the address hash
+            fetch('{{ route("orders.calculate-shipping") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    address: address
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateShippingDisplay(
+                        data.shipping_fee,
+                        data.zone_name || 'Address-based estimation',
+                        data.distance ? `Distance: ${data.distance.toFixed(2)} km` : null
+                    );
+                } else {
+                    // Fallback to default fee if calculation fails
+                    updateShippingDisplay(100, 'Default zone', 'Using standard shipping rate');
+                }
+            })
+            .catch(error => {
+                console.error('Shipping calculation error:', error);
+                updateShippingDisplay(100, 'Default zone', 'Using standard shipping rate');
+            });
+        }
+
+        // Update shipping display and recalculate total
+        function updateShippingDisplay(shippingFee, zoneName, details) {
+            const subtotal = SUBTOTAL;
+            const total = subtotal + shippingFee;
+
+            // Update display elements
+            document.getElementById('display-shipping').textContent = '₱' + shippingFee.toFixed(2);
+            document.getElementById('display-total').textContent = '₱' + total.toFixed(2);
+
+            // Update shipping info text
+            let infoText = '<i class="fas fa-truck me-1"></i>';
+            if (zoneName) {
+                infoText += zoneName;
+                if (details) {
+                    infoText += ` (${details})`;
+                }
+            } else {
+                infoText += 'Standard shipping rate applied';
+            }
+            document.getElementById('shipping-info').innerHTML = infoText;
+        }
+
+        // Calculate shipping on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Calculate initial shipping estimate
+            setTimeout(calculateShippingFromAddress, 500);
+
             const checkoutForm = document.getElementById('checkout-form');
             const placeOrderBtn = document.getElementById('place-order-btn');
             const paymentMethodSelect = document.getElementById('payment_method');
