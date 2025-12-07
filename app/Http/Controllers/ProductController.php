@@ -91,12 +91,8 @@ class ProductController extends Controller
         $products = $query->paginate(12);
         $categories = Category::where('is_active', true)->get();
 
-        // Get unique brands for filter
-        $brands = Brand::whereHas('products', function($q) {
-                $q->where('is_active', true)
-                  ->where('stock_quantity', '>', 0);
-            })
-            ->where('is_active', true)
+        // Get brands for filter (show all active brands)
+        $brands = Brand::where('is_active', true)
             ->orderBy('name')
             ->get();
 
@@ -149,11 +145,7 @@ class ProductController extends Controller
             ->paginate(12);
 
         $categories = Category::where('is_active', true)->get();
-        $brands = Brand::whereHas('products', function($q) {
-                $q->where('is_active', true)
-                  ->where('stock_quantity', '>', 0);
-            })
-            ->where('is_active', true)
+        $brands = Brand::where('is_active', true)
             ->orderBy('name')
             ->get();
 
@@ -176,11 +168,7 @@ class ProductController extends Controller
             ->paginate(12);
 
         $categories = Category::where('is_active', true)->get();
-        $brands = Brand::whereHas('products', function($q) {
-                $q->where('is_active', true)
-                  ->where('stock_quantity', '>', 0);
-            })
-            ->where('is_active', true)
+        $brands = Brand::where('is_active', true)
             ->orderBy('name')
             ->get();
 
@@ -373,11 +361,7 @@ private function getBanners()
             ->paginate(12);
 
         $categories = Category::where('is_active', true)->get();
-        $brands = Brand::whereHas('products', function($q) {
-                $q->where('is_active', true)
-                  ->where('stock_quantity', '>', 0);
-            })
-            ->where('is_active', true)
+        $brands = Brand::where('is_active', true)
             ->orderBy('name')
             ->get();
 

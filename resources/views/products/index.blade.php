@@ -229,7 +229,17 @@
             transform: none;
         }
 
+        .btn-add-cart:hover:not(:disabled) {
+            background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+        }
 
+        .btn-add-cart:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* Enhanced Category Headers */
         .category-header {
@@ -256,7 +266,7 @@
             margin: 0;
         }
 
-        /* Enhanced Filter Panel - Updated */
+        /* Enhanced Filter Panel */
         .floating-filter {
             position: fixed;
             top: 15%;
@@ -267,11 +277,8 @@
 
         .filter-bubble {
             width: 50px;
-            /* smaller width */
             height: 50px;
-            /* smaller height */
             font-size: 1rem;
-            /* smaller icon */
             background: linear-gradient(135deg, #2C8F0C, #4CAF50);
             border-radius: 50%;
             display: flex;
@@ -309,12 +316,10 @@
                 transform: scale(1);
                 opacity: 0.4;
             }
-
             50% {
                 transform: scale(1.1);
                 opacity: 0.2;
             }
-
             100% {
                 transform: scale(1);
                 opacity: 0.4;
@@ -330,7 +335,6 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
             padding: 25px;
             width: 320px;
-            /* Slightly reduced width */
             display: none;
             z-index: 1001;
             border: 1px solid #e2e8f0;
@@ -348,17 +352,17 @@
                 opacity: 0;
                 transform: translateX(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
             }
         }
 
-        /* Brand Dropdown Filter - Replaced Search */
+        /* Brand Dropdown Filter - FIXED */
         .brand-dropdown-container {
             margin-bottom: 1rem;
             position: relative;
+            overflow: visible !important;
         }
 
         .brand-dropdown-header {
@@ -398,23 +402,18 @@
 
         .brand-dropdown-options {
             position: absolute;
-            /* already absolute */
             top: 100%;
-            /* just below header */
             left: 0;
             width: 100%;
-            /* full width of container */
             max-height: 250px;
-            /* enough for multiple brands */
             overflow-y: auto;
             z-index: 1100;
-            /* higher than filter panel */
             display: none;
-            /* hidden initially */
             background: #fff;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 5px;
         }
 
         .brand-dropdown-options.show {
@@ -427,7 +426,6 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -499,20 +497,16 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            /* Reduced gap */
             margin-bottom: 1rem;
         }
 
         .price-input {
             flex: 1;
             max-width: 130px;
-            /* Limited max width */
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 8px 10px;
-            /* Reduced padding */
             font-size: 0.85rem;
-            /* Smaller font */
             transition: all 0.3s ease;
         }
 
@@ -547,7 +541,6 @@
             -webkit-appearance: none;
             appearance: none;
             width: 18px;
-            /* Slightly smaller */
             height: 18px;
             border-radius: 50%;
             background: white;
@@ -561,23 +554,20 @@
             justify-content: space-between;
             margin-top: 8px;
             font-size: 0.8rem;
-            /* Smaller font */
             color: #718096;
         }
 
-        /* Selected Brands Display - Compact */
+        /* Selected Brands Display */
         .selected-brands-container {
             background: #f8fff8;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 10px;
-            /* Reduced padding */
             margin-top: 1rem;
         }
 
         .selected-brands-title {
             font-size: 0.8rem;
-            /* Smaller font */
             color: #2C8F0C;
             font-weight: 600;
             margin-bottom: 6px;
@@ -590,17 +580,14 @@
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
-            /* Reduced gap */
         }
 
         .brand-tag {
             background: linear-gradient(135deg, #2C8F0C, #4CAF50);
             color: white;
             padding: 3px 8px;
-            /* Reduced padding */
             border-radius: 12px;
             font-size: 0.75rem;
-            /* Smaller font */
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -612,7 +599,6 @@
             border: none;
             color: white;
             width: 14px;
-            /* Smaller */
             height: 14px;
             border-radius: 50%;
             display: flex;
@@ -716,23 +702,6 @@
             height: 400px;
             object-fit: cover;
             object-position: center;
-        }
-
-        /* Loading Animation */
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-
-            100% {
-                background-position: -200% 0;
-            }
         }
 
         /* Custom Scrollbar */
@@ -971,7 +940,7 @@
                 </h4>
             </div>
 
-            <!-- Brand Filter Section - UPDATED with Dropdown -->
+            <!-- Brand Filter Section - FIXED -->
             <div class="filter-section">
                 <h6 class="filter-section-title">
                     <i class="fas fa-tags"></i>Brands
@@ -988,19 +957,26 @@
                     </div>
 
                     <div class="brand-dropdown-options" id="brandDropdownOptions">
-                        @foreach ($brands as $brand)
-                            <div class="brand-dropdown-item" data-brand="{{ $brand->name }}">
-                                <input type="checkbox" class="brand-checkbox" value="{{ $brand->name }}"
-                                    id="brand{{ $brand->id }}"
-                                    {{ in_array($brand->name, explode(',', request('brands', ''))) ? 'checked' : '' }}>
-                                <label for="brand{{ $brand->id }}" class="brand-dropdown-label">
-                                    <span class="brand-dropdown-name">
-                                        {{ $brand->name }}
-                                    </span>
-                                    <span class="brand-dropdown-count">{{ $brand->products_count ?? 0 }}</span>
-                                </label>
+                        @if(isset($brands) && $brands->count() > 0)
+                            @foreach ($brands as $brand)
+                                <div class="brand-dropdown-item" data-brand="{{ $brand->name }}">
+                                    <input type="checkbox" class="brand-checkbox" value="{{ $brand->name }}"
+                                        id="brand{{ $brand->id }}"
+                                        {{ in_array($brand->name, explode(',', request('brands', ''))) ? 'checked' : '' }}>
+                                    <label for="brand{{ $brand->id }}" class="brand-dropdown-label">
+                                        <span class="brand-dropdown-name">
+                                            {{ $brand->name }}
+                                        </span>
+                                        <span class="brand-dropdown-count">{{ $brand->products_count ?? 0 }}</span>
+                                    </label>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="p-3 text-center text-muted">
+                                <i class="fas fa-tag fa-lg mb-2"></i>
+                                <p class="mb-0">No brands available</p>
                             </div>
-                        @endforeach
+                        @endif
                     </div>
                 </div>
 
@@ -1014,7 +990,7 @@
                 </div>
             </div>
 
-            <!-- Price Range Filter - COMPACT -->
+            <!-- Price Range Filter -->
             <div class="filter-section">
                 <h6 class="filter-section-title">
                     <i class="fas fa-money-bill-wave"></i>Price Range
@@ -1025,16 +1001,16 @@
                         <input type="number" class="price-input" id="minPrice" placeholder="Min ₱" min="0"
                             value="{{ request('min_price', '') }}">
                         <span class="price-separator">to</span>
-                        <input type="number" class="price-input" id="maxPrice" placeholder="Max ₱" min="0"
+                        <input type="number" class="price-input" id="maxPrice" placeholder="Max ₱" min="0" max="1000000"
                             value="{{ request('max_price', '') }}">
                     </div>
 
                     <div class="price-slider-container">
-                        <input type="range" class="price-slider" id="priceSlider" min="0" max="10000"
-                            step="100" value="{{ request('max_price', 10000) }}">
+                        <input type="range" class="price-slider" id="priceSlider" min="0" max="1000000"
+                            step="1000" value="{{ request('max_price', 1000000) }}">
                         <div class="price-labels">
                             <span>₱0</span>
-                            <span>₱10,000</span>
+                            <span>₱1,000,000</span>
                         </div>
                     </div>
                 </div>
@@ -1151,13 +1127,11 @@
                                                 <div class="mt-1">
                                                     @foreach ($product->variants as $variant)
                                                         @php
-                                                            $variantName =
-                                                                $variant->size ?? ($variant->variant_name ?? 'Option');
+                                                            $variantName = $variant->size ?? ($variant->variant_name ?? 'Option');
                                                             $variantStock = $variant->stock_quantity ?? 0;
                                                             $isInStock = $variantStock > 0;
                                                         @endphp
-                                                        <span
-                                                            class="variant-badge {{ !$isInStock ? 'out-of-stock' : '' }}">
+                                                        <span class="variant-badge {{ !$isInStock ? 'out-of-stock' : '' }}">
                                                             {{ $variantName }}
                                                             @if (!$isInStock)
                                                                 <small class="text-muted">(OOS)</small>
@@ -1172,13 +1146,10 @@
                                             <!-- Price Display -->
                                             <div class="price-section">
                                                 @if ($product->has_discount)
-                                                    <span
-                                                        class="current-price">₱{{ number_format($product->sale_price, 2) }}</span>
-                                                    <span
-                                                        class="original-price">₱{{ number_format($product->price, 2) }}</span>
+                                                    <span class="current-price">₱{{ number_format($product->sale_price, 2) }}</span>
+                                                    <span class="original-price">₱{{ number_format($product->price, 2) }}</span>
                                                 @else
-                                                    <span
-                                                        class="current-price">₱{{ number_format($product->price, 2) }}</span>
+                                                    <span class="current-price">₱{{ number_format($product->price, 2) }}</span>
                                                 @endif
                                             </div>
 
@@ -1223,8 +1194,7 @@
                                                                 <input type="hidden" name="selected_size"
                                                                     value="{{ $firstInStockVariant->size ?? ($firstInStockVariant->variant_name ?? 'Standard') }}">
                                                             @else
-                                                                <input type="hidden" name="selected_size"
-                                                                    value="">
+                                                                <input type="hidden" name="selected_size" value="">
                                                             @endif
                                                         @else
                                                             <input type="hidden" name="selected_size" value="Standard">
@@ -1286,6 +1256,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - initializing product filters...');
+            
+            // Debug: Check if elements exist
+            console.log('Brand dropdown header:', document.getElementById('brandDropdownHeader'));
+            console.log('Brand dropdown options:', document.getElementById('brandDropdownOptions'));
+            console.log('Brand checkboxes:', document.querySelectorAll('.brand-checkbox').length);
+            
             let page = 1;
             let isLoading = false;
             let hasMore = true;
@@ -1315,10 +1292,13 @@
             const currentCategory = urlParams.get('category') || '';
             const searchQuery = urlParams.get('search') || '';
 
-            // Initialize price slider
+            // Initialize price slider (max 1,000,000)
             if (priceSlider && maxPriceInput) {
-                const maxPriceValue = urlParams.get('max_price') || 10000;
+                const maxPriceValue = urlParams.get('max_price') || 1000000;
+                priceSlider.max = 1000000;
+                priceSlider.step = 1000;
                 priceSlider.value = maxPriceValue;
+                maxPriceInput.max = 1000000;
                 maxPriceInput.value = maxPriceValue;
             }
 
@@ -1333,21 +1313,33 @@
                 noProductsModal.show();
             @endif
 
-            // Brand dropdown functionality
-            if (brandDropdownHeader) {
+            // SIMPLIFIED Brand dropdown functionality - FIXED
+            if (brandDropdownHeader && brandDropdownOptions) {
+                console.log('Setting up brand dropdown listeners...');
+                
                 brandDropdownHeader.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    brandDropdownOptions.classList.toggle('show');
-                    brandDropdownHeader.classList.toggle('active');
-                    dropdownArrow.style.transform = brandDropdownOptions.classList.contains('show') ?
-                        'rotate(180deg)' :
-                        'rotate(0deg)';
+                    e.preventDefault();
+                    
+                    const isOpen = brandDropdownOptions.classList.contains('show');
+                    console.log('Brand dropdown clicked, isOpen:', isOpen);
+                    
+                    if (!isOpen) {
+                        brandDropdownOptions.classList.add('show');
+                        brandDropdownHeader.classList.add('active');
+                        dropdownArrow.style.transform = 'rotate(180deg)';
+                        console.log('Brand dropdown opened');
+                    } else {
+                        brandDropdownOptions.classList.remove('show');
+                        brandDropdownHeader.classList.remove('active');
+                        dropdownArrow.style.transform = 'rotate(0deg)';
+                        console.log('Brand dropdown closed');
+                    }
                 });
 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
-                    if (!brandDropdownHeader.contains(e.target) && !brandDropdownOptions.contains(e
-                            .target)) {
+                    if (!brandDropdownHeader.contains(e.target) && !brandDropdownOptions.contains(e.target)) {
                         brandDropdownOptions.classList.remove('show');
                         brandDropdownHeader.classList.remove('active');
                         dropdownArrow.style.transform = 'rotate(0deg)';
@@ -1358,11 +1350,14 @@
                 brandDropdownOptions.addEventListener('click', function(e) {
                     e.stopPropagation();
                 });
+            } else {
+                console.error('Brand dropdown elements not found!');
             }
 
             // Brand selection management
             document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
+                    console.log('Brand checkbox changed:', this.value, this.checked);
                     updateBrandDropdownPlaceholder();
                     updateSelectedBrands();
                     updateActiveFilterCount();
@@ -1378,7 +1373,7 @@
 
                 maxPriceInput.addEventListener('input', function() {
                     let value = parseInt(this.value) || 0;
-                    if (value > 10000) value = 10000;
+                    if (value > 1000000) value = 1000000;
                     if (value < 0) value = 0;
                     priceSlider.value = value;
                     updateActiveFilterCount();
@@ -1395,7 +1390,9 @@
             // Toggle filter panel
             filterBubble.addEventListener('click', function(e) {
                 e.stopPropagation();
+                e.preventDefault();
                 filterPanel.classList.toggle('show');
+                console.log('Filter panel toggled');
             });
 
             // Close filter panel when clicking outside
@@ -1407,25 +1404,29 @@
 
             // Apply filters
             applyFiltersBtn.addEventListener('click', function() {
+                console.log('Apply filters clicked');
                 applyBrandFilters();
             });
 
             // Clear filters
             clearFiltersBtn.addEventListener('click', function() {
+                console.log('Clear filters clicked');
                 clearAllFilters();
             });
 
             // Functions
             function updateBrandDropdownPlaceholder() {
                 const selectedBrands = getSelectedBrands();
-                const placeholderSpan = dropdownPlaceholder.querySelector('span');
+                const placeholderSpan = dropdownPlaceholder ? dropdownPlaceholder.querySelector('span') : null;
 
-                if (selectedBrands.length === 0) {
-                    placeholderSpan.innerHTML = 'Select brands...';
-                } else if (selectedBrands.length === 1) {
-                    placeholderSpan.innerHTML = `${selectedBrands[0]}`;
-                } else {
-                    placeholderSpan.innerHTML = `${selectedBrands.length} brands selected`;
+                if (placeholderSpan) {
+                    if (selectedBrands.length === 0) {
+                        placeholderSpan.innerHTML = 'Select brands...';
+                    } else if (selectedBrands.length === 1) {
+                        placeholderSpan.innerHTML = `${selectedBrands[0]}`;
+                    } else {
+                        placeholderSpan.innerHTML = `${selectedBrands.length} brands selected`;
+                    }
                 }
             }
 
@@ -1439,11 +1440,11 @@
                         const brandTag = document.createElement('span');
                         brandTag.className = 'brand-tag';
                         brandTag.innerHTML = `
-                    ${brand}
-                    <button type="button" class="remove-brand-btn" data-brand="${brand}">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
+                            ${brand}
+                            <button type="button" class="remove-brand-btn" data-brand="${brand}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
                         selectedBrandsList.appendChild(brandTag);
                     });
 
@@ -1452,8 +1453,7 @@
                         btn.addEventListener('click', function(e) {
                             e.stopPropagation();
                             const brand = this.getAttribute('data-brand');
-                            const checkbox = document.querySelector(
-                                `.brand-checkbox[value="${brand}"]`);
+                            const checkbox = document.querySelector(`.brand-checkbox[value="${brand}"]`);
                             if (checkbox) {
                                 checkbox.checked = false;
                                 updateBrandDropdownPlaceholder();
@@ -1466,11 +1466,7 @@
 
                 // Show/hide container
                 if (selectedBrandsContainer) {
-                    if (selectedBrands.length > 0) {
-                        selectedBrandsContainer.style.display = 'block';
-                    } else {
-                        selectedBrandsContainer.style.display = 'none';
-                    }
+                    selectedBrandsContainer.style.display = selectedBrands.length > 0 ? 'block' : 'none';
                 }
             }
 
@@ -1488,13 +1484,18 @@
                     activeFilterCount.textContent = count;
 
                     // Add/remove badge from filter bubble
-                    const filterBubble = document.getElementById('filterBubble');
-                    if (count > 0) {
-                        filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
-                        filterBubble.innerHTML +=
-                            `<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">${count}</span>`;
-                    } else {
-                        filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
+                    if (filterBubble) {
+                        if (count > 0) {
+                            filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
+                            const badge = document.createElement('span');
+                            badge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+                            badge.textContent = count;
+                            badge.style.fontSize = '0.6rem';
+                            badge.style.padding = '0.25rem 0.4rem';
+                            filterBubble.appendChild(badge);
+                        } else {
+                            filterBubble.innerHTML = '<i class="fas fa-filter"></i>';
+                        }
                     }
                 }
             }
@@ -1508,6 +1509,8 @@
                 const selectedBrands = getSelectedBrands();
                 const minPrice = minPriceInput ? minPriceInput.value : '';
                 const maxPrice = maxPriceInput ? maxPriceInput.value : '';
+
+                console.log('Applying filters:', { selectedBrands, minPrice, maxPrice });
 
                 let url = new URL(window.location.href);
 
@@ -1536,20 +1539,27 @@
                 // Close filter panel
                 filterPanel.classList.remove('show');
 
+                console.log('Navigating to:', url.toString());
                 // Navigate to new URL
                 window.location.href = url.toString();
             }
 
             function clearAllFilters() {
+                console.log('Clearing all filters');
+                
                 // Clear brand selection
                 document.querySelectorAll('.brand-checkbox').forEach(checkbox => {
                     checkbox.checked = false;
                 });
 
-                // Clear price inputs
+                // Clear price inputs (reset to full range)
                 if (minPriceInput) minPriceInput.value = '';
                 if (maxPriceInput) maxPriceInput.value = '';
-                if (priceSlider) priceSlider.value = 10000;
+                if (priceSlider) {
+                    priceSlider.max = 1000000;
+                    priceSlider.step = 1000;
+                    priceSlider.value = 1000000;
+                }
 
                 // Update displays
                 updateBrandDropdownPlaceholder();
@@ -1557,9 +1567,15 @@
                 updateActiveFilterCount();
 
                 // Close dropdown
-                brandDropdownOptions.classList.remove('show');
-                brandDropdownHeader.classList.remove('active');
-                dropdownArrow.style.transform = 'rotate(0deg)';
+                if (brandDropdownOptions) {
+                    brandDropdownOptions.classList.remove('show');
+                }
+                if (brandDropdownHeader) {
+                    brandDropdownHeader.classList.remove('active');
+                }
+                if (dropdownArrow) {
+                    dropdownArrow.style.transform = 'rotate(0deg)';
+                }
 
                 // Apply cleared filters
                 applyBrandFilters();
@@ -1599,6 +1615,8 @@
                     if (maxPrice) {
                         url += `&max_price=${maxPrice}`;
                     }
+
+                    console.log('Loading more products from:', url);
 
                     fetch(url, {
                             headers: {
@@ -1663,10 +1681,10 @@
 
             // Add to cart functionality
             document.addEventListener('click', function(e) {
-                if (e.target.closest('.add-to-cart-btn')) {
+                if (e.target.closest('.add-to-cart-form button[type="submit"]')) {
                     e.preventDefault();
                     const form = e.target.closest('.add-to-cart-form');
-                    const submitBtn = form.querySelector('.add-to-cart-btn');
+                    const submitBtn = form.querySelector('button[type="submit"]');
                     const originalText = submitBtn.innerHTML;
 
                     // Show loading state
@@ -1733,22 +1751,22 @@
                 const toast = document.createElement('div');
                 toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
                 toast.style.cssText = `
-            top: 100px;
-            z-index: 9999;
-            min-width: 300px;
-            text-align: center;
-        `;
+                    top: 100px;
+                    z-index: 9999;
+                    min-width: 300px;
+                    text-align: center;
+                `;
 
                 toast.innerHTML = `
-            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
-                <div class="d-flex justify-content-center align-items-center p-3">
-                    <div class="toast-body ${textColor} d-flex align-items-center">
-                        <i class="fas ${icon} me-2 fs-5"></i>
-                        <span class="fw-semibold">${message}</span>
+                    <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                        <div class="d-flex justify-content-center align-items-center p-3">
+                            <div class="toast-body ${textColor} d-flex align-items-center">
+                                <i class="fas ${icon} me-2 fs-5"></i>
+                                <span class="fw-semibold">${message}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
                 document.body.appendChild(toast);
 
                 // Auto remove after 3 seconds
@@ -1774,6 +1792,10 @@
                     element.textContent = count;
                 });
             }
+
+            // Initial debug check
+            console.log('Page initialized. Brands found:', document.querySelectorAll('.brand-dropdown-item').length);
+            console.log('Selected brands:', getSelectedBrands());
         });
     </script>
 @endsection
