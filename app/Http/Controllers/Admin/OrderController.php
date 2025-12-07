@@ -12,7 +12,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $status = $request->get('status', 'active');
+        $status = $request->get('status', 'all');
 
         $orders = Order::with(['user', 'delivery'])
             ->when($search, function ($query) use ($search) {
