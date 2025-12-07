@@ -425,6 +425,10 @@
                                 ₱10.00
                             </span>
                         </div>
+                        <small class="text-muted d-block mb-3" id="cart-shipping-note">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Final shipping fee will be calculated at checkout based on your delivery address.
+                        </small>
 
                         <hr>
 
@@ -710,6 +714,8 @@
                 });
 
                 const savings = originalTotal - subtotal;
+                // Cart shows ESTIMATED shipping: ₱0 for orders ≥₱100, else ₱10
+                // ACTUAL shipping will be calculated at checkout based on GPS coordinates from user's address
                 const shipping = subtotal >= 100 ? 0 : 10;
                 const total = subtotal + shipping;
 

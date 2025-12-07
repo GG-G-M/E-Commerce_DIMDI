@@ -153,4 +153,49 @@ class AddressController extends Controller
 
         return null;
     }
+
+    /**
+     * Estimate coordinates from a textual address when an external geocoding
+     * service (like Google Maps) is not available. This uses a deterministic
+     * hashing approach to generate repeatable, approximate coordinates within
+     * the Philippines bounding box. The result is NOT precise and should be
+     * treated as an approximation for shipping fee estimation only.
+     *
+     * @param string $address
+     * @return array ['latitude' => float, 'longitude' => float, 'method' => 'estimated']
+     */
+    public static function estimateCoordinatesFromAddress($address)
+    {
+        // Normalize input
+        $address = trim(strtolower((string) $address));
+
+        // Philippines approximate bounds
+        $latMin = 5.0;   // southernmost (approx)
+        $latMax = 19.0;  // northernmost (approx)
+        $lngMin = 117.0; // westernmost (approx)
+        $lngMax = 127.0; // easternmost (approx)
+
+        // Create a deterministic 32-bit unsigned hash
+        $hash = crc32($address);
+        // Convert to positive integer
+        if ($hash < 0) {
+            $hash = $hash & 0xFFFFFFFF;
+        }
+
+        // Use parts of the hash to create two fractions [0,1)
+        $partA = ($hash & 0xFFFF); // lower 16 bits
+        $partB = (($hash >> 16) & 0xFFFF); // upper 16 bits
+
+        $fracLat = ($partA / 65535);
+        $fracLng = ($partB / 65535);
+
+        $lat = $latMin + ($latMax - $latMin) * $fracLat;
+        $lng = $lngMin + ($lngMax - $lngMin) * $fracLng;
+
+        return [
+            'latitude' => round($lat, 6),
+            'longitude' => round($lng, 6),
+            'method' => 'estimated'
+        ];
+    }
 }

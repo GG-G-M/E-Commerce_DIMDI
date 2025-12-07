@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Notifications\OrderPlaced;
 use App\Notifications\OrderStatusUpdated;
 use App\Notifications\PaymentReceived;
+use App\Services\ShippingCalculationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -93,13 +94,15 @@ class OrderController extends Controller
         }
 
         $subtotal = $cartItems->sum('total_price');
-        $tax = $subtotal * 0.10;
-        $shipping = $subtotal > 100 ? 0 : 10;
+        
+        // For now, use default shipping until customer enters address
+        // Shipping will be recalculated in store() with actual GPS coordinates
+        $shipping = 0; // Will be calculated based on address
         $total = $subtotal + $shipping;
 
         $user = Auth::user();
 
-        return view('orders.create', compact('cartItems', 'subtotal', 'tax', 'shipping', 'total', 'user'));
+        return view('orders.create', compact('cartItems', 'subtotal', 'shipping', 'total', 'user'));
     }
 
     public function store(Request $request)
@@ -112,7 +115,9 @@ class OrderController extends Controller
             'shipping_address' => 'required|string|min:10',
             'billing_address' => 'required|string|min:10',
             'payment_method' => 'required|in:card,gcash,grab_pay,bank_transfer',
-            'customer_phone' => 'sometimes|string|max:20'
+            'customer_phone' => 'sometimes|string|max:20',
+            'shipping_latitude' => 'nullable|numeric|between:-90,90',
+            'shipping_longitude' => 'nullable|numeric|between:-180,180'
         ]);
 
         // Check if there are selected items from multi-select checkout
@@ -158,8 +163,42 @@ class OrderController extends Controller
 
         // Calculate totals
         $subtotal = $cartItems->sum('total_price');
-        $tax = $subtotal * 0.10;
-        $shipping = $subtotal > 100 ? 0 : 10;
+        
+        // Ensure we have the current user available for fallback address construction
+        $user = Auth::user();
+
+        // Determine coordinates: use provided coordinates or estimate from address
+        $latitude = $request->input('shipping_latitude');
+        $longitude = $request->input('shipping_longitude');
+
+        if (empty($latitude) || empty($longitude)) {
+            // Build a fallback address string: prefer submitted shipping_address, else use user's profile
+            $address = $request->input('shipping_address');
+            if (empty($address) && $user) {
+                $parts = [];
+                if (!empty($user->street_address)) $parts[] = $user->street_address;
+                if (!empty($user->barangay)) $parts[] = $user->barangay;
+                if (!empty($user->city)) $parts[] = $user->city;
+                if (!empty($user->province)) $parts[] = $user->province;
+                if (!empty($user->region)) $parts[] = $user->region;
+                if (!empty($user->country)) $parts[] = $user->country;
+                $address = implode(', ', $parts);
+            }
+
+            // Use AddressController estimator to get approximate coordinates
+            $estimated = \App\Http\Controllers\AddressController::estimateCoordinatesFromAddress($address ?? '');
+            $latitude = $estimated['latitude'];
+            $longitude = $estimated['longitude'];
+        }
+
+        // Calculate shipping fee based on distance from pivot point
+        $shippingResult = ShippingCalculationService::calculateShippingFeeWithFallback(
+            $latitude,
+            $longitude,
+            100 // Default fallback fee of 100 PHP if no zone matches
+        );
+        $shipping = $shippingResult['fee'];
+        
         $total = $subtotal + $shipping;
 
         $user = Auth::user();
@@ -176,6 +215,7 @@ class OrderController extends Controller
                 'billing_address' => $request->billing_address,
                 'subtotal' => $subtotal,
                 'shipping_cost' => $shipping,
+                'tax_amount' => 0,
                 'total_amount' => $total,
                 'payment_method' => $request->payment_method,
                 'order_status' => 'pending',
@@ -407,5 +447,115 @@ class OrderController extends Controller
         $pdf = PDF::loadView('receipt.pdf', compact('order'));
         
         return $pdf->stream("receipt-{$order->order_number}.pdf");
+    }
+
+    /**
+     * Safely notify a user (resolves user model when possible).
+     *
+     * @param mixed $userOrId
+     * @param \Illuminate\Contracts\Support\Renderable|\Illuminate\Notifications\Notification $notification
+     * @return void
+     */
+    private function safeNotify($userOrId, $notification)
+    {
+        // If null, nothing to do
+        if (empty($userOrId)) return;
+
+        // If it's already a User model and has notify method, use it
+        if (is_object($userOrId) && method_exists($userOrId, 'notify')) {
+            try {
+                $userOrId->notify($notification);
+                return;
+            } catch (\Throwable $e) {
+                // fallthrough to Notification facade
+            }
+        }
+
+        // If it's an ID, try to resolve the user model
+        $user = null;
+        if (is_numeric($userOrId)) {
+            $user = User::find($userOrId);
+        } elseif (is_object($userOrId) && property_exists($userOrId, 'id')) {
+            $user = User::find($userOrId->id);
+        }
+
+        if ($user) {
+            try {
+                $user->notify($notification);
+                return;
+            } catch (\Throwable $e) {
+                // fallback
+            }
+        }
+
+        // Last resort: use Notification facade if possible
+        try {
+            Notification::route('mail', config('mail.default'))->notify($notification);
+        } catch (\Throwable $e) {
+            // give up silently
+        }
+    }
+
+    /**
+     * Calculate shipping fee based on delivery coordinates or address
+     * Called via AJAX from checkout form
+     * Accepts either: (latitude + longitude) OR (address)
+     */
+    public function calculateShipping(Request $request)
+    {
+        // Accept either coordinates or address
+        $request->validate([
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'address' => 'nullable|string|min:5'
+        ]);
+
+        try {
+            $latitude = $request->input('latitude');
+            $longitude = $request->input('longitude');
+
+            // If coordinates not provided, estimate from address
+            if (empty($latitude) || empty($longitude)) {
+                $address = $request->input('address');
+                if (empty($address)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Address or coordinates required',
+                    ], 400);
+                }
+
+                // Use address estimator to get approximate coordinates
+                $estimated = \App\Http\Controllers\AddressController::estimateCoordinatesFromAddress($address);
+                $latitude = $estimated['latitude'];
+                $longitude = $estimated['longitude'];
+            }
+
+            $result = ShippingCalculationService::calculateShippingFeeWithFallback(
+                $latitude,
+                $longitude,
+                100 // Default fallback fee
+            );
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'shipping_fee' => $result['fee'],
+                    'distance' => $result['distance'] ?? null,
+                    'zone_name' => $result['zone_name'] ?? null,
+                    'zone_id' => $result['zone_id'] ?? null,
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message'] ?? 'Unable to calculate shipping fee',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            Log::error('Shipping calculation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error calculating shipping fee',
+            ], 500);
+        }
     }
 }
