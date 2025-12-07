@@ -211,15 +211,10 @@ class Order extends Model
             $this->restoreStock();
         }
 
-<<<<<<< HEAD
-        // CHANGED: Now only reduces stock on 'confirmed' status
-        if ($status === 'confirmed') {
-            $this->reduceStock();
-        }
-=======
+
         // NOTE: physical stock deduction is performed when order is marked 'shipped'.
         // Do not perform stock reduction on 'confirmed' to ensure FIFO is applied only once at 'shipped'.
->>>>>>> 36d28fd (most stable)
+
 
         return $this;
     }
@@ -337,37 +332,6 @@ class Order extends Model
         }
 
         foreach ($this->items as $item) {
-<<<<<<< HEAD
-            if (!$item->product) {
-                continue;
-            }
-
-            $product = $item->product;
-            $quantity = $item->quantity;
-
-            // Check if this item has a variant (selected_size)
-            if ($item->selected_size && $product->has_variants) {
-                // Find the variant by matching selected_size with variant_name
-                $variant = $product->variants->first(function($v) use ($item) {
-                    return ($v->variant_name === $item->selected_size) || 
-                           (isset($v->size) && $v->size === $item->selected_size);
-                });
-
-                if ($variant) {
-                    // Deduct from variant stock only
-                    $newVariantStock = max(0, $variant->stock_quantity - $quantity);
-                    $variant->update(['stock_quantity' => $newVariantStock]);
-                    
-                    // Update base product stock to reflect the sum of all variants (if method exists)
-                    if (method_exists($product, 'updateTotalStock')) {
-                        $product->updateTotalStock();
-                    }
-                }
-            } else {
-                // For products without variants, deduct from base product stock_quantity
-                $newStock = max(0, $product->stock_quantity - $quantity);
-                $product->update(['stock_quantity' => $newStock]);
-=======
             if ($item->product) {
                 // If a variant was selected, deduct from variant stock
                 if ($item->selected_size) {
@@ -391,7 +355,6 @@ class Order extends Model
                     $newStock = max(0, $item->product->stock_quantity - $item->quantity);
                     $item->product->update(['stock_quantity' => $newStock]);
                 }
->>>>>>> 8e0195a (fixed products stocks count (with minimal error))
             }
         }
 
@@ -403,7 +366,6 @@ class Order extends Model
      */
     public function restoreStock(): self
     {
-<<<<<<< HEAD
         // Load items with product and variants relationships if not already loaded
         if (!$this->relationLoaded('items')) {
             $this->load('items.product.variants');
@@ -419,78 +381,28 @@ class Order extends Model
         }
 
         foreach ($this->items as $item) {
-<<<<<<< HEAD
-            if (!$item->product) {
-                continue;
-            }
-
-            $product = $item->product;
-            $quantity = $item->quantity;
-
-            // Check if this item has a variant (selected_size)
-            if ($item->selected_size && $product->has_variants) {
-                // Find the variant by matching selected_size with variant_name
-                $variant = $product->variants->first(function($v) use ($item) {
-                    return ($v->variant_name === $item->selected_size) || 
-                           (isset($v->size) && $v->size === $item->selected_size);
-                });
-
-                if ($variant) {
-                    // Restore variant stock only
-                    $variant->increment('stock_quantity', $quantity);
-                    
-                    // Update base product stock to reflect the sum of all variants (if method exists)
-                    if (method_exists($product, 'updateTotalStock')) {
-                        $product->updateTotalStock();
-                    }
-                }
-            } else {
-                // For products without variants, restore base product stock_quantity
-                $product->increment('stock_quantity', $quantity);
-=======
             if ($item->product) {
                 // If a variant was selected, restore to variant stock
                 if ($item->selected_size) {
                     $variant = $item->product->variants()
                         ->where('variant_name', $item->selected_size)
                         ->first();
-=======
-        // Only restore stock if there are StockOut records associated with this order.
-        $stockOuts = \App\Models\StockOut::where('reason', 'like', '%Order #' . $this->id . '%')->get();
->>>>>>> 36d28fd (most stable)
 
-        if ($stockOuts->isEmpty()) {
-            // Nothing to restore (no physical stock-out performed yet)
-            return $this;
-        }
+                    if ($variant) {
+                        // Restore to variant stock
+                        $variant->increment('stock_quantity', $item->quantity);
 
-        foreach ($stockOuts as $stockOut) {
-            // Restore remaining_quantity on batches
-            foreach ($stockOut->stockInBatches as $batch) {
-                $batch->increment('remaining_quantity', $batch->pivot->deducted_quantity);
-            }
-
-            // Restore product/variant totals
-            if ($stockOut->product_variant_id) {
-                $variant = \App\Models\ProductVariant::find($stockOut->product_variant_id);
-                if ($variant) {
-                    $variant->increment('stock_quantity', $stockOut->quantity);
-                    // Sync parent product total
-                    if (method_exists($variant->product, 'updateTotalStock')) {
-                        $variant->product->updateTotalStock();
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
                     }
+                } else {
+                    // No variant selected, restore to main product stock
+                    $item->product->increment('stock_quantity', $item->quantity);
                 }
-            } else {
-                $product = \App\Models\Product::find($stockOut->product_id);
-                if ($product) {
-                    $product->increment('stock_quantity', $stockOut->quantity);
-                }
->>>>>>> 8e0195a (fixed products stocks count (with minimal error))
             }
-
-            // Detach pivot records and delete the StockOut log
-            $stockOut->stockInBatches()->detach();
-            $stockOut->delete();
         }
 
         return $this;
