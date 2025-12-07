@@ -80,14 +80,36 @@ class OrderController extends Controller
 
         // AUTO STOCK-OUT WHEN ORDER BECOMES SHIPPED
         if ($newStatus === 'shipped') {
-            foreach ($order->items as $item) {
-                app(\App\Http\Controllers\Admin\StockOutController::class)
-                    ->autoStockOut(
-                        $item->product_id,
-                        $item->product_variant_id,
-                        $item->quantity,
-                        'Order #' . $order->id . ' shipped'
-                    );
+            // If FIFO stock-out already occurred at confirmation, skip to avoid double deduction
+            $existingStockOut = \App\Models\StockOut::where('reason', 'like', '%Order #' . $order->id . '%')->exists();
+            if (!$existingStockOut) {
+                foreach ($order->items as $item) {
+                    // Resolve variant id from selected_size when available
+                    $variantId = null;
+                    if (!empty($item->selected_size) && $item->product) {
+                        // First try a DB lookup by variant_name
+                        $variant = $item->product->variants()->where('variant_name', $item->selected_size)->first();
+
+                        // Fallback: check the loaded collection (accessors like ->size may exist)
+                        if (!$variant) {
+                            $variant = $item->product->variants->first(function ($v) use ($item) {
+                                return ($v->variant_name === $item->selected_size) || (isset($v->size) && $v->size === $item->selected_size);
+                            });
+                        }
+
+                        if ($variant) {
+                            $variantId = $variant->id;
+                        }
+                    }
+
+                    app(\App\Http\Controllers\Admin\StockOutController::class)
+                        ->autoStockOut(
+                            $item->product_id,
+                            $variantId,
+                            $item->quantity,
+                            'Order #' . $order->id . ' shipped'
+                        );
+                }
             }
         }
 

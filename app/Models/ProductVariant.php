@@ -83,4 +83,24 @@ class ProductVariant extends Model
             return 'Out of Stock';
         }
     }
+
+    /**
+     * Keep parent product's stock_quantity in sync with variants.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function (ProductVariant $variant) {
+            if ($variant->product) {
+                $variant->product->updateTotalStock();
+            }
+        });
+
+        static::deleted(function (ProductVariant $variant) {
+            if ($variant->product) {
+                $variant->product->updateTotalStock();
+            }
+        });
+    }
 }

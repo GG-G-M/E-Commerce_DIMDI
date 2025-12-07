@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Http\Controllers\Admin\StockOutController;
 
 class Order extends Model
 {
@@ -211,9 +212,33 @@ class Order extends Model
             $this->restoreStock();
         }
 
-        // CHANGED: Now only reduces stock on 'confirmed' status
+        // CHANGED: Use FIFO Stock-Out on 'confirmed' status to perform physical deduction once
         if ($status === 'confirmed') {
-            $this->reduceStock();
+            // For each item, resolve variant id (if any) then call StockOutController::autoStockOut
+            foreach ($this->items as $item) {
+                $variantId = null;
+                if (!empty($item->selected_size) && $item->product) {
+                    // Try DB lookup by variant_name first
+                    $variant = $item->product->variants()->where('variant_name', $item->selected_size)->first();
+                    if (!$variant) {
+                        // Fallback to in-memory collection to support accessor-based `size`
+                        $variant = $item->product->variants->first(function ($v) use ($item) {
+                            return ($v->variant_name === $item->selected_size) || (isset($v->size) && $v->size === $item->selected_size);
+                        });
+                    }
+                    if ($variant) {
+                        $variantId = $variant->id;
+                    }
+                }
+
+                try {
+                    app(StockOutController::class)->autoStockOut($item->product_id, $variantId, $item->quantity, 'Order #' . $this->id . ' confirmed');
+                } catch (\Throwable $e) {
+                    // If FIFO fails (e.g., no batches), fall back to reduceStock behaviour for compatibility
+                    $this->reduceStock();
+                    break;
+                }
+            }
         }
 
         return $this;
