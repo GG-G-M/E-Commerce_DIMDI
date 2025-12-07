@@ -900,11 +900,11 @@
                         }
 
                         // Show toast
-                        this.showToast('Notification marked as read', 'success');
+                        // this.showToast('Notification marked as read', 'success');
                     }
                 } catch (error) {
                     console.error('Error marking notification as read:', error);
-                    this.showToast('Error marking notification as read', 'error');
+                    // this.showToast('Error marking notification as read', 'error');
                 }
             }
 

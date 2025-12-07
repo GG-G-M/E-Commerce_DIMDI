@@ -654,6 +654,14 @@
                                     <i class="fas fa-shopping-bag me-2"></i>My Orders
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('notifications.index') }}">
+                                    <i class="fas fa-bell me-2"></i>Notifications
+                                    @if ($unreadCount > 0)
+                                        <span class="badge bg-danger float-end">{{ $unreadCount }}</span>
+                                    @endif
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}" id="logout-form">
@@ -872,11 +880,11 @@
                         }
 
                         // Show toast
-                        this.showToast('Notification marked as read', 'success');
+                        // this.showToast('Notification marked as read', 'success');
                     }
                 } catch (error) {
                     console.error('Error marking notification as read:', error);
-                    this.showToast('Error marking notification as read', 'error');
+                    // this.showToast('Error marking notification as read', 'error');
                 }
             }
 
