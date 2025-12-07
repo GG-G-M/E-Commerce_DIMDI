@@ -635,7 +635,7 @@
                         </a>
 
                         <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                            <li><a class="dropdown-item" href="{{ route('home') }}#stats">Stats</a></li>
+                            {{-- <li><a class="dropdown-item" href="{{ route('home') }}#stats">Stats</a></li> --}}
                             <li><a class="dropdown-item" href="{{ route('home') }}#about">About</a></li>
                             <li><a class="dropdown-item" href="{{ route('home') }}#featured">Featured</a></li>
                             <li><a class="dropdown-item" href="{{ route('home') }}#why-choose-us">Why Choose Us</a></li>
@@ -656,6 +656,14 @@
                                 placeholder="Search products or categories..." id="searchInput" autocomplete="off">
                             {{-- <div class="search-results" id="searchResults"></div> --}}
                         </div>
+                    </li>
+
+                    <!-- Cart - Icon Only -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
+                        </a>
                     </li>
 
                     @auth
