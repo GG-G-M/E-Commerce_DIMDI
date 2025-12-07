@@ -137,6 +137,9 @@ class OrderController extends Controller
 
         try {
             DB::transaction(function () use ($order, $deliveriesTableId) {
+                // Load order items before processing
+                $order->load('items.product.variants');
+                
                 // Use deliveries table ID
                 $order->update([
                     'delivery_id' => $deliveriesTableId, // This is from deliveries table
@@ -145,6 +148,39 @@ class OrderController extends Controller
                 ]);
                 
                 $order->updateStatus('shipped', 'Order picked up by delivery personnel');
+                
+                // AUTO STOCK-OUT WHEN ORDER BECOMES SHIPPED (Same logic as admin)
+                // If FIFO stock-out already occurred at confirmation, skip to avoid double deduction
+                $existingStockOut = \App\Models\StockOut::where('reason', 'like', '%Order #' . $order->id . '%')->exists();
+                if (!$existingStockOut) {
+                    foreach ($order->items as $item) {
+                        // Resolve variant id from selected_size when available
+                        $variantId = null;
+                        if (!empty($item->selected_size) && $item->product) {
+                            // First try a DB lookup by variant_name
+                            $variant = $item->product->variants()->where('variant_name', $item->selected_size)->first();
+
+                            // Fallback: check the loaded collection (accessors like ->size may exist)
+                            if (!$variant) {
+                                $variant = $item->product->variants->first(function ($v) use ($item) {
+                                    return ($v->variant_name === $item->selected_size) || (isset($v->size) && $v->size === $item->selected_size);
+                                });
+                            }
+
+                            if ($variant) {
+                                $variantId = $variant->id;
+                            }
+                        }
+
+                        app(\App\Http\Controllers\Admin\StockOutController::class)
+                            ->autoStockOut(
+                                $item->product_id,
+                                $variantId,
+                                $item->quantity,
+                                'Order #' . $order->id . ' shipped'
+                            );
+                    }
+                }
             });
 
         return redirect()->route('delivery.orders.index')
