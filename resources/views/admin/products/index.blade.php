@@ -315,6 +315,7 @@
             <table class="table table-hover align-middle">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
                         <th>Brand</th>
@@ -329,6 +330,7 @@
                 <tbody>
                     @foreach($products as $product)
                     <tr>
+                        <td class="align-middle"><code>{{ $product->id }}</code></td>
                         <td>
                             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
                                  class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;">
@@ -425,6 +427,11 @@
                         </td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
+                                <a href="{{ route('admin.products.view', $product) }}" 
+                                   class="btn btn-sm btn-outline-primary me-1" 
+                                   title="View Product">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                                 <a href="{{ route('admin.products.edit', $product) }}" 
                                    class="btn btn-sm btn-outline-success me-1" 
                                    title="Edit Product">
