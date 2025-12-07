@@ -10,16 +10,35 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    /**
+     * Get the deliveries table ID for the current authenticated user
+     */
+    private function getDeliveriesTableId()
+    {
+        $deliveryUser = Auth::user();
+        if (!$deliveryUser) {
+            return null;
+        }
+        
+        $deliveryEntry = DB::table('deliveries')->where('email', $deliveryUser->email)->first();
+        return $deliveryEntry ? $deliveryEntry->id : null;
+    }
+
     public function index()
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
         
-        $orders = Order::where(function($query) use ($deliveryUserId) {
-                $query->where('delivery_id', $deliveryUserId)
+        if (!$deliveriesTableId) {
+            $orders = collect([]);
+            return view('delivery.orders.index', compact('orders'))
+                ->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        $orders = Order::where(function($query) use ($deliveriesTableId) {
+                $query->where('delivery_id', $deliveriesTableId)
                       ->whereIn('order_status', ['shipped', 'out_for_delivery']);
             })
             ->orWhere(function($query) {
-                // CHANGE: From 'processing' to 'confirmed'
                 $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id');
             })
@@ -32,7 +51,6 @@ class OrderController extends Controller
 
     public function pickup()
     {
-        // CHANGE: From 'processing' to 'confirmed'
         $orders = Order::where('order_status', 'confirmed')
             ->whereNull('delivery_id')
             ->with(['user', 'orderItems.product'])
@@ -44,9 +62,15 @@ class OrderController extends Controller
 
     public function delivered()
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
         
-        $orders = Order::where('delivery_id', $deliveryUserId)
+        if (!$deliveriesTableId) {
+            $orders = collect([]);
+            return view('delivery.orders.delivered', compact('orders'))
+                ->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        $orders = Order::where('delivery_id', $deliveriesTableId)
             ->where('order_status', 'delivered')
             ->with(['user', 'orderItems.product'])
             ->orderBy('delivered_at', 'desc')
@@ -56,38 +80,36 @@ class OrderController extends Controller
     }
 
     public function myOrders()
-{
-    $deliveryUser = Auth::user();
-    
-    // Get deliveries table ID by email
-    $deliveryEntry = DB::table('deliveries')->where('email', $deliveryUser->email)->first();
-    
-    if (!$deliveryEntry) {
-        // Return empty if not found in deliveries table
-        $orders = collect([]);
-        return view('delivery.orders.my-orders', compact('orders'));
-    }
-    
-    $deliveriesTableId = $deliveryEntry->id;
-    
-    // Get orders assigned to this delivery person (using deliveries table ID)
-    $orders = Order::where('delivery_id', $deliveriesTableId)
-        ->whereIn('order_status', ['shipped', 'out_for_delivery'])
-        ->with(['user', 'orderItems.product'])
-        ->orderBy('created_at', 'desc')
-        ->paginate(9);
+    {
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            $orders = collect([]);
+            return view('delivery.orders.my-orders', compact('orders'))
+                ->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        $orders = Order::where('delivery_id', $deliveriesTableId)
+            ->whereIn('order_status', ['shipped', 'out_for_delivery'])
+            ->with(['user', 'orderItems.product'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(9);
 
     return view('delivery.orders.my-orders', compact('orders'));
 }
 
     public function show(Order $order)
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            abort(403, 'You are not registered in the deliveries system.');
+        }
         
         // Allow viewing if:
         // 1. Order is assigned to current delivery person, OR
         // 2. Order is available for pickup (no delivery person assigned)
-        if ($order->delivery_id !== $deliveryUserId && !is_null($order->delivery_id)) {
+        if ($order->delivery_id !== $deliveriesTableId && !is_null($order->delivery_id)) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -96,60 +118,57 @@ class OrderController extends Controller
         return view('delivery.orders.show', compact('order'));
     }
 
-   // In app/Http\Controllers\Delivery\OrderController.php
-public function markAsPickedUp(Order $order, Request $request)
-{
-    $deliveryUser = Auth::user();
-    
-    // Get the deliveries table ID by email (since there's no user_id column)
-    $deliveryEntry = DB::table('deliveries')->where('email', $deliveryUser->email)->first();
-    
-    if (!$deliveryEntry) {
-        \Log::error('Delivery staff not found in deliveries table', [
-            'user_id' => $deliveryUser->id,
-            'email' => $deliveryUser->email
-        ]);
-        return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
-    }
-    
-    $deliveriesTableId = $deliveryEntry->id;
-    
-    // Check if order can be picked up using model method
-    if (!$order->canBePickedUp()) {
-        return redirect()->back()->with('error', 'This order is no longer available for pickup.');
-    }
-
-    try {
-        DB::transaction(function () use ($order, $deliveriesTableId) {
-            // Use deliveries table ID
-            $order->update([
-                'delivery_id' => $deliveriesTableId, // This is from deliveries table
-                'picked_up_at' => now(),
-                'assigned_at' => now(),
+    public function markAsPickedUp(Order $order, Request $request)
+    {
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            \Log::error('Delivery staff not found in deliveries table', [
+                'user_id' => Auth::id(),
+                'email' => Auth::user()->email
             ]);
-            
-            $order->updateStatus('shipped', 'Order picked up by delivery personnel');
-        });
+            return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        // Check if order can be picked up using model method
+        if (!$order->canBePickedUp()) {
+            return redirect()->back()->with('error', 'This order is no longer available for pickup.');
+        }
+
+        try {
+            DB::transaction(function () use ($order, $deliveriesTableId) {
+                // Use deliveries table ID
+                $order->update([
+                    'delivery_id' => $deliveriesTableId, // This is from deliveries table
+                    'picked_up_at' => now(),
+                    'assigned_at' => now(),
+                ]);
+                
+                $order->updateStatus('shipped', 'Order picked up by delivery personnel');
+            });
 
         return redirect()->route('delivery.orders.index')
             ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
 
-    } catch (\Exception $e) {
-        \Log::error('Failed to mark order as picked up', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('Failed to mark order as picked up', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+        }
     }
-}
     
-
     public function markAsDelivered(Order $order, Request $request)
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
+        }
         
         // Verify the order belongs to the current delivery driver
-        if ($order->delivery_id !== $deliveryUserId) {
+        if ($order->delivery_id !== $deliveriesTableId) {
             return redirect()->back()->with('error', 'Unauthorized action. This order is not assigned to you.');
         }
 
@@ -159,7 +178,7 @@ public function markAsPickedUp(Order $order, Request $request)
         }
 
         try {
-            // ✅ FIX: Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
+            // Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
             $order->updateStatus('delivered', 'Order delivered by delivery personnel');
 
             return redirect()->route('delivery.orders.index')
@@ -172,9 +191,13 @@ public function markAsPickedUp(Order $order, Request $request)
 
     public function markAsOutForDelivery(Order $order, Request $request)
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
         
-        if ($order->delivery_id !== $deliveryUserId) {
+        if (!$deliveriesTableId) {
+            return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        if ($order->delivery_id !== $deliveriesTableId) {
             return redirect()->back()->with('error', 'Unauthorized action. This order is not assigned to you.');
         }
 
@@ -194,9 +217,13 @@ public function markAsPickedUp(Order $order, Request $request)
 
     public function updateDeliveryNotes(Order $order, Request $request)
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
         
-        if ($order->delivery_id !== $deliveryUserId) {
+        if (!$deliveriesTableId) {
+            return response()->json(['error' => 'You are not registered in the deliveries system.'], 403);
+        }
+        
+        if ($order->delivery_id !== $deliveriesTableId) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -224,24 +251,32 @@ public function markAsPickedUp(Order $order, Request $request)
 
     public function getOrderStats()
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            return response()->json([
+                'total_assigned' => 0,
+                'available_for_pickup' => 0,
+                'delivered_today' => 0,
+                'total_delivered' => 0
+            ]);
+        }
         
         $stats = [
-            'total_assigned' => Order::where('delivery_id', $deliveryUserId)
+            'total_assigned' => Order::where('delivery_id', $deliveriesTableId)
                 ->whereIn('order_status', ['shipped', 'out_for_delivery'])
                 ->count(),
                 
-            // CHANGE: From 'processing' to 'confirmed'
             'available_for_pickup' => Order::where('order_status', 'confirmed')
                 ->whereNull('delivery_id')
                 ->count(),
                 
-            'delivered_today' => Order::where('delivery_id', $deliveryUserId)
+            'delivered_today' => Order::where('delivery_id', $deliveriesTableId)
                 ->where('order_status', 'delivered')
                 ->whereDate('delivered_at', today())
                 ->count(),
                 
-            'total_delivered' => Order::where('delivery_id', $deliveryUserId)
+            'total_delivered' => Order::where('delivery_id', $deliveriesTableId)
                 ->where('order_status', 'delivered')
                 ->count(),
         ];
@@ -251,11 +286,17 @@ public function markAsPickedUp(Order $order, Request $request)
 
     public function searchOrders(Request $request)
     {
-        $deliveryUserId = Auth::id();
+        $deliveriesTableId = $this->getDeliveriesTableId();
         $search = $request->get('search');
         
-        $orders = Order::where(function($query) use ($deliveryUserId, $search) {
-                $query->where('delivery_id', $deliveryUserId)
+        if (!$deliveriesTableId) {
+            $orders = collect([]);
+            return view('delivery.orders.index', compact('orders'))
+                ->with('error', 'You are not registered in the deliveries system.');
+        }
+        
+        $orders = Order::where(function($query) use ($deliveriesTableId, $search) {
+                $query->where('delivery_id', $deliveriesTableId)
                       ->whereIn('order_status', ['shipped', 'out_for_delivery'])
                       ->where(function($q) use ($search) {
                           $q->where('order_number', 'like', "%{$search}%")
@@ -264,7 +305,6 @@ public function markAsPickedUp(Order $order, Request $request)
                       });
             })
             ->orWhere(function($query) use ($search) {
-                // CHANGE: From 'processing' to 'confirmed'
                 $query->where('order_status', 'confirmed')
                       ->whereNull('delivery_id')
                       ->where(function($q) use ($search) {

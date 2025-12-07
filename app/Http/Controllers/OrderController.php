@@ -6,10 +6,17 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\User;
+use App\Notifications\OrderPlaced;
+use App\Notifications\OrderStatusUpdated;
+use App\Notifications\PaymentReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Notification;
+
 
 class OrderController extends Controller
 {
@@ -169,7 +176,6 @@ class OrderController extends Controller
                 'shipping_address' => $request->shipping_address,
                 'billing_address' => $request->billing_address,
                 'subtotal' => $subtotal,
-                // 'tax_amount' => $tax,
                 'shipping_cost' => $shipping,
                 'total_amount' => $total,
                 'payment_method' => $request->payment_method,
@@ -196,6 +202,9 @@ class OrderController extends Controller
             // Store order ID in session for payment redirects
             session(['last_order_id' => $order->id]);
 
+            // Send order placed notification (safe)
+            $this->safeNotify($user, new OrderPlaced($order));
+
             // Handle different payment methods
             if (in_array($request->payment_method, ['gcash', 'grab_pay'])) {
                 // For GCash/GrabPay, return JSON response for AJAX handling
@@ -215,6 +224,10 @@ class OrderController extends Controller
             } else {
                 // For card/bank transfer, update status and reduce stock immediately
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
+                
+                // Send status update + receipt notification (safe)
+                $this->safeNotify($user, new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment received via ' . ucfirst($request->payment_method)));
+                $this->safeNotify($user, new PaymentReceived($order));
                 
                 // Clear selected items from cart if multi-select was used
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -238,7 +251,6 @@ class OrderController extends Controller
         }
     }
 
-    // NEW METHOD: Handle GCash/GrabPay redirect
     private function initiateRedirectPayment(Order $order, $paymentMethod, $amount)
     {
         try {
@@ -298,6 +310,35 @@ class OrderController extends Controller
                 // Use the model's updateStatus method to update order status and create timeline
                 $order->updateStatus('confirmed', 'Payment received via ' );
                 
+                // Create notification for payment success
+                if ($order->user) {
+                    $notificationData = [
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'message' => "Payment received for Order #{$order->order_number}. Your order is now being processed.",
+                        'icon' => 'fas fa-credit-card',
+                        'color' => 'success',
+                        'url' => route('orders.show', $order),
+                        'receipt_view_url' => route('orders.receipt.preview', $order),
+                        'receipt_download_url' => route('orders.receipt.download', $order),
+                        'status_display' => 'Payment Received',
+                        'amount' => '₱' . number_format($order->total_amount, 2),
+                        'time_ago' => 'Just now'
+                    ];
+                    
+                    // Create the notification record
+                    $order->user->notifications()->create([
+                        'type' => 'App\Notifications\PaymentReceived',
+                        'data' => $notificationData,
+                        'read_at' => null
+                    ]);
+                    
+                    // Also trigger the OrderStatusUpdated notification if you have it (safe)
+                    if (class_exists('App\Notifications\OrderStatusUpdated')) {
+                        $this->safeNotify($order->user, new \App\Notifications\OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
+                    }
+                }
+                
                 // Clear selected items from cart if multi-select was used
                 $selectedItemIds = session()->get('selected_cart_items');
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -313,7 +354,12 @@ class OrderController extends Controller
                 session()->forget('last_order_id');
                 
                 return redirect()->route('orders.show', $order)
-                    ->with('success', 'Payment completed successfully! Your order is now confirmed.');
+                    ->with('success', 'Payment completed successfully! Your order is now confirmed.')
+                    ->with('notification', [
+                        'type' => 'success',
+                        'message' => 'Payment successful! Check your notifications for details.',
+                        'order_number' => $order->order_number
+                    ]);
             }
         }
         
@@ -337,9 +383,16 @@ class OrderController extends Controller
             'cancellation_reason' => 'required|string|max:500'
         ]);
 
+        // Store old status for notification
+        $oldStatus = $order->order_status;
+        
         // Use the model's updateStatus method which handles the timeline and stock restoration
         $order->updateStatus('cancelled', $request->cancellation_reason);
-        // Note: restoreStock() is automatically called by updateStatus when status is 'cancelled'
+        
+        // Send cancellation notification (safe)
+        if ($order->user) {
+            $this->safeNotify($order->user, new OrderStatusUpdated($order, $oldStatus, 'cancelled', $request->cancellation_reason));
+        }
 
         return redirect()->back()->with('success', 'Order has been cancelled successfully.');
     }
@@ -354,6 +407,85 @@ class OrderController extends Controller
             if ($order->user_id !== null || $order->customer_email !== session()->get('guest_email')) {
                 abort(404);
             }
+        }
+    }
+
+    /**
+     * Download receipt for order
+     */
+    public function downloadReceipt(Order $order)
+    {
+        // Authorization check
+        $this->authorizeOrderView($order);
+
+        $order->load(['items.product', 'user']);
+
+        // Generate PDF using the alias
+        $pdf = PDF::loadView('receipt.pdf', compact('order'));
+        
+        return $pdf->download("receipt-{$order->order_number}.pdf");
+    }
+
+    /**
+     * Preview receipt in browser
+     */
+    public function previewReceipt(Order $order)
+    {
+        // Authorization check
+        $this->authorizeOrderView($order);
+
+        $order->load(['items.product', 'user']);
+
+        // Generate PDF using the alias
+        $pdf = PDF::loadView('receipt.pdf', compact('order'));
+        
+        return $pdf->stream("receipt-{$order->order_number}.pdf");
+    }
+
+    /**
+     * Safely notify a user (resolves user model when possible).
+     *
+     * @param mixed $userOrId
+     * @param \Illuminate\Contracts\Support\Renderable|\Illuminate\Notifications\Notification $notification
+     * @return void
+     */
+    private function safeNotify($userOrId, $notification)
+    {
+        // If null, nothing to do
+        if (empty($userOrId)) return;
+
+        // If it's already a User model and has notify method, use it
+        if (is_object($userOrId) && method_exists($userOrId, 'notify')) {
+            try {
+                $userOrId->notify($notification);
+                return;
+            } catch (\Throwable $e) {
+                // fallthrough to Notification facade
+            }
+        }
+
+        // If it's an ID, try to resolve the user model
+        $user = null;
+        if (is_numeric($userOrId)) {
+            $user = User::find($userOrId);
+        } elseif (is_object($userOrId) && property_exists($userOrId, 'id')) {
+            $user = User::find($userOrId->id);
+        }
+
+        if ($user) {
+            try {
+                $user->notify($notification);
+                return;
+            } catch (\Throwable $e) {
+                // fallback
+            }
+        }
+
+        // Last resort: use Notification facade if possible
+        try {
+            Notification::route('mail', config('mail.default'))->notify($notification);
+        } catch (\Throwable $e) {
+            // give up silently
         }
     }
 }

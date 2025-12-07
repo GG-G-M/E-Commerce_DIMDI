@@ -52,6 +52,14 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+// GOOGLE LOGIN
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+
+// FACEBOOK LOGIN
+Route::get('/auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('login.facebook');
+Route::get('/auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+
 // Cart Routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
@@ -87,6 +95,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    
+    // ADD THESE RECEIPT ROUTES:
+    Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloadReceipt'])->name('orders.receipt.download');
+    Route::get('/orders/{order}/receipt/preview', [OrderController::class, 'previewReceipt'])->name('orders.receipt.preview');
+
+    // ADD ALIASES FOR COMPATIBILITY:
+    Route::get('/orders/{order}/download-receipt', [OrderController::class, 'downloadReceipt'])->name('orders.download-receipt');
+    Route::get('/orders/{order}/preview-receipt', [OrderController::class, 'previewReceipt'])->name('orders.preview-receipt');
 
     // NEW PAYMENT ROUTES FOR ORDERS
     Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');
@@ -101,6 +117,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::get('/{notification}/receipt', [NotificationController::class, 'viewReceipt'])->name('receipt.view');
+        Route::get('/{notification}/receipt/download', [NotificationController::class, 'downloadReceipt'])->name('receipt.download');
+        Route::get('/{notification}/receipt/preview', [NotificationController::class, 'previewReceipt'])->name('receipt.preview');
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'clearAll'])->name('clearAll');
         Route::get('/list', [NotificationController::class, 'list'])->name('list');
@@ -200,12 +219,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
 
+
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
-    Route::get('/admin/stock-in/products/modal', [StockInController::class, 'productModal'])->name('stock_in.products.modal');
 
     // CSV
     Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');

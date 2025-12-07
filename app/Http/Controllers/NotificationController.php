@@ -2,81 +2,155 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
+use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Auth::user()->notifications()->paginate(20);
-        
-        // Mark all as read when viewing all notifications
-        Auth::user()->unreadNotifications->markAsRead();
+        $notifications = Auth::user()->notifications()->latest()->paginate(20);
         
         return view('notifications.index', compact('notifications'));
     }
-
-    public function markAsRead($id)
+    
+    // NEW: Handle receipt viewing through notifications
+    public function viewReceipt($id)
     {
-        $notification = Auth::user()->notifications()->where('id', $id)->first();
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $orderId = $notification->data['order_id'] ?? null;
         
-        if ($notification) {
-            $notification->markAsRead();
-            return response()->json(['success' => true]);
+        if (!$orderId) {
+            return redirect()->route('notifications.index')
+                ->with('error', 'Order information not found in notification.');
         }
         
-        return response()->json(['success' => false], 404);
+        $order = Order::findOrFail($orderId);
+        
+        // Authorization check
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Redirect to order page which has receipt
+        return redirect()->route('orders.show', $order);
     }
-
+    
+    public function downloadReceipt($id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $orderId = $notification->data['order_id'] ?? null;
+        
+        if (!$orderId) {
+            return redirect()->route('notifications.index')
+                ->with('error', 'Order information not found in notification.');
+        }
+        
+        $order = Order::findOrFail($orderId);
+        
+        // Authorization check
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Generate PDF
+        $order->load(['items.product', 'user']);
+        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        
+        return $pdf->download("receipt-{$order->order_number}.pdf");
+    }
+    
+    public function previewReceipt($id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $orderId = $notification->data['order_id'] ?? null;
+        
+        if (!$orderId) {
+            return redirect()->route('notifications.index')
+                ->with('error', 'Order information not found in notification.');
+        }
+        
+        $order = Order::findOrFail($orderId);
+        
+        // Authorization check
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        // Mark notification as read
+        $notification->markAsRead();
+        
+        // Generate PDF
+        $order->load(['items.product', 'user']);
+        $pdf = Pdf::loadView('receipt.pdf', compact('order'));
+        
+        return $pdf->stream("receipt-{$order->order_number}.pdf");
+    }
+    
+    public function markAsRead($id)
+    {
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        
+        return response()->json(['success' => true]);
+    }
+    
     public function markAllAsRead()
     {
-        Auth::user()->unreadNotifications->markAsRead();
-        return response()->json(['success' => true]);
+        Auth::user()->unreadNotifications()->update(['read_at' => now()]);
+        
+        return back()->with('success', 'All notifications marked as read');
     }
-
+    
+    // Add these additional methods:
     public function destroy($id)
     {
-        Auth::user()->notifications()->where('id', $id)->delete();
-        return response()->json(['success' => true]);
+        $notification = Auth::user()->notifications()->findOrFail($id);
+        $notification->delete();
+        
+        return back()->with('success', 'Notification deleted.');
     }
-
+    
     public function clearAll()
     {
         Auth::user()->notifications()->delete();
-        return response()->json(['success' => true]);
+        
+        return back()->with('success', 'All notifications cleared.');
     }
-
+    
     public function list()
     {
-        $notifications = Auth::user()->notifications()->take(5)->get();
+        $notifications = Auth::user()->notifications()->latest()->get();
         
-        return view('partials.notification-list', compact('notifications'))->render();
+        return response()->json([
+            'notifications' => $notifications,
+            'unread_count' => Auth::user()->unreadNotifications()->count()
+        ]);
     }
-
+    
     public function checkNew()
     {
-        $user = Auth::user();
-        $latestNotification = $user->notifications()->first();
-        $newCount = $user->unreadNotifications()->count();
+        $count = Auth::user()->unreadNotifications()->count();
         
-        if ($latestNotification) {
-            $data = $latestNotification->data;
-            $data['time_ago'] = $latestNotification->created_at->diffForHumans();
-            
-            return response()->json([
-                'new_count' => $newCount,
-                'latest' => $data
-            ]);
-        }
-        
-        return response()->json(['new_count' => $newCount]);
+        return response()->json([
+            'has_new' => $count > 0,
+            'count' => $count
+        ]);
     }
-
+    
     public function getUnreadCount()
     {
         $count = Auth::user()->unreadNotifications()->count();
+        
         return response()->json(['count' => $count]);
     }
 }
