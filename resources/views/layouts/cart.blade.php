@@ -259,6 +259,76 @@
             border: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+        /* Notification dropdown tweaks */
+        .notification-dropdown {
+            min-width: 320px;
+            max-width: 420px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .notification-header h6 {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .notification-header .btn-link {
+            font-size: 0.85rem;
+            padding: 0.15rem 0.4rem;
+            text-decoration: none;
+        }
+
+        .notification-body {
+            max-height: 320px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 1rem;
+            color: inherit;
+        }
+
+        .notification-item .notification-icon i {
+            font-size: 1.15rem;
+            width: 36px;
+            text-align: center;
+        }
+
+        .notification-item .notification-content h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .notification-item .notification-content p {
+            margin: 0.25rem 0 0;
+            font-size: 0.88rem;
+            color: #495057;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+
+        .notification-item.unread {
+            background: rgba(44,143,12,0.06);
+        }
+
+        .notification-badge {
+            transform: translate(8px, -8px);
+            font-size: 0.68rem;
+            padding: 0.18rem 0.36rem;
+        }
+
+        .notification-footer a {
+            font-weight: 600;
+        }
         
         .dropdown-item {
             padding: 0.5rem 1rem;
@@ -362,6 +432,62 @@
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
                         </a>
+                    </li>
+
+                    <!-- Notifications Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-controls="notificationMenu">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            @php $unreadCount = auth()->user()->unreadNotifications->count(); @endphp
+                            @if($unreadCount > 0)
+                                <span class="notification-badge badge bg-danger rounded-pill" id="desktopNotificationCount">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationsDropdown" id="notificationMenu" role="menu">
+                            <div class="notification-header p-3 border-bottom d-flex align-items-center justify-content-between">
+                                <h6 class="mb-0">Notifications</h6>
+                                @if($unreadCount > 0)
+                                    <button type="button" class="btn btn-sm btn-link text-white mark-all-read" style="text-decoration: none;">Mark all</button>
+                                @endif
+                            </div>
+
+                            <div class="notification-body" id="notificationList" role="list" style="max-height: 320px; overflow:auto;">
+                                @php $notifications = auth()->user()->notifications->take(5); @endphp
+                                @if($notifications->count() > 0)
+                                    @foreach($notifications as $notification)
+                                        @php
+                                            $data = $notification->data;
+                                            $isUnread = $notification->read_at === null;
+                                        @endphp
+                                        <a href="{{ $data['url'] ?? '#' }}" class="notification-item d-flex p-3 border-bottom text-decoration-none {{ $isUnread ? 'unread' : 'read' }}" data-id="{{ $notification->id }}" role="listitem">
+                                            <div class="notification-icon me-3" aria-hidden="true">
+                                                <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"></i>
+                                            </div>
+                                            <div class="notification-content flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h6 class="mb-1" style="font-size: 0.9rem;">@if(isset($data['order_number'])) Order #{{ $data['order_number'] }} @else Notification @endif</h6>
+                                                    <small class="text-muted notification-time">{{ $data['time_ago'] ?? '' }}</small>
+                                                </div>
+                                                <p class="mb-1" style="font-size: 0.85rem;">{{ $data['message'] ?? 'New notification' }}</p>
+                                                @if(isset($data['status_display']))
+                                                    <small class="text-muted">Status: <span class="badge bg-{{ $data['color'] ?? 'secondary' }}">{{ $data['status_display'] }}</span></small>
+                                                @endif
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                                        <p class="mb-0">No notifications</p>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="notification-footer p-2 border-top text-center">
+                                <a href="{{ route('notifications.index') }}" class="text-decoration-none" style="color: #2C8F0C;">View all notifications</a>
+                            </div>
+                        </div>
                     </li>
                     
                     <!-- User Dropdown -->

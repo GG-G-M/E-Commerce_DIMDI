@@ -160,6 +160,9 @@
             padding: 0.5rem 0.8rem !important;
             border-radius: 6px;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .cart-container:hover {
@@ -169,20 +172,39 @@
         
         .cart-badge {
             position: absolute;
-            top: -5px;
-            right: 2px;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
+            top: -2px;
+            right: -2px;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
         }
         
-        /* Notification styles */
+        /* Notification badge styles */
+        .nav-link.position-relative {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: 2px;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
+            top: -2px;
+            right: -2px;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
             min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
             text-align: center;
         }
         
@@ -279,11 +301,18 @@
         }
         
         #mobileCartCount, #mobileNotificationCount {
-            font-size: 0.6rem;
-            padding: 0.15rem 0.3rem;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
             position: absolute;
             top: -2px;
-            right: 5px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
         }
         
         /* Mobile notification bell */
@@ -328,6 +357,53 @@
             border-radius: 8px;
             border: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Notification dropdown tweaks (sync with cart layout) */
+        .notification-dropdown {
+            min-width: 320px;
+            max-width: 420px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .notification-header h6 {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .notification-header .btn-link {
+            font-size: 0.85rem;
+            padding: 0.15rem 0.4rem;
+            text-decoration: none;
+        }
+
+        .notification-body {
+            max-height: 320px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .notification-item {
+            color: inherit;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+        
+        .notification-item:last-child .border-bottom {
+            border-bottom: none !important;
+        }
+
+        .notification-item.unread {
+            background: rgba(44,143,12,0.06);
+        }
+
+        .notification-footer a {
+            font-weight: 600;
         }
         
         .dropdown-item {
@@ -485,12 +561,10 @@
                             @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationsDropdown">
-                            <div class="notification-header p-3 border-bottom">
-                                <h6 class="mb-0">Notifications</h6>
+                            <div class="notification-header p-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" style="font-weight: 600; font-size: 1rem;">Notifications</h6>
                                 @if($unreadCount > 0)
-                                <small class="float-end">
-                                    <a href="#" class="text-white mark-all-read" style="text-decoration: none;">Mark all as read</a>
-                                </small>
+                                <a href="#" class="text-white mark-all-read" style="text-decoration: none; font-size: 0.85rem; padding: 0.15rem 0.4rem;">Mark all as read</a>
                                 @endif
                             </div>
                             
@@ -504,30 +578,30 @@
                                         $data = $notification->data;
                                         $isUnread = $notification->read_at === null;
                                     @endphp
-                                    <a href="#" class="notification-item d-block p-3 border-bottom text-decoration-none {{ $isUnread ? 'unread' : 'read' }}"
+                                    <a href="#" class="notification-item d-block text-decoration-none {{ $isUnread ? 'unread' : 'read' }}"
                                        data-id="{{ $notification->id }}"
                                        data-url="{{ $data['url'] ?? '#' }}">
-                                        <div class="d-flex align-items-start">
-                                            <div class="notification-icon me-3">
-                                                <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"></i>
+                                        <div class="d-flex align-items-start gap-3 p-3 border-bottom">
+                                            <div class="notification-icon flex-shrink-0">
+                                                <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}" style="font-size: 1.15rem; width: 36px; text-align: center;"></i>
                                             </div>
-                                            <div class="notification-content flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <h6 class="mb-1" style="font-size: 0.9rem;">
+                                            <div class="notification-content flex-grow-1" style="min-width: 0;">
+                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                    <h6 class="mb-0" style="font-size: 0.95rem; font-weight: 600; line-height: 1.3;">
                                                         @if(isset($data['order_number']))
                                                         Order #{{ $data['order_number'] }}
                                                         @else
                                                         Notification
                                                         @endif
                                                     </h6>
-                                                    <small class="text-muted notification-time">{{ $data['time_ago'] ?? '' }}</small>
+                                                    <small class="text-muted notification-time flex-shrink-0 ms-2" style="font-size: 0.75rem; white-space: nowrap;">{{ $data['time_ago'] ?? '' }}</small>
                                                 </div>
-                                                <p class="mb-1" style="font-size: 0.85rem;">
+                                                <p class="mb-1" style="font-size: 0.88rem; color: #495057; line-height: 1.4; margin: 0.25rem 0 0;">
                                                     {{ $data['message'] ?? 'New notification' }}
                                                 </p>
                                                 @if(isset($data['status_display']))
-                                                <small class="text-muted">
-                                                    Status: <span class="badge bg-{{ $data['color'] ?? 'secondary' }}">
+                                                <small class="text-muted mt-1 d-block">
+                                                    Status: <span class="badge bg-{{ $data['color'] ?? 'secondary' }}" style="font-size: 0.75rem;">
                                                         {{ $data['status_display'] }}
                                                     </span>
                                                 </small>
@@ -872,26 +946,33 @@
             showToast(message, type = 'info') {
                 const toastContainer = document.querySelector('.toast-container');
                 const toastId = 'toast-' + Date.now();
-                
+
                 const toast = document.createElement('div');
                 toast.className = `custom-toast ${type} mb-2`;
                 toast.id = toastId;
+                toast.setAttribute('role', 'status');
+                toast.setAttribute('aria-live', 'polite');
+
+                const severity = type.charAt(0).toUpperCase() + type.slice(1);
+                const icon = this.getToastIcon(type);
+
                 toast.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body p-3">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-${this.getToastIcon(type)} me-3 text-${type}"></i>
-                                <div>
-                                    <p class="mb-0" style="font-size: 0.9rem;">${message}</p>
-                                </div>
-                            </div>
+                    <div class="d-flex align-items-start p-2">
+                        <div class="me-3 d-flex align-items-center">
+                            <i class="fas fa-${icon} fa-lg text-${type}"></i>
                         </div>
-                        <button type="button" class="btn-close me-2 m-auto" onclick="document.getElementById('${toastId}').remove()"></button>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="fw-semibold">${severity}</div>
+                                <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('${toastId}').remove()"></button>
+                            </div>
+                            <div class="toast-message mt-1" style="font-size:0.95rem;">${message}</div>
+                        </div>
                     </div>
                 `;
-                
+
                 toastContainer.appendChild(toast);
-                
+
                 // Auto remove after 5 seconds
                 setTimeout(() => {
                     if (toast.parentNode) {

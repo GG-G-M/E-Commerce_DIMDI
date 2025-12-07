@@ -44,6 +44,18 @@
             padding: 5px;
         }
 
+        .quantity-input.error {
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .quantity-error {
+            color: #dc3545;
+            font-size: 0.75rem;
+            margin-top: 5px;
+            display: none;
+        }
+
         .btn-primary {
             background-color: #2C8F0C !important;
             border-color: #2C8F0C !important;
@@ -144,23 +156,29 @@
             font-weight: 600;
         }
     </style>
-
     <div class="container py-4">
         <div class="row">
             <div class="col-lg-8">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Shopping Cart</h2>
+                    <h3 class="fw-bold text-success" style="color: #2C8F0C;">Shopping Cart</h3>
                     <span class="text-muted">{{ $cartItems->count() }} items</span>
                 </div>
 
                 @if ($cartItems->count() > 0)
                     <!-- Selection Controls -->
-                    <div class="selection-controls">
-                        <div class="selection-info">
+                    <div class="selection-controls d-flex justify-content-between align-items-center w-100">
+
+                        <!-- Left side -->
+                        <div class="selection-left d-flex align-items-center gap-2">
                             <input type="checkbox" id="select-all" class="cart-item-checkbox">
                             <label for="select-all" class="mb-0"><strong>Select All</strong></label>
-                            <span class="selected-badge"><span id="selected-count">0</span> selected</span>
                         </div>
+
+                        <!-- Right side -->
+                        <div class="selection-right">
+                            <span><span id="selected-count">0</span> selected</span>
+                        </div>
+
                     </div>
 
                     @foreach ($cartItems as $item)
@@ -190,30 +208,34 @@
 
                                 // Calculate price based on actual variant
                                 $unitPrice = $currentVariant
-                                    ? ($currentVariant->has_discount ? $currentVariant->sale_price : $currentVariant->current_price)
-                                    : ($item->product->has_discount ? $item->product->sale_price : $item->product->current_price);
-                                
+                                    ? ($currentVariant->has_discount
+                                        ? $currentVariant->sale_price
+                                        : $currentVariant->current_price)
+                                    : ($item->product->has_discount
+                                        ? $item->product->sale_price
+                                        : $item->product->current_price);
+
                                 // Store original price for summary calculation
-                                $originalUnitPrice = $currentVariant
-                                    ? $currentVariant->price
-                                    : $item->product->price;
-                                
+                                $originalUnitPrice = $currentVariant ? $currentVariant->price : $item->product->price;
+
                                 $hasDiscount = $currentVariant
                                     ? $currentVariant->has_discount
                                     : $item->product->has_discount;
-                                
+
                                 $discountPercent = $currentVariant
                                     ? $currentVariant->discount_percentage
                                     : $item->product->discount_percentage;
                             } else {
                                 // For products without variants, use product's own stock and price
-                                $currentVariant = null;
-                                $currentStock = $item->product->stock_quantity;
-                                $variantName = 'Standard';
+    $currentVariant = null;
+    $currentStock = $item->product->stock_quantity;
+    $variantName = 'Standard';
                                 $isVariantAvailable = $currentStock > 0;
                                 $maxQuantity = $currentStock;
                                 $displayImage = $item->product->image_url;
-                                $unitPrice = $item->product->has_discount ? $item->product->sale_price : $item->product->current_price;
+                                $unitPrice = $item->product->has_discount
+                                    ? $item->product->sale_price
+                                    : $item->product->current_price;
                                 $originalUnitPrice = $item->product->price;
                                 $hasDiscount = $item->product->has_discount;
                                 $discountPercent = $item->product->discount_percentage;
@@ -223,12 +245,12 @@
                             $itemOriginalTotalPrice = $originalUnitPrice * $item->quantity;
                         @endphp
 
-                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}" data-item-id="{{ $item->id }}"
-                             data-unit-price="{{ $unitPrice }}"
-                             data-original-unit-price="{{ $originalUnitPrice }}"
-                             data-has-discount="{{ $hasDiscount ? '1' : '0' }}"
-                             data-discount-percent="{{ $discountPercent }}"
-                             data-quantity="{{ $item->quantity }}">
+                        <div class="cart-item position-relative" id="cart-item-{{ $item->id }}"
+                            data-item-id="{{ $item->id }}" data-unit-price="{{ $unitPrice }}"
+                            data-original-unit-price="{{ $originalUnitPrice }}"
+                            data-has-discount="{{ $hasDiscount ? '1' : '0' }}"
+                            data-discount-percent="{{ $discountPercent }}" data-quantity="{{ $item->quantity }}"
+                            data-max-quantity="{{ $maxQuantity }}">
                             <div class="loading-spinner" id="loading-{{ $item->id }}">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
@@ -237,11 +259,12 @@
 
                             <div class="row align-items-center">
                                 <div class="col-md-1 d-flex align-items-center">
-                                    <input type="checkbox" class="cart-item-checkbox item-checkbox" data-item-id="{{ $item->id }}">
+                                    <input type="checkbox" class="cart-item-checkbox item-checkbox"
+                                        data-item-id="{{ $item->id }}">
                                 </div>
                                 <div class="col-md-2">
-                                    <img src="{{ $displayImage }}" alt="{{ $item->product->name }}" class="cart-item-image"
-                                        id="item-image-{{ $item->id }}">
+                                    <img src="{{ $displayImage }}" alt="{{ $item->product->name }}"
+                                        class="cart-item-image" id="item-image-{{ $item->id }}">
                                 </div>
                                 <div class="col-md-3">
                                     <h5 class="mb-1">{{ $item->product->name }}</h5>
@@ -262,7 +285,9 @@
                                                         $variantNameOption =
                                                             $variant->size ?? ($variant->variant_name ?? 'Option');
                                                         $variantStock = $variant->stock_quantity ?? 0;
-                                                        $variantPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
+                                                        $variantPrice = $variant->has_discount
+                                                            ? $variant->sale_price
+                                                            : $variant->current_price;
                                                         $variantOriginalPrice = $variant->price;
                                                         $variantHasDiscount = $variant->has_discount;
                                                         $variantDiscountPercent = $variant->discount_percentage;
@@ -273,16 +298,16 @@
                                                         data-original-price="{{ $variantOriginalPrice }}"
                                                         data-has-discount="{{ $variantHasDiscount ? 'true' : 'false' }}"
                                                         data-discount-percent="{{ $variantDiscountPercent }}"
-                                                        data-image="{{ $variantImage }}"
-                                                        data-stock="{{ $variantStock }}"
+                                                        data-image="{{ $variantImage }}" data-stock="{{ $variantStock }}"
                                                         {{ $item->selected_size == $variantNameOption ? 'selected' : '' }}
                                                         {{ $variantStock <= 0 ? 'disabled' : '' }}>
                                                         {{ $variantNameOption }}
                                                         @if ($variantStock <= 0)
                                                             (Out of Stock)
                                                         @else
-                                                            @if($variantHasDiscount)
-                                                                - ₱{{ number_format($variantPrice, 2) }} <small class="text-muted"><del>₱{{ number_format($variantOriginalPrice, 2) }}</del></small>
+                                                            @if ($variantHasDiscount)
+                                                                - ₱{{ number_format($variantPrice, 2) }} <small
+                                                                    class="text-muted"><del>₱{{ number_format($variantOriginalPrice, 2) }}</del></small>
                                                             @else
                                                                 - ₱{{ number_format($variantPrice, 2) }}
                                                             @endif
@@ -327,7 +352,13 @@
                                                 {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
                                         </form>
 
-                                        <span class="quantity-input">{{ $item->quantity }}</span>
+                                        <input type="number" 
+                                               class="quantity-input" 
+                                               value="{{ $item->quantity }}" 
+                                               min="1" 
+                                               max="{{ $maxQuantity }}"
+                                               data-item-id="{{ $item->id }}"
+                                               id="quantity-input-{{ $item->id }}">
 
                                         <form action="{{ route('cart.update', $item) }}" method="POST" class="d-inline">
                                             @csrf
@@ -341,6 +372,10 @@
                                     @if ($isVariantAvailable && $maxQuantity)
                                         <small class="text-muted stock-warning">Max: {{ $maxQuantity }}</small>
                                     @endif
+                                    <div class="quantity-error" id="quantity-error-{{ $item->id }}">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        Quantity cannot exceed {{ $maxQuantity }} available items.
+                                    </div>
                                 </div>
                                 <div class="col-md-2 text-center">
                                     <div class="d-flex flex-column align-items-center">
@@ -348,8 +383,8 @@
                                         <strong class="sale-price" id="item-total-{{ $item->id }}">
                                             ₱{{ number_format($itemTotalPrice, 2) }}
                                         </strong>
-                                        
-                                        @if($item->product->has_variants || $hasDiscount)
+
+                                        @if ($item->product->has_variants || $hasDiscount)
                                             <br>
                                             <small class="text-muted item-unit-price" id="item-unit-{{ $item->id }}">
                                                 ₱{{ number_format($unitPrice, 2) }} each
@@ -411,24 +446,12 @@
                                 <span>Original Price:</span>
                                 <span class="original-price" id="summary-original">₱0.00</span>
                             </div>
-                            
+
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Discount Savings:</span>
                                 <span class="savings-text" id="summary-savings">-₱0.00</span>
                             </div>
                         </div>
-
-                        <!-- Shipping Fee -->
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Shipping:</span>
-                            <span id="summary-shipping">
-                                ₱10.00
-                            </span>
-                        </div>
-                        <small class="text-muted d-block mb-3" id="cart-shipping-note">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Final shipping fee will be calculated at checkout based on your delivery address.
-                        </small>
 
                         <hr>
 
@@ -437,13 +460,6 @@
                             <strong class="text-success" id="summary-total">
                                 ₱0.00
                             </strong>
-                        </div>
-
-                        <div id="free-shipping-alert" class="alert alert-info" style="display: none;">
-                            <small>
-                                <i class="fas fa-info-circle me-2"></i>
-                                Add ₱<span id="remaining-amount">0.00</span> more for free shipping!
-                            </small>
                         </div>
 
                         <!-- Check if any items are out of stock -->
@@ -475,8 +491,10 @@
                                 <i class="fas fa-lock me-2"></i>Update Cart to Checkout
                             </button>
                         @else
-                            <button type="button" id="proceed-checkout-btn" class="btn btn-primary w-100 btn-lg" disabled>
-                                <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                            <button type="button" id="proceed-checkout-btn" class="btn btn-primary w-100 btn-lg"
+                                disabled>
+                                <i class="fas fa-cart-arrow-down me-2"></i>
+                                Proceed to Checkout
                             </button>
                         @endif
                     </div>
@@ -510,8 +528,8 @@
                 const variantStock = parseInt(selectedOption.getAttribute('data-stock'));
 
                 // Get current quantity
-                const quantityElement = document.querySelector(`#cart-item-${itemId} .quantity-input`);
-                const quantity = quantityElement ? parseInt(quantityElement.textContent) : 1;
+                const quantityElement = document.querySelector(`#quantity-input-${itemId}`);
+                const quantity = quantityElement ? parseInt(quantityElement.value) || 1 : 1;
 
                 // Calculate totals
                 const itemTotal = variantPrice * quantity;
@@ -522,7 +540,7 @@
 
                 // Update sale price
                 itemTotalElement.textContent = `₱${itemTotal.toFixed(2)}`;
-                
+
                 // Update unit price
                 if (unitPriceElement) {
                     unitPriceElement.textContent = `₱${variantPrice.toFixed(2)} each`;
@@ -535,6 +553,31 @@
                 cartItem.setAttribute('data-has-discount', variantHasDiscount ? '1' : '0');
                 cartItem.setAttribute('data-discount-percent', variantDiscountPercent);
                 cartItem.setAttribute('data-quantity', quantity);
+                cartItem.setAttribute('data-max-quantity', variantStock);
+
+                // Update quantity input max attribute
+                if (quantityElement) {
+                    quantityElement.setAttribute('max', variantStock);
+                    // If current quantity exceeds new max, adjust it
+                    if (quantity > variantStock) {
+                        quantityElement.value = variantStock;
+                        // Update the displayed total
+                        const adjustedTotal = variantPrice * variantStock;
+                        itemTotalElement.textContent = `₱${adjustedTotal.toFixed(2)}`;
+                    }
+                }
+
+                // Update error message with new max quantity
+                const errorDiv = document.getElementById(`quantity-error-${itemId}`);
+                if (errorDiv) {
+                    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i>Quantity cannot exceed ${variantStock} available items.`;
+                }
+
+                // Update max quantity display
+                const maxQuantityDisplay = cartItem.querySelector('.stock-warning');
+                if (maxQuantityDisplay) {
+                    maxQuantityDisplay.textContent = `Max: ${variantStock}`;
+                }
 
                 // Update image immediately if variant has specific image
                 const itemImage = document.getElementById(`item-image-${itemId}`);
@@ -574,19 +617,19 @@
 
                                 // Show success message
                                 if (data.message) {
-                                    showToast('success', data.message);
+                                    showToast(data.message, 'success');
                                 }
                             } else {
                                 // Show error message
                                 if (data.message) {
-                                    showToast('error', data.message);
+                                    showToast(data.message, 'error');
                                     location.reload();
                                 }
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            showToast('error', 'An error occurred while updating the cart');
+                            showToast('An error occurred while updating the cart', 'error');
                             location.reload();
                         })
                         .finally(() => {
@@ -619,41 +662,209 @@
             });
         });
 
-        // Toast notification function
-        function showToast(type, message) {
-            let toastContainer = document.getElementById('toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.id = 'toast-container';
-                toastContainer.className = 'position-fixed top-0 end-0 p-3';
-                toastContainer.style.zIndex = '9999';
-                document.body.appendChild(toastContainer);
+        // Handle direct quantity input
+        document.querySelectorAll('.quantity-input[type="number"]').forEach(input => {
+            const itemId = input.getAttribute('data-item-id');
+            const cartItem = document.getElementById(`cart-item-${itemId}`);
+            const errorDiv = document.getElementById(`quantity-error-${itemId}`);
+            let originalValue = input.value;
+
+            // Function to get current max quantity dynamically
+            function getMaxQuantity() {
+                return parseInt(cartItem.getAttribute('data-max-quantity')) || 999;
             }
 
-            const toast = document.createElement('div');
-            toast.className =
-            `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.setAttribute('aria-atomic', 'true');
-
-            toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-
-            toastContainer.appendChild(toast);
-
-            const bsToast = new bootstrap.Toast(toast);
-            bsToast.show();
-
-            toast.addEventListener('hidden.bs.toast', () => {
-                toast.remove();
+            // Store original value on focus
+            input.addEventListener('focus', function() {
+                originalValue = this.value;
             });
+
+            // Validate on blur or Enter key
+            input.addEventListener('blur', function() {
+                const currentMaxQuantity = getMaxQuantity();
+                validateAndUpdateQuantity(input, itemId, currentMaxQuantity, errorDiv, originalValue);
+            });
+
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const currentMaxQuantity = getMaxQuantity();
+                    validateAndUpdateQuantity(input, itemId, currentMaxQuantity, errorDiv, originalValue);
+                    input.blur();
+                }
+            });
+
+            // Validate on input to prevent exceeding max
+            input.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                const currentMaxQuantity = getMaxQuantity();
+                if (!isNaN(value) && value > currentMaxQuantity) {
+                    this.classList.add('error');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                    }
+                } else {
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                    this.classList.remove('error');
+                }
+            });
+        });
+
+        function validateAndUpdateQuantity(input, itemId, maxQuantity, errorDiv, originalValue) {
+            let quantity = parseInt(input.value);
+
+            // Validate quantity
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+                input.value = 1;
+            }
+
+            if (quantity > maxQuantity) {
+                // Show error
+                input.classList.add('error');
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                }
+                // Reset to original value or max quantity
+                input.value = Math.min(originalValue, maxQuantity);
+                showToast(`Quantity cannot exceed ${maxQuantity} available items.`, 'error');
+                return;
+            }
+
+            // Clear error if valid
+            input.classList.remove('error');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+
+            // Only update if quantity changed
+            if (quantity !== parseInt(originalValue)) {
+                updateCartQuantity(itemId, quantity);
+            }
+        }
+
+        function updateCartQuantity(itemId, quantity) {
+            const cartItem = document.getElementById(`cart-item-${itemId}`);
+            const loadingSpinner = document.getElementById(`loading-${itemId}`);
+            
+            // Find any form in the cart item to get the route
+            const forms = cartItem.querySelectorAll('form');
+            const firstForm = forms[0];
+            
+            if (firstForm) {
+                // Get the update route from the form action
+                const updateUrl = firstForm.action;
+                
+                // Get selected_size from the form
+                const selectedSizeInput = firstForm.querySelector('input[name="selected_size"]');
+                const selectedSize = selectedSizeInput ? selectedSizeInput.value : '';
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('_method', 'PUT');
+                formData.append('quantity', quantity);
+                if (selectedSize) {
+                    formData.append('selected_size', selectedSize);
+                }
+
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'block';
+                }
+
+                fetch(updateUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message || 'Cart updated successfully', 'success');
+                        // Update cart count if provided
+                        if (data.cart_count !== undefined) {
+                            const cartCountElements = document.querySelectorAll('.cart-count');
+                            cartCountElements.forEach(el => {
+                                el.textContent = data.cart_count;
+                            });
+                        }
+                        // Reload to get updated totals
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        showToast(data.message || 'Error updating cart', 'error');
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred while updating the cart', 'error');
+                    window.location.reload();
+                })
+                .finally(() => {
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Upper middle toast notification function
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+            
+            const bgColors = {
+                'success': '#2C8F0C',
+                'error': '#dc3545',
+                'warning': '#ffc107',
+                'info': '#17a2b8'
+            };
+            
+            const icons = {
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-triangle',
+                'warning': 'fa-exclamation-circle',
+                'info': 'fa-info-circle'
+            };
+            
+            const bgColor = bgColors[type] || bgColors.success;
+            const icon = icons[type] || icons.success;
+            const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+            
+            const toast = document.createElement('div');
+            toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+            toast.style.cssText = `
+                top: 100px;
+                z-index: 9999;
+                min-width: 300px;
+                text-align: center;
+            `;
+            
+            toast.innerHTML = `
+                <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                    <div class="d-flex justify-content-center align-items-center p-3">
+                        <div class="toast-body ${textColor} d-flex align-items-center">
+                            <i class="fas ${icon} me-2 fs-5"></i>
+                            <span class="fw-semibold">${message}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
         }
 
         // Multi-select cart functionality
@@ -662,17 +873,14 @@
             const itemCheckboxes = document.querySelectorAll('.item-checkbox');
             const checkoutBtn = document.getElementById('proceed-checkout-btn');
             const selectedCountSpan = document.getElementById('selected-count');
-            
+
             // Summary elements
             const summaryQuantity = document.getElementById('summary-quantity');
             const summarySubtotal = document.getElementById('summary-subtotal');
             const summaryOriginal = document.getElementById('summary-original');
             const summarySavings = document.getElementById('summary-savings');
-            const summaryShipping = document.getElementById('summary-shipping');
             const summaryTotal = document.getElementById('summary-total');
             const originalPriceRow = document.getElementById('original-price-row');
-            const freeShippingAlert = document.getElementById('free-shipping-alert');
-            const remainingAmount = document.getElementById('remaining-amount');
 
             // Function to calculate summary for selected items
             function calculateSummary(selectedIds) {
@@ -689,8 +897,8 @@
                         quantity: 0,
                         hasDiscount: false,
                         savings: 0,
-                        shipping: 10,
-                        total: 10
+                        shipping: 0,
+                        total: 0
                     };
                 }
 
@@ -699,14 +907,15 @@
                     const cartItem = document.getElementById(`cart-item-${itemId}`);
                     if (cartItem) {
                         const unitPrice = parseFloat(cartItem.getAttribute('data-unit-price')) || 0;
-                        const originalUnitPrice = parseFloat(cartItem.getAttribute('data-original-unit-price')) || 0;
+                        const originalUnitPrice = parseFloat(cartItem.getAttribute(
+                            'data-original-unit-price')) || 0;
                         const itemHasDiscount = cartItem.getAttribute('data-has-discount') === '1';
                         const itemQuantity = parseInt(cartItem.getAttribute('data-quantity')) || 1;
-                        
+
                         quantity += itemQuantity;
                         subtotal += unitPrice * itemQuantity;
                         originalTotal += originalUnitPrice * itemQuantity;
-                        
+
                         if (itemHasDiscount) {
                             hasDiscount = true;
                         }
@@ -714,9 +923,7 @@
                 });
 
                 const savings = originalTotal - subtotal;
-                // Cart shows ESTIMATED shipping: ₱0 for orders ≥₱100, else ₱10
-                // ACTUAL shipping will be calculated at checkout based on GPS coordinates from user's address
-                const shipping = subtotal >= 100 ? 0 : 10;
+                const shipping = 0;
                 const total = subtotal + shipping;
 
                 return {
@@ -733,11 +940,11 @@
             // Function to update summary display
             function updateSummary(selectedIds) {
                 const summary = calculateSummary(selectedIds);
-                
+
                 // Update display
                 summaryQuantity.textContent = summary.quantity;
                 summarySubtotal.textContent = '₱' + summary.subtotal.toFixed(2);
-                
+
                 // Show/hide original price and savings
                 if (summary.hasDiscount && summary.savings > 0) {
                     originalPriceRow.style.display = 'block';
@@ -746,20 +953,10 @@
                 } else {
                     originalPriceRow.style.display = 'none';
                 }
-                
-                // Update shipping
-                if (summary.subtotal >= 100) {
-                    summaryShipping.innerHTML = '<span class="text-success">FREE</span>';
-                    freeShippingAlert.style.display = 'none';
-                } else {
-                    summaryShipping.textContent = '₱10.00';
-                    freeShippingAlert.style.display = 'block';
-                    remainingAmount.textContent = (100 - summary.subtotal).toFixed(2);
-                }
-                
+
                 // Update total
                 summaryTotal.textContent = '₱' + summary.total.toFixed(2);
-                
+
                 // Update checkout button
                 checkoutBtn.disabled = selectedIds.length === 0;
             }
@@ -825,32 +1022,35 @@
                 checkoutBtn.disabled = true;
                 checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
 
-                fetch('{{ route("cart.checkout-selected") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ selected_items: selectedIds })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = '{{ route("orders.create") }}';
-                    } else {
-                        showToast('error', data.message || 'Error processing selection');
+                fetch('{{ route('cart.checkout-selected') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            selected_items: selectedIds
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '{{ route('orders.create') }}';
+                        } else {
+                            showToast(data.message || 'Error processing selection', 'error');
+                            checkoutBtn.disabled = false;
+                            checkoutBtn.innerHTML =
+                                '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred', 'error');
                         checkoutBtn.disabled = false;
                         checkoutBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('error', 'An error occurred');
-                    checkoutBtn.disabled = false;
-                    checkoutBtn.innerHTML = '<i class="fas fa-lock me-2"></i>Proceed to Checkout';
-                });
+                    });
             });
-            
+
             // Initialize with no items selected
             updateSelection();
         });
