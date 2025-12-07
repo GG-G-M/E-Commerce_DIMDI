@@ -216,7 +216,6 @@ class StockOutController extends Controller
             ->with('success', 'Stock-Out deleted and stock restored successfully.');
     }
 
-
     public function autoStockOut($productId, $variantId, $quantity, $reason = 'Order Shipped')
     {
         $request = new Request([
@@ -228,5 +227,4 @@ class StockOutController extends Controller
 
         return $this->store($request, true);
     }
-
 }

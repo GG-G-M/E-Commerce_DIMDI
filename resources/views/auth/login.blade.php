@@ -467,17 +467,13 @@
                     </div>
                     
                     <div class="social-login">
-                        <a href="#" class="social-btn">
+                        <a href="{{ route('login.google') }}" class="social-btn">
                             <i class="bi bi-google"></i>
                             Google
                         </a>
-                        <a href="#" class="social-btn">
+                        <a href="{{ route('login.facebook') }}" class="social-btn">
                             <i class="bi bi-facebook"></i>
                             Facebook
-                        </a>
-                        <a href="#" class="social-btn">
-                            <i class="bi bi-twitter"></i>
-                            Twitter
                         </a>
                     </div>
 

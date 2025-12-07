@@ -95,8 +95,8 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(9);
 
-        return view('delivery.orders.my-orders', compact('orders'));
-    }
+    return view('delivery.orders.my-orders', compact('orders'));
+}
 
     public function show(Order $order)
     {
@@ -147,8 +147,8 @@ class OrderController extends Controller
                 $order->updateStatus('shipped', 'Order picked up by delivery personnel');
             });
 
-            return redirect()->route('delivery.orders.index')
-                ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
+        return redirect()->route('delivery.orders.index')
+            ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
 
         } catch (\Exception $e) {
             \Log::error('Failed to mark order as picked up', [

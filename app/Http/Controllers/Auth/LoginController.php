@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Hash;
+
 
 class LoginController extends Controller
 {
@@ -60,6 +63,138 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/')->with('success', 'You have been logged out successfully.');
+    }
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    /**
+     * Handle Google callback
+     */
+    public function handleGoogleCallback()
+    {
+        try {
+            $socialUser = Socialite::driver('google')->user();
+            
+            // Find or create user
+            $user = $this->findOrCreateUser($socialUser, 'google');
+            
+            // Login the user
+            Auth::login($user, true);
+            
+            // Transfer guest cart to user
+            $this->transferGuestCartToUser($user);
+            
+            // Redirect based on role
+            return $this->redirectBasedOnRole($user);
+            
+        } catch (\Exception $e) {
+            return redirect()->route('login')
+                ->with('error', 'Google login failed. Please try again.');
+        }
+    }
+
+    /**
+     * Redirect to Facebook
+     */
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    /**
+     * Handle Facebook callback
+     */
+    public function handleFacebookCallback()
+    {
+        try {
+            $socialUser = Socialite::driver('facebook')->user();
+            
+            // Find or create user
+            $user = $this->findOrCreateUser($socialUser, 'facebook');
+            
+            // Login the user
+            Auth::login($user, true);
+            
+            // Transfer guest cart to user
+            $this->transferGuestCartToUser($user);
+            
+            // Redirect based on role
+            return $this->redirectBasedOnRole($user);
+            
+        } catch (\Exception $e) {
+            return redirect()->route('login')
+                ->with('error', 'Facebook login failed. Please try again.');
+        }
+    }
+
+    /**
+     * Find or create user from social provider
+     */
+    private function findOrCreateUser($socialUser, $provider)
+    {
+        // Check if user exists by email
+        $user = User::where('email', $socialUser->getEmail())->first();
+        
+        if ($user) {
+            // Update provider info if missing
+            if (empty($user->{$provider . '_id'})) {
+                $user->update([
+                    $provider . '_id' => $socialUser->getId(),
+                    $provider . '_avatar' => $socialUser->getAvatar()
+                ]);
+            }
+            return $user;
+        }
+        
+        // Extract name components
+        $name = $socialUser->getName();
+        $nameParts = explode(' ', $name);
+        
+        $firstName = $nameParts[0] ?? 'User';
+        $lastName = $nameParts[1] ?? '';
+        $middleName = count($nameParts) > 2 ? implode(' ', array_slice($nameParts, 1, -1)) : null;
+        
+        if (empty($lastName) && count($nameParts) > 1) {
+            $lastName = $nameParts[count($nameParts) - 1];
+        }
+        
+        // Create new user
+        $user = User::create([
+            'first_name' => $firstName,
+            'middle_name' => $middleName,
+            'last_name' => $lastName,
+            'email' => $socialUser->getEmail(),
+            'password' => Hash::make(Str::random(24)), // Random password
+            'role' => 'customer',
+            $provider . '_id' => $socialUser->getId(),
+            $provider . '_avatar' => $socialUser->getAvatar(),
+            'email_verified_at' => now(), // Social login emails are verified
+        ]);
+        
+        return $user;
+    }
+
+    /**
+     * Redirect user based on their role
+     */
+    private function redirectBasedOnRole($user)
+    {
+        if ($user->role === 'super_admin') {
+            return redirect()->route('superadmin.dashboard')
+                ->with('success', 'Welcome back, Super Admin!');
+        } elseif ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Welcome back, Admin!');
+        } elseif ($user->role === 'delivery') {
+            return redirect()->route('delivery.dashboard')
+                ->with('success', 'Welcome back!');
+        }
+        
+        return redirect()->intended('/')
+            ->with('success', 'Login successful! Welcome back.');
     }
 
     private function transferGuestCartToUser(User $user)
