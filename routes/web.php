@@ -25,6 +25,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\BrandController;
@@ -301,7 +302,9 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
     // Dashboard
     Route::get('/dashboard', function () {
         // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user || !$user->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.dashboard');
@@ -327,7 +330,9 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
 
     // System Settings
     Route::get('/settings', function () {
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user || !$user->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.settings');
@@ -335,7 +340,9 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
 
     // Super Admin Profile
     Route::get('/profile', function () {
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user || !$user->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.profile');
