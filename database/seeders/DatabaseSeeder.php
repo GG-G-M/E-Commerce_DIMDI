@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(DeliverySeeder::class);
         $this->call(StockSeeder::class);
-        $this->call(OrderSeeder::class);
+        // $this->call(OrderSeeder::class);
         $this->call(RatingSeeder::class);
 
         $this->command->info('|||| Seeder Run Completed ||||');
