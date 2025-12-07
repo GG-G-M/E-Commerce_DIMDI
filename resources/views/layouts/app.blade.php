@@ -461,10 +461,18 @@
                             </a>
                         </li>
                         @endif
+
+                     <!-- Cart - Icon Only -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
+                        </a>
+                    </li>
                     
                     <!-- Notifications Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationsDropdown" role="button" 
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" 
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell"></i>
                             @php
@@ -542,14 +550,6 @@
                                 </a>
                             </div>
                         </div>
-                    </li>
-                    
-                    <!-- Cart - Icon Only -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
-                        </a>
                     </li>
                     
                     <!-- User Dropdown -->
