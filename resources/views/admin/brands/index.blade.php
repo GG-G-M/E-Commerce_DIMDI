@@ -280,6 +280,7 @@
                     <thead>
                         <tr>
                             <th class="brand-logo-cell">Logo</th>
+                            <th>ID</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Products</th>
@@ -300,6 +301,7 @@
                                     </div>
                                 @endif
                             </td>
+                            <td><code>{{ $brand->id }}</code></td>
                             <td>
                                 <strong>{{ $brand->name }}</strong><br>
                                 <small class="text-muted">Slug: {{ $brand->slug }}</small>
