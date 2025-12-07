@@ -175,60 +175,115 @@
             padding: 0.2rem 0.4rem;
         }
         
-        /* Notification styles */
+        /* Notification badge styles */
+        .nav-link.position-relative {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: 2px;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
+            top: -2px;
+            right: -2px;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
             min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
             text-align: center;
         }
-        
+
         .notification-dropdown {
-            border: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            border-radius: 8px;
+            width: 380px;
+            max-height: 450px;
             overflow: hidden;
-            width: 350px;
-            max-height: 400px;
-            overflow-y: auto;
+            border-radius: 12px;
         }
-        
+
         .notification-item {
             transition: all 0.3s ease;
             border-bottom: 1px solid #f0f0f0;
         }
-        
+
         .notification-item:hover {
             background-color: #f8f9fa;
         }
-        
+
         .notification-item.unread {
             background-color: #f0f9ff;
             border-left: 3px solid #2C8F0C;
         }
-        
+
         .notification-item.read {
             opacity: 0.8;
         }
-        
+
         .notification-item .notification-icon {
             font-size: 1.2rem;
         }
-        
+
         .notification-header {
             background: #2C8F0C !important;
             color: white;
         }
-        
+
         .notification-footer {
             background: #f8f9fa;
         }
-        
+
         .notification-time {
             font-size: 0.75rem;
+        }
+
+        /* Notification dropdown tweaks (sync with app layout) */
+        .notification-dropdown {
+            min-width: 320px;
+            max-width: 420px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .notification-header h6 {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .notification-body {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .notification-body {
+            max-height: 320px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .notification-item {
+            color: inherit;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+            text-decoration: none;
+        }
+
+        .notification-item:last-child .border-bottom {
+            border-bottom: none !important;
+        }
+
+        .notification-item.unread {
+            background: rgba(44, 143, 12, 0.06);
+        }
+
+        .notification-footer a {
+            font-weight: 600;
         }
         
         .navbar.scrolled {
@@ -278,42 +333,54 @@
             text-align: center;
         }
         
-        #mobileCartCount, #mobileNotificationCount {
-            font-size: 0.6rem;
-            padding: 0.15rem 0.3rem;
+        #mobileCartCount,
+        #mobileNotificationCount {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
             position: absolute;
             top: -2px;
-            right: 5px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
         }
-        
+
         /* Mobile notification bell */
         @media (max-width: 991.98px) {
             .navbar {
                 position: relative;
             }
+
             body {
                 padding-top: 0;
                 padding-bottom: 60px;
             }
+
             .navbar.scrolled {
                 padding: 0.6rem 0;
             }
+
             .navbar.scrolled .logo-img {
                 height: 40px;
             }
+
             .search-container {
                 margin: 0.8rem 0;
                 max-width: 100%;
             }
-            
+
             .desktop-nav {
                 display: none !important;
             }
-            
+
             .mobile-nav-icons {
                 display: flex;
             }
-            
+
             .notification-dropdown {
                 position: fixed !important;
                 top: 60px !important;
@@ -448,72 +515,89 @@
                             </a>
                         </li>
                         @endif
+
+                     <!-- Cart - Icon Only -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
+                        </a>
+                    </li>
                     
                     <!-- Notifications Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationsDropdown" role="button" 
-                           data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-bell"></i>
                             @php
                                 $unreadCount = auth()->user()->unreadNotifications->count();
                             @endphp
-                            @if($unreadCount > 0)
-                            <span class="notification-badge badge bg-danger rounded-pill" id="desktopNotificationCount">
-                                {{ $unreadCount }}
-                            </span>
+                            @if ($unreadCount > 0)
+                                <span class="notification-badge badge bg-danger rounded-pill"
+                                    id="desktopNotificationCount">
+                                    {{ $unreadCount }}
+                                </span>
                             @endif
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationsDropdown">
-                            <div class="notification-header p-3 border-bottom">
-                                <h6 class="mb-0">Notifications</h6>
-                                @if($unreadCount > 0)
-                                <small class="float-end">
-                                    <a href="#" class="text-white mark-all-read" style="text-decoration: none;">Mark all as read</a>
-                                </small>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                            aria-labelledby="notificationsDropdown">
+                            <div
+                                class="notification-header p-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" style="font-weight: 600; font-size: 1rem;">Notifications</h6>
+                                @if ($unreadCount > 0)
+                                    <a href="#" class="text-white mark-all-read"
+                                        style="text-decoration: none; font-size: 0.85rem; padding: 0.15rem 0.4rem;">Mark
+                                        all as read</a>
                                 @endif
                             </div>
-                            
+
                             <div class="notification-body" id="notificationList">
                                 @php
                                     $notifications = auth()->user()->notifications->take(5);
                                 @endphp
-                                @if($notifications->count() > 0)
-                                    @foreach($notifications as $notification)
-                                    @php
-                                        $data = $notification->data;
-                                        $isUnread = $notification->read_at === null;
-                                    @endphp
-                                    <a href="#" class="notification-item d-block p-3 border-bottom text-decoration-none {{ $isUnread ? 'unread' : 'read' }}"
-                                       data-id="{{ $notification->id }}"
-                                       data-url="{{ $data['url'] ?? '#' }}">
-                                        <div class="d-flex align-items-start">
-                                            <div class="notification-icon me-3">
-                                                <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"></i>
-                                            </div>
-                                            <div class="notification-content flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <h6 class="mb-1" style="font-size: 0.9rem;">
-                                                        @if(isset($data['order_number']))
-                                                        Order #{{ $data['order_number'] }}
-                                                        @else
-                                                        Notification
-                                                        @endif
-                                                    </h6>
-                                                    <small class="text-muted notification-time">{{ $data['time_ago'] ?? '' }}</small>
+                                @if ($notifications->count() > 0)
+                                    @foreach ($notifications as $notification)
+                                        @php
+                                            $data = $notification->data;
+                                            $isUnread = $notification->read_at === null;
+                                        @endphp
+                                        <a href="#"
+                                            class="notification-item d-block text-decoration-none {{ $isUnread ? 'unread' : 'read' }}"
+                                            data-id="{{ $notification->id }}" data-url="{{ $data['url'] ?? '#' }}">
+                                            <div class="d-flex align-items-start gap-3 p-3 border-bottom">
+                                                <div class="notification-icon flex-shrink-0">
+                                                    <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"
+                                                        style="font-size: 1.15rem; width: 36px; text-align: center;"></i>
                                                 </div>
-                                                <p class="mb-1" style="font-size: 0.85rem;">
-                                                    {{ $data['message'] ?? 'New notification' }}
-                                                </p>
-                                                @if(isset($data['status_display']))
-                                                <small class="text-muted">
-                                                    Status: <span class="badge bg-{{ $data['color'] ?? 'secondary' }}">
-                                                        {{ $data['status_display'] }}
-                                                    </span>
-                                                </small>
-                                                @endif
+                                                <div class="notification-content flex-grow-1" style="min-width: 0;">
+                                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                                        <h6 class="mb-0"
+                                                            style="font-size: 0.95rem; font-weight: 600; line-height: 1.3;">
+                                                            @if (isset($data['order_number']))
+                                                                Order #{{ $data['order_number'] }}
+                                                            @else
+                                                                Notification
+                                                            @endif
+                                                        </h6>
+                                                            <small class="text-muted notification-time flex-shrink-0 ms-2"
+                                                                style="font-size: 0.75rem; white-space: nowrap;">{{ $data['time_ago'] ?? '' }}</small>
+                                                    </div>
+                                                    <p class="mb-1"
+                                                        style="font-size: 0.88rem; color: #495057; line-height: 1.4; margin: 0.25rem 0 0;">
+                                                        {{ $data['message'] ?? 'New notification' }}
+                                                    </p>
+                                                    @if (isset($data['status_display']))
+                                                        <small class="text-muted mt-1 d-block">
+                                                            Status: <span
+                                                                class="badge bg-{{ $data['color'] ?? 'secondary' }}"
+                                                                style="font-size: 0.75rem;">
+                                                                {{ $data['status_display'] }}
+                                                            </span>
+                                                        </small>
+                                                    @endif
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
                                     @endforeach
                                 @else
                                     <div class="text-center py-4">
@@ -522,21 +606,14 @@
                                     </div>
                                 @endif
                             </div>
-                            
+
                             <div class="notification-footer p-3 border-top text-center">
-                                <a href="{{ route('notifications.index') }}" class="text-decoration-none" style="color: #2C8F0C;">
+                                <a href="{{ route('notifications.index') }}" class="text-decoration-none"
+                                    style="color: #2C8F0C;">
                                     View all notifications
                                 </a>
                             </div>
                         </div>
-                    </li>
-                    
-                    <!-- Cart - Icon Only -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
-                        </a>
                     </li>
                     
                     <!-- User Dropdown -->
@@ -645,12 +722,12 @@
                 this.setupEventListeners();
                 this.checkForNewNotifications();
             }
-            
+
             initialize() {
                 this.updateNotificationCounts();
                 this.setupPolling();
             }
-            
+
             setupEventListeners() {
                 // Mark notification as read when clicked
                 document.addEventListener('click', (e) => {
@@ -659,23 +736,23 @@
                         e.preventDefault();
                         this.markAsRead(notificationItem.dataset.id, notificationItem.dataset.url);
                     }
-                    
+
                     // Mark all as read
                     if (e.target.classList.contains('mark-all-read')) {
                         e.preventDefault();
                         this.markAllAsRead();
                     }
                 });
-                
+
                 // Request notification permission
                 if ("Notification" in window && Notification.permission === "default") {
                     Notification.requestPermission();
                 }
             }
-            
+
             updateNotificationCounts() {
                 const unreadCount = {{ auth()->check() ? auth()->user()->unreadNotifications->count() : 0 }};
-                
+
                 // Update desktop count
                 const desktopCount = document.getElementById('desktopNotificationCount');
                 if (desktopCount) {
@@ -686,7 +763,7 @@
                         desktopCount.style.display = 'none';
                     }
                 }
-                
+
                 // Update mobile count
                 const mobileCount = document.getElementById('mobileNotificationCount');
                 if (mobileCount) {
@@ -698,7 +775,7 @@
                     }
                 }
             }
-            
+
             async markAsRead(notificationId, url) {
                 try {
                     const response = await fetch(`/notifications/mark-as-read/${notificationId}`, {
@@ -707,18 +784,20 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({_method: 'POST'})
+                        body: JSON.stringify({
+                            _method: 'POST'
+                        })
                     });
-                    
+
                     if (response.ok) {
                         // Update counts
                         this.updateNotificationCounts();
-                        
+
                         // Navigate to the order page if URL exists
                         if (url && url !== '#') {
                             window.location.href = url;
                         }
-                        
+
                         // Show toast
                         this.showToast('Notification marked as read', 'success');
                     }
@@ -727,7 +806,7 @@
                     this.showToast('Error marking notification as read', 'error');
                 }
             }
-            
+
             async markAllAsRead() {
                 try {
                     const response = await fetch('/notifications/mark-all-read', {
@@ -736,13 +815,15 @@
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({_method: 'POST'})
+                        body: JSON.stringify({
+                            _method: 'POST'
+                        })
                     });
-                    
+
                     if (response.ok) {
                         this.updateNotificationCounts();
                         this.showToast('All notifications marked as read', 'success');
-                        
+
                         // Update notification list
                         this.loadNotifications();
                     }
@@ -751,7 +832,7 @@
                     this.showToast('Error marking notifications as read', 'error');
                 }
             }
-            
+
             async loadNotifications() {
                 try {
                     const response = await fetch('/notifications/list');
@@ -763,14 +844,14 @@
                     console.error('Error loading notifications:', error);
                 }
             }
-            
+
             setupPolling() {
                 // Check for new notifications every 30 seconds
                 setInterval(() => {
                     this.checkForNewNotifications();
                 }, 30000);
             }
-            
+
             async checkForNewNotifications() {
                 try {
                     const response = await fetch('/notifications/check-new');
@@ -785,45 +866,54 @@
                     console.error('Error checking for new notifications:', error);
                 }
             }
-            
+
             showPushNotification(data) {
                 // Browser notification
                 if (Notification.permission === "granted" && data) {
                     new Notification("DIMDI Store - Order Update", {
                         body: data.message,
-                        icon: '{{ asset("images/logo-bg-removed.png") }}'
+                        icon: '{{ asset('images/logo-bg-removed.png') }}'
                     });
                 }
-                
+
                 // Toast notification
                 if (data) {
                     this.showToast(data.message, 'info');
                 }
             }
-            
+
             showToast(message, type = 'info') {
                 const toastContainer = document.querySelector('.toast-container');
-                const toastId = 'toast-' + Date.now();
+                if (!toastContainer) return;
                 
+                const toastId = 'toast-' + Date.now();
+
                 const toast = document.createElement('div');
                 toast.className = `custom-toast ${type} mb-2`;
                 toast.id = toastId;
+                toast.setAttribute('role', 'status');
+                toast.setAttribute('aria-live', 'polite');
+
+                const severity = type.charAt(0).toUpperCase() + type.slice(1);
+                const icon = this.getToastIcon(type);
+
                 toast.innerHTML = `
-                    <div class="d-flex">
-                        <div class="toast-body p-3">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-${this.getToastIcon(type)} me-3 text-${type}"></i>
-                                <div>
-                                    <p class="mb-0" style="font-size: 0.9rem;">${message}</p>
-                                </div>
-                            </div>
+                    <div class="d-flex align-items-start p-2">
+                        <div class="me-3 d-flex align-items-center">
+                            <i class="fas fa-${icon} fa-lg text-${type}"></i>
                         </div>
-                        <button type="button" class="btn-close me-2 m-auto" onclick="document.getElementById('${toastId}').remove()"></button>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="fw-semibold">${severity}</div>
+                                <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('${toastId}').remove()"></button>
+                            </div>
+                            <div class="toast-message mt-1" style="font-size:0.95rem;">${message}</div>
+                        </div>
                     </div>
                 `;
-                
+
                 toastContainer.appendChild(toast);
-                
+
                 // Auto remove after 5 seconds
                 setTimeout(() => {
                     if (toast.parentNode) {
@@ -831,7 +921,7 @@
                     }
                 }, 5000);
             }
-            
+
             getToastIcon(type) {
                 const icons = {
                     'success': 'check-circle',

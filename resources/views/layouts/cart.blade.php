@@ -221,9 +221,32 @@
             text-align: center;
         }
         
-        #mobileCartCount {
-            font-size: 0.6rem;
-            padding: 0.15rem 0.3rem;
+        #mobileCartCount,
+        #mobileNotificationCount {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
+        }
+
+        /* Mobile notification bell */
+        @media (max-width: 991.98px) {
+            .notification-dropdown {
+                position: fixed !important;
+                top: 60px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: auto !important;
+                max-height: 60vh !important;
+            }
         }
         
         @media (max-width: 991.98px) {
@@ -260,7 +283,72 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* Notification dropdown tweaks */
+        /* Notification badge styles */
+        .nav-link.position-relative {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            width: 380px;
+            max-height: 450px;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .notification-item {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f9ff;
+            border-left: 3px solid #2C8F0C;
+        }
+
+        .notification-item.read {
+            opacity: 0.8;
+        }
+
+        .notification-item .notification-icon {
+            font-size: 1.2rem;
+        }
+
+        .notification-header {
+            background: #2C8F0C !important;
+            color: white;
+        }
+
+        .notification-footer {
+            background: #f8f9fa;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+        }
+
+        /* Notification dropdown tweaks (sync with app layout) */
         .notification-dropdown {
             min-width: 320px;
             max-width: 420px;
@@ -273,10 +361,9 @@
             font-size: 1rem;
         }
 
-        .notification-header .btn-link {
-            font-size: 0.85rem;
-            padding: 0.15rem 0.4rem;
-            text-decoration: none;
+        .notification-body {
+            max-height: 320px;
+            overflow-y: auto;
         }
 
         .notification-body {
@@ -286,29 +373,8 @@
         }
 
         .notification-item {
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-            padding: 0.8rem 1rem;
             color: inherit;
-        }
-
-        .notification-item .notification-icon i {
-            font-size: 1.15rem;
-            width: 36px;
-            text-align: center;
-        }
-
-        .notification-item .notification-content h6 {
-            margin: 0;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .notification-item .notification-content p {
-            margin: 0.25rem 0 0;
-            font-size: 0.88rem;
-            color: #495057;
+            transition: background-color 0.2s ease;
         }
 
         .notification-item:hover {
@@ -316,14 +382,12 @@
             text-decoration: none;
         }
 
-        .notification-item.unread {
-            background: rgba(44,143,12,0.06);
+        .notification-item:last-child .border-bottom {
+            border-bottom: none !important;
         }
 
-        .notification-badge {
-            transform: translate(8px, -8px);
-            font-size: 0.68rem;
-            padding: 0.18rem 0.36rem;
+        .notification-item.unread {
+            background: rgba(44, 143, 12, 0.06);
         }
 
         .notification-footer a {
@@ -362,9 +426,55 @@
             height: 35px;
             font-size: 0.9rem;
         }
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .custom-toast {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .custom-toast.success {
+            border-left-color: #2C8F0C;
+        }
+
+        .custom-toast.info {
+            border-left-color: #17a2b8;
+        }
+
+        .custom-toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .custom-toast.error {
+            border-left-color: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Toast Notification Container -->
+    <div class="toast-container"></div>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg shadow-sm" id="mainNavbar">
         <div class="container">
@@ -436,56 +546,92 @@
 
                     <!-- Notifications Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-controls="notificationMenu">
-                            <i class="fas fa-bell" aria-hidden="true"></i>
-                            @php $unreadCount = auth()->user()->unreadNotifications->count(); @endphp
-                            @if($unreadCount > 0)
-                                <span class="notification-badge badge bg-danger rounded-pill" id="desktopNotificationCount">{{ $unreadCount }}</span>
+                        <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            @php
+                                $unreadCount = auth()->user()->unreadNotifications->count();
+                            @endphp
+                            @if ($unreadCount > 0)
+                                <span class="notification-badge badge bg-danger rounded-pill"
+                                    id="desktopNotificationCount">
+                                    {{ $unreadCount }}
+                                </span>
                             @endif
                         </a>
-
-                        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0" aria-labelledby="notificationsDropdown" id="notificationMenu" role="menu">
-                            <div class="notification-header p-3 border-bottom d-flex align-items-center justify-content-between">
-                                <h6 class="mb-0">Notifications</h6>
-                                @if($unreadCount > 0)
-                                    <button type="button" class="btn btn-sm btn-link text-white mark-all-read" style="text-decoration: none;">Mark all</button>
+                        <div class="dropdown-menu dropdown-menu-end notification-dropdown p-0"
+                            aria-labelledby="notificationsDropdown">
+                            <div
+                                class="notification-header p-3 border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0" style="font-weight: 600; font-size: 1rem;">Notifications</h6>
+                                @if ($unreadCount > 0)
+                                    <a href="#" class="text-white mark-all-read"
+                                        style="text-decoration: none; font-size: 0.85rem; padding: 0.15rem 0.4rem;">Mark
+                                        all as read</a>
                                 @endif
                             </div>
 
-                            <div class="notification-body" id="notificationList" role="list" style="max-height: 320px; overflow:auto;">
-                                @php $notifications = auth()->user()->notifications->take(5); @endphp
-                                @if($notifications->count() > 0)
-                                    @foreach($notifications as $notification)
+                            <div class="notification-body" id="notificationList">
+                                @php
+                                    $notifications = auth()->user()->notifications->take(5);
+                                @endphp
+                                @if ($notifications->count() > 0)
+                                    @foreach ($notifications as $notification)
                                         @php
                                             $data = $notification->data;
                                             $isUnread = $notification->read_at === null;
                                         @endphp
-                                        <a href="{{ $data['url'] ?? '#' }}" class="notification-item d-flex p-3 border-bottom text-decoration-none {{ $isUnread ? 'unread' : 'read' }}" data-id="{{ $notification->id }}" role="listitem">
-                                            <div class="notification-icon me-3" aria-hidden="true">
-                                                <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"></i>
-                                            </div>
-                                            <div class="notification-content flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <h6 class="mb-1" style="font-size: 0.9rem;">@if(isset($data['order_number'])) Order #{{ $data['order_number'] }} @else Notification @endif</h6>
-                                                    <small class="text-muted notification-time">{{ $data['time_ago'] ?? '' }}</small>
+                                        <a href="#"
+                                            class="notification-item d-block text-decoration-none {{ $isUnread ? 'unread' : 'read' }}"
+                                            data-id="{{ $notification->id }}" data-url="{{ $data['url'] ?? '#' }}">
+                                            <div class="d-flex align-items-start gap-3 p-3 border-bottom">
+                                                <div class="notification-icon flex-shrink-0">
+                                                    <i class="{{ $data['icon'] ?? 'fas fa-bell' }} text-{{ $data['color'] ?? 'primary' }}"
+                                                        style="font-size: 1.15rem; width: 36px; text-align: center;"></i>
                                                 </div>
-                                                <p class="mb-1" style="font-size: 0.85rem;">{{ $data['message'] ?? 'New notification' }}</p>
-                                                @if(isset($data['status_display']))
-                                                    <small class="text-muted">Status: <span class="badge bg-{{ $data['color'] ?? 'secondary' }}">{{ $data['status_display'] }}</span></small>
-                                                @endif
+                                                <div class="notification-content flex-grow-1" style="min-width: 0;">
+                                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                                        <h6 class="mb-0"
+                                                            style="font-size: 0.95rem; font-weight: 600; line-height: 1.3;">
+                                                            @if (isset($data['order_number']))
+                                                                Order #{{ $data['order_number'] }}
+                                                            @else
+                                                                Notification
+                                                            @endif
+                                                        </h6>
+                                                            <small class="text-muted notification-time flex-shrink-0 ms-2"
+                                                                style="font-size: 0.75rem; white-space: nowrap;">{{ $data['time_ago'] ?? '' }}</small>
+                                                    </div>
+                                                    <p class="mb-1"
+                                                        style="font-size: 0.88rem; color: #495057; line-height: 1.4; margin: 0.25rem 0 0;">
+                                                        {{ $data['message'] ?? 'New notification' }}
+                                                    </p>
+                                                    @if (isset($data['status_display']))
+                                                        <small class="text-muted mt-1 d-block">
+                                                            Status: <span
+                                                                class="badge bg-{{ $data['color'] ?? 'secondary' }}"
+                                                                style="font-size: 0.75rem;">
+                                                                {{ $data['status_display'] }}
+                                                            </span>
+                                                        </small>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="text-center py-4 text-muted">
-                                        <i class="fas fa-bell-slash fa-2x mb-2"></i>
-                                        <p class="mb-0">No notifications</p>
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-bell-slash fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">No notifications</p>
                                     </div>
                                 @endif
                             </div>
 
-                            <div class="notification-footer p-2 border-top text-center">
-                                <a href="{{ route('notifications.index') }}" class="text-decoration-none" style="color: #2C8F0C;">View all notifications</a>
+                            <div class="notification-footer p-3 border-top text-center">
+                                <a href="{{ route('notifications.index') }}" class="text-decoration-none"
+                                    style="color: #2C8F0C;">
+                                    View all notifications
+                                </a>
                             </div>
                         </div>
                     </li>
@@ -556,15 +702,25 @@
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="mobileCartCount">0</span>
         </a>
         @auth
-        <a href="{{ route('profile.show') }}" class="mobile-nav-item">
-            <i class="fas fa-user mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Account</span>
-        </a>
+            <a href="#" class="mobile-nav-item position-relative" data-bs-toggle="dropdown"
+                id="mobileNotificationBell">
+                <i class="fas fa-bell mobile-nav-icon"></i>
+                <span class="mobile-nav-label">Alerts</span>
+                @if (auth()->user()->unreadNotifications->count() > 0)
+                    <span class="badge bg-danger rounded-pill" id="mobileNotificationCount">
+                        {{ auth()->user()->unreadNotifications->count() }}
+                    </span>
+                @endif
+            </a>
+            <a href="{{ route('profile.show') }}" class="mobile-nav-item">
+                <i class="fas fa-user mobile-nav-icon"></i>
+                <span class="mobile-nav-label">Account</span>
+            </a>
         @else
-        <a href="{{ route('login') }}" class="mobile-nav-item">
-            <i class="fas fa-sign-in-alt mobile-nav-icon"></i>
-            <span class="mobile-nav-label">Login</span>
-        </a>
+            <a href="{{ route('login') }}" class="mobile-nav-item">
+                <i class="fas fa-sign-in-alt mobile-nav-icon"></i>
+                <span class="mobile-nav-label">Login</span>
+            </a>
         @endauth
     </div>
 
@@ -632,79 +788,344 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Notification System
+        class NotificationSystem {
+            constructor() {
+                this.initialize();
+                this.setupEventListeners();
+                this.checkForNewNotifications();
+            }
 
+            initialize() {
+                this.updateNotificationCounts();
+                this.setupPolling();
+            }
+
+            setupEventListeners() {
+                // Mark notification as read when clicked
+                document.addEventListener('click', (e) => {
+                    const notificationItem = e.target.closest('.notification-item');
+                    if (notificationItem) {
+                        e.preventDefault();
+                        this.markAsRead(notificationItem.dataset.id, notificationItem.dataset.url);
+                    }
+
+                    // Mark all as read
+                    if (e.target.classList.contains('mark-all-read')) {
+                        e.preventDefault();
+                        this.markAllAsRead();
+                    }
+                });
+
+                // Request notification permission
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+            }
+
+            updateNotificationCounts() {
+                const unreadCount = {{ auth()->check() ? auth()->user()->unreadNotifications->count() : 0 }};
+
+                // Update desktop count
+                const desktopCount = document.getElementById('desktopNotificationCount');
+                if (desktopCount) {
+                    if (unreadCount > 0) {
+                        desktopCount.textContent = unreadCount;
+                        desktopCount.style.display = 'block';
+                    } else {
+                        desktopCount.style.display = 'none';
+                    }
+                }
+
+                // Update mobile count
+                const mobileCount = document.getElementById('mobileNotificationCount');
+                if (mobileCount) {
+                    if (unreadCount > 0) {
+                        mobileCount.textContent = unreadCount;
+                        mobileCount.style.display = 'block';
+                    } else {
+                        mobileCount.style.display = 'none';
+                    }
+                }
+            }
+
+            async markAsRead(notificationId, url) {
+                try {
+                    const response = await fetch(`/notifications/mark-as-read/${notificationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            _method: 'POST'
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Update counts
+                        this.updateNotificationCounts();
+
+                        // Navigate to the order page if URL exists
+                        if (url && url !== '#') {
+                            window.location.href = url;
+                        }
+
+                        // Show toast
+                        this.showToast('Notification marked as read', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                    this.showToast('Error marking notification as read', 'error');
+                }
+            }
+
+            async markAllAsRead() {
+                try {
+                    const response = await fetch('/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            _method: 'POST'
+                        })
+                    });
+
+                    if (response.ok) {
+                        this.updateNotificationCounts();
+                        this.showToast('All notifications marked as read', 'success');
+
+                        // Update notification list
+                        this.loadNotifications();
+                    }
+                } catch (error) {
+                    console.error('Error marking all notifications as read:', error);
+                    this.showToast('Error marking notifications as read', 'error');
+                }
+            }
+
+            async loadNotifications() {
+                try {
+                    const response = await fetch('/notifications/list');
+                    if (response.ok) {
+                        const html = await response.text();
+                        document.getElementById('notificationList').innerHTML = html;
+                    }
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                }
+            }
+
+            setupPolling() {
+                // Check for new notifications every 30 seconds
+                setInterval(() => {
+                    this.checkForNewNotifications();
+                }, 30000);
+            }
+
+            async checkForNewNotifications() {
+                try {
+                    const response = await fetch('/notifications/check-new');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.new_count > 0) {
+                            this.updateNotificationCounts();
+                            this.showPushNotification(data.latest);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking for new notifications:', error);
+                }
+            }
+
+            showPushNotification(data) {
+                // Browser notification
+                if (Notification.permission === "granted" && data) {
+                    new Notification("DIMDI Store - Order Update", {
+                        body: data.message,
+                        icon: '{{ asset('images/logo-bg-removed.png') }}'
+                    });
+                }
+
+                // Toast notification
+                if (data) {
+                    this.showToast(data.message, 'info');
+                }
+            }
+
+            showToast(message, type = 'info') {
+                const toastContainer = document.querySelector('.toast-container');
+                if (!toastContainer) return;
+                
+                const toastId = 'toast-' + Date.now();
+
+                const toast = document.createElement('div');
+                toast.className = `custom-toast ${type} mb-2`;
+                toast.id = toastId;
+                toast.setAttribute('role', 'status');
+                toast.setAttribute('aria-live', 'polite');
+
+                const severity = type.charAt(0).toUpperCase() + type.slice(1);
+                const icon = this.getToastIcon(type);
+
+                toast.innerHTML = `
+                    <div class="d-flex align-items-start p-2">
+                        <div class="me-3 d-flex align-items-center">
+                            <i class="fas fa-${icon} fa-lg text-${type}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="fw-semibold">${severity}</div>
+                                <button type="button" class="btn-close" aria-label="Close" onclick="document.getElementById('${toastId}').remove()"></button>
+                            </div>
+                            <div class="toast-message mt-1" style="font-size:0.95rem;">${message}</div>
+                        </div>
+                    </div>
+                `;
+
+                toastContainer.appendChild(toast);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 5000);
+            }
+
+            getToastIcon(type) {
+                const icons = {
+                    'success': 'check-circle',
+                    'error': 'exclamation-circle',
+                    'warning': 'exclamation-triangle',
+                    'info': 'info-circle'
+                };
+                return icons[type] || 'bell';
+            }
+        }
+
+        // Initialize notification system
+        let notificationSystem;
+        document.addEventListener('DOMContentLoaded', function() {
+            notificationSystem = new NotificationSystem();
+
+            // Cart count update
+            updateCartCount();
+
+            // Navbar scroll effect
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('mainNavbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Initialize navbar state
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            }
+        });
+
+        // Cart functions
+        async function updateCartCount() {
+            try {
+                const response = await fetch('{{ route('cart.count') }}');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('cartCount').textContent = data.count;
+                    document.getElementById('mobileCartCount').textContent = data.count;
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // Search functionality (your existing code)
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
 
-        searchInput.addEventListener('input', function(e) {
-            const query = e.target.value.trim();
-            
-        
-            clearTimeout(searchTimeout);
-            
-            if (query.length === 0) {
-                searchResults.style.display = 'none';
-                return;
-            }
-            
-            // Show loading state
-            searchResults.innerHTML = '<div class="no-results">Searching...</div>';
-            searchResults.style.display = 'block';
-            
-            // Debounce search
-            searchTimeout = setTimeout(() => {
-                performSearch(query);
-            }, 300);
-        });
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
 
-        // Close search results when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
-            }
-        });
+                clearTimeout(searchTimeout);
 
-        // Perform search with proper error handling
-        function performSearch(query) {
-        
-            setTimeout(() => {
-                const mockResults = [
-                    { type: 'Product', name: 'Modern Refrigerator', price: '$899.99', slug: 'modern-refrigerator' },
-                    { type: 'Product', name: 'Leather Sofa', price: '$1,299.99', slug: 'leather-sofa' },
-                    { type: 'Product', name: 'Coffee Maker', price: '$149.99', slug: 'coffee-maker' },
-                    { type: 'Category', name: 'Appliances', slug: 'appliances' },
-                    { type: 'Category', name: 'Furniture', slug: 'furniture' }
-                ];
-                
-                // Filter results based on query
-                const filteredResults = mockResults.filter(item => 
-                    item.name.toLowerCase().includes(query.toLowerCase())
-                );
-                
-                displaySearchResults(filteredResults);
-            }, 500);
-            
-            // In your actual implementation, use:
-            /*
-            fetch(`/api/search?q=${encodeURIComponent(query)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Search failed');
+                if (query.length === 0) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchResults.innerHTML = '<div class="no-results">Searching...</div>';
+                searchResults.style.display = 'block';
+
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.trim();
+                    if (query.length > 0) {
+                        window.location.href = `/products?search=${encodeURIComponent(query)}`;
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    displaySearchResults(data);
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    searchResults.innerHTML = '<div class="no-results">Error performing search</div>';
-                });
-            */
+                }
+            });
         }
 
-        // Display search results
+        function performSearch(query) {
+            setTimeout(() => {
+                const mockResults = [
+                    {
+                        type: 'Product',
+                        name: 'Modern Refrigerator',
+                        price: '$899.99',
+                        slug: 'modern-refrigerator'
+                    },
+                    {
+                        type: 'Product',
+                        name: 'Leather Sofa',
+                        price: '$1,299.99',
+                        slug: 'leather-sofa'
+                    },
+                    {
+                        type: 'Product',
+                        name: 'Coffee Maker',
+                        price: '$149.99',
+                        slug: 'coffee-maker'
+                    },
+                    {
+                        type: 'Category',
+                        name: 'Appliances',
+                        slug: 'appliances'
+                    },
+                    {
+                        type: 'Category',
+                        name: 'Furniture',
+                        slug: 'furniture'
+                    }
+                ];
+
+                const filteredResults = mockResults.filter(item =>
+                    item.name.toLowerCase().includes(query.toLowerCase())
+                );
+
+                displaySearchResults(filteredResults);
+            }, 500);
+        }
+
         function displaySearchResults(results) {
             if (!results || results.length === 0) {
                 searchResults.innerHTML = '<div class="no-results">No products found</div>';
@@ -712,7 +1133,6 @@
             }
 
             let html = '';
-            
             results.forEach(item => {
                 html += `
                     <div class="search-result-item" onclick="selectResult('${item.slug}', '${item.type}')">
@@ -722,11 +1142,10 @@
                     </div>
                 `;
             });
-            
+
             searchResults.innerHTML = html;
         }
 
-        // Handle result selection
         function selectResult(slug, type) {
             if (type === 'Product') {
                 window.location.href = `/products/${slug}`;
@@ -734,48 +1153,6 @@
                 window.location.href = `/products?category=${slug}`;
             }
         }
-
-        // Handle Enter key press for search
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                if (query.length > 0) {
-                    window.location.href = `/products?search=${encodeURIComponent(query)}`;
-                }
-            }
-        });
-
-        // Update cart count
-        function updateCartCount() {
-            // Your existing cart count logic
-            fetch('{{ route("cart.count") }}')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('cartCount').textContent = data.count;
-                    document.getElementById('mobileCartCount').textContent = data.count;
-                });
-        }
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('mainNavbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Update cart count on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCartCount();
-            
-            // Initialize navbar state
-            const navbar = document.getElementById('mainNavbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            }
-        });
     </script>
     @stack('scripts')
 </body>
