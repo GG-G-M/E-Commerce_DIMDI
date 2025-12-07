@@ -152,6 +152,15 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'categories', 'brands', 'variants'));
     }
 
+    /**
+     * Read-only product view for admins
+     */
+    public function view(Product $product)
+    {
+        $variants = $product->variants;
+        return view('admin.products.view', compact('product', 'variants'));
+    }
+
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
