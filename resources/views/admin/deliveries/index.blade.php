@@ -323,6 +323,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>ID</th>
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Vehicle Type</th>
@@ -347,6 +348,7 @@
                                 </div>
                             </div>
                         </td>
+                        <td><code>{{ $delivery->id }}</code></td>
                         <td>{{ $delivery->email }}</td>
                         <td>{{ $delivery->phone }}</td>
                         <td>
@@ -386,7 +388,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5">
+                        <td colspan="7" class="text-center py-5">
                             <div class="empty-state">
                                 <i class="fas fa-truck"></i>
                                 <h4 class="text-muted">No Delivery Personnel Found</h4>

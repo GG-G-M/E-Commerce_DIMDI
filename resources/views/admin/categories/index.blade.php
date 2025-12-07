@@ -221,6 +221,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>ID</th>
                             <th>Slug</th>
                             <th>Products</th>
                             <th>Status</th>
@@ -231,6 +232,7 @@
                         @foreach ($categories as $category)
                             <tr>
                                 <td class="fw-semibold">{{ $category->name }}</td>
+                                <td><code>{{ $category->id }}</code></td>
                                 <td>{{ $category->slug }}</td>
                                 <td>
                                     <span>
