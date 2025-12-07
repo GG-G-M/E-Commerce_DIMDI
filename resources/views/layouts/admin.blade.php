@@ -223,6 +223,14 @@
                                 id="managementMenu">
 
                                 <ul class="nav flex-column ms-3">
+
+                                    <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.abouts.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.abouts.index') }}">
+                                            <i class="fas fa-info-circle me-2"></i>About
+                                        </a>
+                                    </li>
+
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}"
                                             href="{{ route('admin.suppliers.index') }}">
