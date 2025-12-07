@@ -304,31 +304,31 @@
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="barangay" class="form-label">Barangay *</label>
-                        <input id="barangay" type="text" class="form-control @error('barangay') is-invalid @enderror"
-                               name="barangay" value="{{ old('barangay', $user->barangay) }}" required
-                               placeholder="Barangay code or name">
-                        @error('barangay')
+                        <label for="province" class="form-label">Province *</label>
+                        <select id="province" name="province" class="form-control @error('province') is-invalid @enderror" required>
+                            <option value="">Select Province</option>
+                        </select>
+                        @error('province')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label for="city" class="form-label">City *</label>
-                        <input id="city" type="text" class="form-control @error('city') is-invalid @enderror"
-                               name="city" value="{{ old('city', $user->city) }}" required
-                               placeholder="City code or name">
+                        <select id="city" name="city" class="form-control @error('city') is-invalid @enderror" required>
+                            <option value="">Select City</option>
+                        </select>
                         @error('city')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="col-md-4 mb-3">
-                        <label for="province" class="form-label">Province *</label>
-                        <input id="province" type="text" class="form-control @error('province') is-invalid @enderror"
-                               name="province" value="{{ old('province', $user->province) }}" required
-                               placeholder="Province code or name">
-                        @error('province')
+                        <label for="barangay" class="form-label">Barangay *</label>
+                        <select id="barangay" name="barangay" class="form-control @error('barangay') is-invalid @enderror" required>
+                            <option value="">Select Barangay</option>
+                        </select>
+                        @error('barangay')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
@@ -438,6 +438,146 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPasswordToggle('current_password', 'toggleCurrentPassword');
     setupPasswordToggle('password', 'togglePassword');
     setupPasswordToggle('password_confirmation', 'togglePasswordConfirm');
+
+    // ----------- ADDRESS API SECTION ----------------
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+    const barangaySelect = document.getElementById('barangay');
+    const regionInput = document.getElementById('region');
+
+    // Current user values (from database - these are names, not codes)
+    const currentProvince = @json($user->province ?? '');
+    const currentCity = @json($user->city ?? '');
+    const currentBarangay = @json($user->barangay ?? '');
+    const currentRegion = @json($user->region ?? '');
+
+    // Store selected codes for form submission
+    let selectedProvinceCode = '';
+    let selectedCityCode = '';
+    let selectedBarangayCode = '';
+
+    // Fetch provinces and pre-select current value
+    fetch('/address/provinces')
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(province => {
+                const option = document.createElement('option');
+                option.value = province.code;
+                option.dataset.region = province.region ?? '';
+                option.text = province.name;
+                provinceSelect.appendChild(option);
+
+                // Pre-select if it matches current province name
+                if (province.name === currentProvince) {
+                    option.selected = true;
+                    selectedProvinceCode = province.code;
+                    regionInput.value = province.region || currentRegion;
+                    
+                    // Load cities for this province
+                    if (province.code) {
+                        loadCities(province.code);
+                    }
+                }
+            });
+        })
+        .catch(err => {
+            console.error('Error loading provinces:', err);
+        });
+
+    // Load cities for a province
+    function loadCities(provinceCode) {
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        
+        if (!provinceCode) return;
+
+        fetch(`/address/cities/${provinceCode}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.code;
+                    option.text = city.name;
+                    citySelect.appendChild(option);
+
+                    // Pre-select if it matches current city name
+                    if (city.name === currentCity) {
+                        option.selected = true;
+                        selectedCityCode = city.code;
+                        
+                        // Load barangays for this city
+                        if (city.code) {
+                            loadBarangays(city.code);
+                        }
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error loading cities:', err);
+            });
+    }
+
+    // Load barangays for a city
+    function loadBarangays(cityCode) {
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        
+        if (!cityCode) return;
+
+        fetch(`/address/barangays/${cityCode}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(barangay => {
+                    const option = document.createElement('option');
+                    option.value = barangay.code;
+                    option.text = barangay.name;
+                    barangaySelect.appendChild(option);
+
+                    // Pre-select if it matches current barangay name
+                    if (barangay.name === currentBarangay) {
+                        option.selected = true;
+                        selectedBarangayCode = barangay.code;
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Error loading barangays:', err);
+            });
+    }
+
+    // Fetch cities when a province is selected
+    provinceSelect.addEventListener('change', function() {
+        const provinceCode = this.value;
+        selectedProvinceCode = provinceCode;
+        const selectedOption = this.options[this.selectedIndex];
+        regionInput.value = selectedOption.dataset.region || '';
+        
+        citySelect.innerHTML = '<option value="">Select City</option>';
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        selectedCityCode = '';
+        selectedBarangayCode = '';
+        
+        if (provinceCode) {
+            loadCities(provinceCode);
+        }
+    });
+
+    // Fetch barangays when a city is selected
+    citySelect.addEventListener('change', function() {
+        const cityCode = this.value;
+        selectedCityCode = cityCode;
+        
+        barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+        selectedBarangayCode = '';
+        
+        if (cityCode) {
+            loadBarangays(cityCode);
+        }
+    });
+
+    // Update selected codes when barangay changes
+    barangaySelect.addEventListener('change', function() {
+        selectedBarangayCode = this.value;
+    });
 });
 </script>
 @endsection
