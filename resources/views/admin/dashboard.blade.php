@@ -123,9 +123,10 @@
         margin-top: 1rem;
         border: 1px solid #E8F5E6;
     }
+    
     .clickable-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
     .clickable-card:hover {
@@ -137,98 +138,257 @@
     .text-decoration-none {
         display: block;
     }
+
+    /* Improved Filter Dropdown */
+    .filter-dropdown-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .filter-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #E8F5E6;
+    }
+
+    .filter-title {
+        font-weight: 600;
+        color: #2C8F0C;
+        margin: 0;
+    }
+
+    .filter-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .filter-dropdown-btn {
+        width: 100%;
+        background: white;
+        border: 2px solid #E8F5E6;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-weight: 500;
+        color: #2C8F0C;
+        transition: all 0.2s ease;
+    }
+
+    .filter-dropdown-btn:hover {
+        border-color: #2C8F0C;
+        background: #F8FFF8;
+    }
+
+    .filter-dropdown-btn:after {
+        content: '▼';
+        float: right;
+        font-size: 0.8rem;
+        margin-top: 2px;
+        transition: transform 0.2s ease;
+    }
+
+    .filter-dropdown-btn.active:after {
+        transform: rotate(180deg);
+    }
+
+    .filter-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 2px solid #E8F5E6;
+        border-radius: 8px;
+        margin-top: 0.25rem;
+        padding: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 1000;
+        display: none;
+    }
+
+    .filter-dropdown-menu.show {
+        display: block;
+    }
+
+    .filter-option {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-option:hover {
+        background: #E8F5E6;
+        color: #2C8F0C;
+    }
+
+    .filter-option.active {
+        background: #2C8F0C;
+        color: white;
+    }
+
+    .filter-option i {
+        margin-right: 0.5rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Date range display */
+    .date-range-display {
+        background: linear-gradient(135deg, #E8F5E6, #D4EDDA);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-top: 1rem;
+        border-left: 4px solid #2C8F0C;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .date-range-text {
+        font-size: 0.9rem;
+        color: #2C8F0C;
+        font-weight: 500;
+    }
+
+    .clear-filter-btn {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid #2C8F0C;
+        color: #2C8F0C;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+    }
+
+    .clear-filter-btn:hover {
+        background: #2C8F0C;
+        color: white;
+    }
 </style>
 
+<!-- Clean Header -->
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Dashboard Overview</h1>
-            <p class="mb-0 text-muted">Welcome back, {{ Auth::user()->name }}! Here's what's happening with your store.</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted">Last updated: {{ now()->format('M d, Y \\a\\t h:i A') }}</small>
+            <p class="mb-0 text-muted">Welcome back, {{ Auth::user()->name }}! Here's your store performance overview.</p>
         </div>
     </div>
 </div>
 
-<!-- Filter Section -->
-<div class="card section-card mb-4">
-    <div class="card-body">
-        <form id="dashboardFilter" method="GET" action="{{ route('admin.dashboard') }}">
-            <div class="row align-items-end">
-                <div class="col-md-8">
-                    <label class="form-label fw-bold text-muted mb-2">Filter by Date Range:</label>
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="filter" value="all" id="filter_all" 
-                               {{ $filter == 'all' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_all">All Time</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="today" id="filter_today" 
-                               {{ $filter == 'today' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_today">Today</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="week" id="filter_week" 
-                               {{ $filter == 'week' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_week">This Week</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="month" id="filter_month" 
-                               {{ $filter == 'month' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_month">This Month</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="year" id="filter_year" 
-                               {{ $filter == 'year' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_year">This Year</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="custom" id="filter_custom" 
-                               {{ $filter == 'custom' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_custom">Custom</label>
-                    </div>
-
-                    <!-- Custom Date Inputs -->
-                    <div id="customDateInputs" class="custom-date-inputs" 
-                         style="{{ $filter == 'custom' ? 'display: block;' : 'display: none;' }}">
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" 
-                                       value="{{ $startDate }}" max="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="col-md-5">
-                                <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" 
-                                       value="{{ $endDate }}" max="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-success w-100">Apply</button>
-                            </div>
-                        </div>
-                    </div>
+<!-- Filter Section with Dropdown -->
+<div class="filter-dropdown-container">
+    <div class="filter-header">
+        <h6 class="filter-title">
+            <i class="fas fa-filter me-2"></i>Filter Dashboard Data
+        </h6>
+        @if($filter != 'all')
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-success">
+            <i class="fas fa-times me-1"></i> Clear Filter
+        </a>
+        @endif
+    </div>
+    
+    <form id="dashboardFilter" method="GET" action="{{ route('admin.dashboard') }}">
+        <div class="filter-dropdown">
+            <div class="filter-dropdown-btn" id="filterDropdownBtn">
+                <span id="selectedFilterText">
+                    @php
+                        $filterTexts = [
+                            'all' => '<i class="fas fa-calendar-alt"></i> All Time',
+                            'today' => '<i class="fas fa-sun"></i> Today',
+                            'week' => '<i class="fas fa-calendar-week"></i> This Week',
+                            'month' => '<i class="fas fa-calendar"></i> This Month',
+                            'year' => '<i class="fas fa-calendar-day"></i> This Year',
+                            'custom' => '<i class="fas fa-calendar-check"></i> Custom Date Range'
+                        ];
+                        echo $filterTexts[$filter] ?? $filterTexts['all'];
+                    @endphp
+                </span>
+            </div>
+            
+            <div class="filter-dropdown-menu" id="filterDropdownMenu">
+                <div class="filter-option {{ $filter == 'all' ? 'active' : '' }}" 
+                     data-value="all" data-text="All Time">
+                    <i class="fas fa-calendar-alt"></i> All Time
                 </div>
-                <div class="col-md-4 text-end">
-                    @if($filter != 'all')
-                    <div class="d-flex align-items-center justify-content-end">
-                        <small class="text-muted me-2">
-                            @php
-                                $displayText = match($filter) {
-                                    'today' => 'Today: ' . now()->format('M d, Y'),
-                                    'week' => 'This Week: ' . now()->startOfWeek()->format('M d') . ' - ' . now()->endOfWeek()->format('M d, Y'),
-                                    'month' => 'This Month: ' . now()->format('F Y'),
-                                    'year' => 'This Year: ' . now()->format('Y'),
-                                    'custom' => 'Custom: ' . ($startDate ? Carbon\Carbon::parse($startDate)->format('M d, Y') : '') . ' - ' . ($endDate ? Carbon\Carbon::parse($endDate)->format('M d, Y') : ''),
-                                    default => ''
-                                };
-                            @endphp
-                            {{ $displayText }}
-                        </small>
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary ms-2">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </div>
-                    @endif
+                <div class="filter-option {{ $filter == 'today' ? 'active' : '' }}" 
+                     data-value="today" data-text="Today">
+                    <i class="fas fa-sun"></i> Today
+                </div>
+                <div class="filter-option {{ $filter == 'week' ? 'active' : '' }}" 
+                     data-value="week" data-text="This Week">
+                    <i class="fas fa-calendar-week"></i> This Week
+                </div>
+                <div class="filter-option {{ $filter == 'month' ? 'active' : '' }}" 
+                     data-value="month" data-text="This Month">
+                    <i class="fas fa-calendar"></i> This Month
+                </div>
+                <div class="filter-option {{ $filter == 'year' ? 'active' : '' }}" 
+                     data-value="year" data-text="This Year">
+                    <i class="fas fa-calendar-day"></i> This Year
+                </div>
+                <div class="filter-option {{ $filter == 'custom' ? 'active' : '' }}" 
+                     data-value="custom" data-text="Custom Date Range">
+                    <i class="fas fa-calendar-check"></i> Custom Date Range
                 </div>
             </div>
-        </form>
+            
+            <input type="hidden" name="filter" id="filterInput" value="{{ $filter }}">
+        </div>
+
+        <!-- Custom Date Inputs -->
+        <div id="customDateInputs" class="custom-date-inputs" 
+             style="{{ $filter == 'custom' ? 'display: block;' : 'display: none;' }}">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                           value="{{ $startDate }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" 
+                           value="{{ $endDate }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check me-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Date Range Display -->
+    @if($filter != 'all')
+    <div class="date-range-display">
+        <div class="date-range-text">
+            @php
+                $displayText = match($filter) {
+                    'today' => '<i class="fas fa-sun me-1"></i>Today: ' . now()->format('M d, Y'),
+                    'week' => '<i class="fas fa-calendar-week me-1"></i>This Week: ' . now()->startOfWeek()->format('M d') . ' - ' . now()->endOfWeek()->format('M d, Y'),
+                    'month' => '<i class="fas fa-calendar me-1"></i>This Month: ' . now()->format('F Y'),
+                    'year' => '<i class="fas fa-calendar-day me-1"></i>This Year: ' . now()->format('Y'),
+                    'custom' => '<i class="fas fa-calendar-check me-1"></i>Custom Range: ' . ($startDate ? Carbon\Carbon::parse($startDate)->format('M d, Y') : '') . ' - ' . ($endDate ? Carbon\Carbon::parse($endDate)->format('M d, Y') : ''),
+                    default => ''
+                };
+            @endphp
+            {!! $displayText !!}
+        </div>
+        <a href="{{ route('admin.dashboard') }}" class="clear-filter-btn">
+            <i class="fas fa-times me-1"></i> Clear
+        </a>
     </div>
+    @endif
 </div>
 
 <!-- Stats Cards -->
@@ -689,30 +849,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Filter functionality (existing code)
-    const filterRadios = document.querySelectorAll('input[name="filter"]');
+    // Custom Dropdown Functionality
+    const filterDropdownBtn = document.getElementById('filterDropdownBtn');
+    const filterDropdownMenu = document.getElementById('filterDropdownMenu');
+    const filterInput = document.getElementById('filterInput');
+    const selectedFilterText = document.getElementById('selectedFilterText');
     const customDateInputs = document.getElementById('customDateInputs');
     const form = document.getElementById('dashboardFilter');
 
-    filterRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'custom') {
+    // Toggle dropdown
+    filterDropdownBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterDropdownMenu.classList.toggle('show');
+        filterDropdownBtn.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!filterDropdownBtn.contains(e.target) && !filterDropdownMenu.contains(e.target)) {
+            filterDropdownMenu.classList.remove('show');
+            filterDropdownBtn.classList.remove('active');
+        }
+    });
+
+    // Handle filter option selection
+    const filterOptions = document.querySelectorAll('.filter-option');
+    filterOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            const text = this.getAttribute('data-text');
+            const icon = this.querySelector('i').cloneNode(true);
+            
+            // Update active state
+            filterOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update selected display
+            selectedFilterText.innerHTML = '';
+            selectedFilterText.appendChild(icon);
+            selectedFilterText.innerHTML += ' ' + text;
+            
+            // Update hidden input
+            filterInput.value = value;
+            
+            // Handle custom date range
+            if (value === 'custom') {
                 customDateInputs.style.display = 'block';
             } else {
                 customDateInputs.style.display = 'none';
-                if (this.value !== 'custom') {
-                    form.submit();
-                }
+                form.submit();
             }
+            
+            // Close dropdown
+            filterDropdownMenu.classList.remove('show');
+            filterDropdownBtn.classList.remove('active');
         });
     });
 
+    // Handle custom date inputs
     const startDate = document.getElementById('start_date');
     const endDate = document.getElementById('end_date');
 
     [startDate, endDate].forEach(input => {
         input.addEventListener('change', function() {
-            if (document.querySelector('input[name="filter"]:checked').value === 'custom') {
+            if (filterInput.value === 'custom') {
                 form.submit();
             }
         });

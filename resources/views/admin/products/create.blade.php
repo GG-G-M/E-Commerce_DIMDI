@@ -3,381 +3,585 @@
 @section('content')
 <style>
     .page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #E8F5E6;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2C8F0C;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+    
+    .form-container {
         background: white;
         border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .form-section {
         padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
+        border-bottom: 1px solid #f0f0f0;
     }
-
-    .page-header h1 {
-        color: #2C8F0C;
-        font-weight: 700;
+    
+    .form-section:last-child {
+        border-bottom: none;
     }
-
-    .card-custom {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .card-header-custom {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
+    
+    .section-title {
+        font-size: 1.1rem;
         font-weight: 600;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #4CAF50, #66BB6A);
-        border: none;
-    }
-
-    .variant-card {
-        border: 2px solid #E8F5E6;
-        border-radius: 10px;
-        padding: 1.5rem;
+        color: #2C8F0C;
         margin-bottom: 1rem;
-        background: #F8FDF8;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #E8F5E6;
     }
-
+    
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.15);
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #495057;
+    }
+    
+    /* Variants Section */
+    .variants-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .variants-container {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .variant-item {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
     .variant-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
         padding-bottom: 0.5rem;
-        border-bottom: 1px solid #C8E6C9;
+        border-bottom: 1px solid #f0f0f0;
     }
-
-    .variant-number {
-        background: #2C8F0C;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
+    
+    .variant-title {
         font-weight: 600;
+        color: #495057;
+        font-size: 0.95rem;
     }
-
-    .remove-variant {
-        background: #C62828;
+    
+    .btn-remove-variant {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 0.85rem;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-remove-variant:hover {
+        background-color: #f8d7da;
+    }
+    
+    .btn-add-variant {
+        background: #2C8F0C;
         color: white;
         border: none;
         border-radius: 6px;
         padding: 0.5rem 1rem;
+        font-weight: 500;
         cursor: pointer;
+        transition: background 0.2s ease;
+        font-size: 0.9rem;
     }
-
-    .image-preview-container {
-        border: 2px dashed #C8E6C9;
-        border-radius: 8px;
-        padding: 1rem;
+    
+    .btn-add-variant:hover {
+        background: #25750A;
+    }
+    
+    /* Stock Summary */
+    .stock-summary {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .stock-item {
         text-align: center;
-        background: #F8FDF8;
     }
-
-    .variant-image-preview {
-        max-height: 120px;
-        max-width: 100%;
+    
+    .stock-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stock-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2C8F0C;
+    }
+    
+    /* Image Preview */
+    .image-preview {
+        max-width: 200px;
+        max-height: 150px;
+        border: 1px solid #dee2e6;
         border-radius: 6px;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
     }
-
-    .no-variants-message {
-        background: #FFF3E0;
-        border: 2px dashed #FFB74D;
-        border-radius: 8px;
-        padding: 2rem;
-        text-align: center;
-        color: #E65100;
-    }
-
-    .total-stock-summary {
-        background: linear-gradient(135deg, #E8F5E6, #C8E6C9);
+    
+    /* Status Section */
+    .status-section {
+        background: #f8f9fa;
         border-radius: 8px;
         padding: 1rem;
         margin-top: 1rem;
-        border: 1px solid #2C8F0C;
+    }
+    
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .status-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+        padding: 1rem 1.5rem;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #495057;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+    
+    .btn-secondary:hover {
+        background: #f8f9fa;
+        color: #212529;
+        text-decoration: none;
+    }
+    
+    .btn-primary {
+        background: #2C8F0C;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+    
+    .btn-primary:hover {
+        background: #25750A;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-section {
+            padding: 1rem;
+        }
+        
+        .stock-summary {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn-secondary, .btn-primary {
+            width: 100%;
+            text-align: center;
+        }
     }
 </style>
 
 <!-- Header -->
 <div class="page-header">
-    <h1 class="h3 mb-1">Add New Product</h1>
-    <p class="text-muted mb-0">Fill out the form to add a new product to your store.</p>
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1>Add New Product</h1>
+            <p>Fill out the form to add a new product to your store</p>
+        </div>
+        <a href="{{ route('admin.products.index') }}" class="btn-secondary">
+            Back to Products
+        </a>
+    </div>
 </div>
 
 <!-- Product Form -->
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <i class="fas fa-box me-2"></i> Product Information
-    </div>
-
-    <div class="card-body">
-        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
-            @csrf
+<div class="form-container">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
+        @csrf
+        
+        <!-- Basic Information -->
+        <div class="form-section">
+            <div class="section-title">Basic Information</div>
             
             <div class="row">
-                <div class="col-md-8">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Product Name *</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name') }}" required>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                <div class="col-md-8 mb-3">
+                    <label class="form-label">Product Name *</label>
+                    <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                           name="name" value="{{ old('name') }}" required>
+                    @error('name')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Description *</label>
+                <textarea class="form-control @error('description') is-invalid @enderror" 
+                          name="description" rows="3" required>{{ old('description') }}</textarea>
+                @error('description')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+        
+        <!-- Pricing -->
+        <div class="form-section">
+            <div class="section-title">Pricing</div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Price *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₱</span>
+                        <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" 
+                               name="price" value="{{ old('price') }}" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description *</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" 
-                                  id="description" name="description" rows="4" required>{{ old('description') }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    @error('price')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Sale Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₱</span>
+                        <input type="number" step="0.01" class="form-control @error('sale_price') is-invalid @enderror" 
+                               name="sale_price" value="{{ old('sale_price') }}" 
+                               placeholder="Optional">
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Base Price *</label>
-                                <input type="number" step="0.01" class="form-control @error('price') is-invalid @enderror" 
-                                       id="price" name="price" value="{{ old('price') }}" required>
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="sale_price" class="form-label">Sale Price</label>
-                                <input type="number" step="0.01" class="form-control @error('sale_price') is-invalid @enderror" 
-                                       id="sale_price" name="sale_price" value="{{ old('sale_price') }}">
-                                @error('sale_price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
+                    @error('sale_price')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categories & Stock -->
+        <div class="form-section">
+            <div class="section-title">Categories & Stock</div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Category *</label>
+                    <select class="form-select @error('category_id') is-invalid @enderror" 
+                            name="category_id" required>
+                        <option value="">Select Category</option>
+                        @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Brand</label>
+                    <select class="form-select @error('brand_id') is-invalid @enderror" 
+                            name="brand_id">
+                        <option value="">Select Brand</option>
+                        @foreach($brands as $brand)
+                        <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                            {{ $brand->name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('brand_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Base Stock Quantity *</label>
+                    <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
+                           name="stock_quantity" value="{{ old('stock_quantity', 0) }}" 
+                           id="stock_quantity" required>
+                    @error('stock_quantity')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <small class="text-muted">Used when variants are disabled</small>
+                </div>
+            </div>
+            
+            <!-- Variants Toggle -->
+            <div class="mt-3">
+                <div class="variants-toggle">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" 
+                               id="has_variants" name="has_variants" value="1" 
+                               {{ old('has_variants') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="has_variants">
+                            Enable Product Variants
+                        </label>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
-                                <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
-                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" required>
-                                @error('stock_quantity')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">Used when variants are disabled</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="category_id" class="form-label">Category *</label>
-                                <select class="form-select @error('category_id') is-invalid @enderror" 
-                                        id="category_id" name="category_id" required>
-                                    <option value="">Select Category</option>
-                                    @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('category_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Brand Dropdown -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="brand_id" class="form-label">Brand</label>
-                                <select class="form-select @error('brand_id') is-invalid @enderror" 
-                                        id="brand_id" name="brand_id">
-                                    <option value="">Select Brand</option>
-                                    @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                        {{ $brand->name }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @error('brand_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">Select the product brand (optional)</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- You can add more fields here if needed -->
-                        </div>
-                    </div>
-
-                    <!-- Variants Toggle -->
-                    <div class="mb-4">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="has_variants" name="has_variants" value="1" {{ old('has_variants') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="has_variants">
-                                <strong>Enable Product Variants</strong>
-                            </label>
-                            <small class="form-text text-muted d-block">
-                                Enable this to create different models/versions of this product
-                            </small>
-                        </div>
-                    </div>
-
-                    <!-- Variants Section -->
-                    <div id="variantsSection" style="display: {{ old('has_variants') ? 'block' : 'none' }};">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <label class="form-label mb-0">Product Variants</label>
-                            <button type="button" id="addVariant" class="btn btn-success btn-sm">
-                                <i class="fas fa-plus me-1"></i> Add Variant
-                            </button>
-                        </div>
-
-                        <div id="variantsContainer">
-                            @if(old('variants'))
-                                @foreach(old('variants') as $index => $variant)
-                                <div class="variant-card" data-index="{{ $index }}">
-                                    <div class="variant-header">
-                                        <span class="variant-number">Variant #{{ $index + 1 }}</span>
-                                        <button type="button" class="remove-variant" onclick="removeVariant(this)">
-                                            <i class="fas fa-times me-1"></i> Remove
-                                        </button>
+                </div>
+            </div>
+            
+            <!-- Variants Section -->
+            <div id="variantsSection" style="display: {{ old('has_variants') ? 'block' : 'none' }};">
+                <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                    <label class="form-label mb-0">Product Variants</label>
+                    <button type="button" id="addVariant" class="btn-add-variant">
+                        + Add Variant
+                    </button>
+                </div>
+                
+                <div class="variants-container">
+                    <div id="variantsContainer">
+                        @if(old('variants'))
+                            @foreach(old('variants') as $index => $variant)
+                            <div class="variant-item" data-index="{{ $index }}">
+                                <div class="variant-header">
+                                    <div class="variant-title">Variant #{{ $index + 1 }}</div>
+                                    <button type="button" class="btn-remove-variant" onclick="removeVariant(this)">
+                                        Remove
+                                    </button>
+                                </div>
+                                
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Variant Name *</label>
+                                        <input type="text" class="form-control" 
+                                               name="variants[{{ $index }}][variant_name]" 
+                                               value="{{ $variant['variant_name'] ?? '' }}" 
+                                               placeholder="e.g., Pro Model, Standard Edition" required>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Variant Name *</label>
-                                                <input type="text" class="form-control" 
-                                                       name="variants[{{ $index }}][variant_name]" 
-                                                       value="{{ $variant['variant_name'] ?? '' }}" 
-                                                       placeholder="e.g., Pro Model, Standard Edition" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label class="form-label">Stock Quantity *</label>
-                                                <input type="number" class="form-control" 
-                                                       name="variants[{{ $index }}][stock]" 
-                                                       value="{{ $variant['stock'] ?? 0 }}" 
-                                                       min="0" required>
-                                            </div>
-                                        </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label class="form-label">Stock Quantity *</label>
+                                        <input type="number" class="form-control stock-input" 
+                                               name="variants[{{ $index }}][stock]" 
+                                               value="{{ $variant['stock'] ?? 0 }}" 
+                                               min="0" required>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label class="form-label">Variant Description</label>
-                                                <textarea class="form-control" 
-                                                          name="variants[{{ $index }}][variant_description]" 
-                                                          rows="2" 
-                                                          placeholder="Optional description for this variant">{{ $variant['variant_description'] ?? '' }}</textarea>
-                                            </div>
-                                        </div>
+                                    
+                                    <div class="col-12">
+                                        <label class="form-label">Variant Description</label>
+                                        <textarea class="form-control" 
+                                                  name="variants[{{ $index }}][variant_description]" 
+                                                  rows="2" 
+                                                  placeholder="Optional description for this variant">{{ $variant['variant_description'] ?? '' }}</textarea>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Price *</label>
-                                                <input type="number" step="0.01" class="form-control" 
-                                                       name="variants[{{ $index }}][price]" 
-                                                       value="{{ $variant['price'] ?? '' }}" 
-                                                       min="0" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Sale Price</label>
-                                                <input type="number" step="0.01" class="form-control" 
-                                                       name="variants[{{ $index }}][sale_price]" 
-                                                       value="{{ $variant['sale_price'] ?? '' }}" 
-                                                       min="0" placeholder="Optional">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label class="form-label">Variant Image</label>
-                                                <input type="file" class="form-control variant-image-input" 
-                                                       name="variants[{{ $index }}][image]" 
-                                                       accept="image/*">
-                                                <div class="image-preview-container mt-2" style="display: none;">
-                                                    <img class="variant-image-preview" src="#" alt="Preview">
-                                                </div>
-                                            </div>
+                                    
+                                    <div class="col-md-4">
+                                        <label class="form-label">Price *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">₱</span>
+                                            <input type="number" step="0.01" class="form-control" 
+                                                   name="variants[{{ $index }}][price]" 
+                                                   value="{{ $variant['price'] ?? '' }}" 
+                                                   min="0" required>
                                         </div>
                                     </div>
-                                </div>
-                                @endforeach
-                            @else
-                                <div class="no-variants-message" id="noVariantsMessage">
-                                    <i class="fas fa-info-circle fa-2x mb-3"></i>
-                                    <h5>No Variants Added</h5>
-                                    <p class="mb-0">Click "Add Variant" to create different models of this product.</p>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Total Stock Summary -->
-                        <div class="total-stock-summary">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <strong>Total Variants:</strong> 
-                                    <span class="badge bg-info" id="totalVariants">0</span>
-                                </div>
-                                <div class="col-md-6">
-                                    <strong>Total Stock:</strong> 
-                                    <span class="badge bg-success" id="totalStock">0 units</span>
+                                    
+                                    <div class="col-md-4">
+                                        <label class="form-label">Sale Price</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">₱</span>
+                                            <input type="number" step="0.01" class="form-control" 
+                                                   name="variants[{{ $index }}][sale_price]" 
+                                                   value="{{ $variant['sale_price'] ?? '' }}" 
+                                                   min="0" placeholder="Optional">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <label class="form-label">Variant Image</label>
+                                        <input type="file" class="form-control" 
+                                               name="variants[{{ $index }}][image]" 
+                                               accept="image/*">
+                                    </div>
                                 </div>
                             </div>
+                            @endforeach
+                        @else
+                            <div class="empty-state" id="noVariantsMessage">
+                                <i class="fas fa-info-circle"></i>
+                                <p>No variants added yet</p>
+                                <small>Click "Add Variant" to create different models</small>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <!-- Stock Summary -->
+                    <div class="stock-summary">
+                        <div class="stock-item">
+                            <div class="stock-label">Total Variants</div>
+                            <div class="stock-value" id="totalVariants">{{ old('variants') ? count(old('variants')) : 0 }}</div>
+                        </div>
+                        <div class="stock-item">
+                            <div class="stock-label">Total Stock</div>
+                            <div class="stock-value" id="totalStock">0 units</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <!-- Main Image -->
+            </div>
+        </div>
+        
+        <!-- Product Image -->
+        <div class="form-section">
+            <div class="section-title">Product Image</div>
+            
+            <div class="row">
+                <div class="col-md-6">
                     <div class="mb-3">
-                        <label for="image" class="form-label">Product Image *</label>
+                        <label class="form-label">Product Image *</label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
                                id="image" name="image" accept="image/*" required>
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <small class="text-muted">Supported formats: JPEG, PNG, JPG, GIF, WEBP</small>
                         <div class="mt-2">
-                            <img id="imagePreview" src="#" alt="Image preview" class="img-thumbnail d-none" style="max-height: 200px;">
-                        </div>
-                        <small class="form-text text-muted">Supported formats: JPEG, PNG, JPG, GIF, WEBP. Max size: 2MB</small>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_featured">Featured Product</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">Active</label>
+                            <img id="imagePreview" src="#" alt="Image preview" class="image-preview d-none">
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-md-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create Product</button>
+        </div>
+        
+        <!-- Product Status -->
+        <div class="form-section">
+            <div class="section-title">Product Status</div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="status-section">
+                        <div class="status-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       id="is_featured" name="is_featured" value="1" 
+                                       {{ old('is_featured') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_featured">
+                                    Featured Product
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="status-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       id="is_active" name="is_active" value="1" 
+                                       {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
-    </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{{ route('admin.products.index') }}" class="btn-secondary">
+                Cancel
+            </a>
+            <button type="submit" class="btn-primary">
+                Create Product
+            </button>
+        </div>
+    </form>
 </div>
+
 @endsection
 
 @push('scripts')
@@ -387,7 +591,16 @@
     // Toggle variants section
     document.getElementById('has_variants').addEventListener('change', function() {
         const variantsSection = document.getElementById('variantsSection');
+        const stockQuantityInput = document.getElementById('stock_quantity');
+        
         variantsSection.style.display = this.checked ? 'block' : 'none';
+        stockQuantityInput.disabled = this.checked;
+        stockQuantityInput.required = !this.checked;
+        
+        if (this.checked) {
+            stockQuantityInput.value = 0;
+        }
+        
         updateSummary();
     });
 
@@ -401,70 +614,63 @@
         }
 
         const variantHtml = `
-            <div class="variant-card" data-index="${variantCount}">
+            <div class="variant-item" data-index="${variantCount}">
                 <div class="variant-header">
-                    <span class="variant-number">Variant #${variantCount + 1}</span>
-                    <button type="button" class="remove-variant" onclick="removeVariant(this)">
-                        <i class="fas fa-times me-1"></i> Remove
+                    <div class="variant-title">Variant #${variantCount + 1}</div>
+                    <button type="button" class="btn-remove-variant" onclick="removeVariant(this)">
+                        Remove
                     </button>
                 </div>
-                <div class="row">
+                
+                <div class="row g-2">
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Variant Name *</label>
-                            <input type="text" class="form-control" 
-                                   name="variants[${variantCount}][variant_name]" 
-                                   placeholder="e.g., Pro Model, Standard Edition" required>
-                        </div>
+                        <label class="form-label">Variant Name *</label>
+                        <input type="text" class="form-control" 
+                               name="variants[${variantCount}][variant_name]" 
+                               placeholder="e.g., Pro Model, Standard Edition" required>
                     </div>
+                    
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Stock Quantity *</label>
-                            <input type="number" class="form-control stock-input" 
-                                   name="variants[${variantCount}][stock]" 
-                                   value="0" min="0" required>
-                        </div>
+                        <label class="form-label">Stock Quantity *</label>
+                        <input type="number" class="form-control stock-input" 
+                               name="variants[${variantCount}][stock]" 
+                               value="0" min="0" required>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="mb-3">
-                            <label class="form-label">Variant Description</label>
-                            <textarea class="form-control" 
-                                      name="variants[${variantCount}][variant_description]" 
-                                      rows="2" 
-                                      placeholder="Optional description for this variant"></textarea>
-                        </div>
+                    
+                    <div class="col-12">
+                        <label class="form-label">Variant Description</label>
+                        <textarea class="form-control" 
+                                  name="variants[${variantCount}][variant_description]" 
+                                  rows="2" 
+                                  placeholder="Optional description for this variant"></textarea>
                     </div>
-                </div>
-                <div class="row">
+                    
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Price *</label>
+                        <label class="form-label">Price *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
                             <input type="number" step="0.01" class="form-control" 
                                    name="variants[${variantCount}][price]" 
                                    value="{{ old('price', '') }}" 
                                    min="0" required>
                         </div>
                     </div>
+                    
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Sale Price</label>
+                        <label class="form-label">Sale Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
                             <input type="number" step="0.01" class="form-control" 
                                    name="variants[${variantCount}][sale_price]" 
                                    min="0" placeholder="Optional">
                         </div>
                     </div>
+                    
                     <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Variant Image</label>
-                            <input type="file" class="form-control variant-image-input" 
-                                   name="variants[${variantCount}][image]" 
-                                   accept="image/*">
-                            <div class="image-preview-container mt-2" style="display: none;">
-                                <img class="variant-image-preview" src="#" alt="Preview">
-                            </div>
-                        </div>
+                        <label class="form-label">Variant Image</label>
+                        <input type="file" class="form-control" 
+                               name="variants[${variantCount}][image]" 
+                               accept="image/*">
                     </div>
                 </div>
             </div>
@@ -477,20 +683,22 @@
 
     // Remove variant
     function removeVariant(button) {
-        const variantCard = button.closest('.variant-card');
-        variantCard.remove();
-        updateSummary();
-        
-        // Show no variants message if all are removed
-        const container = document.getElementById('variantsContainer');
-        if (container.children.length === 0) {
-            container.innerHTML = `
-                <div class="no-variants-message" id="noVariantsMessage">
-                    <i class="fas fa-info-circle fa-2x mb-3"></i>
-                    <h5>No Variants Added</h5>
-                    <p class="mb-0">Click "Add Variant" to create different models of this product.</p>
-                </div>
-            `;
+        if (confirm('Are you sure you want to remove this variant?')) {
+            const variantCard = button.closest('.variant-item');
+            variantCard.remove();
+            updateSummary();
+            
+            // Show no variants message if all are removed
+            const container = document.getElementById('variantsContainer');
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" id="noVariantsMessage">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No variants added yet</p>
+                        <small>Click "Add Variant" to create different models</small>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -498,10 +706,11 @@
     function updateSummary() {
         const stockInputs = document.querySelectorAll('.stock-input');
         let totalStock = 0;
-        let totalVariants = document.querySelectorAll('.variant-card').length;
+        let totalVariants = document.querySelectorAll('.variant-item').length;
         
         stockInputs.forEach(input => {
-            totalStock += parseInt(input.value) || 0;
+            const value = parseInt(input.value) || 0;
+            totalStock += value;
         });
 
         document.getElementById('totalVariants').textContent = totalVariants;
@@ -514,6 +723,13 @@
         const file = e.target.files[0];
         
         if (file) {
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit
+                alert('Image size must be less than 2MB');
+                this.value = '';
+                preview.classList.add('d-none');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
@@ -522,26 +738,6 @@
             reader.readAsDataURL(file);
         } else {
             preview.classList.add('d-none');
-        }
-    });
-
-    // Image preview for variant images
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('variant-image-input')) {
-            const file = e.target.files[0];
-            const previewContainer = e.target.nextElementSibling;
-            const preview = previewContainer.querySelector('.variant-image-preview');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    previewContainer.style.display = 'block';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                previewContainer.style.display = 'none';
-            }
         }
     });
 
@@ -557,16 +753,28 @@
         const hasVariants = document.getElementById('has_variants').checked;
         
         if (hasVariants) {
-            const variants = document.querySelectorAll('.variant-card');
+            const variants = document.querySelectorAll('.variant-item');
             if (variants.length === 0) {
                 e.preventDefault();
                 alert('Please add at least one variant when variants are enabled.');
                 return false;
             }
         }
+        
+        // Validate prices
+        const price = parseFloat(document.querySelector('input[name="price"]').value);
+        const salePrice = parseFloat(document.querySelector('input[name="sale_price"]').value) || 0;
+        
+        if (salePrice > 0 && salePrice >= price) {
+            e.preventDefault();
+            alert('Sale price must be less than the base price.');
+            return false;
+        }
     });
 
-    // Initial summary update
-    updateSummary();
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSummary();
+    });
 </script>
 @endpush

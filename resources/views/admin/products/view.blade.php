@@ -32,6 +32,7 @@
         color: white;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow);
     }
 
     .modern-header::before {
@@ -46,7 +47,7 @@
     }
 
     .modern-header h1 {
-        font-weight: 800;
+        font-weight: 700;
         font-size: 2rem;
         margin-bottom: 0.5rem;
         position: relative;
@@ -55,15 +56,10 @@
 
     .modern-header .subtitle {
         opacity: 0.9;
-        font-size: 1rem;
+        font-size: 0.95rem;
         position: relative;
         z-index: 1;
-    }
-
-    .header-actions {
-        position: relative;
-        z-index: 2;
-        margin-top: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     /* Modern Card Design */
@@ -74,6 +70,7 @@
         box-shadow: var(--shadow);
         overflow: hidden;
         transition: all 0.3s ease;
+        margin-bottom: 2rem;
     }
 
     .modern-card:hover {
@@ -88,6 +85,8 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        font-weight: 600;
+        font-size: 1.1rem;
     }
 
     .modern-card-header i {
@@ -102,7 +101,7 @@
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
+        gap: 1.5rem;
         margin-bottom: 2rem;
     }
 
@@ -116,12 +115,13 @@
     .info-section h6 {
         color: var(--gray-700);
         font-weight: 600;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
         border-bottom: 2px solid var(--light-green);
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        font-size: 1rem;
     }
 
     .info-item {
@@ -139,11 +139,14 @@
     .info-label {
         color: var(--gray-600);
         font-weight: 500;
+        font-size: 0.9rem;
     }
 
     .info-value {
         color: var(--gray-800);
         font-weight: 600;
+        text-align: right;
+        max-width: 60%;
     }
 
     /* Status Badges */
@@ -185,17 +188,18 @@
         padding: 1.5rem;
         border: 2px solid var(--primary-green);
         text-align: center;
+        margin-top: 1.5rem;
     }
 
     .current-price {
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: 2.25rem;
+        font-weight: 700;
         color: var(--primary-green);
         line-height: 1;
     }
 
     .original-price {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         color: var(--gray-500);
         text-decoration: line-through;
         margin-top: 0.5rem;
@@ -224,7 +228,7 @@
 
     .product-image {
         width: 100%;
-        height: 300px;
+        height: 280px;
         object-fit: contain;
         border-radius: var(--radius-md);
         background: white;
@@ -242,6 +246,7 @@
         border-radius: var(--radius-sm);
         font-size: 0.875rem;
         font-weight: 500;
+        z-index: 2;
     }
 
     /* Variants Table */
@@ -283,6 +288,7 @@
     .variants-table td {
         padding: 1rem;
         color: var(--gray-700);
+        vertical-align: middle;
     }
 
     .variant-sku {
@@ -295,9 +301,9 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.25rem 0.75rem;
+        padding: 0.35rem 0.85rem;
         border-radius: 1rem;
-        font-size: 0.875rem;
+        font-size: 0.85rem;
         font-weight: 500;
     }
 
@@ -401,6 +407,7 @@
         border: 1px solid var(--gray-200);
         text-align: center;
         transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
     }
 
     .stat-card:hover {
@@ -410,22 +417,24 @@
     }
 
     .stat-icon {
-        font-size: 2rem;
+        font-size: 1.75rem;
         margin-bottom: 1rem;
         color: var(--primary-green);
+        opacity: 0.9;
     }
 
     .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
+        font-size: 1.75rem;
+        font-weight: 700;
         color: var(--gray-800);
         line-height: 1;
+        margin-bottom: 0.5rem;
     }
 
     .stat-label {
         color: var(--gray-600);
         font-size: 0.875rem;
-        margin-top: 0.5rem;
+        font-weight: 500;
     }
 
     /* Empty State */
@@ -439,6 +448,33 @@
         font-size: 3rem;
         margin-bottom: 1rem;
         opacity: 0.5;
+    }
+
+    /* Status Badge Container */
+    .status-badge-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+
+    /* Header Actions */
+    .header-actions {
+        position: relative;
+        z-index: 2;
+        margin-top: 1rem;
+    }
+
+    /* Action Buttons in Bottom */
+    .bottom-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
     }
 
     /* Responsive */
@@ -464,11 +500,32 @@
         .stats-grid {
             grid-template-columns: repeat(2, 1fr);
         }
+
+        .bottom-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     @media (max-width: 480px) {
         .stats-grid {
             grid-template-columns: 1fr;
+        }
+        
+        .status-badge-container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .variants-table th,
+        .variants-table td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.85rem;
         }
     }
 </style>
@@ -481,7 +538,7 @@
             <p class="subtitle">Product Details & Management</p>
             
             <!-- Product Status Badges -->
-            <div class="d-flex flex-wrap gap-2 mt-3">
+            <div class="status-badge-container">
                 <span class="status-badge status-{{ $product->is_archived ? 'archived' : ($product->is_effectively_inactive ? 'inactive' : 'active') }}">
                     <i class="fas fa-circle fa-xs"></i>
                     {{ $product->is_archived ? 'Archived' : ($product->is_effectively_inactive ? 'Inactive' : 'Active') }}
@@ -507,14 +564,10 @@
             </div>
         </div>
         
-        <div class="header-actions d-flex gap-2">
+        <div class="header-actions d-flex gap-2 mt-2">
             <a href="{{ route('admin.products.index') }}" class="action-btn btn-secondary">
                 <i class="fas fa-arrow-left"></i>
                 Back to List
-            </a>
-            <a href="{{ route('admin.products.edit', $product) }}" class="action-btn btn-primary">
-                <i class="fas fa-edit"></i>
-                Edit Product
             </a>
         </div>
     </div>
@@ -527,7 +580,7 @@
         <span class="sku-badge">SKU: {{ $product->sku }}</span>
         <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-image">
         
-        <div class="price-display mt-4">
+        <div class="price-display">
             @if($product->has_discount)
                 <div class="discount-badge">{{ $product->discount_percentage }}% OFF</div>
                 <div class="current-price">₱{{ number_format($product->sale_price, 2) }}</div>
@@ -651,7 +704,7 @@
 </div>
 
 <!-- Product Variants Section -->
-<div class="modern-card mb-4">
+<div class="modern-card">
     <div class="modern-card-header">
         <i class="fas fa-layer-group"></i>
         Product Variants
@@ -725,7 +778,7 @@
             <div class="d-flex justify-content-between align-items-center mt-3 p-3" 
                  style="background: linear-gradient(135deg, #F0F9FF, #E0F2FE); border-radius: var(--radius-md);">
                 <div>
-                    <strong class="text-primary">Total Stock Across All Variants:</strong>
+                    <strong class="text-primary">Total Stock:</strong>
                     <div class="h4 mb-0 text-primary">{{ $product->total_stock }} units</div>
                 </div>
                 <div class="text-end">
@@ -737,7 +790,7 @@
             <div class="empty-state">
                 <i class="fas fa-box-open"></i>
                 <h5 class="mt-3 mb-2">No Variants Found</h5>
-                <p class="text-muted">This product has no variants. Click "Edit Product" to add variants.</p>
+                <p class="text-muted">This product has no variants.</p>
             </div>
         @endif
     </div>
@@ -778,65 +831,58 @@
     </div>
 </div>
 
-<!-- Bottom Actions -->
-<div class="d-flex justify-content-between align-items-center mt-4 p-4" 
-     style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
-    <div>
-        <h6 class="mb-1">Product Actions</h6>
-        <p class="text-muted mb-0">Manage this product</p>
-    </div>
-    <div class="d-flex gap-2">
-        <!-- Archive/Unarchive Form -->
-        @if($product->is_archived)
-            <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="is_archived" value="0">
-                <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Unarchive this product?')">
-                    <i class="fas fa-box-open"></i>
-                    Unarchive
-                </button>
-            </form>
-        @else
-            <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="is_archived" value="1">
-                <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Archive this product?')">
-                    <i class="fas fa-archive"></i>
-                    Archive
-                </button>
-            </form>
-        @endif
-        
-        <!-- Feature/Unfeature Form -->
-        @if($product->is_featured)
-            <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="is_featured" value="0">
-                <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Unfeature this product?')">
-                    <i class="fas fa-star"></i>
-                    Unfeature
-                </button>
-            </form>
-        @else
-            <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="is_featured" value="1">
-                <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Feature this product?')">
-                    <i class="far fa-star"></i>
-                    Feature
-                </button>
-            </form>
-        @endif
-        
-        <a href="{{ route('admin.products.edit', $product) }}" class="action-btn btn-primary">
-            <i class="fas fa-edit"></i>
-            Edit Product
-        </a>
-    </div>
+<!-- Clean Bottom Actions -->
+<div class="bottom-actions">
+    <!-- Archive/Unarchive Form -->
+    @if($product->is_archived)
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="is_archived" value="0">
+            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Unarchive this product?')">
+                <i class="fas fa-box-open"></i>
+                Unarchive
+            </button>
+        </form>
+    @else
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="is_archived" value="1">
+            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Archive this product?')">
+                <i class="fas fa-archive"></i>
+                Archive
+            </button>
+        </form>
+    @endif
+    
+    <!-- Feature/Unfeature Form -->
+    @if($product->is_featured)
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="is_featured" value="0">
+            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Unfeature this product?')">
+                <i class="fas fa-star"></i>
+                Unfeature
+            </button>
+        </form>
+    @else
+        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="is_featured" value="1">
+            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Feature this product?')">
+                <i class="far fa-star"></i>
+                Feature
+            </button>
+        </form>
+    @endif
+    
+    <a href="{{ route('admin.products.edit', $product) }}" class="action-btn btn-primary">
+        <i class="fas fa-edit"></i>
+        Edit Product
+    </a>
 </div>
 
 @endsection
