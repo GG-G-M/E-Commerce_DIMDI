@@ -82,6 +82,41 @@
     .progress-bar {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
     }
+
+    /* Unified action icon (green) */
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+
+    .action-icon {
+        background: transparent;
+        color: #2C8F0C;
+        border: 1.5px solid #2C8F0C;
+        padding: 0.35rem;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .action-icon:hover {
+        background: #E8F5E9;
+        color: #1B5E20;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
 </style>
 
 <div class="dashboard-header">
@@ -256,7 +291,7 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-outline-primary">
+                                    <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn action-icon" title="View {{ $order->order_number }}" aria-label="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     

@@ -129,6 +129,97 @@
         border-color: #FBC02D;
         color: white;
     }
+    
+    /* Unified action icon (green) for table action buttons */
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.15s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+
+    .action-icon {
+        background: transparent;
+        color: #2C8F0C;
+        border: 1.5px solid #2C8F0C;
+        padding: 0.35rem;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .action-icon:hover {
+        background: #E8F5E9;
+        color: #1B5E20;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+    
+    /* GREEN PAGINATION STYLES */
+    .pagination-custom .page-link {
+        color: #2C8F0C;
+        border: 1px solid #C8E6C9;
+        background-color: white;
+        transition: all 0.3s ease;
+        margin: 0 3px;
+        border-radius: 6px;
+        font-weight: 600;
+        padding: 0.5rem 0.9rem;
+    }
+    
+    .pagination-custom .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8F5E9;
+        border-color: #2C8F0C;
+        color: #1E6A08;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
+    }
+    
+    .pagination-custom .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+        box-shadow: 0 2px 6px rgba(44, 143, 12, 0.3);
+    }
+    
+    .pagination-custom .page-item.disabled .page-link {
+        color: #A5D6A7;
+        border-color: #E8F5E9;
+        background-color: #F8FDF8;
+    }
+    
+    /* Pagination container */
+    .pagination-custom {
+        margin-bottom: 0;
+    }
+    
+    /* Custom styling for pagination info */
+    .pagination-info {
+        color: #2C8F0C;
+        font-weight: 600;
+        background: #E8F5E9;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #C8E6C9;
+    }
+    
+    /* Responsive pagination */
+    @media (max-width: 768px) {
+        .pagination-custom .page-link {
+            padding: 0.4rem 0.7rem;
+            font-size: 0.85rem;
+        }
+    }
 </style>
 
 <!-- CSV Upload Modal -->
@@ -428,8 +519,8 @@
                         <td class="text-center">
                             <div class="btn-group" role="group">
                                 <a href="{{ route('admin.products.view', $product) }}" 
-                                   class="btn btn-sm btn-outline-primary me-1" 
-                                   title="View Product">
+                                   class="action-btn action-icon me-1" 
+                                   title="View Product" aria-label="View">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a href="{{ route('admin.products.edit', $product) }}" 
@@ -464,9 +555,13 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-center mt-3">
-            {{ $products->links() }}
+        @if($products->hasPages())
+        <div class="d-flex justify-content-center p-4">
+            <nav aria-label="Product pagination" class="pagination-custom">
+                {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
+            </nav>
         </div>
+        @endif
     </div>
 </div>
 

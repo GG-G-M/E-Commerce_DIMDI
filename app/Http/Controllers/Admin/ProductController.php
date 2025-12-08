@@ -22,6 +22,13 @@ class ProductController extends Controller
         $categoryId = $request->get('category_id');
         $status = $request->get('status', 'active');
 
+        // Respect per_page selection from the UI (fall back to 10)
+        $perPage = (int) $request->get('per_page', 10);
+        $allowedPerPage = [5, 10, 15, 25, 50];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+
         $products = Product::with(['category', 'variants'])
             ->when($search, function ($query) use ($search) {
                 return $query->search($search);
@@ -33,8 +40,8 @@ class ProductController extends Controller
                 return $query->filterByStatus($status);
             })
             ->latest()
-            ->paginate(10)
-            ->appends($request->all());
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         $categories = Category::active()->get();
         $statuses = [
