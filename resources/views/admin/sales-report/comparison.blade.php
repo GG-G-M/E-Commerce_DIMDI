@@ -29,6 +29,185 @@
         --radius-sm: 8px;
     }
 
+    /* Print-specific styles */
+    @media print {
+        /* Hide everything except print container */
+        body * {
+            visibility: hidden;
+        }
+        
+        .print-container, .print-container * {
+            visibility: visible;
+        }
+        
+        .print-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            font-family: Arial, sans-serif;
+            display: block !important;
+        }
+        
+        /* Hide all non-print elements */
+        .no-print,
+        .header-actions,
+        .comparison-header,
+        .card-modern,
+        .btn,
+        .action-btn,
+        .dashboard-header::before,
+        .dashboard-header-card,
+        .comparison-stats-grid {
+            display: none !important;
+        }
+        
+        /* Print header */
+        .print-header {
+            text-align: center;
+            border-bottom: 2px solid #2C8F0C;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .print-title {
+            color: #2C8F0C;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .print-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .print-info {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* Stats section */
+        .print-stats-section {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .print-stats-grid {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .print-stat-box {
+            display: table-cell;
+            padding: 15px;
+            text-align: center;
+            border-right: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        
+        .print-stat-box:last-child {
+            border-right: none;
+        }
+        
+        .print-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2C8F0C;
+            display: block;
+        }
+        
+        .print-stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        
+        /* Data sections */
+        .print-data-section {
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+        
+        .print-section-title {
+            background: #2C8F0C;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        /* Comparison table */
+        .print-comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 11px;
+        }
+        
+        .print-comparison-table th {
+            background: #f5f5f5;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+            font-weight: bold;
+        }
+        
+        .print-comparison-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .print-comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .print-total-row {
+            font-weight: bold;
+            background: #E8F5E9 !important;
+            border-top: 2px solid #2C8F0C;
+        }
+        
+        /* Chart container for print */
+        .print-chart-section {
+            margin: 25px 0;
+            page-break-inside: avoid;
+            text-align: center;
+        }
+        
+        .print-chart-image {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+        }
+        
+        /* Print footer */
+        .print-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+        }
+        
+        @page {
+            margin: 1cm;
+            size: A4 landscape;
+        }
+        
+        body {
+            font-size: 12px;
+            color: #000;
+        }
+    }
+
     /* Dashboard Header Card */
     .dashboard-header-card {
         background: white;
@@ -407,9 +586,9 @@
             <a href="{{ route('admin.sales-report.index') }}" class="action-btn btn-outline">
                 <i class="fas fa-arrow-left me-1"></i> Back to Reports
             </a>
-            <button type="button" class="action-btn btn-primary" onclick="exportComparison()">
-                <i class="fas fa-download me-1"></i> Export PDF
-            </button>
+            <a href="{{ route('admin.sales-report.comparison.export-pdf', ['year1' => $year1, 'year2' => $year2]) }}" class="action-btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf me-1"></i> Download PDF
+            </a>
         </div>
     </div>
 
