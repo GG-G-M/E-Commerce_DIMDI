@@ -280,33 +280,29 @@
         color: white;
     }
 
-    /* Fixed Table Container - No Horizontal Scroll Unless Needed */
+    /* Fixed Table Container - Allow horizontal scroll when needed */
     .table-container {
         overflow-x: auto;
         border-radius: 8px;
         border: 1px solid #e9ecef;
         max-width: 100%;
     }
-    
-    /* Responsive table - no horizontal scroll on desktop */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
+
+    /* Responsive table - fixed layout on larger screens */
+    @media (min-width: 992px) {
         .table {
             table-layout: fixed;
         }
     }
 
-    /* Column width control */
-    .id-col { min-width: 80px; width: 80px; }
-    .name-col { min-width: 180px; width: 200px; }
-    .email-col { min-width: 200px; width: 250px; }
-    .phone-col { min-width: 120px; width: 150px; }
-    .address-col { min-width: 200px; max-width: 250px; width: 250px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
+    /* Column width control - adjusted for better fit */
+    .id-col { min-width: 60px; width: 60px; }
+    .name-col { min-width: 150px; width: 150px; }
+    .email-col { min-width: 180px; width: 180px; }
+    .phone-col { min-width: 120px; width: 120px; }
+    .address-col { min-width: 180px; max-width: 180px; width: 180px; }
+    .status-col { min-width: 100px; width: 100px; }
+    .action-col { min-width: 120px; width: 120px; }
 
     /* Pagination styling */
     .pagination .page-item .page-link {
@@ -756,15 +752,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fix table layout on window resize
     window.addEventListener('resize', function() {
-        const tableContainer = document.querySelector('.table-container');
         const table = document.querySelector('.table');
-        
-        // Only apply horizontal scroll on mobile
-        if (window.innerWidth < 1200) {
-            tableContainer.style.overflowX = 'auto';
+
+        // Apply fixed layout on larger screens
+        if (window.innerWidth < 992) {
             table.style.tableLayout = 'auto';
         } else {
-            tableContainer.style.overflowX = 'visible';
             table.style.tableLayout = 'fixed';
         }
     });

@@ -317,8 +317,12 @@
     .id-col { min-width: 80px; width: 80px; }
     .name-col { min-width: 250px; width: 300px; }
     .status-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
-
+    .action-col { 
+        min-width: 120px; 
+        width: 140px; 
+        /* ADD THIS LINE for explicit cell content centering */
+        text-align: center; 
+    }
     /* Warehouse Info Cell */
     .warehouse-info-cell {
         display: flex;
@@ -424,7 +428,8 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Warehouse Management</h5>
         <button class="btn btn-add-warehouse" data-bs-toggle="modal" data-bs-target="#addWarehouseModal">
-            <i class="fas fa-user-plus"></i> Add Warehouse
+            {{-- <i class="fas fa-user-plus"></i>  --}}
+            Add Warehouse
         </button>
     </div>
     <div class="card-body p-0">

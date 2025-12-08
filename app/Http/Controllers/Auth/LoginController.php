@@ -39,15 +39,15 @@ class LoginController extends Controller
             
             // FIXED: Added super_admin role check FIRST (before admin)
             if ($user->role === 'super_admin') {
-                return redirect()->route('superadmin.dashboard')->with('success', 'Welcome back, Super Admin!');
+                return redirect()->route('superadmin.dashboard')->with('login_success', true);
             } elseif ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+                return redirect()->route('admin.dashboard')->with('login_success', true);
             } elseif ($user->role === 'delivery') {
-                return redirect()->route('delivery.dashboard')->with('success', 'Welcome back!');
+                return redirect()->route('delivery.dashboard')->with('login_success', true);
             }
 
             // Redirect to intended URL or home for customers
-            return redirect()->intended('/')->with('success', 'Login successful! Welcome back.');
+            return redirect()->intended('/')->with('login_success', true);
         }
 
         return back()->withErrors([
@@ -183,18 +183,14 @@ class LoginController extends Controller
     private function redirectBasedOnRole($user)
     {
         if ($user->role === 'super_admin') {
-            return redirect()->route('superadmin.dashboard')
-                ->with('success', 'Welcome back, Super Admin!');
+            return redirect()->route('superadmin.dashboard')->with('login_success', true);
         } elseif ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard')
-                ->with('success', 'Welcome back, Admin!');
+            return redirect()->route('admin.dashboard')->with('login_success', true);
         } elseif ($user->role === 'delivery') {
-            return redirect()->route('delivery.dashboard')
-                ->with('success', 'Welcome back!');
+            return redirect()->route('delivery.dashboard')->with('login_success', true);
         }
         
-        return redirect()->intended('/')
-            ->with('success', 'Login successful! Welcome back.');
+        return redirect()->intended('/')->with('login_success', true);
     }
 
     private function transferGuestCartToUser(User $user)
