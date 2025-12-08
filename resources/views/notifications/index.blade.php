@@ -13,7 +13,7 @@
             --text-dark: #212529;
         }
 
-        ..notifications-container {
+        .notifications-container {
             max-width: 1000px;
             /* or remove if you want full width */
             margin: 0 auto;
@@ -439,7 +439,13 @@
                     @php
                         $data = $notification->data;
                         $isUnread = $notification->read_at === null;
-                        $hasReceipt = isset($data['receipt_view_url']) || isset($data['receipt_download_url']);
+                        // Determine receipt availability from payload (order_id)
+                        $hasReceipt = isset($data['order_id']) && !empty($data['order_id']);
+                        if ($hasReceipt) {
+                            $receiptViewUrl = route('notifications.receipt.view', $notification->id);
+                            $receiptDownloadUrl = route('notifications.receipt.download', $notification->id);
+                            $receiptPreviewUrl = route('notifications.receipt.preview', $notification->id);
+                        }
                     @endphp
                     <div class="notification-card {{ $isUnread ? 'unread' : 'read' }}">
                         <div class="d-flex align-items-start">
@@ -483,20 +489,14 @@
                                 <!-- Actions -->
                                 <div class="notification-actions">
                                     @if ($hasReceipt)
-                                        @if (isset($data['receipt_view_url']))
-                                            <a href="{{ $data['receipt_view_url'] }}"
-                                                class="btn btn-success-rounded btn-rounded">
-                                                <i class="fas fa-eye"></i>
-                                                <span>View Receipt</span>
-                                            </a>
-                                        @endif
-                                        @if (isset($data['receipt_download_url']))
-                                            <a href="{{ $data['receipt_download_url'] }}"
-                                                class="btn btn-outline-rounded btn-rounded">
-                                                <i class="fas fa-download"></i>
-                                                <span>Download</span>
-                                            </a>
-                                        @endif
+                                        <a href="{{ $receiptViewUrl }}" class="btn btn-success-rounded btn-rounded">
+                                            <i class="fas fa-eye"></i>
+                                            <span>View Receipt</span>
+                                        </a>
+                                        <a href="{{ $receiptDownloadUrl }}" class="btn btn-outline-rounded btn-rounded">
+                                            <i class="fas fa-download"></i>
+                                            <span>Download</span>
+                                        </a>
                                     @endif
                                     @if (isset($data['order_url']))
                                         <a href="{{ $data['order_url'] }}" class="btn btn-primary-rounded btn-rounded">

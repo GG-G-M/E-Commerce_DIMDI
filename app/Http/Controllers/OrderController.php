@@ -74,16 +74,16 @@ class OrderController extends Controller
         // Validate stock before showing checkout
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->product;
-            
+
             if ($product->has_variants) {
-                $variant = $product->variants->first(function($v) use ($cartItem) {
+                $variant = $product->variants->first(function ($v) use ($cartItem) {
                     return ($v->size === $cartItem->selected_size) || ($v->variant_name === $cartItem->selected_size);
                 });
-                
+
                 if (!$variant) {
                     return redirect()->route('cart.index')->with('error', "Sorry, {$product->name} in variant {$cartItem->selected_size} is no longer available.");
                 }
-                
+
                 if ($variant->stock_quantity < $cartItem->quantity) {
                     return redirect()->route('cart.index')->with('error', "Sorry, {$product->name} in variant {$cartItem->selected_size} only has {$variant->stock_quantity} items available.");
                 }
@@ -95,7 +95,7 @@ class OrderController extends Controller
         }
 
         $subtotal = $cartItems->sum('total_price');
-        
+
         // For now, use default shipping until customer enters address
         // Shipping will be recalculated in store() with actual GPS coordinates
         $shipping = 0; // Will be calculated based on address
@@ -142,16 +142,16 @@ class OrderController extends Controller
         // Validate stock before creating order
         foreach ($cartItems as $cartItem) {
             $product = $cartItem->product;
-            
+
             if ($product->has_variants) {
-                $variant = $product->variants->first(function($v) use ($cartItem) {
+                $variant = $product->variants->first(function ($v) use ($cartItem) {
                     return ($v->size === $cartItem->selected_size) || ($v->variant_name === $cartItem->selected_size);
                 });
-                
+
                 if (!$variant) {
                     return redirect()->route('cart.index')->with('error', "Sorry, {$product->name} in variant {$cartItem->selected_size} is no longer available.");
                 }
-                
+
                 if ($variant->stock_quantity < $cartItem->quantity) {
                     return redirect()->route('cart.index')->with('error', "Sorry, {$product->name} in variant {$cartItem->selected_size} only has {$variant->stock_quantity} items available.");
                 }
@@ -164,7 +164,7 @@ class OrderController extends Controller
 
         // Calculate totals
         $subtotal = $cartItems->sum('total_price');
-        
+
         // Ensure we have the current user available for fallback address construction
         $user = Auth::user();
 
@@ -199,7 +199,7 @@ class OrderController extends Controller
             100 // Default fallback fee of 100 PHP if no zone matches
         );
         $shipping = $shippingResult['fee'];
-        
+
         $total = $subtotal + $shipping;
 
         $user = Auth::user();
@@ -227,7 +227,7 @@ class OrderController extends Controller
             // Create order items (but DON'T update stock yet - wait for payment success)
             foreach ($cartItems as $cartItem) {
                 $product = $cartItem->product;
-                
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
@@ -242,8 +242,10 @@ class OrderController extends Controller
             // Store order ID in session for payment redirects
             session(['last_order_id' => $order->id]);
 
-            // Send order placed notification (safe)
-            $this->safeNotify($user, new OrderPlaced($order));
+            // Send order placed notification immediately so DB notification is present
+            // even if queue workers are not running (use sendNow to bypass queue).
+            // Original: $user->notifyNow(new OrderPlaced($order)); // Undefined method
+            \Illuminate\Support\Facades\Notification::sendNow($user, new OrderPlaced($order));
 
             // Handle different payment methods
             if (in_array($request->payment_method, ['gcash', 'grab_pay'])) {
@@ -257,18 +259,17 @@ class OrderController extends Controller
                         'message' => 'Order created successfully. Redirecting to payment...'
                     ]);
                 }
-                
+
                 // If not AJAX, initiate redirect payment directly
                 return $this->initiateRedirectPayment($order, $request->payment_method, $total);
-                
             } else {
                 // For card/bank transfer, update status and reduce stock immediately
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
-                
+
                 // Send status update + receipt notification (safe)
                 $this->safeNotify($user, new OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment received via ' . ucfirst($request->payment_method)));
                 $this->safeNotify($user, new PaymentReceived($order));
-                
+
                 // Clear selected items from cart if multi-select was used
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
                     Cart::where('user_id', Auth::id())
@@ -279,11 +280,10 @@ class OrderController extends Controller
                     // Otherwise clear entire cart (backward compatibility)
                     Cart::where('user_id', Auth::id())->delete();
                 }
-                
+
                 return redirect()->route('orders.show', $order)
                     ->with('success', 'Order placed successfully! Your order number is: ' . $order->order_number);
             }
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Failed to place order. Please try again. Error: ' . $e->getMessage())
@@ -324,11 +324,10 @@ class OrderController extends Controller
 
             // Redirect to PayMongo payment page
             return redirect()->away($responseData['data']['attributes']['redirect']['checkout_url']);
-
         } catch (\Exception $e) {
             // If payment setup fails, delete the order and show error
             $order->delete();
-            
+
             return redirect()->route('cart.index')
                 ->with('error', 'Payment setup failed: ' . $e->getMessage());
         }
@@ -337,19 +336,19 @@ class OrderController extends Controller
     public function success(Request $request)
     {
         $orderId = $request->query('order') ?? session('last_order_id');
-        
+
         if ($orderId) {
             $order = Order::find($orderId);
-            
+
             if ($order && $order->payment_status === 'pending') {
                 // Update payment status
                 $order->update([
                     'payment_status' => 'paid'
                 ]);
-                
+
                 // Use the model's updateStatus method to update order status and create timeline
-                $order->updateStatus('confirmed', 'Payment received via ' );
-                
+                $order->updateStatus('confirmed', 'Payment received via ');
+
                 // Create notification for payment success
                 if ($order->user) {
                     $notificationData = [
@@ -365,20 +364,20 @@ class OrderController extends Controller
                         'amount' => '₱' . number_format($order->total_amount, 2),
                         'time_ago' => 'Just now'
                     ];
-                    
+
                     // Create the notification record
                     $order->user->notifications()->create([
                         'type' => 'App\Notifications\PaymentReceived',
                         'data' => $notificationData,
                         'read_at' => null
                     ]);
-                    
+
                     // Also trigger the OrderStatusUpdated notification if you have it (safe)
                     if (class_exists('App\Notifications\OrderStatusUpdated')) {
                         $this->safeNotify($order->user, new \App\Notifications\OrderStatusUpdated($order, 'pending', 'confirmed', 'Payment completed successfully'));
                     }
                 }
-                
+
                 // Clear selected items from cart if multi-select was used
                 $selectedItemIds = session()->get('selected_cart_items');
                 if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
@@ -390,9 +389,9 @@ class OrderController extends Controller
                     // Otherwise clear entire cart (backward compatibility)
                     Cart::where('user_id', $order->user_id)->delete();
                 }
-                
+
                 session()->forget('last_order_id');
-                
+
                 return redirect()->route('orders.show', $order)
                     ->with('success', 'Payment completed successfully! Your order is now confirmed.')
                     ->with('notification', [
@@ -402,7 +401,7 @@ class OrderController extends Controller
                     ]);
             }
         }
-        
+
         return redirect()->route('orders.index')
             ->with('info', 'Payment completed successfully!');
     }
@@ -425,10 +424,10 @@ class OrderController extends Controller
 
         // Store old status for notification
         $oldStatus = $order->order_status;
-        
+
         // Use the model's updateStatus method which handles the timeline and stock restoration
         $order->updateStatus('cancelled', $request->cancellation_reason);
-        
+
         // Send cancellation notification (safe)
         if ($order->user) {
             $this->safeNotify($order->user, new OrderStatusUpdated($order, $oldStatus, 'cancelled', $request->cancellation_reason));
@@ -436,7 +435,7 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', 'Order has been cancelled successfully.');
     }
-    
+
     private function authorizeOrderView(Order $order)
     {
         if (Auth::check()) {
@@ -462,7 +461,7 @@ class OrderController extends Controller
 
         // Generate PDF using the alias
         $pdf = PDF::loadView('receipt.pdf', compact('order'));
-        
+
         return $pdf->download("receipt-{$order->order_number}.pdf");
     }
 
@@ -478,7 +477,7 @@ class OrderController extends Controller
 
         // Generate PDF using the alias
         $pdf = PDF::loadView('receipt.pdf', compact('order'));
-        
+
         return $pdf->stream("receipt-{$order->order_number}.pdf");
     }
 

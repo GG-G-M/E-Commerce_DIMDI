@@ -121,6 +121,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/list', [NotificationController::class, 'list'])->name('list');
         Route::get('/check-new', [NotificationController::class, 'checkNew'])->name('checkNew');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
+        // Receipt viewing/download/preview via notification
+        Route::get('/{id}/receipt', [NotificationController::class, 'viewReceipt'])->name('receipt.view');
+        Route::get('/{id}/receipt/download', [NotificationController::class, 'downloadReceipt'])->name('receipt.download');
+        Route::get('/{id}/receipt/preview', [NotificationController::class, 'previewReceipt'])->name('receipt.preview');
     });
 });
 
