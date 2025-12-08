@@ -10,7 +10,7 @@
         --secondary-green: #4CAF50;
         --light-green: #E8F5E9;
         --dark-green: #1B5E20;
-        --blue: #4A90E2;
+        --orange: #FFA000;
         --light-blue: rgba(74, 144, 226, 0.1);
         --gradient-green: linear-gradient(135deg, #2C8F0C, #4CAF50);
         --gradient-dark: linear-gradient(135deg, #1B5E20, #2C8F0C);
@@ -132,8 +132,8 @@
         box-shadow: var(--shadow-sm);
     }
 
-    .year-badge.blue {
-        background: linear-gradient(135deg, var(--blue), #2D9CDB);
+    .year-badge.stat-value.orange {
+        background: linear-gradient(135deg, var(--orange), #FFA000);
     }
 
     .stat-value {
@@ -147,8 +147,8 @@
         color: var(--primary-green);
     }
 
-    .stat-value.blue {
-        color: var(--blue);
+    .stat-value.orange {
+        color: var(--orange);
     }
 
     .stat-label {
@@ -458,8 +458,8 @@
         </div>
         
         <div class="comparison-stat-item">
-            <span class="year-badge blue">{{ $year2 }}</span>
-            <div class="stat-value blue">₱{{ number_format(array_sum($year2Sales), 2) }}</div>
+            <span class="year-badge orange">{{ $year2 }}</span>
+            <div class="stat-value orange">₱{{ number_format(array_sum($year2Sales), 2) }}</div>
             <div class="stat-label">Total Sales</div>
             <div class="mt-2">
                 <span class="badge bg-light text-dark">
@@ -512,7 +512,7 @@
             </div>
             
             <div class="text-center p-3">
-                <div class="stat-value {{ (array_sum($year1Sales) - array_sum($year2Sales)) >= 0 ? 'text-success' : 'text-danger' }}">
+                <div class="stat-value orange {{ (array_sum($year1Sales) - array_sum($year2Sales)) >= 0 ? 'text-success' : 'text-danger' }}">
                     ₱{{ number_format(array_sum($year1Sales) - array_sum($year2Sales), 2) }}
                 </div>
                 <div class="stat-label">Revenue Difference</div>
@@ -520,11 +520,11 @@
             </div>
             
             <div class="text-center p-3">
-                <div class="stat-value text-primary">
+                <div class="stat-value green">
                     {{ $year1 }}
                 </div>
                 <div class="stat-label">Compared To</div>
-                <div class="stat-value text-info">{{ $year2 }}</div>
+                <div class="stat-value orange">{{ $year2 }}</div>
             </div>
         </div>
     </div>
@@ -553,7 +553,7 @@
             </div>
             <div class="col-md-6">
                 <div class="d-flex align-items-center justify-content-center mb-2">
-                    <div style="width: 12px; height: 12px; background-color: #4A90E2; border-radius: 2px; margin-right: 8px;"></div>
+                    <div style="width: 12px; height: 12px; background-color:  #FFA000; border-radius: 2px; margin-right: 8px;"></div>
                     <span class="fw-medium">{{ $year2 }} Sales Trend</span>
                 </div>
             </div>
@@ -603,7 +603,7 @@
                             <div class="fw-bold text-success">₱{{ number_format($sales1, 2) }}</div>
                         </td>
                         <td class="text-end">
-                            <div class="fw-bold text-info">₱{{ number_format($sales2, 2) }}</div>
+                            <div class="fw-bold text-warning">₱{{ number_format($sales2, 2) }}</div>
                         </td>
                         <td class="text-end">
                             <span class="{{ $growth >= 0 ? 'growth-positive' : 'growth-negative' }} fw-bold">
@@ -625,7 +625,7 @@
                             <div class="fw-bold text-success">₱{{ number_format(array_sum($year1Sales), 2) }}</div>
                         </td>
                         <td class="text-end">
-                            <div class="fw-bold text-info">₱{{ number_format(array_sum($year2Sales), 2) }}</div>
+                            <div class="fw-bold text-warning">₱{{ number_format(array_sum($year2Sales), 2) }}</div>
                         </td>
                         <td class="text-end">
                             <span class="{{ $totalGrowth >= 0 ? 'growth-positive' : 'growth-negative' }} fw-bold">
@@ -694,14 +694,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 {
                     label: "{{ $year2 }} Sales",
-                    borderColor: "#4A90E2",
+                    borderColor: " #FFA000",
                     backgroundColor: gradient2,
-                    pointBackgroundColor: "#4A90E2",
+                    pointBackgroundColor: " #FFA000",
                     pointBorderColor: "#ffffff",
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
-                    pointHoverBackgroundColor: "#2D9CDB",
+                    pointHoverBackgroundColor: " #FFA000",
                     borderWidth: 3,
                     tension: 0.4,
                     fill: true,

@@ -25,7 +25,7 @@
     }
 
     .card-custom:hover {
-        transform: translateY(-5px);
+        transform: translateY(-3px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
@@ -44,6 +44,33 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
+    }
+
+    /* Improved Add Customer Button */
+    .btn-add-customer {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+    }
+    
+    .btn-add-customer:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-customer:active {
+        transform: translateY(0);
     }
 
     .btn-primary {
@@ -68,6 +95,9 @@
 
     .table {
         margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table th {
@@ -77,6 +107,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -147,7 +180,36 @@
         word-break: break-word;
     }
 
-    .status-badge {
+    /* Status styling - no badge for active */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
+        color: #2C8F0C;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+
+    .status-badge-archived {
         padding: 0.35rem 0.75rem;
         border-radius: 20px;
         font-size: 0.8rem;
@@ -155,62 +217,96 @@
         display: inline-block;
         text-align: center;
         min-width: 80px;
-    }
-
-    .status-active {
-        background-color: #D4EDDA;
-        color: #155724;
-        border: 1px solid #C3E6CB;
-    }
-
-    .status-archived {
         background-color: #FFF3CD;
         color: #856404;
         border: 1px solid #FFEAA7;
     }
 
+    /* Enhanced Action Buttons */
     .action-buttons {
         display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
+        gap: 8px;
+        flex-wrap: nowrap;
     }
-
-    .btn-outline-success {
-        color: #2C8F0C;
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-edit {
+        background-color: white;
         border-color: #2C8F0C;
-        border-radius: 6px;
+        color: #2C8F0C;
     }
-
-    .btn-outline-success:hover {
+    
+    .btn-edit:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+    
+    .btn-archive {
+        background-color: white;
+        border-color: #FBC02D;
+        color: #FBC02D;
+    }
+    
+    .btn-archive:hover {
+        background-color: #FBC02D;
+        color: white;
+    }
+    
+    .btn-unarchive {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-unarchive:hover {
         background-color: #2C8F0C;
         color: white;
     }
 
-    .btn-outline-warning {
-        color: #FBC02D;
-        border-color: #FBC02D;
-        border-radius: 6px;
-    }
-
-    .btn-outline-warning:hover {
-        background-color: #FBC02D;
-        color: white;
-    }
-
+    /* Fixed Table Container - No Horizontal Scroll Unless Needed */
     .table-container {
         overflow-x: auto;
         border-radius: 8px;
         border: 1px solid #e9ecef;
+        max-width: 100%;
+    }
+    
+    /* Responsive table - no horizontal scroll on desktop */
+    @media (min-width: 1200px) {
+        .table-container {
+            overflow-x: visible;
+        }
+        
+        .table {
+            table-layout: fixed;
+        }
     }
 
     /* Column width control */
-    .id-col { min-width: 80px; }
-    .name-col { min-width: 180px; }
-    .email-col { min-width: 200px; }
-    .phone-col { min-width: 120px; }
-    .address-col { min-width: 200px; max-width: 250px; }
-    .status-col { min-width: 100px; }
-    .action-col { min-width: 140px; }
+    .id-col { min-width: 80px; width: 80px; }
+    .name-col { min-width: 180px; width: 200px; }
+    .email-col { min-width: 200px; width: 250px; }
+    .phone-col { min-width: 120px; width: 150px; }
+    .address-col { min-width: 200px; max-width: 250px; width: 250px; }
+    .status-col { min-width: 100px; width: 120px; }
+    .action-col { min-width: 120px; width: 140px; }
 
     /* Pagination styling */
     .pagination .page-item .page-link {
@@ -237,6 +333,37 @@
         color: #6c757d;
         background-color: #f8f9fa;
     }
+
+    /* Tooltip styling for buttons */
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Ensure the table fits within the container */
+
 </style>
 
 <!-- Filters and Search -->
@@ -291,8 +418,8 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Customer List</h5>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            <i class="fas fa-user-plus me-1"></i> Add Customer
+        <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="fas fa-user-plus"></i> Add Customer
         </button>
     </div>
     <div class="card-body p-0">
@@ -312,25 +439,25 @@
                 <tbody>
                     @foreach ($customers as $customer)
                     <tr data-id="{{ $customer->id }}">
-                        <td>
+                        <td class="id-col">
                             <span class="text-muted">#{{ $customer->id }}</span>
                         </td>
-                        <td>
+                        <td class="name-col">
                             <div class="customer-name">{{ $customer->first_name }} {{ $customer->last_name }}</div>
                         </td>
-                        <td>
+                        <td class="email-col">
                             <a href="mailto:{{ $customer->email }}" class="customer-email" title="{{ $customer->email }}">
                                 {{ $customer->email }}
                             </a>
                         </td>
-                        <td>
+                        <td class="phone-col">
                             @if($customer->phone)
                                 <div class="customer-phone">{{ $customer->phone }}</div>
                             @else
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="address-col">
                             @if($customer->address)
                                 <div class="customer-address" title="{{ $customer->address }}">
                                     {{ Str::limit($customer->address, 40) }}
@@ -339,24 +466,24 @@
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="status-col">
                             @if ($customer->is_archived)
-                                <span class="status-badge status-archived">Archived</span>
+                                <span class="status-badge-archived">Archived</span>
                             @else
-                                <span class="status-badge status-active">Active</span>
+                                <span class="status-text status-text-active">Active</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="action-col">
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-success editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)'>
+                                <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' title="Edit Customer">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 @if ($customer->is_archived)
-                                    <button class="btn btn-sm btn-outline-success unarchiveBtn" data-id="{{ $customer->id }}" title="Unarchive Customer">
+                                    <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}" title="Unarchive Customer">
                                        <i class="fas fa-box-open"></i>
                                     </button>
                                 @else
-                                    <button class="btn btn-sm btn-outline-warning archiveBtn" data-id="{{ $customer->id }}" title="Archive Customer">
+                                    <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}" title="Archive Customer">
                                         <i class="fas fa-archive"></i>
                                     </button>
                                 @endif
@@ -567,11 +694,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirm('Are you sure you want to archive this customer? This will make them inactive but preserve their data.')) return;
             
             const id = this.dataset.id;
-            const row = this.closest('tr');
+            const button = this;
 
             // Disable button during processing
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             fetch(`/admin/customers/${id}/archive`, {
                 method: 'POST',
@@ -600,10 +727,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!confirm('Are you sure you want to unarchive this customer? They will become active again.')) return;
             
             const id = this.dataset.id;
+            const button = this;
 
             // Disable button during processing
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             fetch(`/admin/customers/${id}/unarchive`, {
                 method: 'POST',
@@ -624,6 +752,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             });
         });
+    });
+    
+    // Fix table layout on window resize
+    window.addEventListener('resize', function() {
+        const tableContainer = document.querySelector('.table-container');
+        const table = document.querySelector('.table');
+        
+        // Only apply horizontal scroll on mobile
+        if (window.innerWidth < 1200) {
+            tableContainer.style.overflowX = 'auto';
+            table.style.tableLayout = 'auto';
+        } else {
+            tableContainer.style.overflowX = 'visible';
+            table.style.tableLayout = 'fixed';
+        }
     });
 });
 </script>
