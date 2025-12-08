@@ -359,35 +359,448 @@ class Product extends Model
         return $this->ratings()->count();
     }
 
-    // Check if user has purchased this product
-    public function purchasedBy(User $user)
+    // Stock relationships
+    public function stockIns()
     {
-        return OrderItem::whereHas('order', function($query) use ($user) {
+        return $this->hasMany(StockIn::class);
+    }
+
+    public function stockOuts()
+    {
+        return $this->hasMany(StockOut::class);
+    }
+
+    public function stockMovements()
+    {
+        // This combines both stock in and out
+        return $this->stockIns->merge($this->stockOuts);
+    }
+
+    /**
+     * ===========================================
+     * RATING & REVIEW METHODS (NEWLY ADDED)
+     * ===========================================
+     */
+
+    /**
+     * Check if user has purchased this product (any order, delivered or not)
+     */
+    public function purchasedBy($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
+        return \App\Models\OrderItem::whereHas('order', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->where('product_id', $this->id)->exists();
+    }
+
+    /**
+     * Check if user has purchased and received this product (delivered orders only)
+     */
+    public function purchasedAndReceivedBy($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
+        return \App\Models\OrderItem::whereHas('order', function($query) use ($user) {
             $query->where('user_id', $user->id)
                   ->where('order_status', 'delivered');
         })->where('product_id', $this->id)->exists();
     }
 
-    // Check if user has already rated this product
-    public function ratedBy(User $user)
+    /**
+     * Check if user has already rated this product (any order)
+     */
+    public function ratedBy($user = null)
     {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
         return $this->ratings()->where('user_id', $user->id)->exists();
     }
-    // Add these methods to your Product model:
 
-public function stockIns()
-{
-    return $this->hasMany(StockIn::class);
-}
+    /**
+     * Check if user can review this product
+     * (Has purchased and received the product)
+     */
+    public function canUserReview($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
 
-public function stockOuts()
-{
-    return $this->hasMany(StockOut::class);
-}
+        // Check if user has any delivered order containing this product
+        return \App\Models\Order::where('user_id', $user->id)
+            ->where('order_status', 'delivered')
+            ->whereHas('items', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->exists();
+    }
 
-public function stockMovements()
-{
-    // This combines both stock in and out
-    return $this->stockIns->merge($this->stockOuts);
-}
+    /**
+     * Get user's delivered orders containing this product
+     */
+    public function getUserDeliveredOrders($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return collect();
+        }
+
+        return \App\Models\Order::where('user_id', $user->id)
+            ->where('order_status', 'delivered')
+            ->whereHas('items', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->with(['items' => function($query) {
+                $query->where('product_id', $this->id);
+            }])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get user's rating for specific order
+     */
+    public function getUserRatingForOrder($orderId, $user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return null;
+        }
+
+        return $this->ratings()
+            ->where('user_id', $user->id)
+            ->where('order_id', $orderId)
+            ->first();
+    }
+
+    /**
+     * Check if user has any rating for any order of this product
+     */
+    public function userHasAnyRating($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $this->ratings()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * Get all user's ratings for this product
+     */
+    public function getUserRatings($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return collect();
+        }
+
+        return $this->ratings()
+            ->where('user_id', $user->id)
+            ->with('order')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get the count of user's delivered orders for this product
+     */
+    public function getUserDeliveredOrdersCount($user = null)
+    {
+        return $this->getUserDeliveredOrders($user)->count();
+    }
+
+    /**
+     * Get user's rating count for this product
+     */
+    public function getUserRatingCount($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return 0;
+        }
+
+        return $this->ratings()->where('user_id', $user->id)->count();
+    }
+
+    /**
+     * Check if user can leave a new review (has delivered orders without reviews)
+     */
+    public function canLeaveNewReview($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
+        $deliveredOrders = $this->getUserDeliveredOrders($user);
+        $ratedOrders = $this->getUserRatings($user)->pluck('order_id')->toArray();
+
+        // Count orders that haven't been rated yet
+        $unratedOrders = $deliveredOrders->filter(function($order) use ($ratedOrders) {
+            return !in_array($order->id, $ratedOrders);
+        });
+
+        return $unratedOrders->count() > 0;
+    }
+
+    /**
+     * Get orders that user can still review (delivered but not rated)
+     */
+    public function getOrdersForReview($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return collect();
+        }
+
+        $deliveredOrders = $this->getUserDeliveredOrders($user);
+        $ratedOrders = $this->getUserRatings($user)->pluck('order_id')->toArray();
+
+        return $deliveredOrders->filter(function($order) use ($ratedOrders) {
+            return !in_array($order->id, $ratedOrders);
+        });
+    }
+
+    /**
+     * Get orders that user has already reviewed
+     */
+    public function getReviewedOrders($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return collect();
+        }
+
+        $ratings = $this->getUserRatings($user);
+        $reviewedOrderIds = $ratings->pluck('order_id')->toArray();
+        
+        return \App\Models\Order::whereIn('id', $reviewedOrderIds)
+            ->with(['items' => function($query) {
+                $query->where('product_id', $this->id);
+            }])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get orders that have been reviewed (for admin purposes)
+     */
+    public function getReviewedOrdersWithUser()
+    {
+        return \App\Models\Order::whereHas('items', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->whereHas('ratings', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->with(['user', 'items' => function($query) {
+                $query->where('product_id', $this->id);
+            }, 'ratings' => function($query) {
+                $query->where('product_id', $this->id);
+            }])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get orders that haven't been reviewed yet (for admin purposes)
+     */
+    public function getUnreviewedOrders()
+    {
+        return \App\Models\Order::whereHas('items', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->where('order_status', 'delivered')
+            ->whereDoesntHave('ratings', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->with(['user', 'items' => function($query) {
+                $query->where('product_id', $this->id);
+            }])
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Calculate the rating distribution (how many 1-star, 2-star, etc.)
+     */
+    public function getRatingDistribution()
+    {
+        $distribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $distribution[$i] = $this->ratings()->where('rating', $i)->count();
+        }
+        return $distribution;
+    }
+
+    /**
+     * Get rating distribution percentages
+     */
+    public function getRatingDistributionPercentages()
+    {
+        $distribution = $this->getRatingDistribution();
+        $totalRatings = $this->total_ratings;
+        
+        if ($totalRatings === 0) {
+            return array_fill(1, 5, 0);
+        }
+        
+        $percentages = [];
+        foreach ($distribution as $rating => $count) {
+            $percentages[$rating] = round(($count / $totalRatings) * 100, 1);
+        }
+        
+        return $percentages;
+    }
+
+    /**
+     * Get recent reviews (last 10)
+     */
+    public function getRecentReviews($limit = 10)
+    {
+        return $this->ratings()
+            ->with('user')
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Get reviews with text (not just star ratings)
+     */
+    public function getReviewsWithText()
+    {
+        return $this->ratings()
+            ->whereNotNull('review')
+            ->where('review', '!=', '')
+            ->with('user')
+            ->latest()
+            ->get();
+    }
+
+    /**
+     * Get helpful reviews (with most likes or positive feedback)
+     * This assumes you have a 'helpful_count' field or similar
+     */
+    public function getMostHelpfulReviews($limit = 5)
+    {
+        return $this->ratings()
+            ->with('user')
+            ->orderBy('helpful_count', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Check if user has reviewed a specific order
+     */
+    public function hasUserReviewedOrder($orderId, $user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return false;
+        }
+
+        return $this->ratings()
+            ->where('user_id', $user->id)
+            ->where('order_id', $orderId)
+            ->exists();
+    }
+
+    /**
+     * Get user's rating for a specific order if it exists
+     */
+    public function getUserOrderRating($orderId, $user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return null;
+        }
+
+        return $this->ratings()
+            ->where('user_id', $user->id)
+            ->where('order_id', $orderId)
+            ->first();
+    }
+
+    /**
+     * Get all orders where user purchased this product (regardless of status)
+     */
+    public function getAllUserOrders($user = null)
+    {
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+        
+        if (!$user) {
+            return collect();
+        }
+
+        return \App\Models\Order::where('user_id', $user->id)
+            ->whereHas('items', function($query) {
+                $query->where('product_id', $this->id);
+            })
+            ->with(['items' => function($query) {
+                $query->where('product_id', $this->id);
+            }])
+            ->latest()
+            ->get();
+    }
 }

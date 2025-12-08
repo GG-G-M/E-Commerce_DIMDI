@@ -7,6 +7,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -95,8 +96,8 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(9);
 
-    return view('delivery.orders.my-orders', compact('orders'));
-}
+        return view('delivery.orders.my-orders', compact('orders'));
+    }
 
     public function show(Order $order)
     {
@@ -183,8 +184,8 @@ class OrderController extends Controller
                 }
             });
 
-        return redirect()->route('delivery.orders.index')
-            ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
+            return redirect()->route('delivery.orders.index')
+                ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
 
         } catch (\Exception $e) {
             \Log::error('Failed to mark order as picked up', [
@@ -192,6 +193,135 @@ class OrderController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
             return redirect()->back()->with('error', 'Failed to mark order as picked up: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk pickup multiple orders at once
+     */
+    public function bulkPickup(Request $request)
+    {
+        $deliveriesTableId = $this->getDeliveriesTableId();
+        
+        if (!$deliveriesTableId) {
+            return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
+        }
+
+        $request->validate([
+            'order_ids' => 'required|json',
+            'pickup_notes' => 'nullable|string|max:500'
+        ]);
+
+        $orderIds = json_decode($request->order_ids);
+        $pickupNotes = $request->pickup_notes;
+        
+        if (!is_array($orderIds) || empty($orderIds)) {
+            return redirect()->back()->with('error', 'No orders selected for bulk pickup.');
+        }
+
+        $successCount = 0;
+        $failedOrders = [];
+        $processedOrders = [];
+
+        DB::beginTransaction();
+        
+        try {
+            foreach ($orderIds as $orderId) {
+                try {
+                    $order = Order::find($orderId);
+                    
+                    if (!$order) {
+                        $failedOrders[] = "Order #{$orderId} (Not found)";
+                        continue;
+                    }
+                    
+                    // Check if order can be picked up
+                    if (!$order->canBePickedUp()) {
+                        $failedOrders[] = "Order #{$order->order_number} (Not available)";
+                        continue;
+                    }
+                    
+                    // Load order items before processing
+                    $order->load('items.product.variants');
+                    
+                    // Use deliveries table ID
+                    $order->update([
+                        'delivery_id' => $deliveriesTableId,
+                        'picked_up_at' => now(),
+                        'assigned_at' => now(),
+                    ]);
+                    
+                    $statusNote = 'Order picked up by delivery personnel';
+                    if ($pickupNotes) {
+                        $statusNote .= ' | Notes: ' . $pickupNotes;
+                    }
+                    
+                    $order->updateStatus('shipped', $statusNote);
+                    
+                    // AUTO STOCK-OUT WHEN ORDER BECOMES SHIPPED
+                    $existingStockOut = \App\Models\StockOut::where('reason', 'like', '%Order #' . $order->id . '%')->exists();
+                    if (!$existingStockOut) {
+                        foreach ($order->items as $item) {
+                            // Resolve variant id from selected_size when available
+                            $variantId = null;
+                            if (!empty($item->selected_size) && $item->product) {
+                                $variant = $item->product->variants()->where('variant_name', $item->selected_size)->first();
+                                
+                                if (!$variant) {
+                                    $variant = $item->product->variants->first(function ($v) use ($item) {
+                                        return ($v->variant_name === $item->selected_size) || (isset($v->size) && $v->size === $item->selected_size);
+                                    });
+                                }
+                                
+                                if ($variant) {
+                                    $variantId = $variant->id;
+                                }
+                            }
+                            
+                            app(\App\Http\Controllers\Admin\StockOutController::class)
+                                ->autoStockOut(
+                                    $item->product_id,
+                                    $variantId,
+                                    $item->quantity,
+                                    'Order #' . $order->id . ' shipped'
+                                );
+                        }
+                    }
+                    
+                    $successCount++;
+                    $processedOrders[] = $order->order_number;
+                    
+                } catch (\Exception $e) {
+                    $failedOrders[] = "Order #{$orderId} (Error: " . $e->getMessage() . ")";
+                    Log::error('Error in bulk pickup for order ' . $orderId, [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
+            }
+            
+            DB::commit();
+            
+            if ($successCount > 0) {
+                $message = "Successfully picked up {$successCount} order(s): #" . implode(', #', $processedOrders);
+                
+                if (!empty($failedOrders)) {
+                    $message .= "\nFailed to pick up " . count($failedOrders) . " order(s): " . implode(', ', $failedOrders);
+                }
+                
+                return redirect()->route('delivery.orders.pickup')->with('success', $message);
+            } else {
+                return redirect()->route('delivery.orders.pickup')->with('error', 'Failed to pick up any orders. ' . implode(', ', $failedOrders));
+            }
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk pickup transaction failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('delivery.orders.pickup')->with('error', 'Bulk pickup failed: ' . $e->getMessage());
         }
     }
     

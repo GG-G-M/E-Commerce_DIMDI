@@ -46,6 +46,7 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 
+
 // Authentication Routes (SINGLE LOGIN FOR ALL)
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
@@ -106,8 +107,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
 
     // Rating
-    Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+     Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+    Route::delete('/ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
 
     // ADD THIS: Notification Routes
     Route::prefix('notifications')->name('notifications.')->group(function () {
@@ -132,6 +134,7 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::get('/orders/pickup', [DeliveryOrderController::class, 'pickup'])->name('orders.pickup');
     Route::get('/orders/delivered', [DeliveryOrderController::class, 'delivered'])->name('orders.delivered');
     Route::get('/orders/my-orders', [DeliveryOrderController::class, 'myOrders'])->name('orders.my-orders');
+    Route::post('/orders/bulk-pickup', [DeliveryOrderController::class, 'bulkPickup'])->name('orders.bulkPickup');
 
     // PARAMETERIZED ROUTES LAST - CLEANED UP AND CORRECTED
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
