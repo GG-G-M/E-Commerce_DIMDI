@@ -4,6 +4,7 @@
 
 @section('content')
 <style>
+    /* === Consistent Green Theme === */
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -12,7 +13,7 @@
     }
 
     .card-custom:hover {
-        transform: translateY(-2px);
+        transform: translateY(-3px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
@@ -31,33 +32,99 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Improved Add Button */
+    .btn-add-delivery {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+    }
+    
+    .btn-add-delivery:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-delivery:active {
+        transform: translateY(0);
     }
 
     .btn-primary {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
-        font-weight: 600;
     }
 
     .btn-primary:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-1px);
     }
 
-    .btn-info {
-        background: #17a2b8;
-        border: none;
+    /* Enhanced Action Buttons - Consistent with other pages */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+        justify-content: center;
+    }
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-edit {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-edit:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+    
+    .btn-delete {
+        background-color: white;
+        border-color: #C62828;
+        color: #C62828;
+    }
+    
+    .btn-delete:hover {
+        background-color: #C62828;
+        color: white;
     }
 
-    .btn-warning {
-        background: #FBC02D;
-        border: none;
-        color: #fff;
-    }
-
-    .btn-danger {
-        background: #C62828;
-        border: none;
+    /* Table Styling - Consistent */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table th {
@@ -65,12 +132,14 @@
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
-        padding: 1rem;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
     }
 
     .table td {
-        padding: 1rem;
+        padding: 1rem 0.75rem;
         vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
@@ -78,109 +147,72 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Status badges */
-    .badge-success {
+    /* Alternating row colors */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Status styling - Consistent with other pages */
+    .status-text {
         font-weight: 600;
-        color: #000000ff;
-    }
-
-    .badge-danger {
-        color: #000000ff;
-        font-weight: 600;
-    }
-
-    .badge-info {
-        font-weight: 600;
-        color: #000000ff;
-    }
-
-    .badge-warning {
-        background-color: #FF9800 !important;
-        color: #000;
-    }
-
-    /* Button group styling */
-    .btn-group .btn {
-        margin-right: 0.25rem;
-        border-radius: 6px;
-    }
-
-    .btn-group .btn:last-child {
-        margin-right: 0;
-    }
-
-    /* Empty state styling */
-    .empty-state {
-        padding: 3rem 1rem;
-        text-align: center;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        color: #6c757d;
-    }
-
-    /* Delivery person avatar */
-    .delivery-avatar {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border-radius: 50%;
-        display: flex;
+        font-size: 0.9rem;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        color: white;
+        gap: 6px;
     }
-
-    .search-loading {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: none;
-    }
-
-    .position-relative {
-        position: relative;
-    }
-
-    /* Theme consistent buttons */
-    .btn-outline-success {
-        border-color: #2C8F0C;
+    
+    .status-text-active {
         color: #2C8F0C;
     }
-
-    .btn-outline-success:hover {
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
         background-color: #2C8F0C;
-        border-color: #2C8F0C;
-        color: white;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
-    .btn-outline-warning {
-        border-color: #FBC02D;
-        color: #FBC02D;
+    .status-badge-inactive {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 80px;
+        background-color: #FFF3CD;
+        color: #856404;
+        border: 1px solid #FFEAA7;
     }
 
-    .btn-outline-warning:hover {
-        background-color: #FBC02D;
-        border-color: #FBC02D;
-        color: white;
+    /* Vehicle Type Badge */
+    .vehicle-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        background-color: #E3F2FD;
+        color: #1565C0;
+        border: 1px solid #BBDEFB;
     }
 
-    .btn-outline-danger {
-        border-color: #C62828;
-        color: #C62828;
-    }
-
-    .btn-outline-danger:hover {
-        background-color: #C62828;
-        border-color: #C62828;
-        color: white;
-    }
-
-    /* Modal Styles */
-    .modal-header-custom {
+    /* Modal Styling - Consistent */
+    .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
         border-top-left-radius: 12px;
@@ -188,7 +220,7 @@
         padding: 1.25rem;
     }
 
-    .modal-header-custom .modal-title {
+    .modal-title {
         font-weight: 700;
     }
 
@@ -198,6 +230,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
+    /* Form Styling */
     .form-label {
         font-weight: 600;
         color: #2C8F0C;
@@ -214,16 +247,32 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    .form-select:focus {
-        border-color: #2C8F0C;
-        box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    /* Filter Section - Consistent */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
     }
 
-    .form-check-input:checked {
-        background-color: #2C8F0C;
-        border-color: #2C8F0C;
+    .position-relative {
+        position: relative;
     }
 
+    /* Delivery Avatar */
+    .delivery-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    /* Tips Box */
     .tips-box {
         background-color: #F8FDF8;
         border-left: 4px solid #2C8F0C;
@@ -238,27 +287,119 @@
         margin-right: 5px;
     }
 
-    .status-toggle {
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #C8E6C9;
+        margin-bottom: 1rem;
+    }
+
+    /* Table Container for consistency */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 1200px) {
+        .table-container {
+            overflow-x: visible;
+        }
+        
+        .table {
+            table-layout: fixed;
+        }
+    }
+
+    /* Column widths for consistency */
+    .name-col { min-width: 200px; width: 250px; }
+    .id-col { min-width: 80px; width: 100px; }
+    .email-col { min-width: 200px; width: 250px; }
+    .phone-col { min-width: 120px; width: 150px; }
+    .vehicle-col { min-width: 120px; width: 150px; }
+    .status-col { min-width: 100px; width: 120px; }
+    .action-col { min-width: 120px; width: 140px; }
+
+    /* Delivery Info Cell */
+    .delivery-info-cell {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
+    }
+    
+    .delivery-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .delivery-vehicle {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 2px;
+    }
+    
+    .delivery-email {
+        color: #2C8F0C;
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+    
+    .delivery-phone {
+        color: #495057;
+        font-size: 0.9rem;
     }
 
-    .status-toggle .form-check {
-        margin-bottom: 0;
+    /* Pagination styling - Consistent */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8FDF8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
     }
 
-    .form-check-input:focus {
-        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
+    /* Remove old badge styles */
+    .badge-success,
+    .badge-danger,
+    .badge-info,
+    .badge-warning {
+        display: none;
     }
+
+
 </style>
 
-<!-- Filters -->
+<!-- Filters and Search - Consistent -->
 <div class="card card-custom mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.deliveries.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-4">
+                <!-- Search by Name or Email -->
+                <div class="col-md-5">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Delivery Personnel</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -270,6 +411,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Filter by Status -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
@@ -280,7 +423,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+
+                <!-- Filter by Vehicle Type -->
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="vehicle_type" class="form-label fw-bold">Vehicle Type</label>
                         <select class="form-select" id="vehicle_type" name="vehicle_type">
@@ -292,11 +437,13 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Items per page selection -->
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
-                            @foreach([5, 10, 15, 25, 50] as $option)
+                            @foreach([2, 5, 10, 15, 25, 50] as $option)
                                 <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
                                 </option>
@@ -312,102 +459,104 @@
 <!-- Delivery Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
-        <h5 class="mb-0">Delivery Personnel</h5>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
-            <i class="fas fa-plus me-1"></i> Add Delivery Person
+        <h5 class="mb-0">Delivery Management</h5>
+        <button class="btn btn-add-delivery" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
+            <i class="fas fa-user-plus"></i> Add Delivery
         </button>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table align-middle table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>ID</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Vehicle Type</th>
-                        <th>Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($deliveries as $delivery)
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="delivery-avatar">
-                                    <i class="fas fa-truck"></i>
+    <div class="card-body p-0">
+        @if($deliveries->count())
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="name-col">Name</th>
+                            <th class="id-col">ID</th>
+                            <th class="email-col">Email</th>
+                            <th class="phone-col">Phone</th>
+                            <th class="vehicle-col">Vehicle Type</th>
+                            <th class="status-col">Status</th>
+                            <th class="action-col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($deliveries as $delivery)
+                        <tr data-id="{{ $delivery->id }}">
+                            <td class="name-col">
+                                <div class="delivery-info-cell">
+                                    <div class="delivery-avatar">
+                                        <i class="fas fa-truck"></i>
+                                    </div>
+                                    <div>
+                                        <div class="delivery-name">{{ $delivery->name }}</div>
+                                        @if($delivery->vehicle_number)
+                                            <div class="delivery-vehicle" title="Vehicle: {{ $delivery->vehicle_number }}">
+                                                {{ $delivery->vehicle_number }}
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
-                                <div class="ms-3">
-                                    <strong>{{ $delivery->name }}</strong>
-                                    @if($delivery->vehicle_number)
-                                    <br>
-                                    <small class="text-muted">{{ $delivery->vehicle_number }}</small>
-                                    @endif
-                                </div>
-                            </div>
-                        </td>
-                        <td><code>{{ $delivery->id }}</code></td>
-                        <td>{{ $delivery->email }}</td>
-                        <td>{{ $delivery->phone }}</td>
-                        <td>
-                            <span class="badge badge-info">{{ $delivery->vehicle_type }}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-{{ $delivery->is_active ? 'success' : 'danger' }}">
-                                {{ $delivery->is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-sm btn-outline-success edit-delivery-btn"
-                                        data-bs-toggle="modal" data-bs-target="#editDeliveryModal"
-                                        data-id="{{ $delivery->id }}"
-                                        data-first_name="{{ $delivery->first_name }}"
-                                        data-last_name="{{ $delivery->last_name }}"
-                                        data-email="{{ $delivery->email }}"
-                                        data-phone="{{ $delivery->phone }}"
-                                        data-vehicle_type="{{ $delivery->vehicle_type }}"
-                                        data-vehicle_number="{{ $delivery->vehicle_number }}"
-                                        data-license_number="{{ $delivery->license_number }}"
-                                        data-is_active="{{ $delivery->is_active }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('admin.deliveries.destroy', $delivery) }}" 
-                                      method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                            onclick="return confirm('Are you sure you want to delete this delivery person?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-truck"></i>
-                                <h4 class="text-muted">No Delivery Personnel Found</h4>
-                                <p class="text-muted mb-4">Get started by adding your first delivery person</p>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
-                                    <i class="fas fa-plus me-2"></i>Add First Delivery Person
+                            </td>
+                            <td class="id-col">
+                                <span class="text-muted">#{{ $delivery->id }}</span>
+                            </td>
+                            <td class="email-col">
+                                <a href="mailto:{{ $delivery->email }}" class="delivery-email" title="{{ $delivery->email }}">
+                                    {{ $delivery->email }}
                                 </a>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </td>
+                            <td class="phone-col">
+                                <div class="delivery-phone">{{ $delivery->phone }}</div>
+                            </td>
+                            <td class="vehicle-col">
+                                <span class="vehicle-badge">{{ $delivery->vehicle_type }}</span>
+                            </td>
+                            <td class="status-col">
+                                @if ($delivery->is_active)
+                                    <span class="status-text status-text-active">Active</span>
+                                @else
+                                    <span class="status-badge-inactive">Inactive</span>
+                                @endif
+                            </td>
+                            <td class="action-col">
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-edit editBtn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editDeliveryModal"
+                                            data-delivery='@json($delivery)'>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    
+                                    <form action="{{ route('admin.deliveries.destroy', $delivery) }}" 
+                                          method="POST" class="d-inline delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="action-btn btn-delete deleteBtn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-        @if($deliveries->hasPages())
-        <div class="d-flex justify-content-center mt-4">
-            {{ $deliveries->links('pagination::bootstrap-5') }}
-        </div>
+            @if($deliveries->hasPages())
+            <div class="d-flex justify-content-center p-4">
+                {{ $deliveries->links('pagination::bootstrap-5') }}
+            </div>
+            @endif
+        @else
+            <div class="empty-state p-5">
+                <i class="fas fa-truck"></i>
+                <h5 class="text-muted">No Delivery Personnel Found</h5>
+                <p class="text-muted mb-4">Add your first delivery person to get started</p>
+                <button class="btn btn-add-delivery" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
+                    <i class="fas fa-user-plus"></i> Add First Delivery
+                </button>
+            </div>
         @endif
     </div>
 </div>
@@ -415,314 +564,215 @@
 <!-- Add Delivery Modal -->
 <div class="modal fade" id="addDeliveryModal" tabindex="-1" aria-labelledby="addDeliveryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="addDeliveryModalLabel">
-                    <i class="fas fa-user-plus me-2"></i> Add New Delivery Person
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('admin.deliveries.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <!-- Personal Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_first_name" class="form-label">First Name *</label>
-                                <input type="text" id="add_first_name" name="first_name"
-                                    class="form-control @error('first_name') is-invalid @enderror"
-                                    placeholder="Enter first name" value="{{ old('first_name') }}" required>
-                                @error('first_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+        <form id="addDeliveryForm" action="{{ route('admin.deliveries.store') }}" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDeliveryModalLabel">Add New Delivery Person</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_first_name" class="form-label">First Name *</label>
+                            <input type="text" id="add_first_name" name="first_name" class="form-control" 
+                                   placeholder="Enter first name" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_last_name" class="form-label">Last Name *</label>
-                                <input type="text" id="add_last_name" name="last_name"
-                                    class="form-control @error('last_name') is-invalid @enderror"
-                                    placeholder="Enter last name" value="{{ old('last_name') }}" required>
-                                @error('last_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_last_name" class="form-label">Last Name *</label>
+                            <input type="text" id="add_last_name" name="last_name" class="form-control" 
+                                   placeholder="Enter last name" required>
                         </div>
+                    </div>
 
-                        <!-- Contact Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_email" class="form-label">Email *</label>
-                                <input type="email" id="add_email" name="email"
-                                    class="form-control @error('email') is-invalid @enderror"
-                                    placeholder="Enter email address" value="{{ old('email') }}" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_email" class="form-label">Email *</label>
+                            <input type="email" id="add_email" name="email" class="form-control" 
+                                   placeholder="Enter email address" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_phone" class="form-label">Phone Number *</label>
-                                <input type="text" id="add_phone" name="phone"
-                                    class="form-control @error('phone') is-invalid @enderror"
-                                    placeholder="Enter phone number" value="{{ old('phone') }}" required>
-                                @error('phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_phone" class="form-label">Phone Number *</label>
+                            <input type="text" id="add_phone" name="phone" class="form-control" 
+                                   placeholder="Enter phone number" required>
                         </div>
+                    </div>
 
-                        <!-- Vehicle Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_vehicle_type" class="form-label">Vehicle Type *</label>
-                                <select class="form-select @error('vehicle_type') is-invalid @enderror" 
-                                        id="add_vehicle_type" name="vehicle_type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Motorcycle" {{ old('vehicle_type') == 'Motorcycle' ? 'selected' : '' }}>Motorcycle</option>
-                                    <option value="Car" {{ old('vehicle_type') == 'Car' ? 'selected' : '' }}>Car</option>
-                                    <option value="Van" {{ old('vehicle_type') == 'Van' ? 'selected' : '' }}>Van</option>
-                                    <option value="Truck" {{ old('vehicle_type') == 'Truck' ? 'selected' : '' }}>Truck</option>
-                                    <option value="Bicycle" {{ old('vehicle_type') == 'Bicycle' ? 'selected' : '' }}>Bicycle</option>
-                                </select>
-                                @error('vehicle_type')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_vehicle_type" class="form-label">Vehicle Type *</label>
+                            <select class="form-select" id="add_vehicle_type" name="vehicle_type" required>
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Car">Car</option>
+                                <option value="Van">Van</option>
+                                <option value="Truck">Truck</option>
+                                <option value="Bicycle">Bicycle</option>
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_vehicle_number" class="form-label">Vehicle Number</label>
-                                <input type="text" id="add_vehicle_number" name="vehicle_number"
-                                    class="form-control @error('vehicle_number') is-invalid @enderror"
-                                    placeholder="Enter vehicle number" value="{{ old('vehicle_number') }}">
-                                @error('vehicle_number')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_vehicle_number" class="form-label">Vehicle Number</label>
+                            <input type="text" id="add_vehicle_number" name="vehicle_number" class="form-control" 
+                                   placeholder="Enter vehicle number">
                         </div>
+                    </div>
 
-                        <!-- License and Status -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_license_number" class="form-label">License Number</label>
-                                <input type="text" id="add_license_number" name="license_number"
-                                    class="form-control @error('license_number') is-invalid @enderror"
-                                    placeholder="Enter license number" value="{{ old('license_number') }}">
-                                @error('license_number')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_license_number" class="form-label">License Number</label>
+                            <input type="text" id="add_license_number" name="license_number" class="form-control" 
+                                   placeholder="Enter license number">
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_is_active" class="form-label">Status</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" 
-                                           id="add_is_active" name="is_active" value="1" checked>
-                                    <label class="form-check-label" for="add_is_active">Active Account</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_password" class="form-label">Password *</label>
-                                <input type="password" id="add_password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Enter password" required>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_password_confirmation" class="form-label">Confirm Password *</label>
-                                <input type="password" id="add_password_confirmation" name="password_confirmation"
-                                    class="form-control @error('password_confirmation') is-invalid @enderror"
-                                    placeholder="Confirm password" required>
-                                @error('password_confirmation')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="add_is_active" name="is_active" value="1" checked>
+                                <label class="form-check-label" for="add_is_active">Active Account</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tips-box mt-4">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Tips:</strong> Make sure to provide accurate contact information. The delivery person will use this email and password to login to the delivery app.
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_password" class="form-label">Password *</label>
+                            <input type="password" id="add_password" name="password" class="form-control" 
+                                   placeholder="Enter password" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_password_confirmation" class="form-label">Confirm Password *</label>
+                            <input type="password" id="add_password_confirmation" name="password_confirmation" class="form-control" 
+                                   placeholder="Confirm password" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tips:</strong> Make sure to provide accurate contact information. The delivery person will use this email and password to login to the delivery app.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Create Delivery Person
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Delivery Person</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Edit Delivery Modal -->
 <div class="modal fade" id="editDeliveryModal" tabindex="-1" aria-labelledby="editDeliveryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="editDeliveryModalLabel">
-                    <i class="fas fa-edit me-2"></i> Edit Delivery Person
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editDeliveryForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <!-- Personal Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_first_name" class="form-label">First Name *</label>
-                                <input type="text" id="edit_first_name" name="first_name"
-                                    class="form-control @error('first_name') is-invalid @enderror"
-                                    placeholder="Enter first name" required>
-                                @error('first_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+        <form id="editDeliveryForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDeliveryModalLabel">Edit Delivery Person</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_first_name" class="form-label">First Name *</label>
+                            <input type="text" id="edit_first_name" name="first_name" class="form-control" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_last_name" class="form-label">Last Name *</label>
-                                <input type="text" id="edit_last_name" name="last_name"
-                                    class="form-control @error('last_name') is-invalid @enderror"
-                                    placeholder="Enter last name" required>
-                                @error('last_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_last_name" class="form-label">Last Name *</label>
+                            <input type="text" id="edit_last_name" name="last_name" class="form-control" required>
                         </div>
+                    </div>
 
-                        <!-- Contact Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_email" class="form-label">Email *</label>
-                                <input type="email" id="edit_email" name="email"
-                                    class="form-control @error('email') is-invalid @enderror"
-                                    placeholder="Enter email address" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_email" class="form-label">Email *</label>
+                            <input type="email" id="edit_email" name="email" class="form-control" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_phone" class="form-label">Phone Number *</label>
-                                <input type="text" id="edit_phone" name="phone"
-                                    class="form-control @error('phone') is-invalid @enderror"
-                                    placeholder="Enter phone number" required>
-                                @error('phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_phone" class="form-label">Phone Number *</label>
+                            <input type="text" id="edit_phone" name="phone" class="form-control" required>
                         </div>
+                    </div>
 
-                        <!-- Vehicle Information -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_vehicle_type" class="form-label">Vehicle Type *</label>
-                                <select class="form-select @error('vehicle_type') is-invalid @enderror" 
-                                        id="edit_vehicle_type" name="vehicle_type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Motorcycle">Motorcycle</option>
-                                    <option value="Car">Car</option>
-                                    <option value="Van">Van</option>
-                                    <option value="Truck">Truck</option>
-                                    <option value="Bicycle">Bicycle</option>
-                                </select>
-                                @error('vehicle_type')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_vehicle_type" class="form-label">Vehicle Type *</label>
+                            <select class="form-select" id="edit_vehicle_type" name="vehicle_type" required>
+                                <option value="">Select Vehicle Type</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Car">Car</option>
+                                <option value="Van">Van</option>
+                                <option value="Truck">Truck</option>
+                                <option value="Bicycle">Bicycle</option>
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_vehicle_number" class="form-label">Vehicle Number</label>
-                                <input type="text" id="edit_vehicle_number" name="vehicle_number"
-                                    class="form-control @error('vehicle_number') is-invalid @enderror"
-                                    placeholder="Enter vehicle number">
-                                @error('vehicle_number')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_vehicle_number" class="form-label">Vehicle Number</label>
+                            <input type="text" id="edit_vehicle_number" name="vehicle_number" class="form-control">
                         </div>
+                    </div>
 
-                        <!-- License and Status -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_license_number" class="form-label">License Number</label>
-                                <input type="text" id="edit_license_number" name="license_number"
-                                    class="form-control @error('license_number') is-invalid @enderror"
-                                    placeholder="Enter license number">
-                                @error('license_number')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_license_number" class="form-label">License Number</label>
+                            <input type="text" id="edit_license_number" name="license_number" class="form-control">
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_is_active" class="form-label">Status</label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" 
-                                           id="edit_is_active" name="is_active" value="1">
-                                    <label class="form-check-label" for="edit_is_active">Active Account</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Password (Optional) -->
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_password" class="form-label">Password (Leave blank to keep current)</label>
-                                <input type="password" id="edit_password" name="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Enter new password">
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_password_confirmation" class="form-label">Confirm Password</label>
-                                <input type="password" id="edit_password_confirmation" name="password_confirmation"
-                                    class="form-control"
-                                    placeholder="Confirm new password">
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="edit_is_active" name="is_active" value="1">
+                                <label class="form-check-label" for="edit_is_active">Active Account</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tips-box mt-4">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Note:</strong> Only fill the password fields if you want to change the password. The vehicle type and license information are important for delivery tracking.
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_password" class="form-label">Password (Leave blank to keep current)</label>
+                            <input type="password" id="edit_password" name="password" class="form-control" 
+                                   placeholder="Enter new password">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_password_confirmation" class="form-label">Confirm Password</label>
+                            <input type="password" id="edit_password_confirmation" name="password_confirmation" class="form-control" 
+                                   placeholder="Confirm new password">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Note:</strong> Only fill the password fields if you want to change the password. The vehicle type and license information are important for delivery tracking.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Update Delivery Person
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Delivery Person</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -768,135 +818,158 @@ document.addEventListener('DOMContentLoaded', function() {
         searchLoading.style.display = 'none';
     });
 
-    // Edit delivery modal handling
-    const editDeliveryButtons = document.querySelectorAll('.edit-delivery-btn');
-    const editDeliveryForm = document.getElementById('editDeliveryForm');
-    const editFirstNameInput = document.getElementById('edit_first_name');
-    const editLastNameInput = document.getElementById('edit_last_name');
-    const editEmailInput = document.getElementById('edit_email');
-    const editPhoneInput = document.getElementById('edit_phone');
-    const editVehicleTypeSelect = document.getElementById('edit_vehicle_type');
-    const editVehicleNumberInput = document.getElementById('edit_vehicle_number');
-    const editLicenseNumberInput = document.getElementById('edit_license_number');
-    const editIsActiveInput = document.getElementById('edit_is_active');
+    /* === Add Delivery === */
+    document.getElementById('addDeliveryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-    editDeliveryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const firstName = this.getAttribute('data-first_name');
-            const lastName = this.getAttribute('data-last_name');
-            const email = this.getAttribute('data-email');
-            const phone = this.getAttribute('data-phone');
-            const vehicleType = this.getAttribute('data-vehicle_type');
-            const vehicleNumber = this.getAttribute('data-vehicle_number');
-            const licenseNumber = this.getAttribute('data-license_number');
-            const isActive = this.getAttribute('data-is_active') === '1';
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
 
-            // Set form action URL
-            editDeliveryForm.action = `/admin/deliveries/${id}`;
-            
-            // Populate form fields
-            editFirstNameInput.value = firstName;
-            editLastNameInput.value = lastName;
-            editEmailInput.value = email;
-            editPhoneInput.value = phone;
-            editVehicleTypeSelect.value = vehicleType;
-            editVehicleNumberInput.value = vehicleNumber;
-            editLicenseNumberInput.value = licenseNumber;
-            editIsActiveInput.checked = isActive;
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addDeliveryModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error adding delivery person: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         });
     });
 
-    // Handle modal form validation
-    const addDeliveryForm = document.querySelector('#addDeliveryModal form');
-    const editDeliveryFormElement = document.querySelector('#editDeliveryModal form');
+    /* === Edit Delivery === */
+    document.querySelectorAll('.editBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const delivery = JSON.parse(this.dataset.delivery);
+            const form = document.getElementById('editDeliveryForm');
+            
+            // Set form action
+            form.action = `/admin/deliveries/${delivery.id}`;
+            
+            // Fill form fields
+            document.getElementById('edit_first_name').value = delivery.first_name || '';
+            document.getElementById('edit_last_name').value = delivery.last_name || '';
+            document.getElementById('edit_email').value = delivery.email || '';
+            document.getElementById('edit_phone').value = delivery.phone || '';
+            document.getElementById('edit_vehicle_type').value = delivery.vehicle_type || '';
+            document.getElementById('edit_vehicle_number').value = delivery.vehicle_number || '';
+            document.getElementById('edit_license_number').value = delivery.license_number || '';
+            document.getElementById('edit_is_active').checked = delivery.is_active;
+        });
+    });
 
-    [addDeliveryForm, editDeliveryFormElement].forEach(form => {
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                const requiredFields = this.querySelectorAll('[required]');
-                let hasError = false;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        e.preventDefault();
-                        field.classList.add('is-invalid');
-                        hasError = true;
-                        
-                        // Remove invalid class when user starts typing
-                        field.addEventListener('input', function() {
-                            this.classList.remove('is-invalid');
-                        }, { once: true });
-                    }
-                });
+    document.getElementById('editDeliveryForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
 
-                // Check password confirmation for add form
-                if (form === addDeliveryForm) {
-                    const password = this.querySelector('#add_password');
-                    const confirmPassword = this.querySelector('#add_password_confirmation');
-                    
-                    if (password.value !== confirmPassword.value) {
-                        e.preventDefault();
-                        confirmPassword.classList.add('is-invalid');
-                        confirmPassword.nextElementSibling.textContent = 'Passwords do not match';
-                        hasError = true;
-                        
-                        confirmPassword.addEventListener('input', function() {
-                            if (password.value === this.value) {
-                                this.classList.remove('is-invalid');
-                            }
-                        }, { once: true });
-                    }
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'X-HTTP-Method-Override': 'PUT' 
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editDeliveryModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error updating delivery person: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+
+    /* === Delete Delivery === */
+    document.querySelectorAll('.deleteBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to delete this delivery person? This action cannot be undone.')) return;
+            
+            const form = this.closest('.delete-form');
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-HTTP-Method-Override': 'DELETE'
                 }
-
-                if (hasError) {
-                    // Focus on first invalid field
-                    const firstInvalid = this.querySelector('.is-invalid');
-                    if (firstInvalid) {
-                        firstInvalid.focus();
-                    }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete delivery person: ' + (data.message || 'Unknown error'));
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-trash"></i>';
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-trash"></i>';
             });
-        }
+        });
     });
 
-    // Clear form when modal is closed
-    const addDeliveryModal = document.getElementById('addDeliveryModal');
-    addDeliveryModal.addEventListener('hidden.bs.modal', function () {
-        const form = this.querySelector('form');
-        if (form) {
-            form.reset();
-            const invalidFields = form.querySelectorAll('.is-invalid');
-            invalidFields.forEach(field => {
-                field.classList.remove('is-invalid');
-            });
+    // Fix table layout on window resize
+    window.addEventListener('resize', function() {
+        const tableContainer = document.querySelector('.table-container');
+        const table = document.querySelector('.table');
+        
+        // Only apply horizontal scroll on mobile
+        if (window.innerWidth < 1200) {
+            tableContainer.style.overflowX = 'auto';
+            table.style.tableLayout = 'auto';
+        } else {
+            tableContainer.style.overflowX = 'visible';
+            table.style.tableLayout = 'fixed';
         }
     });
-
-    // Clear edit form when modal is closed
-    const editDeliveryModal = document.getElementById('editDeliveryModal');
-    editDeliveryModal.addEventListener('hidden.bs.modal', function () {
-        const form = this.querySelector('form');
-        if (form) {
-            const invalidFields = form.querySelectorAll('.is-invalid');
-            invalidFields.forEach(field => {
-                field.classList.remove('is-invalid');
-            });
-        }
-    });
-
-    // Show modal if there are validation errors
-    @if($errors->any())
-        @if($errors->has('first_name') || $errors->has('email') || $errors->has('password'))
-            @if(request()->routeIs('admin.deliveries.index') || request()->routeIs('admin.deliveries.store'))
-                const addModal = new bootstrap.Modal(document.getElementById('addDeliveryModal'));
-                addModal.show();
-            @elseif(request()->routeIs('admin.deliveries.update'))
-                const editModal = new bootstrap.Modal(document.getElementById('editDeliveryModal'));
-                editModal.show();
-            @endif
-        @endif
-    @endif
 });
 </script>
 @endpush

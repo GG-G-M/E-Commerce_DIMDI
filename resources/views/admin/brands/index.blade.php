@@ -2,16 +2,17 @@
 
 @section('content')
 <style>
+    /* === Consistent Green Theme === */
     .card-custom {
         border: none;
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
     }
 
     .card-custom:hover {
         transform: translateY(-3px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
     .card-header-custom {
@@ -29,65 +30,99 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Improved Add Button */
+    .btn-add-brand {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+    }
+    
+    .btn-add-brand:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-brand:active {
+        transform: translateY(0);
     }
 
     .btn-primary {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
-        font-weight: 600;
     }
 
     .btn-primary:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    /* Enhanced Action Buttons - Consistent with other pages */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+        justify-content: center;
+    }
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
-
-    .status-active {
-        color: #2C8F0C;
-        font-weight: 600;
-    }
-
-    .status-inactive {
-        color: #6c757d;
-        font-weight: 600;
-    }
-
-    .search-loading {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: none;
-    }
-
-    .position-relative {
-        position: relative;
-    }
-
-    .btn-outline-success {
+    
+    .btn-edit {
+        background-color: white;
         border-color: #2C8F0C;
         color: #2C8F0C;
-        font-weight: 500;
     }
-
-    .btn-outline-success:hover {
+    
+    .btn-edit:hover {
         background-color: #2C8F0C;
-        border-color: #2C8F0C;
         color: white;
-        transform: translateY(-2px);
     }
-
-    .btn-outline-danger {
+    
+    .btn-delete {
+        background-color: white;
         border-color: #C62828;
         color: #C62828;
-        font-weight: 500;
+    }
+    
+    .btn-delete:hover {
+        background-color: #C62828;
+        color: white;
     }
 
-    .btn-outline-danger:hover {
-        background-color: #C62828;
-        border-color: #C62828;
-        color: white;
-        transform: translateY(-2px);
+    /* Table Styling - Consistent */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table th {
@@ -95,6 +130,14 @@
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
@@ -102,8 +145,59 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Modal Styles */
-    .modal-header-custom {
+    /* Alternating row colors */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Status styling - Consistent with other pages */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
+        color: #2C8F0C;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+
+    .status-badge-inactive {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 80px;
+        background-color: #FFF3CD;
+        color: #856404;
+        border: 1px solid #FFEAA7;
+    }
+
+    /* Modal Styling - Consistent */
+    .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
         border-top-left-radius: 12px;
@@ -111,7 +205,7 @@
         padding: 1.25rem;
     }
 
-    .modal-header-custom .modal-title {
+    .modal-title {
         font-weight: 700;
     }
 
@@ -121,6 +215,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
+    /* Form Styling */
     .form-label {
         font-weight: 600;
         color: #2C8F0C;
@@ -137,30 +232,32 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    .form-check-input:checked {
-        background-color: #2C8F0C;
-        border-color: #2C8F0C;
+    /* Filter Section - Consistent */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
     }
 
-    .logo-preview-container {
-        text-align: center;
-        margin-bottom: 1rem;
+    .position-relative {
+        position: relative;
     }
 
-    .logo-preview {
-        max-width: 150px;
-        max-height: 100px;
-        border-radius: 8px;
-        border: 1px solid #dee2e6;
-        padding: 5px;
-        background-color: white;
+    /* Brand Icon */
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
     }
 
-    .remove-logo-btn {
-        margin-top: 10px;
-        display: block;
-    }
-
+    /* Tips Box */
     .tips-box {
         background-color: #F8FDF8;
         border-left: 4px solid #2C8F0C;
@@ -175,20 +272,7 @@
         margin-right: 5px;
     }
 
-    .brand-logo-cell {
-        width: 80px;
-    }
-
-    .brand-logo-small {
-        width: 60px;
-        height: 40px;
-        object-fit: contain;
-        border-radius: 6px;
-        border: 1px solid #dee2e6;
-        padding: 3px;
-        background-color: white;
-    }
-
+    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -200,18 +284,133 @@
         margin-bottom: 1rem;
     }
 
-    .action-buttons {
+    /* Table Container for consistency */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 1200px) {
+        .table-container {
+            overflow-x: visible;
+        }
+        
+        .table {
+            table-layout: fixed;
+        }
+    }
+
+    /* Column widths for consistency */
+    .name-col { min-width: 200px; width: 250px; }
+    .id-col { min-width: 80px; width: 100px; }
+    .slug-col { min-width: 150px; width: 180px; }
+    .description-col { min-width: 200px; max-width: 250px; width: 250px; }
+    .products-col { min-width: 100px; width: 120px; }
+    .status-col { min-width: 100px; width: 120px; }
+    .sort-col { min-width: 100px; width: 120px; }
+    .action-col { min-width: 120px; width: 140px; }
+
+    /* Brand Info Cell */
+    .brand-info-cell {
         display: flex;
-        gap: 8px;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .brand-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .brand-slug {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 2px;
+    }
+    
+    .brand-description {
+        color: #6c757d;
+        font-size: 0.85rem;
+        max-width: 250px;
+        word-break: break-word;
+    }
+
+    /* Products Count */
+    .products-count {
+        font-weight: 600;
+        color: #2C8F0C;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Pagination styling - Consistent */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8FDF8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+
+    /* Remove old status styles */
+    .status-active,
+    .status-inactive {
+        display: none;
+    }
+
+    /* ID styling */
+    .brand-id {
+        font-family: monospace;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* Sort order styling */
+    .sort-order {
+        color: #495057;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    /* Remove old logo preview styles */
+    .logo-preview-container,
+    .logo-preview,
+    .remove-logo-btn,
+    .brand-logo-cell,
+    .brand-logo-small {
+        display: none;
     }
 </style>
 
-<!-- Search and Filters -->
+<!-- Filters and Search - Consistent -->
 <div class="card card-custom mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.brands.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-4">
+                <!-- Search by Name or Description -->
+                <div class="col-md-5">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Brands</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -223,6 +422,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Filter by Status -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
@@ -233,21 +434,13 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="mb-3">
-                        <label for="sort_by" class="form-label fw-bold">Sort By</label>
-                        <select class="form-select" id="sort_by" name="sort_by">
-                            <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
-                            <option value="sort_order" {{ request('sort_by') == 'sort_order' ? 'selected' : '' }}>Sort Order</option>
-                            <option value="products_count" {{ request('sort_by') == 'products_count' ? 'selected' : '' }}>Product Count</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
+
+                <!-- Items per page selection -->
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
-                            @foreach([5, 10, 15, 25, 50] as $option)
+                            @foreach([2, 5, 10, 15, 25, 50] as $option)
                                 <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
                                 </option>
@@ -264,93 +457,85 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Brand Management</h5>
-        <div class="d-flex align-items-center">
-            <span class="text-white me-3 small d-none d-md-block">
-                Total: {{ $brands->total() }} brands
-            </span>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
-                <i class="fas fa-plus me-1"></i> Add Brand
-            </button>
-        </div>
+        <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+            <i class="fas fa-user-plus"></i> Add Brand
+        </button>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         @if($brands->count())
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="brand-logo-cell">Logo</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Products</th>
-                            <th>Status</th>
-                            <th>Sort Order</th>
-                            <th class="text-center">Actions</th>
+                            <th class="name-col">Brand</th>
+                            <th class="id-col">ID</th>
+                            <th class="slug-col">Slug</th>
+                            <th class="description-col">Description</th>
+                            <th class="products-col">Products</th>
+                            <th class="status-col">Status</th>
+                            <th class="sort-col">Sort Order</th>
+                            <th class="action-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($brands as $brand)
-                        <tr>
-                            <td class="brand-logo-cell">
-                                @if($brand->logo)
-                                    <img src="{{ asset('storage/' . $brand->logo) }}" alt="{{ $brand->name }}" class="brand-logo-small">
-                                @else
-                                    <div class="brand-logo-small d-flex align-items-center justify-content-center bg-light">
-                                        <i class="fas fa-tag text-muted"></i>
+                        <tr data-id="{{ $brand->id }}">
+                            <td class="name-col">
+                                <div class="brand-info-cell">
+                                    <div class="brand-icon">
+                                        <i class="fas fa-tag"></i>
                                     </div>
-                                @endif
+                                    <div>
+                                        <div class="brand-name">{{ $brand->name }}</div>
+                                        <div class="brand-slug">{{ $brand->slug }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td><code>{{ $brand->id }}</code></td>
-                            <td>
-                                <strong>{{ $brand->name }}</strong><br>
-                                <small class="text-muted">Slug: {{ $brand->slug }}</small>
+                            <td class="id-col">
+                                <span class="brand-id">#{{ $brand->id }}</span>
                             </td>
-                            <td>
+                            <td class="slug-col">
+                                <code class="brand-slug">{{ $brand->slug }}</code>
+                            </td>
+                            <td class="description-col">
                                 @if($brand->description)
-                                    <span class="text-muted">{{ Str::limit($brand->description, 50) }}</span>
+                                    <div class="brand-description" title="{{ $brand->description }}">
+                                        {{ Str::limit($brand->description, 50) }}
+                                    </div>
                                 @else
-                                    <span class="text-muted">No description</span>
+                                    <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            <td>
-                                <span class="text-dark">
-                                    <i class="fas fa-box me-1"></i>{{ $brand->products->count() }} products
+                            <td class="products-col">
+                                <span class="products-count">
+                                    <i class="fas fa-box"></i>
+                                    {{ $brand->products->count() }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="status-col">
                                 @if($brand->is_active)
-                                    <span class="status-active">
-                                        <i class="fas fa-check-circle me-1"></i>Active
-                                    </span>
+                                    <span class="status-text status-text-active">Active</span>
                                 @else
-                                    <span class="status-inactive">
-                                        <i class="fas fa-times-circle me-1"></i>Inactive
-                                    </span>
+                                    <span class="status-badge-inactive">Inactive</span>
                                 @endif
                             </td>
-                            <td>
-                                <span class="text-muted">{{ $brand->sort_order }}</span>
+                            <td class="sort-col">
+                                <span class="sort-order">{{ $brand->sort_order }}</span>
                             </td>
-                            <td class="text-center">
+                            <td class="action-col">
                                 <div class="action-buttons">
-                                    <button type="button" class="btn btn-sm btn-outline-success edit-brand-btn"
-                                            data-bs-toggle="modal" data-bs-target="#editBrandModal"
-                                            data-id="{{ $brand->id }}"
-                                            data-name="{{ $brand->name }}"
-                                            data-slug="{{ $brand->slug }}"
-                                            data-description="{{ $brand->description }}"
-                                            data-sort_order="{{ $brand->sort_order }}"
-                                            data-is_active="{{ $brand->is_active }}"
-                                            data-logo="{{ $brand->logo ? asset('storage/' . $brand->logo) : '' }}">
+                                    <button class="action-btn btn-edit editBtn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editBrandModal"
+                                            data-brand='@json($brand)'>
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST" class="d-inline">
+                                    
+                                    <form action="{{ route('admin.brands.destroy', $brand) }}" 
+                                          method="POST" class="d-inline delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                onclick="return confirm('Are you sure you want to delete this brand?')"
-                                                title="Delete Brand">
+                                        <button type="button" class="action-btn btn-delete deleteBtn">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -362,16 +547,18 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-center mt-3">
-                {{ $brands->links() }}
+            @if($brands->hasPages())
+            <div class="d-flex justify-content-center p-4">
+                {{ $brands->links('pagination::bootstrap-5') }}
             </div>
+            @endif
         @else
-            <div class="empty-state">
+            <div class="empty-state p-5">
                 <i class="fas fa-tag"></i>
                 <h5 class="text-muted">No Brands Found</h5>
                 <p class="text-muted mb-4">Add your first brand to get started</p>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBrandModal">
-                    <i class="fas fa-plus me-2"></i> Add First Brand
+                <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+                    <i class="fas fa-user-plus"></i> Add First Brand
                 </button>
             </div>
         @endif
@@ -381,202 +568,131 @@
 <!-- Add Brand Modal -->
 <div class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="addBrandModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="addBrandModalLabel">
-                    <i class="fas fa-plus-circle me-2"></i> Add New Brand
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="{{ route('admin.brands.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_name" class="form-label">Brand Name *</label>
-                                <input type="text" id="add_name" name="name"
-                                    class="form-control @error('name') is-invalid @enderror"
-                                    placeholder="Enter brand name" value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+        <form id="addBrandForm" action="{{ route('admin.brands.store') }}" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBrandModalLabel">Add New Brand</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_name" class="form-label">Brand Name *</label>
+                            <input type="text" id="add_name" name="name" class="form-control" 
+                                   placeholder="Enter brand name" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_slug" class="form-label">Slug *</label>
-                                <input type="text" id="add_slug" name="slug"
-                                    class="form-control @error('slug') is-invalid @enderror"
-                                    placeholder="brand-slug" value="{{ old('slug') }}" required>
-                                @error('slug')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_slug" class="form-label">Slug *</label>
+                            <input type="text" id="add_slug" name="slug" class="form-control" 
+                                   placeholder="brand-slug" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="add_description" class="form-label">Description</label>
+                            <textarea id="add_description" name="description" class="form-control" rows="3"
+                                      placeholder="Enter brand description (optional)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_sort_order" class="form-label">Sort Order</label>
+                            <input type="number" id="add_sort_order" name="sort_order" class="form-control" 
+                                   value="0" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="add_is_active" name="is_active" value="1" checked>
+                                <label class="form-check-label" for="add_is_active">Active Brand</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="add_description" class="form-label">Description</label>
-                        <textarea id="add_description" name="description" rows="3"
-                            class="form-control @error('description') is-invalid @enderror"
-                            placeholder="Enter brand description (optional)">{{ old('description') }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_logo" class="form-label">Brand Logo</label>
-                                <input type="file" id="add_logo" name="logo"
-                                    class="form-control @error('logo') is-invalid @enderror"
-                                    accept="image/*">
-                                @error('logo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div id="add_logo_preview" class="logo-preview-container mt-2" style="display: none;">
-                                    <img id="add_logo_preview_img" class="logo-preview" src="#" alt="Logo preview">
-                                </div>
-                            </div>
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tips:</strong> Keep brand names clear and descriptive. The slug will be used in URLs.
                         </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="add_sort_order" class="form-label">Sort Order</label>
-                                <input type="number" id="add_sort_order" name="sort_order" class="form-control" 
-                                       value="{{ old('sort_order', 0) }}" min="0">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="add_is_active" class="form-label">Status</label>
-                                <div class="form-check form-switch mt-2">
-                                    <input class="form-check-input" type="checkbox" role="switch" 
-                                           id="add_is_active" name="is_active" value="1" checked>
-                                    <label class="form-check-label" for="add_is_active">Active Brand</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tips-box mt-3">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Tips:</strong> Brand logos should be high-quality images. Recommended size is 200x100 pixels for best display.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Create Brand
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Brand</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Edit Brand Modal -->
 <div class="modal fade" id="editBrandModal" tabindex="-1" aria-labelledby="editBrandModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="editBrandModalLabel">
-                    <i class="fas fa-edit me-2"></i> Edit Brand
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editBrandForm" method="POST" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <input type="hidden" name="id">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_name" class="form-label">Brand Name *</label>
-                                <input type="text" id="edit_name" name="name"
-                                    class="form-control @error('name') is-invalid @enderror" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+        <form id="editBrandForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editBrandModalLabel">Edit Brand</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_name" class="form-label">Brand Name *</label>
+                            <input type="text" id="edit_name" name="name" class="form-control" required>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_slug" class="form-label">Slug *</label>
-                                <input type="text" id="edit_slug" name="slug"
-                                    class="form-control @error('slug') is-invalid @enderror" required>
-                                @error('slug')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_slug" class="form-label">Slug *</label>
+                            <input type="text" id="edit_slug" name="slug" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="edit_description" class="form-label">Description</label>
+                            <textarea id="edit_description" name="description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_sort_order" class="form-label">Sort Order</label>
+                            <input type="number" id="edit_sort_order" name="sort_order" class="form-control" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch mt-4">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="edit_is_active" name="is_active" value="1">
+                                <label class="form-check-label" for="edit_is_active">Active Brand</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="edit_description" class="form-label">Description</label>
-                        <textarea id="edit_description" name="description" rows="3"
-                            class="form-control @error('description') is-invalid @enderror"></textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_logo" class="form-label">Brand Logo</label>
-                                <input type="file" id="edit_logo" name="logo"
-                                    class="form-control @error('logo') is-invalid @enderror"
-                                    accept="image/*">
-                                @error('logo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <div id="edit_logo_preview" class="logo-preview-container mt-2">
-                                    <img id="edit_logo_preview_img" class="logo-preview" src="#" alt="Current logo">
-                                </div>
-                                <div class="form-check mt-2">
-                                    <input type="checkbox" name="remove_logo" id="edit_remove_logo" class="form-check-input" value="1">
-                                    <label for="edit_remove_logo" class="form-check-label text-danger">Remove current logo</label>
-                                </div>
-                            </div>
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Note:</strong> Updating brand information will affect all products under this brand.
                         </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="edit_sort_order" class="form-label">Sort Order</label>
-                                <input type="number" id="edit_sort_order" name="sort_order" class="form-control" min="0">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
-                                <label for="edit_is_active" class="form-label">Status</label>
-                                <div class="form-check form-switch mt-2">
-                                    <input class="form-check-input" type="checkbox" role="switch" 
-                                           id="edit_is_active" name="is_active" value="1">
-                                    <label class="form-check-label" for="edit_is_active">Active Brand</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tips-box mt-3">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Note:</strong> Updating brand information will affect all products under this brand.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Update Brand
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Brand</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -586,7 +702,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filterForm');
     const searchInput = document.getElementById('search');
     const statusSelect = document.getElementById('status');
-    const sortBySelect = document.getElementById('sort_by');
     const perPageSelect = document.getElementById('per_page');
     const searchLoading = document.getElementById('searchLoading');
     
@@ -607,11 +722,6 @@ document.addEventListener('DOMContentLoaded', function() {
         filterForm.submit();
     });
 
-    // Auto-submit sort by selection immediately
-    sortBySelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
     // Auto-submit per page selection immediately
     perPageSelect.addEventListener('change', function() {
         filterForm.submit();
@@ -620,6 +730,141 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear loading indicator when form submits
     filterForm.addEventListener('submit', function() {
         searchLoading.style.display = 'none';
+    });
+
+    /* === Add Brand === */
+    document.getElementById('addBrandForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error adding brand: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+
+    /* === Edit Brand === */
+    document.querySelectorAll('.editBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const brand = JSON.parse(this.dataset.brand);
+            const form = document.getElementById('editBrandForm');
+            
+            // Set form action
+            form.action = `/admin/brands/${brand.id}`;
+            
+            // Fill form fields
+            document.getElementById('edit_name').value = brand.name || '';
+            document.getElementById('edit_slug').value = brand.slug || '';
+            document.getElementById('edit_description').value = brand.description || '';
+            document.getElementById('edit_sort_order').value = brand.sort_order || 0;
+            document.getElementById('edit_is_active').checked = brand.is_active;
+        });
+    });
+
+    document.getElementById('editBrandForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'X-HTTP-Method-Override': 'PUT' 
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editBrandModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error updating brand: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+
+    /* === Delete Brand === */
+    document.querySelectorAll('.deleteBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to delete this brand? This action cannot be undone.')) return;
+            
+            const form = this.closest('.delete-form');
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-HTTP-Method-Override': 'DELETE'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete brand: ' + (data.message || 'Unknown error'));
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-trash"></i>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-trash"></i>';
+            });
+        });
     });
 
     // Auto-generate slug from name (Add Brand)
@@ -650,158 +895,20 @@ document.addEventListener('DOMContentLoaded', function() {
         editSlugInput.value = slug;
     });
 
-    // Logo preview for Add Brand
-    const addLogoInput = document.getElementById('add_logo');
-    const addLogoPreview = document.getElementById('add_logo_preview');
-    const addLogoPreviewImg = document.getElementById('add_logo_preview_img');
-    
-    addLogoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                addLogoPreviewImg.src = e.target.result;
-                addLogoPreview.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
+    // Fix table layout on window resize
+    window.addEventListener('resize', function() {
+        const tableContainer = document.querySelector('.table-container');
+        const table = document.querySelector('.table');
+        
+        // Only apply horizontal scroll on mobile
+        if (window.innerWidth < 1200) {
+            tableContainer.style.overflowX = 'auto';
+            table.style.tableLayout = 'auto';
         } else {
-            addLogoPreview.style.display = 'none';
+            tableContainer.style.overflowX = 'visible';
+            table.style.tableLayout = 'fixed';
         }
     });
-
-    // Logo preview for Edit Brand
-    const editLogoInput = document.getElementById('edit_logo');
-    const editLogoPreview = document.getElementById('edit_logo_preview');
-    const editLogoPreviewImg = document.getElementById('edit_logo_preview_img');
-    
-    editLogoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                editLogoPreviewImg.src = e.target.result;
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Edit brand modal handling
-    const editBrandButtons = document.querySelectorAll('.edit-brand-btn');
-    const editBrandForm = document.getElementById('editBrandForm');
-    const editIdInput = editBrandForm.querySelector('[name="id"]');
-    const editNameInput = document.getElementById('edit_name');
-    const editSlugInput = document.getElementById('edit_slug');
-    const editDescriptionInput = document.getElementById('edit_description');
-    const editSortOrderInput = document.getElementById('edit_sort_order');
-    const editIsActiveInput = document.getElementById('edit_is_active');
-    const editRemoveLogoCheckbox = document.getElementById('edit_remove_logo');
-
-    editBrandButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const id = this.getAttribute('data-id');
-            const name = this.getAttribute('data-name');
-            const slug = this.getAttribute('data-slug');
-            const description = this.getAttribute('data-description');
-            const sortOrder = this.getAttribute('data-sort_order');
-            const isActive = this.getAttribute('data-is_active') === '1';
-            const logo = this.getAttribute('data-logo');
-
-            // Set form action URL
-            editBrandForm.action = `/admin/brands/${id}`;
-            
-            // Populate form fields
-            editIdInput.value = id;
-            editNameInput.value = name;
-            editSlugInput.value = slug;
-            editDescriptionInput.value = description;
-            editSortOrderInput.value = sortOrder;
-            editIsActiveInput.checked = isActive;
-            editRemoveLogoCheckbox.checked = false;
-
-            // Handle logo preview
-            if (logo) {
-                editLogoPreviewImg.src = logo;
-                editLogoPreview.style.display = 'block';
-            } else {
-                editLogoPreview.style.display = 'none';
-            }
-        });
-    });
-
-    // Handle modal form validation
-    const addBrandForm = document.querySelector('#addBrandModal form');
-    const editBrandFormElement = document.querySelector('#editBrandModal form');
-
-    [addBrandForm, editBrandFormElement].forEach(form => {
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                const nameInput = this.querySelector('[name="name"]');
-                const slugInput = this.querySelector('[name="slug"]');
-                
-                if (!nameInput.value.trim()) {
-                    e.preventDefault();
-                    nameInput.classList.add('is-invalid');
-                    nameInput.focus();
-                    
-                    nameInput.addEventListener('input', function() {
-                        this.classList.remove('is-invalid');
-                    }, { once: true });
-                    return false;
-                }
-                
-                if (!slugInput.value.trim()) {
-                    e.preventDefault();
-                    slugInput.classList.add('is-invalid');
-                    slugInput.focus();
-                    
-                    slugInput.addEventListener('input', function() {
-                        this.classList.remove('is-invalid');
-                    }, { once: true });
-                    return false;
-                }
-                
-                return true;
-            });
-        }
-    });
-
-    // Clear add form when modal is closed
-    const addBrandModal = document.getElementById('addBrandModal');
-    addBrandModal.addEventListener('hidden.bs.modal', function () {
-        const form = this.querySelector('form');
-        if (form) {
-            form.reset();
-            addLogoPreview.style.display = 'none';
-            const invalidFields = form.querySelectorAll('.is-invalid');
-            invalidFields.forEach(field => {
-                field.classList.remove('is-invalid');
-            });
-        }
-    });
-
-    // Handle remove logo checkbox
-    editRemoveLogoCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            editLogoPreview.style.display = 'none';
-            editLogoInput.disabled = true;
-        } else {
-            editLogoPreview.style.display = 'block';
-            editLogoInput.disabled = false;
-        }
-    });
-
-    // Show modal if there are validation errors
-    @if($errors->any())
-        @if($errors->has('name') || $errors->has('slug'))
-            @if(request()->routeIs('admin.brands.index') || request()->routeIs('admin.brands.store'))
-                const addModal = new bootstrap.Modal(document.getElementById('addBrandModal'));
-                addModal.show();
-            @elseif(request()->routeIs('admin.brands.update'))
-                const editModal = new bootstrap.Modal(document.getElementById('editBrandModal'));
-                editModal.show();
-            @endif
-        @endif
-    @endif
 });
 </script>
 @endpush
