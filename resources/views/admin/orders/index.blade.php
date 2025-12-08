@@ -2,6 +2,7 @@
 
 @section('content')
 <style>
+    /* === Green Theme and Card Styling === */
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -10,7 +11,7 @@
     }
 
     .card-custom:hover {
-        transform: translateY(-2px);
+        transform: translateY(-3px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
@@ -49,6 +50,13 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -56,6 +64,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -69,32 +80,26 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Simplified status text styling */
-    .status-text {
+    /* Alternating row colors for better readability */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+    }
+
+    .form-label {
         font-weight: 600;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        display: inline-block;
-    }
-    
-    .status-pending { color: #FF9800; }
-    .status-confirmed { color: #2196F3; }
-    .status-processing { color: #9C27B0; }
-    .status-shipped { color: #673AB7; }
-    .status-delivered { color: #2C8F0C; }
-    .status-cancelled { color: #C62828; }
-
-    .btn-outline-primary {
         color: #2C8F0C;
-        border-color: #2C8F0C;
-        border-radius: 6px;
     }
 
-    .btn-outline-primary:hover {
-        background-color: #2C8F0C;
-        color: #fff;
-    }
-
+    /* Loading indicator for search */
     .search-loading {
         position: absolute;
         right: 10px;
@@ -107,6 +112,7 @@
         position: relative;
     }
 
+    /* Order styling */
     .order-number {
         font-weight: 700;
         color: #2C8F0C;
@@ -117,22 +123,16 @@
     .customer-name {
         font-weight: 600;
         color: #333;
-        font-size: 0.9rem;
-        margin-bottom: 0.1rem;
+        font-size: 0.95rem;
     }
 
     .customer-email {
-        color: #6c757d;
-        font-size: 0.8rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 180px;
-        display: block;
+        color: #2C8F0C;
+        font-size: 0.85rem;
+        word-break: break-word;
     }
 
     .customer-contact {
-        font-weight: 500;
         color: #495057;
         font-size: 0.9rem;
     }
@@ -154,48 +154,53 @@
         font-size: 0.8rem;
     }
 
-    .empty-state {
-        padding: 3rem 1rem;
-        text-align: center;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        color: #2C8F0C;
-    }
-
-    .summary-card {
-        background: linear-gradient(135deg, #E8F5E6, #F8FDF8);
-        border: 1px solid #2C8F0C;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .summary-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2C8F0C;
-        line-height: 1;
-    }
-
-    .summary-label {
-        font-size: 0.875rem;
-        color: #6c757d;
+    /* Enhanced Status styling */
+    .status-text {
         font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    
+    .status-pending {
+        color: #FF9800;
     }
-
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: nowrap;
+    
+    .status-confirmed {
+        color: #2196F3;
+    }
+    
+    .status-processing {
+        color: #9C27B0;
+    }
+    
+    .status-shipped {
+        color: #673AB7;
+    }
+    
+    .status-delivered {
+        color: #2C8F0C;
+    }
+    
+    .status-delivered::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-cancelled {
+        color: #C62828;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
     .cancellation-reason {
@@ -212,34 +217,80 @@
         white-space: nowrap;
     }
 
-    .table thead th:first-child,
-    .table tbody td:first-child {
-        padding-left: 1.5rem;
+    /* Enhanced Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
     }
-
-    .table thead th:last-child,
-    .table tbody td:last-child {
-        padding-right: 1.5rem;
-    }
-
-    /* Alternating row colors for better readability */
-    .table tbody tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    .table tbody tr:nth-child(even):hover {
-        background-color: #F8FDF8;
-    }
-
-    /* Better column widths */
-    .order-col { min-width: 140px; }
-    .customer-col { min-width: 200px; }
-    .contact-col { min-width: 130px; }
-    .total-col { min-width: 120px; }
-    .status-col { min-width: 140px; }
-    .date-col { min-width: 130px; }
-    .action-col { min-width: 120px; text-align: center; }
     
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-view {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-view:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+    
+    .btn-refund {
+        background-color: white;
+        border-color: #28a745;
+        color: #28a745;
+    }
+    
+    .btn-refund:hover {
+        background-color: #28a745;
+        color: white;
+    }
+
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+    
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+    
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Column width control - compact for no scroll */
+    .order-col { min-width: 120px; width: 120px; }
+    .customer-col { min-width: 160px; width: 160px; }
+    .contact-col { min-width: 100px; width: 100px; }
+    .total-col { min-width: 100px; width: 100px; }
+    .status-col { min-width: 120px; width: 120px; }
+    .date-col { min-width: 100px; width: 100px; }
+    .action-col { min-width: 80px; width: 80px; }
+
     /* Pagination styling */
     .pagination .page-item .page-link {
         color: #2C8F0C;
@@ -271,6 +322,68 @@
         color: #6c757d;
         margin-top: 0.5rem;
     }
+
+    /* Summary Cards */
+    .summary-card {
+        background: linear-gradient(135deg, #E8F5E6, #F8FDF8);
+        border: 1px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .summary-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2C8F0C;
+        line-height: 1;
+    }
+
+    .summary-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #C8E6C9;
+        margin-bottom: 1rem;
+    }
+
+    /* Tooltip styling for buttons */
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
 </style>
 
 <!-- Summary Cards -->
@@ -301,12 +414,13 @@
     </div>
 </div>
 
-<!-- Filters -->
+<!-- Filters and Search -->
 <div class="card card-custom mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.orders.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-4">
+                <!-- Search by Order, Customer, or Email -->
+                <div class="col-md-5">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Orders</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -318,6 +432,8 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Filter by Status -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
@@ -331,7 +447,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+
+                <!-- Date Range and Items per page -->
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="date_range" class="form-label fw-bold">Date Range</label>
                         <select class="form-select" id="date_range" name="date_range">
@@ -342,6 +460,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
@@ -366,7 +485,6 @@
     </div>
     <div class="card-body p-0">
         @if($orders->count() > 0)
-        <div class="table-container">
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
@@ -381,27 +499,27 @@
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
-                    <tr>
-                        <td>
-                            <div class="order-number">{{ $order->order_number }}</div>
+                    <tr data-id="{{ $order->id }}">
+                        <td class="order-col">
+                            <div class="order-number">#{{ $order->order_number }}</div>
                         </td>
-                        <td>
+                        <td class="customer-col">
                             <div class="customer-name">{{ $order->customer_name }}</div>
                             <a href="mailto:{{ $order->customer_email }}" class="customer-email" title="{{ $order->customer_email }}">
                                 {{ $order->customer_email }}
                             </a>
                         </td>
-                        <td>
+                        <td class="contact-col">
                             @if($order->customer_phone)
                                 <div class="customer-contact">{{ $order->customer_phone }}</div>
                             @else
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="total-col">
                             <div class="total-amount">₱{{ number_format($order->total_amount, 2) }}</div>
                         </td>
-                        <td>
+                        <td class="status-col">
                             <span class="status-text status-{{ $order->order_status }}">
                                 {{ ucfirst($order->order_status) }}
                             </span>
@@ -411,7 +529,7 @@
                             </div>
                             @endif
                         </td>
-                        <td>
+                        <td class="date-col">
                             <div class="order-date">
                                 {{ $order->created_at->format('M j, Y') }}
                             </div>
@@ -419,13 +537,13 @@
                                 {{ $order->created_at->format('h:i A') }}
                             </div>
                         </td>
-                        <td class="text-center">
-                            <div class="action-buttons justify-content-center">
-                                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-primary" title="View Order Details">
+                        <td class="action-col">
+                            <div class="action-buttons">
+                                <a href="{{ route('admin.orders.show', $order) }}" class="action-btn btn-view" data-title="View Order Details">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 @if($order->order_status == 'cancelled' && !$order->refund_processed)
-                                <a href="{{ route('admin.orders.refund.show', $order) }}" class="btn btn-sm btn-success" title="Process Refund">
+                                <a href="{{ route('admin.orders.refund.show', $order) }}" class="action-btn btn-refund" data-title="Process Refund">
                                     <i class="fas fa-money-bill-wave"></i>
                                 </a>
                                 @endif
@@ -435,25 +553,26 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
 
-        @if($orders->hasPages())
-        <div class="d-flex flex-column align-items-center p-4">
-            <nav aria-label="Page navigation">
-                {{ $orders->links('pagination::bootstrap-5') }}
-            </nav>
-            <div class="pagination-info text-center mt-2">
-                Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries
+            @if($orders->hasPages())
+            <div class="d-flex justify-content-center p-4">
+                <nav aria-label="Page navigation">
+                    {{ $orders->links('pagination::bootstrap-5') }}
+                </nav>
             </div>
-        </div>
-        @endif
+            <div class="d-flex justify-content-center">
+                <div class="pagination-info">
+                    Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries
+                </div>
+            </div>
+            @endif
 
         @else
-        <div class="empty-state">
-            <i class="fas fa-shopping-cart"></i>
-            <h4 class="text-success">No Orders Found</h4>
-            <p class="text-muted mb-4">Try adjusting your search or filter criteria</p>
-        </div>
+            <div class="empty-state p-5">
+                <i class="fas fa-shopping-cart"></i>
+                <h5 class="text-muted">No Orders Found</h5>
+                <p class="text-muted mb-4">Try adjusting your search or filter criteria</p>
+            </div>
         @endif
     </div>
 </div>
@@ -477,7 +596,7 @@
             
             searchTimeout = setTimeout(() => {
                 filterForm.submit();
-            }, 800);
+            }, 800); // 800ms delay after typing stops
         });
 
         // Auto-submit status filter immediately
@@ -498,6 +617,18 @@
         // Clear loading indicator when form submits
         filterForm.addEventListener('submit', function() {
             searchLoading.style.display = 'none';
+        });
+
+        // Ensure table fits container on all screen sizes
+        window.addEventListener('resize', function() {
+            const table = document.querySelector('.table');
+            if (table) {
+                // Always keep fixed layout for consistent appearance
+                table.style.tableLayout = 'fixed';
+                // Ensure table doesn't overflow
+                table.style.width = '100%';
+                table.style.maxWidth = '100%';
+            }
         });
     });
 </script>

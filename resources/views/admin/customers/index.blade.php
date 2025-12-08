@@ -344,7 +344,7 @@
     }
     
     .action-btn::after {
-        content: attr(title);
+        content: attr(data-title);
         position: absolute;
         bottom: -30px;
         left: 50%;
@@ -507,15 +507,15 @@
                         </td>
                         <td class="action-col">
                             <div class="action-buttons">
-                                <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' title="Edit Customer">
+                                <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' data-title="Edit Customer">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 @if ($customer->is_archived)
-                                    <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}" title="Unarchive Customer">
+                                    <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}" data-title="Unarchive Customer">
                                        <i class="fas fa-box-open"></i>
                                     </button>
                                 @else
-                                    <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}" title="Archive Customer">
+                                    <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}" data-title="Archive Customer">
                                         <i class="fas fa-archive"></i>
                                     </button>
                                 @endif

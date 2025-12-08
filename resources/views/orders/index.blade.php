@@ -432,7 +432,8 @@
                             <span class="order-number">{{ $order->order_number }}</span>
                         </td>
                         <td>
-                            <span class="text-muted">{{ $order->created_at->format('M d, Y') }}</span>
+                            <div class="text-muted">{{ $order->created_at->format('M d, Y') }}</div>
+                            <div class="text-muted" style="font-size: 0.8rem; color: var(--gray-500);">{{ $order->created_at->format('h:i A') }}</div>
                         </td>
                         <td>{{ $order->customer_name }}</td>
                         <td>
