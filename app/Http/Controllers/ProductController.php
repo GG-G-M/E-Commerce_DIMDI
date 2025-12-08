@@ -105,30 +105,59 @@ class ProductController extends Controller
     /**
      * Display the specified product.
      */
-    public function show($slug)
-    {
-        $product = Product::with(['category', 'brand'])
-            ->where('slug', $slug)
-            ->where('is_active', true)
-            ->firstOrFail();
+   public function show($slug)
+{
+    $product = Product::with(['category', 'brand', 'ratings.user', 'variants'])
+        ->where('slug', $slug)
+        ->where('is_active', true)
+        ->firstOrFail();
 
-        // Get related products (same category, excluding current product)
-        $relatedProducts = Product::with(['category', 'brand'])
-            ->where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->where('stock_quantity', '>', 0)
-            ->inRandomOrder()
-            ->limit(4)
-            ->get();
+    // Get related products
+    $relatedProducts = Product::with(['category', 'brand'])
+        ->where('category_id', $product->category_id)
+        ->where('id', '!=', $product->id)
+        ->where('is_active', true)
+        ->where('stock_quantity', '>', 0)
+        ->inRandomOrder()
+        ->limit(4)
+        ->get();
 
-        // Increment view count if you have that field - FIXED
-        if (Schema::hasTable('products') && Schema::hasColumn('products', 'views')) {
-            $product->increment('views');
+    // Initialize variables
+    $userOrders = collect();
+    $userRatings = [];
+    
+    // Get user's delivered orders and ratings (if logged in)
+    if (auth()->check()) {
+        $user = auth()->user();
+        
+        // Get delivered orders containing this product
+        try {
+            $userOrders = $product->getUserDeliveredOrders($user);
+        } catch (\Exception $e) {
+            $userOrders = collect(); // Fallback to empty collection
+            \Log::error('Error getting user orders: ' . $e->getMessage());
         }
-
-        return view('products.show', compact('product', 'relatedProducts'));
+        
+        // Get ratings for those orders
+        foreach ($userOrders as $order) {
+            try {
+                $rating = $product->getUserRatingForOrder($order->id, $user);
+                if ($rating) {
+                    $userRatings[$order->id] = $rating;
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error getting user rating: ' . $e->getMessage());
+            }
+        }
     }
+
+    // Increment view count if you have that field
+    if (\Illuminate\Support\Facades\Schema::hasTable('products') && \Illuminate\Support\Facades\Schema::hasColumn('products', 'views')) {
+        $product->increment('views');
+    }
+
+    return view('products.show', compact('product', 'relatedProducts', 'userOrders', 'userRatings'));
+}
 
     /**
      * Display products by category.
