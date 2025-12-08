@@ -280,33 +280,37 @@
         color: white;
     }
 
-    /* Fixed Table Container - No Horizontal Scroll Unless Needed */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
         max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
     }
     
-    /* Responsive table - no horizontal scroll on desktop */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
-        .table {
-            table-layout: fixed;
-        }
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+    
+    .card-custom {
+        overflow: hidden;
     }
 
-    /* Column width control */
-    .id-col { min-width: 80px; width: 80px; }
-    .name-col { min-width: 180px; width: 200px; }
-    .email-col { min-width: 200px; width: 250px; }
-    .phone-col { min-width: 120px; width: 150px; }
-    .address-col { min-width: 200px; max-width: 250px; width: 250px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
+    }
+
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 120px; }
+    .email-col { min-width: 140px; width: 140px; }
+    .phone-col { min-width: 100px; width: 100px; }
+    .address-col { min-width: 120px; max-width: 120px; width: 120px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
 
     /* Pagination styling */
     .pagination .page-item .page-link {
@@ -360,6 +364,27 @@
     .action-btn:hover::after {
         opacity: 1;
         visibility: visible;
+    }
+
+    /* Customer Icon - Profile Icon */
+    .customer-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Customer Info Cell */
+    .customer-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
     
     /* Ensure the table fits within the container */
@@ -419,12 +444,12 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Customer List</h5>
         <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            <i class="fas fa-user-plus"></i> Add Customer
+            {{-- <i class="fas fa-user-plus"></i>  --}}
+            Add Customer
         </button>
     </div>
     <div class="card-body p-0">
-        <div class="table-container">
-            <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
                         <th class="id-col">ID</th>
@@ -443,7 +468,14 @@
                             <span class="text-muted">#{{ $customer->id }}</span>
                         </td>
                         <td class="name-col">
-                            <div class="customer-name">{{ $customer->first_name }} {{ $customer->last_name }}</div>
+                            <div class="customer-info-cell">
+                                <div class="customer-icon">
+                                    {{ substr($customer->first_name, 0, 1) }}{{ substr($customer->last_name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <div class="customer-name">{{ $customer->first_name }} {{ $customer->last_name }}</div>
+                                </div>
+                            </div>
                         </td>
                         <td class="email-col">
                             <a href="mailto:{{ $customer->email }}" class="customer-email" title="{{ $customer->email }}">
@@ -492,8 +524,7 @@
                     </tr>
                     @endforeach
                 </tbody>
-            </table>
-        </div>
+        </table>
 
         @if($customers->hasPages())
         <div class="d-flex justify-content-center p-4">
@@ -754,18 +785,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Fix table layout on window resize
+    // Ensure table fits container on all screen sizes
     window.addEventListener('resize', function() {
         const tableContainer = document.querySelector('.table-container');
         const table = document.querySelector('.table');
-        
-        // Only apply horizontal scroll on mobile
-        if (window.innerWidth < 1200) {
-            tableContainer.style.overflowX = 'auto';
-            table.style.tableLayout = 'auto';
-        } else {
-            tableContainer.style.overflowX = 'visible';
+        if (table) {
+            // Always keep fixed layout for consistent appearance
             table.style.tableLayout = 'fixed';
+            // Ensure table doesn't overflow
+            table.style.width = '100%';
+            table.style.maxWidth = '100%';
         }
     });
 });
