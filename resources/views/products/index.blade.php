@@ -1077,7 +1077,19 @@
         <!-- Products Container -->
         <div id="products-container">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="category-title">Featured Products</h2>
+                @php
+                    $title = 'Products';
+                    if(request('sort') == 'featured') {
+                        $title = 'Featured Products';
+                    } elseif(request('category')) {
+                        $cat = $categories->firstWhere('slug', request('category'));
+                        $title = $cat ? $cat->name : 'Category Products';
+                    } elseif(request('q')) {
+                        $title = 'Search Results';
+                    }
+                @endphp
+
+                <h2 class="category-title">{{ $title }}</h2>
                 <span class="text-muted" id="products-count">{{ $products->count() }} products found</span>
             </div>
 

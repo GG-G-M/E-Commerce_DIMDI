@@ -351,6 +351,9 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
         }
         return view('superadmin.profile');
     })->name('profile');
+
+    // Audits (who logged in and actions)
+    Route::get('/audits', [App\Http\Controllers\SuperAdmin\AuditController::class, 'index'])->name('audits.index');
 });
 
 // =============================================

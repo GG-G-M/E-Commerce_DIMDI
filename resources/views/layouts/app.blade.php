@@ -541,6 +541,14 @@
                             </li>
                         @endif
 
+                        @if (Auth::user()->isSuperAdmin())
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('superadmin.dashboard') }}">
+                                    Super Admin
+                                </a>
+                            </li>
+                        @endif
+
                         <!-- Cart - Icon Only -->
                         <li class="nav-item">
                             <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
