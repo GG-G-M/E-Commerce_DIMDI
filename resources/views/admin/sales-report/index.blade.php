@@ -455,9 +455,9 @@
             <a href="{{ route('admin.sales-report.comparison') }}" class="action-btn btn-outline">
                 <i class="fas fa-chart-line me-1"></i> Year Comparison
             </a>
-            <button type="button" class="action-btn btn-primary" onclick="exportReport('pdf')">
-                <i class="fas fa-download me-1"></i> Export PDF
-            </button>
+            <a href="{{ route('admin.sales-report.export-pdf', request()->query()) }}" class="action-btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf me-1"></i> Download PDF
+            </a>
         </div>
     </div>
 
