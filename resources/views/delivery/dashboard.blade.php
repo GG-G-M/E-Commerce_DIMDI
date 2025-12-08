@@ -160,6 +160,41 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+
+    /* Unified action icon (green) */
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+
+    .action-icon {
+        background: transparent;
+        color: #2C8F0C;
+        border: 1.5px solid #2C8F0C;
+        padding: 0.35rem;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .action-icon:hover {
+        background: #E8F5E9;
+        color: #1B5E20;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
 </style>
 
 <div class="dashboard-header">
@@ -288,8 +323,8 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span class="fw-bold text-success">₱{{ number_format($order->total_amount, 2) }}</span>
                                             <div>
-                                                <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                    <i class="fas fa-eye"></i> View
+                                                <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn action-icon" title="View {{ $order->order_number }}" aria-label="View">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                                 <form action="{{ route('delivery.orders.markAsPickedUp', $order) }}" method="POST" class="d-inline">
                                                     @csrf
@@ -351,8 +386,8 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span class="fw-bold text-primary">₱{{ number_format($order->total_amount, 2) }}</span>
                                             <div>
-                                                <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                    <i class="fas fa-eye"></i> View
+                                                <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn action-icon" title="View {{ $order->order_number }}" aria-label="View">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                                 @if($order->order_status == 'picked_up')
                                                 <form action="{{ route('delivery.orders.markAsDelivered', $order) }}" method="POST" class="d-inline">
@@ -433,8 +468,8 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-eye"></i> View
+                                        <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn action-icon" title="View {{ $order->order_number }}" aria-label="View">
+                                            <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
                                 </tr>

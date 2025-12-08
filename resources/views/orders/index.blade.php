@@ -172,19 +172,30 @@
         border: 1px solid transparent;
     }
 
-    .btn-view {
-        background: var(--primary-light);
+    /* Unified icon-style action button (green) */
+    .action-icon {
+        background: transparent;
         color: var(--primary);
-        border-color: rgba(44, 143, 12, 0.2);
+        border: 1.5px solid var(--primary);
+        padding: 0.35rem;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 0.95rem;
     }
 
-    .btn-view:hover {
-        background: rgba(44, 143, 12, 0.15);
+    .action-icon:hover {
+        background: var(--primary-light);
         color: var(--primary-dark);
         text-decoration: none;
+        transform: translateY(-1px);
     }
 
     .btn-cancel {
+        /* keep for forms but visually replace in-table cancel with icon style */
         background: #FEF2F2;
         color: #DC2626;
         border-color: rgba(220, 38, 38, 0.2);
@@ -444,19 +455,18 @@
                         </td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a href="{{ route('orders.show', $order) }}" class="action-btn btn-view">
+                                <a href="{{ route('orders.show', $order) }}" class="action-btn action-icon" title="View order {{ $order->order_number }}" aria-label="View">
                                     <i class="fas fa-eye"></i>
-                                    View
                                 </a>
 
                                 @if($order->canBeCancelled())
                                 <button 
                                     type="button" 
-                                    class="action-btn btn-cancel cancel-btn"
+                                    class="action-btn action-icon cancel-btn"
                                     data-order-id="{{ $order->id }}"
-                                    data-order-number="{{ $order->order_number }}">
+                                    data-order-number="{{ $order->order_number }}"
+                                    title="Cancel order {{ $order->order_number }}" aria-label="Cancel">
                                     <i class="fas fa-times"></i>
-                                    Cancel
                                 </button>
                                 @endif
                             </div>
