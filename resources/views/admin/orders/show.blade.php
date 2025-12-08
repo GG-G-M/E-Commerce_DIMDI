@@ -19,7 +19,6 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border-left: 4px solid var(--primary-green);
     }
     
     /* Modern Info Grid */
