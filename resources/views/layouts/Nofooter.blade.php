@@ -353,7 +353,7 @@
         @media (max-width: 991.98px) {
             .navbar {
                 position: relative;
-            }
+            }a
 
             body {
                 padding-top: 0;

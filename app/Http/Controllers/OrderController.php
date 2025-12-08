@@ -241,8 +241,10 @@ class OrderController extends Controller
             // Store order ID in session for payment redirects
             session(['last_order_id' => $order->id]);
 
-            // Send order placed notification
-            $user->notify(new OrderPlaced($order));
+            // Send order placed notification immediately so DB notification is present
+            // even if queue workers are not running (use notifyNow to bypass queue).
+            // If you prefer queued delivery (mail, etc.), revert to ->notify() and run a queue worker.
+            $user->notifyNow(new OrderPlaced($order));
 
             // Handle different payment methods
             if (in_array($request->payment_method, ['gcash', 'grab_pay'])) {

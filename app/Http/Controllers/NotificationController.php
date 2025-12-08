@@ -38,8 +38,8 @@ class NotificationController extends Controller
         // Mark notification as read
         $notification->markAsRead();
         
-        // Redirect to order page which has receipt
-        return redirect()->route('orders.show', $order);
+        // Render receipt view (allows download/preview using the notification id)
+        return view('receipt.view', compact('order', 'notification'));
     }
     
     public function downloadReceipt($id)

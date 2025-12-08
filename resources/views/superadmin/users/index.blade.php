@@ -65,35 +65,27 @@
         box-shadow: 0 0 0 0.25rem rgba(44, 143, 12, 0.1);
     }
 
-    /* Bulk Actions Card */
-    .bulk-actions-card {
-        background: #f8fdf8;
-        border: 2px dashed var(--border-color);
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-    }
-
-    .btn-outline-green {
-        color: var(--light-green);
-        border: 2px solid var(--light-green);
-        background: white;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-green:hover {
-        background: var(--light-green);
-        color: white;
-        border-color: var(--light-green);
-    }
-
     /* Table Styling */
     .table-card {
         background: white;
         border: none;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        background: white;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table-header h5 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--dark-green);
     }
 
     .table-custom {
@@ -124,19 +116,6 @@
 
     .table-custom tbody tr:hover {
         background-color: #f8fdf8;
-    }
-
-    /* Checkbox styling */
-    .checkbox-cell {
-        width: 40px;
-        text-align: center;
-    }
-
-    .user-checkbox {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        accent-color: var(--light-green);
     }
 
     /* Role text */
@@ -311,34 +290,31 @@
         .table-custom tbody td {
             padding: 0.75rem 0.5rem;
         }
+        
+        .table-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .btn-green {
+            width: 100%;
+        }
     }
 </style>
-
-<!-- Page Header -->
-<div class="page-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>
-            <i class="fas fa-users me-2"></i>User Management
-        </h1>
-        <a href="{{ route('superadmin.users.create') }}" class="btn btn-green">
-            <i class="fas fa-user-plus me-1"></i> Create New User
-        </a>
-    </div>
-</div>
-
 <!-- Filters -->
 <div class="filter-card">
     <div class="card-body">
-        <form method="GET" class="row g-3">
+        <form method="GET" class="row g-3" id="filterForm">
             <div class="col-md-3">
                 <label class="form-label fw-bold small text-muted">Search Users</label>
                 <input type="text" name="search" class="form-control" 
                        placeholder="Search by name or email..." 
-                       value="{{ request('search') }}">
+                       value="{{ request('search') }}" id="searchInput">
             </div>
             <div class="col-md-3">
                 <label class="form-label fw-bold small text-muted">Filter by Role</label>
-                <select name="role" class="form-select">
+                <select name="role" class="form-select" id="roleSelect">
                     <option value="">All Roles</option>
                     @foreach($roles as $key => $label)
                         <option value="{{ $key }}" {{ request('role') == $key ? 'selected' : '' }}>
@@ -349,7 +325,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label fw-bold small text-muted">Status</label>
-                <select name="status" class="form-select">
+                <select name="status" class="form-select" id="statusSelect">
                     <option value="">All Status</option>
                     <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -357,81 +333,35 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label fw-bold small text-muted">Sort By</label>
-                <select name="sort" class="form-select">
+                <select name="sort" class="form-select" id="sortSelect">
                     <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
                     <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest First</option>
                     <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name A-Z</option>
                     <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
                 </select>
             </div>
-            <div class="col-md-2 d-flex flex-column gap-2">
-                <button type="submit" class="btn btn-green mt-auto">
-                    <i class="fas fa-filter me-1"></i> Filter
-                </button>
-                @if(request()->has('search') || request()->has('role') || request()->has('status') || request()->has('sort'))
-                    <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-green">
-                        <i class="fas fa-times me-1"></i> Clear
-                    </a>
-                @endif
+            <div class="col-md-2 d-flex align-items-end">
+                <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-green w-100">
+                </a>
             </div>
         </form>
     </div>
 </div>
-
-<!-- Bulk Actions -->
-@if($users->count() > 0)
-<div class="bulk-actions-card">
-    <div class="card-body">
-        <form id="bulk-action-form" method="POST">
-            @csrf
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <label class="form-label fw-bold small text-muted mb-2">Bulk Actions</label>
-                    <div class="d-flex gap-2">
-                        <select name="bulk_action" class="form-select" id="bulkActionSelect">
-                            <option value="">Select Action</option>
-                            <option value="activate">Activate Selected</option>
-                            <option value="deactivate">Deactivate Selected</option>
-                            <option value="delete">Delete Selected</option>
-                        </select>
-                        <button type="button" class="btn btn-outline-green" id="applyBulkAction">
-                            Apply
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="d-flex justify-content-end align-items-center gap-3">
-                        <span class="text-muted small">
-                            <i class="fas fa-check-circle me-1"></i>
-                            <span id="selectedCount">0</span> users selected
-                        </span>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAll">
-                                <i class="fas fa-check-double me-1"></i>Select All
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAll">
-                                <i class="fas fa-times me-1"></i>Deselect All
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-@endif
 
 <!-- Users Table -->
 <div class="table-card">
+    <div class="table-header">
+        <h5>All Users ({{ $totalUsers }})</h5>
+        <a href="{{ route('superadmin.users.create') }}" class="btn btn-green">
+            <i class="fas fa-user-plus me-1"></i> Create New User
+        </a>
+    </div>
     <div class="card-body p-0">
         @if($users->count() > 0)
         <div class="table-responsive">
             <table class="table table-custom">
                 <thead>
                     <tr>
-                        <th class="checkbox-cell">
-                            <input type="checkbox" id="selectAllCheckbox">
-                        </th>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -445,10 +375,6 @@
                 <tbody>
                     @foreach($users as $user)
                     <tr>
-                        <td class="checkbox-cell">
-                            <input type="checkbox" class="user-checkbox" name="user_ids[]" 
-                                   value="{{ $user->id }}">
-                        </td>
                         <td>
                             <span class="text-muted">#{{ $user->id }}</span>
                         </td>
@@ -569,79 +495,33 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-    const userCheckboxes = document.querySelectorAll('.user-checkbox');
-    const selectAllBtn = document.getElementById('selectAll');
-    const deselectAllBtn = document.getElementById('deselectAll');
-    const selectedCountSpan = document.getElementById('selectedCount');
-    const bulkActionSelect = document.getElementById('bulkActionSelect');
-    const applyBulkActionBtn = document.getElementById('applyBulkAction');
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('searchInput');
+    const roleSelect = document.getElementById('roleSelect');
+    const statusSelect = document.getElementById('statusSelect');
+    const sortSelect = document.getElementById('sortSelect');
 
-    function updateSelectedCount() {
-        const selected = document.querySelectorAll('.user-checkbox:checked').length;
-        selectedCountSpan.textContent = selected;
-        
-        // Update select all checkbox state
-        selectAllCheckbox.checked = selected === userCheckboxes.length && selected > 0;
-        selectAllCheckbox.indeterminate = selected > 0 && selected < userCheckboxes.length;
-    }
+    let searchTimeout;
 
-    selectAllCheckbox.addEventListener('change', function() {
-        userCheckboxes.forEach(cb => cb.checked = this.checked);
-        updateSelectedCount();
+    // Auto-submit on search input with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 500);
     });
 
-    selectAllBtn.addEventListener('click', function() {
-        userCheckboxes.forEach(cb => cb.checked = true);
-        updateSelectedCount();
+    // Auto-submit on select changes
+    roleSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
 
-    deselectAllBtn.addEventListener('click', function() {
-        userCheckboxes.forEach(cb => cb.checked = false);
-        updateSelectedCount();
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
 
-    userCheckboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
-
-    applyBulkActionBtn.addEventListener('click', function() {
-        const action = bulkActionSelect.value;
-        const selectedIds = [...document.querySelectorAll('.user-checkbox:checked')].map(cb => cb.value);
-
-        if (!action) {
-            alert('Please select a bulk action');
-            return;
-        }
-        
-        if (selectedIds.length === 0) {
-            alert('Please select at least one user');
-            return;
-        }
-
-        let confirmMessage = '';
-        if (action === 'delete') {
-            confirmMessage = `Are you sure you want to delete ${selectedIds.length} user(s)? This action cannot be undone.`;
-        } else if (action === 'activate') {
-            confirmMessage = `Activate ${selectedIds.length} user(s)?`;
-        } else if (action === 'deactivate') {
-            confirmMessage = `Deactivate ${selectedIds.length} user(s)?`;
-        }
-
-        if (!confirm(confirmMessage)) return;
-
-        const form = document.getElementById('bulk-action-form');
-        const input = document.createElement('input');
-
-        input.type = 'hidden';
-        input.name = 'user_ids';
-        input.value = JSON.stringify(selectedIds);
-
-        form.appendChild(input);
-
-        if (action === 'activate') form.action = '{{ route("superadmin.users.bulk-activate") }}';
-        if (action === 'deactivate') form.action = '{{ route("superadmin.users.bulk-deactivate") }}';
-        if (action === 'delete') form.action = '{{ route("superadmin.users.bulk-delete") }}';
-
-        form.submit();
+    sortSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
 });
 </script>

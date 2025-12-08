@@ -341,33 +341,51 @@
         font-size: 0.85rem;
     }
 
-    /* Action Buttons in Table */
-    .btn-view-action {
+    /* Action buttons in table - UPDATED to match user management */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: nowrap;
+    }
+
+    .btn-action {
+        padding: 0.5rem;
+        border-radius: 6px;
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Eye button with green outline and green icon */
+    .btn-view {
+        background: white;
+        color: var(--light-green);
+        border: 2px solid var(--light-green);
+    }
+
+    .btn-view:hover {
         background: var(--light-green);
         color: white;
-        border: none;
-        padding: 0.25rem 0.5rem;
-        border-radius: 6px;
-        transition: all 0.3s ease;
+        border-color: var(--light-green);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.2);
     }
 
-    .btn-view-action:hover {
-        background: var(--dark-green);
-        color: white;
+    /* Edit button with grey outline */
+    .btn-edit {
+        background: white;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
     }
 
-    .btn-edit-action {
-        background: var(--warning-green);
-        color: white;
-        border: none;
-        padding: 0.25rem 0.5rem;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-edit-action:hover {
-        background: #7A5B0A;
-        color: white;
+    .btn-edit:hover {
+        background: #f8f9fa;
+        color: var(--dark-green);
+        border-color: var(--light-green);
     }
 
     /* Text Colors */
@@ -422,6 +440,11 @@
         
         .view-all-btn {
             width: 100%;
+        }
+        
+        .action-buttons {
+            flex-wrap: wrap;
+            justify-content: center;
         }
     }
 </style>
@@ -574,11 +597,14 @@
                         <small class="text-dark">{{ $user->created_at->format('M d, Y') }}</small>
                     </td>
                     <td>
-                        <div class="btn-group btn-group-sm" role="group">
-                            <a href="{{ route('superadmin.users.show', $user) }}" class="btn btn-view-action" title="View Details">
+                        <div class="action-buttons">
+                            <a href="{{ route('superadmin.users.show', $user) }}" 
+                               class="btn-action btn-view" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{{ route('superadmin.users.edit', $user) }}" class="btn btn-edit-action" title="Edit User">
+                            
+                            <a href="{{ route('superadmin.users.edit', $user) }}" 
+                               class="btn-action btn-edit" title="Edit User">
                                 <i class="fas fa-edit"></i>
                             </a>
                         </div>
