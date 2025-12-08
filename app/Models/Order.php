@@ -39,6 +39,8 @@ class Order extends Model
         'refund_method',
         'refund_notes',
         'refund_processed_at',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
@@ -539,6 +541,8 @@ class Order extends Model
             }
         });
     }
+
+
 
     // ========== ADDED METHODS FOR DELIVERY FLOW ==========
 
