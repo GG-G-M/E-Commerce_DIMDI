@@ -2,7 +2,21 @@
 
 @section('content')
 <style>
-    /* === Consistent Green Theme === */
+    /* === Green Theme and Card Styling === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -30,7 +44,6 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
-        font-size: 1.25rem;
     }
 
     /* Improved Add Button */
@@ -69,12 +82,38 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
-    /* Enhanced Action Buttons - Consistent with other pages */
+    /* Enhanced Action Buttons */
     .action-buttons {
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
+    }
+    
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
     }
     
     .action-btn {
@@ -143,6 +182,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -212,9 +254,6 @@
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1.25rem;
     }
 
     .modal-title {
@@ -314,16 +353,11 @@
         }
     }
 
-    /* Column widths for consistency */
-    .id-col { min-width: 80px; width: 80px; }
-    .name-col { min-width: 250px; width: 300px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .action-col { 
-        min-width: 120px; 
-        width: 140px; 
-        /* ADD THIS LINE for explicit cell content centering */
-        text-align: center; 
-    }
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
     /* Warehouse Info Cell */
     .warehouse-info-cell {
         display: flex;
@@ -334,6 +368,7 @@
     .warehouse-name {
         font-weight: 600;
         color: #333;
+        font-size: 0.95rem;
     }
     
     .warehouse-description {
@@ -478,20 +513,21 @@
                                     <button class="action-btn btn-edit edit-warehouse-btn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editWarehouseModal"
-                                            data-warehouse='@json($warehouse)'>
+                                            data-warehouse='@json($warehouse)'
+                                            data-title="Edit Warehouse">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
                                     @if (!$warehouse->is_archived)
                                         <button class="action-btn btn-archive archiveBtn" 
                                                 data-id="{{ $warehouse->id }}" 
-                                                title="Archive Warehouse">
+                                                data-title="Archive Warehouse">
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @else
                                         <button class="action-btn btn-unarchive unarchiveBtn" 
                                                 data-id="{{ $warehouse->id }}" 
-                                                title="Unarchive Warehouse">
+                                                data-title="Unarchive Warehouse">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @endif
@@ -791,15 +827,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to archive warehouse: ' + (data.message || 'Unknown error'));
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-archive"></i>';
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-archive"></i>';
+                location.reload();
             });
         });
     });
@@ -826,15 +860,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to unarchive warehouse: ' + (data.message || 'Unknown error'));
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-box-open"></i>';
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-box-open"></i>';
+                location.reload();
             });
         });
     });

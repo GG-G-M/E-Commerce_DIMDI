@@ -2,7 +2,23 @@
 
 @section('content')
 <style>
-    /* === Consistent Green Theme === */
+    /* === Green Theme and Card Styling === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
+
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -30,7 +46,6 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
-        font-size: 1.25rem;
     }
 
     /* Improved Add Button */
@@ -69,12 +84,38 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
-    /* Enhanced Action Buttons - Consistent with other pages */
+    /* Enhanced Action Buttons */
     .action-buttons {
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
+    }
+    
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
     }
     
     .action-btn {
@@ -143,6 +184,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -212,9 +256,6 @@
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1.25rem;
     }
 
     .modal-title {
@@ -316,13 +357,13 @@
         }
     }
 
-    /* Column widths for consistency */
-    .id-col { min-width: 80px; width: 80px; }
-    .name-col { min-width: 250px; width: 300px; }
-    .contact-col { min-width: 150px; width: 180px; }
-    .address-col { min-width: 200px; max-width: 250px; width: 250px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .contact-col { min-width: 90px; width: 90px; }
+    .address-col { min-width: 120px; max-width: 120px; width: 120px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
 
     /* Name Cell */
     .checker-info-cell {
@@ -500,20 +541,21 @@
                                     <button class="action-btn btn-edit editBtn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editStockCheckerModal"
-                                            data-checker='@json($checker)'>
+                                            data-checker='@json($checker)'
+                                            data-title="Edit Stock Checker">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
                                     @if (!$checker->is_archived)
                                         <button class="action-btn btn-archive archiveBtn" 
                                                 data-id="{{ $checker->id }}" 
-                                                title="Archive Stock Checker">
+                                                data-title="Archive Stock Checker">
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @else
                                         <button class="action-btn btn-unarchive unarchiveBtn" 
                                                 data-id="{{ $checker->id }}" 
-                                                title="Unarchive Stock Checker">
+                                                data-title="Unarchive Stock Checker">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @endif
@@ -828,15 +870,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to archive stock checker: ' + (data.message || 'Unknown error'));
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-archive"></i>';
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-archive"></i>';
+                location.reload();
             });
         });
     });
@@ -863,15 +903,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to unarchive stock checker: ' + (data.message || 'Unknown error'));
-                    button.disabled = false;
-                    button.innerHTML = '<i class="fas fa-box-open"></i>';
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-box-open"></i>';
+                location.reload();
             });
         });
     });
