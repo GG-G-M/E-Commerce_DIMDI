@@ -213,6 +213,25 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
+    /* Clickable field styling */
+    .clickable-field {
+        cursor: pointer;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .clickable-field:hover {
+        background-color: #e9ecef;
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    }
+
+    .clickable-field:focus {
+        background-color: #fff;
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    }
+
     /* Filter Section - Consistent */
     .search-loading {
         position: absolute;
@@ -785,21 +804,27 @@
                 <div class="modal-body">
                     <div class="mb-3 position-relative">
                         <label class="form-label">Product</label>
-                        <input type="text" class="form-control" id="productField"
-                            placeholder="Click to select product" readonly>
+                        <div class="position-relative">
+                            <input type="text" class="form-control clickable-field" id="productField"
+                                placeholder="Click to select product" readonly>
+                            <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
+                                <i class="fas fa-search text-muted"></i>
+                            </div>
+                        </div>
                         <input type="hidden" name="product_id" id="productId">
                     </div>
 
                     <div class="mb-3" id="variantContainer" style="display: none;">
                         <label class="form-label">Variant</label>
-                        <select class="form-select" name="product_variant_id" id="variantSelect">
-                            <option value="">Select Variant</option>
-                            @foreach ($variants as $variant)
-                                <option value="{{ $variant->id }}" data-product-id="{{ $variant->product_id }}">
-                                    {{ Str::limit($variant->product->name, 20) }} / {{ Str::limit($variant->variant_name, 15) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="position-relative">
+                            <input type="text" class="form-control clickable-field" id="variantField"
+                                placeholder="Click to select variant" readonly>
+                            <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
+                                <i class="fas fa-search text-muted"></i>
+                            </div>
+                            <input type="hidden" name="product_variant_id" id="variantId">
+                        </div>
+                        <div class="form-text">Select a specific variant of the chosen product</div>
                     </div>
 
                     <div class="mb-3">
@@ -868,15 +893,24 @@
             </div>
             <div class="modal-body">
                 <div class="row mb-3">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <input type="text" id="productSearch" class="form-control"
                             placeholder="Search by name or SKU">
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <select id="productFilter" class="form-select">
                             <option value="active" selected>Active</option>
                             <option value="archived">Archived</option>
                             <option value="all">All</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="productPerPage" class="form-select">
+                            <option value="5" {{ request('product_per_page', 10) == '5' ? 'selected' : '' }}>5 per page</option>
+                            <option value="10" {{ request('product_per_page', 10) == '10' ? 'selected' : '' }}>10 per page</option>
+                            <option value="15" {{ request('product_per_page', 10) == '15' ? 'selected' : '' }}>15 per page</option>
+                            <option value="25" {{ request('product_per_page', 10) == '25' ? 'selected' : '' }}>25 per page</option>
+                            <option value="50" {{ request('product_per_page', 10) == '50' ? 'selected' : '' }}>50 per page</option>
                         </select>
                     </div>
                 </div>
@@ -889,12 +923,13 @@
                                 <th>Name</th>
                                 <th>SKU</th>
                                 <th>Category</th>
+                                <th>Variants</th>
                                 <th>Stock</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
-                            @foreach($products as $product)
+                            @foreach($productsForModal ?? $products as $product)
                                 <tr data-archived="{{ $product->is_archived ? '1' : '0' }}">
                                     <td>
                                         @if($product->image_url)
@@ -911,6 +946,19 @@
                                     <td>{{ $product->name }}</td>
                                     <td><small class="text-muted">{{ $product->sku }}</small></td>
                                     <td>{{ $product->category->name ?? 'N/A' }}</td>
+                                    <td>
+                                        @if($product->has_variants && $product->variants && $product->variants->count() > 0)
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-layer-group me-1"></i>
+                                                {{ $product->variants->count() }} variant(s)
+                                            </span>
+                                        @else
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-box me-1"></i>
+                                                No variants
+                                            </span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($product->has_variants)
                                             <span class="fw-bold text-info">{{ $product->total_stock }}</span>
@@ -936,6 +984,81 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- JavaScript-based Pagination -->
+                <div id="productPagination" class="d-flex justify-content-center mt-3" style="display: none;">
+                    <nav aria-label="Product selection pagination">
+                        <ul class="pagination pagination-sm" id="productPaginationList">
+                            <!-- Pagination will be populated by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted" id="productPaginationInfo">
+                        Showing {{ $productsForModal ? $productsForModal->firstItem() : 1 }} to {{ $productsForModal ? $productsForModal->lastItem() : ($productsForModal ? $productsForModal->total() : 0) }} of {{ $productsForModal ? $productsForModal->total() : 0 }} products
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Variant Selection Modal -->
+<div class="modal fade" id="variantModal" tabindex="-1" aria-labelledby="variantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Variant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" id="variantSearch" class="form-control"
+                            placeholder="Search by variant name">
+                    </div>
+                    <div class="col-md-6">
+                        <select id="variantPerPage" class="form-select">
+                            <option value="5" {{ request('variant_per_page', 10) == '5' ? 'selected' : '' }}>5 per page</option>
+                            <option value="10" {{ request('variant_per_page', 10) == '10' ? 'selected' : '' }}>10 per page</option>
+                            <option value="15" {{ request('variant_per_page', 10) == '15' ? 'selected' : '' }}>15 per page</option>
+                            <option value="25" {{ request('variant_per_page', 10) == '25' ? 'selected' : '' }}>25 per page</option>
+                            <option value="50" {{ request('variant_per_page', 10) == '50' ? 'selected' : '' }}>50 per page</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                    <table class="table table-hover align-middle" id="variantTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Variant Name</th>
+                                <th>SKU</th>
+                                <th>Stock</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="variantTableBody">
+                            <!-- Variants will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- JavaScript-based Pagination -->
+                <div id="variantPagination" class="d-flex justify-content-center mt-3" style="display: none;">
+                    <nav aria-label="Variant selection pagination">
+                        <ul class="pagination pagination-sm" id="variantPaginationList">
+                            <!-- Pagination will be populated by JavaScript -->
+                        </ul>
+                    </nav>
+                </div>
+                <div class="text-center mt-2">
+                    <small class="text-muted" id="variantPaginationInfo">
+                        <!-- Pagination info will be updated by JavaScript -->
+                    </small>
                 </div>
             </div>
         </div>
@@ -976,11 +1099,192 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Stock-In Form ---
+    // --- Variant Loading Functions ---
+    async function loadVariants(page = 1, search = '', perPage = 10, productId = null) {
+        const tableBody = document.getElementById('variantTableBody');
+        const pagination = document.getElementById('variantPagination');
+        const paginationInfo = document.getElementById('variantPaginationInfo');
+        
+        if (!tableBody) return;
+        
+        // Show loading state
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading variants...</td></tr>';
+        
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                search: search,
+                per_page: perPage,
+                product_id: productId
+            });
+            
+            const response = await fetch(`{{ route('admin.stock_in.variants') }}?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update table
+                updateVariantTable(data.variants);
+                
+                // Update pagination
+                updateVariantPagination(data.pagination);
+                
+                // Update pagination info
+                if (paginationInfo) {
+                    paginationInfo.textContent = `Showing ${data.pagination.first_item} to ${data.pagination.last_item} of ${data.pagination.total} variants`;
+                }
+                
+                // Show pagination if there are multiple pages
+                if (pagination && data.pagination.last_page > 1) {
+                    pagination.style.display = 'flex';
+                } else if (pagination) {
+                    pagination.style.display = 'none';
+                }
+            } else {
+                throw new Error(data.message || 'Failed to load variants');
+            }
+        } catch (error) {
+            console.error('Error loading variants:', error);
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading variants. Please try again.</td></tr>';
+        }
+    }
+    
+    // Function to update variant table
+    function updateVariantTable(variants) {
+        const tableBody = document.getElementById('variantTableBody');
+        if (!tableBody) return;
+        
+        let html = '';
+        variants.forEach(variant => {
+            const imageHtml = variant.product && variant.product.image_url
+                ? `<img src="${variant.product.image_url}" alt="${variant.product.name}" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: cover;">`
+                : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="fas fa-box text-muted"></i></div>`;
+            
+            const stockHtml = variant.stock_quantity > 10
+                ? `<span class="text-success">${variant.stock_quantity}</span>`
+                : variant.stock_quantity > 0
+                    ? `<span class="text-warning">${variant.stock_quantity}</span>`
+                    : `<span class="text-danger">${variant.stock_quantity}</span>`;
+            
+            const priceHtml = variant.price
+                ? `<span class="text-success fw-bold">₱${variant.price}</span>`
+                : `<span class="text-muted">-</span>`;
+            
+            html += `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            ${imageHtml}
+                            <div>
+                                <div class="fw-bold">${variant.product.name}</div>
+                                <small class="text-muted">${variant.product.sku}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${variant.variant_name}</td>
+                    <td><small class="text-muted">${variant.sku}</small></td>
+                    <td>${stockHtml}</td>
+                    <td>${priceHtml}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success select-variant-btn"
+                            data-id="${variant.id}" 
+                            data-name="${variant.variant_name}"
+                            data-product-name="${variant.product.name}">
+                            Select
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableBody.innerHTML = html;
+        
+        // Re-attach event listeners to new buttons
+        document.querySelectorAll('.select-variant-btn').forEach(button => {
+            button.addEventListener('click', handleVariantSelection);
+        });
+    }
+    
+    // Function to update variant pagination controls
+    function updateVariantPagination(paginationData) {
+        const paginationList = document.getElementById('variantPaginationList');
+        if (!paginationList) return;
+        
+        let html = '';
+        
+        // Previous button
+        if (paginationData.current_page > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeVariantPage(${paginationData.current_page - 1})">‹</a></li>`;
+        } else {
+            html += `<li class="page-item disabled"><span class="page-link">‹</span></li>`;
+        }
+        
+        // Page numbers
+        const start = Math.max(1, paginationData.current_page - 2);
+        const end = Math.min(paginationData.last_page, paginationData.current_page + 2);
+        
+        if (start > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeVariantPage(1)">1</a></li>`;
+            if (start > 2) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+        
+        for (let i = start; i <= end; i++) {
+            const activeClass = i === paginationData.current_page ? 'active' : '';
+            html += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changeVariantPage(${i})">${i}</a></li>`;
+        }
+        
+        if (end < paginationData.last_page) {
+            if (end < paginationData.last_page - 1) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeVariantPage(${paginationData.last_page})">${paginationData.last_page}</a></li>`;
+        }
+        
+        // Next button
+        if (paginationData.current_page < paginationData.last_page) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeVariantPage(${paginationData.current_page + 1})">›</a></li>`;
+        } else {
+            html += `<li class="page-item disabled"><span class="page-link">›</span></li>`;
+        }
+        
+        paginationList.innerHTML = html;
+        
+        // Update current page
+        currentVariantPage = paginationData.current_page;
+    }
+    
+    // Global function for changing variant pages
+    window.changeVariantPage = function(page) {
+        loadVariants(page, currentVariantSearch, currentVariantPerPage, selectedProductId);
+    }
+    
+    // Handle variant selection
+    function handleVariantSelection() {
+        const variantId = this.dataset.id;
+        const variantName = this.dataset.name;
+        const productName = this.dataset.productName;
+        
+        // Set selected variant
+        variantField.value = `${productName} / ${variantName}`;
+        variantIdInput.value = variantId;
+        
+        // Close modal
+        const modalEl = document.getElementById('variantModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+    }
+
+    // --- Stock-In Form Variables ---
     const productField = document.getElementById('productField');
     const productIdInput = document.getElementById('productId');
     const variantContainer = document.getElementById('variantContainer');
-    const variantSelect = document.getElementById('variantSelect');
+    const variantField = document.getElementById('variantField');
+    const variantIdInput = document.getElementById('variantId');
+    let selectedProductId = null;
+    let currentVariantPage = 1;
+    let currentVariantPerPage = 10;
+    let currentVariantSearch = '';
 
     // Hide variant field initially
     if (variantContainer) variantContainer.style.display = 'none';
@@ -993,41 +1297,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle product selection from modal
-    document.querySelectorAll('.select-product-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.dataset.id;
-            const productName = this.dataset.name;
-            const hasVariants = this.dataset.hasVariants === '1';
-
-            // Set selected product
-            productField.value = productName;
-            productIdInput.value = productId;
-
-            if (hasVariants && variantContainer && variantSelect) {
-                variantContainer.style.display = 'block';
-
-                // Filter variant options to only the selected product
-                Array.from(variantSelect.options).forEach(option => {
-                    if (option.value === "" || option.dataset.productId === productId) {
-                        option.style.display = 'block';
-                    } else {
-                        option.style.display = 'none';
-                    }
-                });
-
-                // Reset selected variant
-                variantSelect.value = "";
-            } else if (variantContainer && variantSelect) {
-                variantContainer.style.display = 'none';
-                variantSelect.value = "";
+    // Show variant modal when variant field is clicked
+    if (variantField) {
+        variantField.addEventListener('click', function() {
+            if (!selectedProductId) {
+                alert('Please select a product first.');
+                return;
             }
-
-            // Close modal
-            const modalEl = document.getElementById('productModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
+            const variantModal = new bootstrap.Modal(document.getElementById('variantModal'));
+            variantModal.show();
+            // Load variants for the selected product
+            loadVariants(1, '', currentVariantPerPage, selectedProductId);
         });
+    }
+
+    // Attach product selection handlers (will be re-attached when products load)
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('select-product-btn')) {
+            handleProductSelection.call(e.target, e);
+        }
     });
 
     // --- CSV Upload functionality ---
@@ -1086,33 +1374,278 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- Product Modal: Search & Filter ---
-    const tableBody = document.getElementById('productTableBody');
+    // JavaScript-only pagination for product modal
+    let currentProductPage = {{ $productsForModal ? $productsForModal->currentPage() : 1 }};
+    let currentProductPerPage = {{ request('product_per_page', 10) }};
+    let currentProductSearch = '';
+    let currentProductFilter = 'active';
+
+    // Function to fetch and display products
+    async function loadProducts(page = 1, search = '', filter = 'active', perPage = 10) {
+        const tableBody = document.getElementById('productTableBody');
+        const pagination = document.getElementById('productPagination');
+        const paginationInfo = document.getElementById('productPaginationInfo');
+        
+        if (!tableBody) return;
+        
+        // Show loading state
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading products...</td></tr>';
+        
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                search: search,
+                filter: filter,
+                per_page: perPage
+            });
+            
+            const response = await fetch(`{{ route('admin.stock_in.products') }}?${params}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update table
+                updateProductTable(data.products);
+                
+                // Update pagination
+                updatePagination(data.pagination);
+                
+                // Update pagination info
+                if (paginationInfo) {
+                    paginationInfo.textContent = `Showing ${data.pagination.first_item} to ${data.pagination.last_item} of ${data.pagination.total} products`;
+                }
+                
+                // Show pagination if there are multiple pages
+                if (pagination && data.pagination.last_page > 1) {
+                    pagination.style.display = 'flex';
+                } else if (pagination) {
+                    pagination.style.display = 'none';
+                }
+            } else {
+                throw new Error(data.message || 'Failed to load products');
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading products. Please try again.</td></tr>';
+        }
+    }
+    
+    // Function to update product table
+    function updateProductTable(products) {
+        const tableBody = document.getElementById('productTableBody');
+        if (!tableBody) return;
+        
+        let html = '';
+        products.forEach(product => {
+            const hasVariants = product.has_variants && product.variants_count > 0;
+            const imageHtml = product.image_url 
+                ? `<img src="${product.image_url}" alt="${product.name}" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: cover;">`
+                : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="fas fa-box text-muted"></i></div>`;
+            
+            const variantBadge = hasVariants 
+                ? `<span class="badge bg-info"><i class="fas fa-layer-group me-1"></i> ${product.variants_count} variant(s)</span>`
+                : `<span class="badge bg-secondary"><i class="fas fa-box me-1"></i> No variants</span>`;
+            
+            const stockHtml = hasVariants 
+                ? `<span class="badge bg-info">${product.total_stock}</span>`
+                : product.stock_quantity > 10 
+                    ? `<span class="text-success">${product.stock_quantity}</span>`
+                    : product.stock_quantity > 0 
+                        ? `<span class="text-warning">${product.stock_quantity}</span>`
+                        : `<span class="text-danger">${product.stock_quantity}</span>`;
+            
+            html += `
+                <tr data-archived="${product.is_archived ? '1' : '0'}">
+                    <td>${imageHtml}</td>
+                    <td>${product.name}</td>
+                    <td><small class="text-muted">${product.sku}</small></td>
+                    <td>${product.category_name}</td>
+                    <td>${variantBadge}</td>
+                    <td>${stockHtml}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success select-product-btn"
+                            data-id="${product.id}" 
+                            data-name="${product.name}"
+                            data-has-variants="${hasVariants ? '1' : '0'}">
+                            Select
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tableBody.innerHTML = html;
+        
+        // Re-attach event listeners to new buttons
+        document.querySelectorAll('.select-product-btn').forEach(button => {
+            button.addEventListener('click', handleProductSelection);
+        });
+    }
+    
+    // Function to update pagination controls
+    function updatePagination(paginationData) {
+        const paginationList = document.getElementById('productPaginationList');
+        if (!paginationList) return;
+        
+        let html = '';
+        
+        // Previous button
+        if (paginationData.current_page > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeProductPage(${paginationData.current_page - 1})">‹</a></li>`;
+        } else {
+            html += `<li class="page-item disabled"><span class="page-link">‹</span></li>`;
+        }
+        
+        // Page numbers
+        const start = Math.max(1, paginationData.current_page - 2);
+        const end = Math.min(paginationData.last_page, paginationData.current_page + 2);
+        
+        if (start > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeProductPage(1)">1</a></li>`;
+            if (start > 2) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+        
+        for (let i = start; i <= end; i++) {
+            const activeClass = i === paginationData.current_page ? 'active' : '';
+            html += `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="changeProductPage(${i})">${i}</a></li>`;
+        }
+        
+        if (end < paginationData.last_page) {
+            if (end < paginationData.last_page - 1) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeProductPage(${paginationData.last_page})">${paginationData.last_page}</a></li>`;
+        }
+        
+        // Next button
+        if (paginationData.current_page < paginationData.last_page) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="changeProductPage(${paginationData.current_page + 1})">›</a></li>`;
+        } else {
+            html += `<li class="page-item disabled"><span class="page-link">›</span></li>`;
+        }
+        
+        paginationList.innerHTML = html;
+        
+        // Update current page
+        currentProductPage = paginationData.current_page;
+    }
+    
+    // Global function for changing pages
+    window.changeProductPage = function(page) {
+        loadProducts(page, currentProductSearch, currentProductFilter, currentProductPerPage);
+    }
+    
+    // Handle product selection
+    function handleProductSelection() {
+        const productId = this.dataset.id;
+        const productName = this.dataset.name;
+        const hasVariants = this.dataset.hasVariants === '1';
+        
+        // Set selected product
+        productField.value = productName;
+        productIdInput.value = productId;
+        selectedProductId = productId; // Track for variant selection
+        
+        if (hasVariants && variantContainer && variantField) {
+            variantContainer.style.display = 'block';
+            // Reset variant field
+            variantField.value = '';
+            if (variantIdInput) variantIdInput.value = '';
+        } else if (variantContainer && variantField) {
+            variantContainer.style.display = 'none';
+            // Reset variant field
+            variantField.value = '';
+            if (variantIdInput) variantIdInput.value = '';
+        }
+        
+        // Close modal
+        const modalEl = document.getElementById('productModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+    }
+
+    // --- Product Modal: Search & Filter with AJAX ---
     const productSearch = document.getElementById('productSearch');
     const productFilter = document.getElementById('productFilter');
+    const productPerPageSelect = document.getElementById('productPerPage');
     
-    if (productSearch && tableBody) {
-        const allRows = Array.from(tableBody.querySelectorAll('tr'));
-
-        function filterProducts() {
-            const searchTerm = productSearch.value.toLowerCase();
-            const filterValue = productFilter.value;
-
-            allRows.forEach(row => {
-                const name = row.children[1].textContent.toLowerCase();
-                const sku = row.children[2].textContent.toLowerCase();
-                const isArchived = row.dataset.archived === '1';
-                const matchesSearch = searchTerm === '' || name.includes(searchTerm) || sku.includes(searchTerm);
-                const matchesFilter = filterValue === 'all' || 
-                                    (filterValue === 'active' && !isArchived) || 
-                                    (filterValue === 'archived' && isArchived);
-
-                row.style.display = matchesSearch && matchesFilter ? '' : 'none';
+    if (productSearch) {
+        let searchTimeout;
+        productSearch.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentProductSearch = this.value;
+                loadProducts(1, currentProductSearch, currentProductFilter, currentProductPerPage);
+            }, 300);
+        });
+    }
+    
+    if (productFilter) {
+        productFilter.addEventListener('change', function() {
+            currentProductFilter = this.value;
+            loadProducts(1, currentProductSearch, currentProductFilter, currentProductPerPage);
+        });
+    }
+    
+    if (productPerPageSelect) {
+        productPerPageSelect.addEventListener('change', function() {
+            currentProductPerPage = this.value;
+            loadProducts(1, currentProductSearch, currentProductFilter, currentProductPerPage);
+        });
+    }
+    
+    // --- Variant Modal: Search & Filter with AJAX ---
+    const variantSearch = document.getElementById('variantSearch');
+    const variantPerPageSelect = document.getElementById('variantPerPage');
+    
+    if (variantSearch) {
+        let variantSearchTimeout;
+        variantSearch.addEventListener('input', function() {
+            clearTimeout(variantSearchTimeout);
+            variantSearchTimeout = setTimeout(() => {
+                currentVariantSearch = this.value;
+                loadVariants(1, currentVariantSearch, currentVariantPerPage, selectedProductId);
+            }, 300);
+        });
+    }
+    
+    if (variantPerPageSelect) {
+        variantPerPageSelect.addEventListener('change', function() {
+            currentVariantPerPage = this.value;
+            loadVariants(1, currentVariantSearch, currentVariantPerPage, selectedProductId);
+        });
+    }
+    
+    // Initialize product modal with current data
+    const productModal = document.getElementById('productModal');
+    if (productModal) {
+        productModal.addEventListener('shown.bs.modal', function() {
+            // Load products on modal open if table is empty or shows loading message
+            const tableBody = document.getElementById('productTableBody');
+            if (!tableBody.children.length || 
+                (tableBody.children[0].children.length === 1 && tableBody.children[0].children[0].textContent.includes('Loading'))) {
+                loadProducts(currentProductPage, currentProductSearch, currentProductFilter, currentProductPerPage);
+            }
+        });
+    }
+    
+    // Load initial products if page already has them
+    const tableBody = document.getElementById('productTableBody');
+    if (tableBody && tableBody.children.length > 0) {
+        // Set initial pagination state from loaded products
+        currentProductPage = {{ $productsForModal ? $productsForModal->currentPage() : 1 }};
+        
+        // Show pagination if there are multiple pages
+        const pagination = document.getElementById('productPagination');
+        const totalPages = {{ $productsForModal ? $productsForModal->lastPage() : 1 }};
+        if (pagination && totalPages > 1) {
+            pagination.style.display = 'flex';
+            updatePagination({
+                current_page: currentProductPage,
+                last_page: totalPages
             });
         }
-
-        productSearch.addEventListener('input', filterProducts);
-        productFilter.addEventListener('change', filterProducts);
     }
 
     // Form submission loading state
