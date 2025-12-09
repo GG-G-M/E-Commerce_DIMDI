@@ -318,6 +318,108 @@
         color: #6c757d;
     }
 
+    /* Stock Availability Styling */
+    .stock-info {
+        background-color: #F8F9FA;
+        border: 1px solid #E9ECEF;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .stock-info .stock-label {
+        font-weight: 600;
+        color: #2C8F0C;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stock-info .stock-available {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stock-info.stock-high {
+        border-color: #C8E6C9;
+        background-color: #F8FDF8;
+    }
+    
+    .stock-info.stock-high .stock-available {
+        color: #2C8F0C;
+    }
+    
+    .stock-info.stock-medium {
+        border-color: #FFEAA7;
+        background-color: #FFFBF0;
+    }
+    
+    .stock-info.stock-medium .stock-available {
+        color: #FBC02D;
+    }
+    
+    .stock-info.stock-low {
+        border-color: #FFCDD2;
+        background-color: #FFF5F5;
+    }
+    
+    .stock-info.stock-low .stock-available {
+        color: #C62828;
+    }
+    
+    .stock-info.stock-out {
+        border-color: #FFCDD2;
+        background-color: #FFF5F5;
+    }
+    
+    .stock-info.stock-out .stock-available {
+        color: #C62828;
+        font-size: 1.2rem;
+    }
+
+    /* Error Styling */
+    .error-message {
+        background-color: #FFEBEE;
+        border: 1px solid #FFCDD2;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        color: #C62828;
+        font-size: 0.85rem;
+        display: none;
+    }
+    
+    .error-message i {
+        margin-right: 0.5rem;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #C62828;
+        box-shadow: 0 0 0 0.15rem rgba(198, 40, 40, 0.2);
+    }
+    
+    .quantity-warning {
+        border: 2px solid #FBC02D;
+        background-color: #FFFBF0;
+    }
+    
+    .quantity-error {
+        border: 2px solid #C62828;
+        background-color: #FFF5F5;
+    }
+
+    /* Loading Spinner */
+    .stock-loading {
+        display: none;
+        color: #2C8F0C;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+    
+    .stock-loading.show {
+        display: block;
+    }
+
     /* Pagination styling - Compact */
     .pagination .page-item .page-link {
         color: #2C8F0C;
@@ -586,6 +688,18 @@
                     <div class="mb-3">
                         <label class="form-label">Quantity</label>
                         <input type="number" class="form-control" name="quantity" id="quantityInput" min="1" required>
+                        <div class="stock-loading" id="stockLoading">
+                            <i class="fas fa-spinner fa-spin me-1"></i> Checking stock availability...
+                        </div>
+                        <div class="stock-info" id="stockInfo" style="display: none;">
+                            <div class="stock-label">Available Stock:</div>
+                            <div class="stock-available" id="stockAvailable">0</div>
+                            <div class="stock-status" id="stockStatus">-</div>
+                        </div>
+                        <div class="error-message" id="quantityError">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="errorText"></span>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -827,9 +941,239 @@ document.addEventListener('DOMContentLoaded', function() {
         productFilter.addEventListener('change', filterProducts);
     }
 
+    // --- Stock Validation Functions ---
+    let currentStock = 0;
+    let isCheckingStock = false;
+
+    function getStockForProduct(productId, variantId = null) {
+        if (!productId || isCheckingStock) return;
+        
+        isCheckingStock = true;
+        const stockLoading = document.getElementById('stockLoading');
+        const stockInfo = document.getElementById('stockInfo');
+        const stockAvailable = document.getElementById('stockAvailable');
+        const stockStatus = document.getElementById('stockStatus');
+        
+        if (stockLoading) stockLoading.classList.add('show');
+        if (stockInfo) stockInfo.style.display = 'none';
+        hideError(); // Clear any previous errors
+        
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        if (variantId) formData.append('variant_id', variantId);
+        
+        fetch('{{ route("admin.stock_out.check-stock") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            currentStock = data.available_stock || 0;
+            
+            if (stockLoading) stockLoading.classList.remove('show');
+            if (stockInfo) stockInfo.style.display = 'block';
+            if (stockAvailable) stockAvailable.textContent = currentStock;
+            
+            // Set stock status and styling
+            let statusClass = '';
+            let statusText = '';
+            
+            if (currentStock === 0) {
+                statusClass = 'stock-out';
+                statusText = 'OUT OF STOCK';
+            } else if (currentStock <= 10) {
+                statusClass = 'stock-low';
+                statusText = 'Low Stock';
+            } else if (currentStock <= 50) {
+                statusClass = 'stock-medium';
+                statusText = 'Medium Stock';
+            } else {
+                statusClass = 'stock-high';
+                statusText = 'Good Stock';
+            }
+            
+            stockInfo.className = `stock-info ${statusClass}`;
+            if (stockStatus) stockStatus.textContent = statusText;
+            
+            // Trigger quantity validation
+            validateQuantity();
+        })
+        .catch(error => {
+            console.error('Error checking stock:', error);
+            if (stockLoading) stockLoading.classList.remove('show');
+            showError('Failed to check stock availability');
+        })
+        .finally(() => {
+            isCheckingStock = false;
+        });
+    }
+
+    function validateQuantity() {
+        const quantityInput = document.getElementById('quantityInput');
+        const quantityError = document.getElementById('quantityError');
+        const errorText = document.getElementById('errorText');
+        
+        if (!quantityInput) return;
+        
+        const quantity = parseInt(quantityInput.value);
+        
+        // Remove previous validation classes
+        quantityInput.classList.remove('is-invalid', 'quantity-warning', 'quantity-error');
+        hideError();
+        
+        if (!quantity || quantity <= 0) {
+            return;
+        }
+        
+        if (quantity > currentStock) {
+            quantityInput.classList.add('quantity-error');
+            showError(`Quantity (${quantity}) exceeds available stock (${currentStock})`);
+            return false;
+        } else if (quantity > currentStock * 0.8) {
+            quantityInput.classList.add('quantity-warning');
+            // Warning but don't prevent - user can still proceed
+            return true;
+        }
+        
+        return true;
+    }
+    
+    function showError(message) {
+        const quantityError = document.getElementById('quantityError');
+        const errorText = document.getElementById('errorText');
+        
+        if (quantityError) {
+            quantityError.style.display = 'block';
+        }
+        if (errorText) {
+            errorText.textContent = message;
+        }
+    }
+    
+    function hideError() {
+        const quantityError = document.getElementById('quantityError');
+        if (quantityError) {
+            quantityError.style.display = 'none';
+        }
+    }
+
+    // --- Enhanced Product Selection with Stock Check ---
+    document.querySelectorAll('.select-product-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.dataset.id;
+            const productName = this.dataset.name;
+            const hasVariants = this.dataset.hasVariants === '1';
+
+            productField.value = productName;
+            productIdInput.value = productId;
+
+            if (hasVariants && variantContainer && variantSelect) {
+                variantContainer.style.display = 'block';
+                Array.from(variantSelect.options).forEach(option => {
+                    option.style.display = (option.value === "" || option.dataset.productId === productId) ? 'block' : 'none';
+                });
+                variantSelect.value = "";
+                
+                // Check stock for main product initially
+                getStockForProduct(productId);
+            } else if (variantContainer && variantSelect) {
+                variantContainer.style.display = 'none';
+                variantSelect.value = "";
+                
+                // Check stock for product without variant
+                getStockForProduct(productId);
+            }
+
+            const modalEl = document.getElementById('productModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+        });
+    });
+    
+    // --- Variant Selection with Stock Check ---
+    if (variantSelect) {
+        variantSelect.addEventListener('change', function() {
+            const productId = productIdInput.value;
+            const variantId = this.value;
+            
+            if (productId) {
+                getStockForProduct(productId, variantId || null);
+            }
+        });
+    }
+
+    // --- Quantity Input Validation ---
+    const quantityInput = document.getElementById('quantityInput');
+    if (quantityInput) {
+        let validationTimeout;
+        
+        quantityInput.addEventListener('input', function() {
+            clearTimeout(validationTimeout);
+            validationTimeout = setTimeout(validateQuantity, 300);
+        });
+        
+        quantityInput.addEventListener('blur', validateQuantity);
+    }
+
+    // --- Enhanced Edit Functionality ---
+    document.querySelectorAll('.editStockBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const productName = this.dataset.productName || '';
+            const productId = this.dataset.productId || '';
+            const variantId = this.dataset.variantId || '';
+
+            productField.value = productName;
+            productIdInput.value = productId;
+            
+            if (variantSelect && variantId) {
+                variantSelect.value = variantId;
+                variantContainer.style.display = 'block';
+                
+                // Filter variant options
+                Array.from(variantSelect.options).forEach(option => {
+                    option.style.display = (option.value === "" || option.dataset.productId === productId) ? 'block' : 'none';
+                });
+                
+                // Check stock for variant
+                getStockForProduct(productId, variantId);
+            } else if (variantContainer) {
+                variantContainer.style.display = 'none';
+                variantSelect.value = "";
+                
+                // Check stock for product
+                getStockForProduct(productId);
+            }
+            
+            const quantity = this.dataset.quantity || '';
+            document.getElementById('quantityInput').value = quantity;
+            document.getElementById('reasonInput').value = this.dataset.reason || '';
+
+            form.action = `/admin/stock-out/${id}`;
+            formMethod.value = 'PUT';
+            modalTitle.textContent = 'Edit Stock-Out';
+            stockModal.show();
+            
+            // Validate quantity after a delay to allow stock check
+            setTimeout(validateQuantity, 500);
+        });
+    });
+
     // Form submission loading state
     if (form) {
         form.addEventListener('submit', function(e) {
+            const quantityInput = document.getElementById('quantityInput');
+            
+            // Final validation before submission
+            if (quantityInput && !validateQuantity()) {
+                e.preventDefault();
+                showError('Please fix the quantity error before submitting');
+                return false;
+            }
+            
             const saveBtn = document.getElementById('saveBtn');
             if (saveBtn) {
                 saveBtn.disabled = true;

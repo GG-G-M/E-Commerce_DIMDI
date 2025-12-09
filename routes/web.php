@@ -250,6 +250,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/stock-outs', [StockOutController::class, 'store'])->name('stock_out.store');
     Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
     Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
+    Route::post('/stock-out/check-stock', [StockOutController::class, 'checkStock'])->name('stock_out.check-stock');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
