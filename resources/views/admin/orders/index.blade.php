@@ -396,7 +396,7 @@
     </div>
     <div class="col-md-3">
         <div class="summary-card text-center">
-            <div class="summary-number">₱{{ number_format($orders->sum('total_amount'), 0) }}</div>
+            <div class="summary-number">₱{{ number_format($orders->sum('total_amount'), 2) }}</div>
             <div class="summary-label">Total Revenue</div>
         </div>
     </div>
