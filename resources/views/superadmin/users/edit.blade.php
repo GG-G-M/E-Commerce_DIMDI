@@ -93,13 +93,13 @@
                                     <h4 class="mb-1 fw-bold">{{ $user->name }}</h4>
                                     <div class="d-flex flex-wrap gap-2">
                                         @if($user->isSuperAdmin())
-                                            <span class="badge-text badge-superadmin">Super Admin</span>
+                                            <span >Super Admin</span>
                                         @elseif($user->isAdmin())
-                                            <span class="badge-text badge-admin">Admin</span>
+                                            <span >Admin</span>
                                         @elseif($user->isDelivery())
-                                            <span class="badge-text badge-delivery">Delivery</span>
+                                            <span >Delivery</span>
                                         @else
-                                            <span class="badge-text badge-customer">Customer</span>
+                                            <span >Customer</span>
                                         @endif
                                         <span class="status-text {{ $user->is_active ? 'status-active' : 'status-inactive' }}">
                                             {{ $user->is_active ? 'Active' : 'Inactive' }}

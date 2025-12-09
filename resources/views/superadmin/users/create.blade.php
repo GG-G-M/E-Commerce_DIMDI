@@ -276,7 +276,7 @@
                                                         @elseif($key == 'admin')
                                                             Manage all operations
                                                         @elseif($key == 'delivery')
-                                                            Delivery operations only
+                                                            Delivery operations 
                                                         @else
                                                             Customer access
                                                         @endif
@@ -347,7 +347,7 @@
                                 <div class="section-icon">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-                                <h6 class="mb-0 text-dark fw-bold fs-5">Address Information (Optional)</h6>
+                                <h6 class="mb-0 text-dark fw-bold fs-5">Address Information</h6>
                             </div>
                             
                             <div class="row g-3">
