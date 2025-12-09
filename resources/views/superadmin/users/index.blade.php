@@ -135,69 +135,32 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    /* Badges - Compact */
-    .badge-text {
+    /* Role Text Styles */
+    .role-text {
         font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 100px;
+        font-size: 0.85rem;
     }
     
-    .badge-super-admin {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
+    .role-super-admin {
+        color: #9C27B0;
     }
     
-    .badge-admin {
-        background-color: #E8F5E6;
+    .role-admin {
         color: #2C8F0C;
-        border: 1px solid #C8E6C9;
     }
     
-    .badge-delivery {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+    .role-delivery {
+        color: #FBC02D;
     }
     
-    .badge-checker {
-        background-color: #E8F5E9;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
+    .role-checker {
+        color: #1A5D1A;
     }
     
-    .badge-customer {
-        background-color: #F8F9FA;
-        color: #495057;
-        border: 1px solid #E9ECEF;
+    .role-customer {
+        color: #6c757d;
     }
 
-    /* Status Badges - Compact */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 70px;
-    }
-    
-    .status-active {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-inactive {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
 
     /* Action Buttons */
     .action-buttons {
@@ -435,15 +398,8 @@
             padding: 0.5rem 0.25rem;
         }
         
-        .badge-text {
-            min-width: 80px;
-            font-size: 0.7rem;
-        }
-        
-        .status-text {
-            min-width: 60px;
-            font-size: 0.7rem;
-        }
+        .role-text,
+
         
         .action-btn {
             width: 28px;
@@ -589,15 +545,15 @@
                             </td>
                             <td class="role-col">
                                 @if($user->role == 'super_admin')
-                                    <span class="badge-text badge-super-admin">Super Admin</span>
+                                    <span class="role-text role-super-admin">Super Admin</span>
                                 @elseif($user->role == 'admin')
-                                    <span class="badge-text badge-admin">Admin</span>
+                                    <span class="role-text role-admin">Admin</span>
                                 @elseif($user->role == 'delivery')
-                                    <span class="badge-text badge-delivery">Delivery</span>
+                                    <span class="role-text role-delivery">Delivery</span>
                                 @elseif($user->role == 'stock_checker' || $user->role == 'checker')
-                                    <span class="badge-text badge-checker">Checker</span>
+                                    <span class="role-text role-checker">Checker</span>
                                 @else
-                                    <span class="badge-text badge-customer">Customer</span>
+                                    <span class="role-text role-customer">Customer</span>
                                 @endif
                             </td>
                             <td class="phone-col">
@@ -609,9 +565,9 @@
                             </td>
                             <td class="status-col">
                                 @if($user->is_active)
-                                    <span class="status-text status-active">Active</span>
+                                    <span >Active</span>
                                 @else
-                                    <span class="status-text status-inactive">Inactive</span>
+                                    <span>Inactive</span>
                                 @endif
                             </td>
                             <td class="date-col">
