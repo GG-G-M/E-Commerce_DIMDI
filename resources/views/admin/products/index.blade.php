@@ -235,15 +235,16 @@
     }
 
     /* Column widths */
+    .id-col { width: 60px; min-width: 60px; }
     .image-col { width: 70px; min-width: 70px; }
-    .name-col { width: 200px; min-width: 200px; }
-    .brand-col { width: 120px; min-width: 120px; }
-    .category-col { width: 120px; min-width: 120px; }
-    .variants-col { width: 100px; min-width: 100px; }
-    .price-col { width: 100px; min-width: 100px; }
-    .stock-col { width: 100px; min-width: 100px; }
-    .status-col { width: 100px; min-width: 100px; }
-    .action-col { width: 100px; min-width: 100px; }
+    .name-col { width: 180px; min-width: 180px; }
+    .brand-col { width: 100px; min-width: 100px; }
+    .category-col { width: 100px; min-width: 100px; }
+    .variants-col { width: 80px; min-width: 80px; }
+    .price-col { width: 90px; min-width: 90px; }
+    .stock-col { width: 80px; min-width: 80px; }
+    .status-col { width: 80px; min-width: 80px; }
+    .action-col { width: 80px; min-width: 80px; }
 
     /* Product Image */
     .product-img {
@@ -267,6 +268,8 @@
         font-size: 0.75rem;
         margin-top: 2px;
     }
+    
+
 
     /* Price Styling */
     .price-current {
@@ -646,6 +649,7 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
+                            <th class="id-col">ID</th>
                             <th class="image-col">Image</th>
                             <th class="name-col">Product</th>
                             <th class="brand-col">Brand</th>
@@ -660,6 +664,9 @@
                     <tbody>
                         @foreach($products as $product)
                         <tr>
+                            <td class="id-col">
+                                <span class="badge bg-light text-dark">#{{ $product->id }}</span>
+                            </td>
                             <td class="image-col">
                                 <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
                                      class="product-img">

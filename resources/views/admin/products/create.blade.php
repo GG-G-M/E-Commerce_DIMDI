@@ -170,7 +170,7 @@
                             <div class="mb-3">
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
-                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" required>
+                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" readonly>
                                 @error('stock_quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -269,7 +269,7 @@
                                                 <input type="number" class="form-control" 
                                                        name="variants[{{ $index }}][stock]" 
                                                        value="{{ $variant['stock'] ?? 0 }}" 
-                                                       min="0" required>
+                                                       min="0" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -422,7 +422,7 @@
                             <label class="form-label">Stock Quantity *</label>
                             <input type="number" class="form-control stock-input" 
                                    name="variants[${variantCount}][stock]" 
-                                   value="0" min="0" required>
+                                   value="0" min="0" readonly>
                         </div>
                     </div>
                 </div>

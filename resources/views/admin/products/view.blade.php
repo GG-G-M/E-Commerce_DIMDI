@@ -534,7 +534,10 @@
 <div class="modern-header">
     <div class="d-flex justify-content-between align-items-start flex-wrap">
         <div class="flex-grow-1">
-            <h1>{{ $product->name }}</h1>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <h1 class="mb-0">{{ $product->name }}</h1>
+                <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 0.5rem 1rem;">ID: #{{ $product->id }}</span>
+            </div>
             <p class="subtitle">Product Details & Management</p>
             
             <!-- Product Status Badges -->
@@ -594,6 +597,11 @@
     <!-- Product Information -->
     <div class="info-section">
         <h6><i class="fas fa-info-circle"></i> Product Information</h6>
+        
+        <div class="info-item">
+            <span class="info-label">Product ID</span>
+            <span class="info-value">#{{ $product->id }}</span>
+        </div>
         
         <div class="info-item">
             <span class="info-label">Name</span>
