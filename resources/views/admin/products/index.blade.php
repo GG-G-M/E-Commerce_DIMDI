@@ -57,9 +57,9 @@
         font-weight: 600;
     }
 
-    /* CSV Import Button */
+    /* CSV Import Button - Matching Add Product Button */
     .btn-import-csv {
-        background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
         color: white;
         font-weight: 600;
@@ -69,15 +69,19 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(23, 162, 184, 0.2);
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
         height: 46px;
     }
     
     .btn-import-csv:hover {
-        background: linear-gradient(135deg, #138496, #5a32a3);
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(23, 162, 184, 0.3);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
         color: white;
+    }
+
+    .btn-import-csv:active {
+        transform: translateY(0);
     }
 
     /* Add Product Button */
@@ -101,6 +105,10 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
         color: white;
+    }
+
+    .btn-add-product:active {
+        transform: translateY(0);
     }
 
     /* Table Styling - Compact */
@@ -226,12 +234,27 @@
         position: relative;
     }
 
-    /* Table Container */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
         max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
     }
 
     /* Column widths */
@@ -354,21 +377,21 @@
     }
     
     .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         transition: all 0.2s ease;
         border: 2px solid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .action-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     .btn-edit {
@@ -417,9 +440,9 @@
         }
         
         .action-btn {
-            width: 28px;
-            height: 28px;
-            font-size: 0.8rem;
+            width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
         }
         
         .product-img {
@@ -474,7 +497,7 @@
     <div class="card-body">
         <form method="GET" action="{{ route('admin.products.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Products</label>
                         <input type="text" class="form-control" id="search" name="search" 
@@ -634,19 +657,20 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Product List</h5>
-        <div class="header-buttons">
-            <button class="btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                <i class="fas fa-file-csv"></i> Import CSV
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                {{-- <i class="fas fa-file-csv"></i> --}}
+                Import CSV
             </button>
-            <a href="{{ route('admin.products.create') }}" class="btn-add-product">
-             Add Product
-            </a>
+            <button class="btn btn-add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                {{-- <i class="fas fa-plus"></i> --}}
+                Add Product
+            </button>
         </div>
     </div>
     <div class="card-body p-0">
         @if($products->count() > 0)
-            <div class="table-container">
-                <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
@@ -665,7 +689,7 @@
                         @foreach($products as $product)
                         <tr>
                             <td class="id-col">
-                                <span class="badge bg-light text-dark">#{{ $product->id }}</span>
+                                <span class="text-muted">#{{ $product->id }}</span>
                             </td>
                             <td class="image-col">
                                 <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
@@ -699,7 +723,6 @@
                                 @if($product->has_discount)
                                     <div class="price-current">₱{{ number_format($product->sale_price, 2) }}</div>
                                     <div class="price-original">₱{{ number_format($product->price, 2) }}</div>
-                                    <div class="discount-badge">{{ $product->discount_percentage }}% OFF</div>
                                 @else
                                     <div class="price-current">₱{{ number_format($product->price, 2) }}</div>
                                 @endif
@@ -763,7 +786,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
 
             @if($products->hasPages())
             <div class="d-flex justify-content-center p-3">
@@ -776,12 +798,14 @@
                 <h5 class="text-muted">No Products Found</h5>
                 <p class="text-muted mb-4">Try adjusting your search or filter criteria</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                        <i class="fas fa-file-csv"></i> Import CSV
+                    <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                        {{-- <i class="fas fa-file-csv"></i> --}}
+                        Import CSV
                     </button>
-                    <a href="{{ route('admin.products.create') }}" class="btn-add-product">
-                        <i class="fas fa-plus"></i> Add Product
-                    </a>
+                    <button class="btn btn-add-product" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        {{-- <i class="fas fa-plus"></i> --}}
+                        Add First Product
+                    </button>
                 </div>
             </div>
         @endif

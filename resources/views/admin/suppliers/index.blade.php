@@ -275,22 +275,30 @@
         color: white;
     }
 
-    /* Table Container for consistency */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
     }
-    
-    /* Responsive adjustments */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
-        .table {
-            table-layout: fixed;
-        }
+
+
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+
+    .card-custom {
+        overflow: hidden;
+    }
+
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
     }
 
     /* Column width control - compact for no scroll */
