@@ -791,91 +791,150 @@
 
 <!-- Stock-In Modal (Add/Edit) -->
 <div class="modal fade" id="stockInModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Add Stock-In</h5>
+                <h5 class="modal-title" id="modalTitle">
+                    <i class="fas fa-plus-circle me-2"></i>Add Stock-In
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="stockInForm" method="POST" action="{{ route('admin.stock_in.store') }}">
                 @csrf
                 <input type="hidden" name="_method" id="formMethod" value="POST">
-                
+
                 <div class="modal-body">
-                    <div class="mb-3 position-relative">
-                        <label class="form-label">Product</label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control clickable-field" id="productField"
-                                placeholder="Click to select product" readonly>
-                            <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
-                                <i class="fas fa-search text-muted"></i>
+                    <!-- Product Selection Section -->
+                    <div class="mb-4">
+                  
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 position-relative">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-cube me-1"></i>Product
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control clickable-field" id="productField"
+                                            placeholder="Click to select product" readonly>
+                                        <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="product_id" id="productId">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3" id="variantContainer" style="display: none;">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-layer-group me-1"></i>Variant
+                                    </label>
+                                    <div class="position-relative">
+                                        <input type="text" class="form-control clickable-field" id="variantField"
+                                            placeholder="Click to select variant" readonly>
+                                        <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </div>
+                                        <input type="hidden" name="product_variant_id" id="variantId">
+                                    </div>
+                                    <div class="form-text text-muted">Select a specific variant of the chosen product</div>
+                                </div>
                             </div>
                         </div>
-                        <input type="hidden" name="product_id" id="productId">
                     </div>
 
-                    <div class="mb-3" id="variantContainer" style="display: none;">
-                        <label class="form-label">Variant</label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control clickable-field" id="variantField"
-                                placeholder="Click to select variant" readonly>
-                            <div class="position-absolute end-0 top-50 translate-middle-y me-3" style="pointer-events: none;">
-                                <i class="fas fa-search text-muted"></i>
+                    <!-- Logistics Section -->
+                    <div class="mb-4">
+                  
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-warehouse me-1"></i>Warehouse
+                                    </label>
+                                    <select class="form-select" name="warehouse_id" id="warehouseSelect" required>
+                                        <option value="">Select Warehouse</option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                            <input type="hidden" name="product_variant_id" id="variantId">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-truck-moving me-1"></i>Supplier
+                                    </label>
+                                    <select class="form-select" name="supplier_id" id="supplierSelect" required>
+                                        <option value="">Select Supplier</option>
+                                        @foreach ($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-text">Select a specific variant of the chosen product</div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Warehouse</label>
-                        <select class="form-select" name="warehouse_id" id="warehouseSelect" required>
-                            <option value="">Select Warehouse</option>
-                            @foreach ($warehouses as $warehouse)
-                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                            @endforeach
-                        </select>
+                    <!-- Verification Section -->
+                    <div class="mb-4">
+                   
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-user-tie me-1"></i>Stock Checker
+                                    </label>
+                                    <select class="form-select" name="stock_checker_id" id="checkerSelect" required>
+                                        <option value="">Select Stock Checker</option>
+                                        @foreach ($stockCheckers as $checker)
+                                            <option value="{{ $checker->id }}">
+                                                {{ $checker->firstname }} {{ $checker->lastname }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-hashtag me-1"></i>Quantity
+                                    </label>
+                                    <input type="number" class="form-control" name="quantity" id="quantityInput"
+                                        min="1" required placeholder="Enter quantity">
+                                    <div class="form-text text-muted">Number of items being added to stock</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-comment me-1"></i>Reason
+                            </label>
+                            <input type="text" class="form-control" name="reason" id="reasonInput"
+                                   placeholder="e.g., New stock, Restock, Return, Damaged replacement">
+                            <div class="form-text text-muted">Brief description of why this stock is being added</div>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Supplier</label>
-                        <select class="form-select" name="supplier_id" id="supplierSelect" required>
-                            <option value="">Select Supplier</option>
-                            @foreach ($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Stock Checker</label>
-                        <select class="form-select" name="stock_checker_id" id="checkerSelect" required>
-                            <option value="">Select Stock Checker</option>
-                            @foreach ($stockCheckers as $checker)
-                                <option value="{{ $checker->id }}">
-                                    {{ $checker->firstname }} {{ $checker->lastname }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Quantity</label>
-                        <input type="number" class="form-control" name="quantity" id="quantityInput"
-                            min="1" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Reason</label>
-                        <input type="text" class="form-control" name="reason" id="reasonInput" 
-                               placeholder="e.g., New stock, Restock, Return">
+                    <!-- Form Tips -->
+                    <div class="alert alert-light border border-success">
+                        <div class="d-flex">
+                            <i class="fas fa-info-circle text-success me-2 mt-1"></i>
+                            <div>
+                                <small class="text-muted">
+                                    <strong>Tips:</strong> Select a product first, then choose a warehouse and supplier.
+                                    If the product has variants, you'll be able to select a specific variant.
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
                     <button type="submit" class="btn-add-stock-in" id="saveBtn">
-                        <i class="fas fa-save me-1"></i> Save
+                        <i class="fas fa-save me-1"></i> Save Stock-In
                     </button>
                 </div>
             </form>
@@ -885,7 +944,7 @@
 
 <!-- Product Selection Modal -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Select Product</h5>
@@ -915,7 +974,7 @@
                     </div>
                 </div>
 
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
                     <table class="table table-hover align-middle" id="productTable">
                         <thead class="table-light">
                             <tr>
@@ -948,12 +1007,12 @@
                                     <td>{{ $product->category->name ?? 'N/A' }}</td>
                                     <td>
                                         @if($product->has_variants && $product->variants && $product->variants->count() > 0)
-                                            <span class="badge bg-info">
+                                            <span >
                                                 <i class="fas fa-layer-group me-1"></i>
                                                 {{ $product->variants->count() }} variant(s)
                                             </span>
                                         @else
-                                            <span class="badge bg-secondary">
+                                            <span >
                                                 <i class="fas fa-box me-1"></i>
                                                 No variants
                                             </span>
@@ -961,15 +1020,9 @@
                                     </td>
                                     <td>
                                         @if($product->has_variants)
-                                            <span class="fw-bold text-info">{{ $product->total_stock }}</span>
+                                            {{ $product->total_stock }}
                                         @else
-                                            @if($product->stock_quantity > 10)
-                                                <span class="fw-bold text-success">{{ $product->stock_quantity }}</span>
-                                            @elseif($product->stock_quantity > 0)
-                                                <span class="fw-bold text-warning">{{ $product->stock_quantity }}</span>
-                                            @else
-                                                <span class="fw-bold text-danger">{{ $product->stock_quantity }}</span>
-                                            @endif
+                                            {{ $product->stock_quantity }}
                                         @endif
                                     </td>
                                     <td>
@@ -1441,17 +1494,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? `<img src="${product.image_url}" alt="${product.name}" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: cover;">`
                 : `<div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="fas fa-box text-muted"></i></div>`;
             
-            const variantBadge = hasVariants 
-                ? `<span class="badge bg-info"><i class="fas fa-layer-group me-1"></i> ${product.variants_count} variant(s)</span>`
-                : `<span class="badge bg-secondary"><i class="fas fa-box me-1"></i> No variants</span>`;
-            
-            const stockHtml = hasVariants 
-                ? `<span class="badge bg-info">${product.total_stock}</span>`
-                : product.stock_quantity > 10 
-                    ? `<span class="text-success">${product.stock_quantity}</span>`
-                    : product.stock_quantity > 0 
-                        ? `<span class="text-warning">${product.stock_quantity}</span>`
-                        : `<span class="text-danger">${product.stock_quantity}</span>`;
+            const variantBadge = hasVariants
+                ? `${product.variants_count} variant(s)`
+                : `No variants`;
+
+            const stockHtml = hasVariants
+                ? `${product.total_stock}`
+                : `${product.stock_quantity}`;
             
             html += `
                 <tr data-archived="${product.is_archived ? '1' : '0'}">

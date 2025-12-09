@@ -142,7 +142,7 @@
         background-color: #F8FDF8;
     }
 
-    /* Modal Styling - Consistent */
+    /* Modal Styling - Consistent Green Theme */
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
@@ -160,6 +160,43 @@
         border-radius: 12px;
         border: none;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Product Selection Modal - Green Theme */
+    #productModal .modal-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    #productModal .modal-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    #productModal .btn-close {
+        filter: invert(1);
+    }
+
+    /* Custom Green Scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 4px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
     /* Form Styling */
