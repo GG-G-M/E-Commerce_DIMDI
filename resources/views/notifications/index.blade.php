@@ -417,7 +417,7 @@
                     </div>
                     <div class="header-actions">
                         @if (auth()->check() && auth()->user()->unreadNotifications->count() > 0)
-                            <form method="POST" action="{{ route('notifications.mark-all-read') }}" class="d-inline m-0">
+                            <form method="POST" action="{{ route('notifications.markAllAsRead') }}" class="d-inline m-0">
                                 @csrf
                                 <button type="submit" class="btn btn-light-rounded btn-rounded">
                                     <i class="fas fa-check-double"></i>
