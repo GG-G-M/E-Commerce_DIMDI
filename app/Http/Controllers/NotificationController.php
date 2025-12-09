@@ -139,12 +139,33 @@ class NotificationController extends Controller
     
     public function checkNew()
     {
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            // For unauthenticated users, redirect to login
+            return redirect()->route('login')
+                ->with('info', 'Please log in to view your notifications.');
+        }
+        
         $count = Auth::user()->unreadNotifications()->count();
         
-        return response()->json([
-            'has_new' => $count > 0,
-            'count' => $count
-        ]);
+        // Check if this is an AJAX request
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'has_new' => $count > 0,
+                'count' => $count
+            ]);
+        }
+        
+        // For direct browser visits, redirect to notifications index
+        // If there are new notifications, redirect with a flash message
+        if ($count > 0) {
+            return redirect()->route('notifications.index')
+                ->with('info', "You have {$count} new notification(s)");
+        }
+        
+        // If no new notifications, redirect to notifications index
+        return redirect()->route('notifications.index')
+            ->with('info', 'No new notifications at the moment');
     }
     
     public function getUnreadCount()
