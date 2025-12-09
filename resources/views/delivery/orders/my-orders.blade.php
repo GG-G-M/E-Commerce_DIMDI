@@ -628,7 +628,6 @@
                                     <form action="{{ route('delivery.orders.deliver-order', $order) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="action-btn btn-deliver" 
-                                                onclick="return confirm('Mark order #{{ $order->order_number }} as delivered?')"
                                                 title="Mark as Delivered">
                                             <i class="fas fa-check"></i>
                                         </button>

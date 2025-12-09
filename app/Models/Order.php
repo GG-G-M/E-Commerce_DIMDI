@@ -277,13 +277,8 @@ class Order extends Model
             'order_status' => 'delivered',
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order successfully delivered to customer',
-            ]);
-        }
+        // NOTE: Status history is created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }
@@ -579,13 +574,8 @@ class Order extends Model
             'delivered_at' => now(),
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order delivered to customer by delivery personnel',
-            ]);
-        }
+        // NOTE: Status history should be created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }
