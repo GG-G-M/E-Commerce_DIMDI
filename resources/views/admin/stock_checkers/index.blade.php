@@ -435,7 +435,8 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock Checker Management</h5>
         <button class="btn btn-add-checker" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
-            <i class="fas fa-user-plus"></i> Add Stock Checker
+            {{-- <i class="fas fa-user-plus"></i>  --}}
+            Add Stock Checker
         </button>
     </div>
     <div class="card-body p-0">

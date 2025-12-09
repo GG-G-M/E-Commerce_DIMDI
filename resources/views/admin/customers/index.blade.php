@@ -203,23 +203,24 @@
         animation: pulse 2s infinite;
     }
     
+    .status-text-archived {
+        color: #6c757d;
+    }
+    
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+    
     @keyframes pulse {
         0% { opacity: 1; }
         50% { opacity: 0.6; }
         100% { opacity: 1; }
-    }
-
-    .status-badge-archived {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
     }
 
     /* Enhanced Action Buttons */
@@ -279,6 +280,17 @@
         background-color: #2C8F0C;
         color: white;
     }
+    
+    .btn-view {
+        background-color: white;
+        border-color: #4CAF50;
+        color: #4CAF50;
+    }
+    
+    .btn-view:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
 
     /* Table styling for no scroll bars */
     .table {
@@ -308,7 +320,7 @@
     .name-col { min-width: 120px; width: 120px; }
     .email-col { min-width: 140px; width: 140px; }
     .phone-col { min-width: 100px; width: 100px; }
-    .address-col { min-width: 120px; max-width: 120px; width: 120px; }
+    .address-col { min-width: 160px; max-width: 160px; width: 160px; }
     .status-col { min-width: 80px; width: 80px; }
     .action-col { min-width: 80px; width: 80px; }
 
@@ -387,6 +399,92 @@
         gap: 12px;
     }
     
+    /* View Modal Styling */
+    .view-modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
+    }
+    
+    .view-info-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .view-info-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border-color: #2C8F0C;
+    }
+    
+    .view-info-card .form-label {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+    
+    .view-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .view-detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .view-detail-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.85rem;
+        flex: 0 0 120px;
+    }
+    
+    .view-detail-value {
+        color: #212529;
+        font-size: 0.85rem;
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
+    }
+    
+    .view-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.8rem;
+        margin: 0 auto 1rem;
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
+    }
+    
+    .view-customer-name {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .view-customer-id {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
     /* Ensure the table fits within the container */
 
 </style>
@@ -397,7 +495,7 @@
         <form method="GET" action="{{ route('admin.customers.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Email -->
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Customers</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -412,22 +510,23 @@
                 </div>
 
                 <!-- Filter by Status (Active / Archived) -->
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
                             <option value="active" {{ request('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All</option>
                             <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
-                            @foreach([2, 5, 10, 15, 25, 50] as $option)
+                            @foreach([5, 10, 15, 25, 50] as $option)
                                 <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
                                 </option>
@@ -443,10 +542,10 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Customer List</h5>
-        <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            {{-- <i class="fas fa-user-plus"></i>  --}}
+        {{-- <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="fas fa-user-plus"></i> 
             Add Customer
-        </button>
+        </button> --}}
     </div>
     <div class="card-body p-0">
         <table class="table table-hover align-middle mb-0">
@@ -490,9 +589,20 @@
                             @endif
                         </td>
                         <td class="address-col">
-                            @if($customer->address)
-                                <div class="customer-address" title="{{ $customer->address }}">
-                                    {{ Str::limit($customer->address, 40) }}
+                            @php
+                                $addressParts = [];
+                                if($customer->street_address) $addressParts[] = $customer->street_address;
+                                if($customer->barangay) $addressParts[] = 'Barangay ' . $customer->barangay;
+                                if($customer->city) $addressParts[] = $customer->city;
+                                if($customer->province) $addressParts[] = $customer->province;
+                                if($customer->region) $addressParts[] = $customer->region;
+                                if($customer->country && $customer->country !== 'Philippines') $addressParts[] = $customer->country;
+                                
+                                $fullAddress = implode(', ', $addressParts);
+                            @endphp
+                            @if($fullAddress)
+                                <div class="customer-address" title="{{ $fullAddress }}">
+                                    {{ Str::limit($fullAddress, 40) }}
                                 </div>
                             @else
                                 <span class="text-muted">-</span>
@@ -500,16 +610,19 @@
                         </td>
                         <td class="status-col">
                             @if ($customer->is_archived)
-                                <span class="status-badge-archived">Archived</span>
+                                <span class="status-text status-text-archived">Archived</span>
                             @else
                                 <span class="status-text status-text-active">Active</span>
                             @endif
                         </td>
                         <td class="action-col">
                             <div class="action-buttons">
-                                <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' data-title="Edit Customer">
-                                    <i class="fas fa-edit"></i>
+                                <button class="action-btn btn-view viewBtn" data-bs-toggle="modal" data-bs-target="#viewCustomerModal" data-customer='@json($customer)' data-title="View Customer">
+                                    <i class="fas fa-eye"></i>
                                 </button>
+                                {{-- <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' data-title="Edit Customer">
+                                    <i class="fas fa-edit"></i>
+                                </button> --}}
                                 @if ($customer->is_archived)
                                     <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}" data-title="Unarchive Customer">
                                        <i class="fas fa-box-open"></i>
@@ -580,6 +693,132 @@
     </div>
 </div>
 
+<!-- View Customer Modal -->
+<div class="modal fade" id="viewCustomerModal" tabindex="-1" aria-labelledby="viewCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content view-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewCustomerModalLabel">Customer Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Customer Avatar and Basic Info -->
+                    <div class="col-md-4 text-center">
+                        <div class="view-avatar-large">
+                            <span id="viewFirstName">J</span><span id="viewLastName">D</span>
+                        </div>
+                        <div class="view-customer-name" id="viewFullName">John Doe</div>
+                        <div class="view-customer-id" id="viewCustomerId">Customer ID: #123</div>
+                        <div id="viewStatus" class="status-text status-text-active">
+                            Active
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Information Cards -->
+                    <div class="col-md-8">
+                        <div class="view-info-card">
+                            <label class="form-label">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </label>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">First Name:</span>
+                                <span class="view-detail-value" id="viewFirstNameField">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Middle Name:</span>
+                                <span class="view-detail-value" id="viewMiddleName">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Last Name:</span>
+                                <span class="view-detail-value" id="viewLastNameField">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="view-info-card">
+                            <label class="form-label">
+                                <i class="fas fa-address-book me-2"></i>Contact Information
+                            </label>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Email:</span>
+                                <span class="view-detail-value" id="viewEmail">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Phone:</span>
+                                <span class="view-detail-value" id="viewPhone">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="view-info-card">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Address Information
+                            </label>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Street Address:</span>
+                                <span class="view-detail-value" id="viewStreetAddress">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Barangay:</span>
+                                <span class="view-detail-value" id="viewBarangay">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">City:</span>
+                                <span class="view-detail-value" id="viewCity">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Province:</span>
+                                <span class="view-detail-value" id="viewProvince">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Region:</span>
+                                <span class="view-detail-value" id="viewRegion">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Country:</span>
+                                <span class="view-detail-value" id="viewCountry">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="view-info-card">
+                            <label class="form-label">
+                                <i class="fas fa-shield-alt me-2"></i>Account Information
+                            </label>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Role:</span>
+                                <span class="view-detail-value" id="viewRole">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Status:</span>
+                                <span class="view-detail-value" id="viewAccountStatus">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Member Since:</span>
+                                <span class="view-detail-value" id="viewCreatedAt">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Last Updated:</span>
+                                <span class="view-detail-value" id="viewUpdatedAt">-</span>
+                            </div>
+                            <div class="view-detail-item">
+                                <span class="view-detail-label">Email Verified:</span>
+                                <span class="view-detail-value" id="viewEmailVerified">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+                <button type="button" class="btn btn-primary" id="editFromViewBtn">
+                    <i class="fas fa-edit me-1"></i>Edit Customer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -614,6 +853,103 @@ document.addEventListener('DOMContentLoaded', function() {
     // Clear loading indicator when form submits
     filterForm.addEventListener('submit', function() {
         searchLoading.style.display = 'none';
+    });
+
+    /* === View Customer === */
+    document.querySelectorAll('.viewBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const customer = JSON.parse(this.dataset.customer);
+            
+            // Populate avatar and basic info
+            const firstInitial = customer.first_name ? customer.first_name.charAt(0) : 'N';
+            const lastInitial = customer.last_name ? customer.last_name.charAt(0) : 'A';
+            
+            document.getElementById('viewFirstName').textContent = firstInitial;
+            document.getElementById('viewLastName').textContent = lastInitial;
+            document.getElementById('viewFullName').textContent = `${customer.first_name || ''} ${customer.middle_name || ''} ${customer.last_name || ''}`.trim() || 'N/A';
+            document.getElementById('viewCustomerId').textContent = `Customer ID: #${customer.id}`;
+            
+            // Populate status
+            const statusElement = document.getElementById('viewStatus');
+            if (customer.is_archived) {
+                statusElement.className = 'status-text status-text-archived';
+                statusElement.innerHTML = 'Archived';
+            } else {
+                statusElement.className = 'status-text status-text-active';
+                statusElement.innerHTML = 'Active';
+            }
+            
+            // Populate personal information
+            document.getElementById('viewFirstNameField').textContent = customer.first_name || '-';
+            document.getElementById('viewMiddleName').textContent = customer.middle_name || '-';
+            document.getElementById('viewLastNameField').textContent = customer.last_name || '-';
+            
+            // Populate contact information
+            const emailElement = document.getElementById('viewEmail');
+            if (customer.email) {
+                emailElement.innerHTML = `<a href="mailto:${customer.email}" style="color: #2C8F0C; text-decoration: none;">${customer.email}</a>`;
+            } else {
+                emailElement.textContent = '-';
+            }
+            document.getElementById('viewPhone').textContent = customer.phone || '-';
+            
+            // Populate address information
+            document.getElementById('viewStreetAddress').textContent = customer.street_address || '-';
+            document.getElementById('viewBarangay').textContent = customer.barangay ? `Barangay ${customer.barangay}` : '-';
+            document.getElementById('viewCity').textContent = customer.city || '-';
+            document.getElementById('viewProvince').textContent = customer.province || '-';
+            document.getElementById('viewRegion').textContent = customer.region || '-';
+            document.getElementById('viewCountry').textContent = customer.country || 'Philippines';
+            
+            // Populate account information
+            const roleName = customer.role ? customer.role.charAt(0).toUpperCase() + customer.role.slice(1).replace('_', ' ') : 'Customer';
+            document.getElementById('viewRole').textContent = roleName;
+            document.getElementById('viewAccountStatus').textContent = customer.is_archived ? 'Archived' : 'Active';
+            document.getElementById('viewCreatedAt').textContent = customer.created_at ? new Date(customer.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : '-';
+            document.getElementById('viewUpdatedAt').textContent = customer.updated_at ? new Date(customer.updated_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : '-';
+            document.getElementById('viewEmailVerified').textContent = customer.email_verified_at ? 'Yes' : 'No';
+            
+            // Set edit button data for later use
+            document.getElementById('editFromViewBtn').dataset.customer = this.dataset.customer;
+        });
+    });
+    
+    /* === Edit from View Modal === */
+    document.getElementById('editFromViewBtn').addEventListener('click', function() {
+        const customer = JSON.parse(this.dataset.customer);
+        
+        // Close view modal
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCustomerModal'));
+        viewModal.hide();
+        
+        // Open edit modal and populate it
+        setTimeout(() => {
+            const editModal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+            editModal.show();
+            
+            const form = document.getElementById('editCustomerForm');
+            form.action = `/admin/customers/${customer.id}`;
+            
+            // Fill form fields
+            for (const key in customer) {
+                const input = form.querySelector(`[name="${key}"]`);
+                if (input) {
+                    if (input.type === 'checkbox') {
+                        input.checked = customer[key];
+                    } else {
+                        input.value = customer[key];
+                    }
+                }
+            }
+        }, 300);
     });
 
     /* === Add Customer === */

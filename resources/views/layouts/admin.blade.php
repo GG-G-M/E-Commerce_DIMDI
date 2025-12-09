@@ -257,12 +257,12 @@
                                         </a>
                                     </li>
 
-                                    <li class="nav-item">
+                                    {{-- <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
                                             href="{{ route('admin.deliveries.index') }}">
                                             <i class="fas fa-truck me-2"></i>Delivery
                                         </a>
-                                    </li>
+                                    </li> --}}
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
