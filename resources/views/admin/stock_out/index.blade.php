@@ -298,6 +298,19 @@
         font-style: italic;
     }
 
+    /* Quantity Styling - No badges */
+    .quantity-text {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #333;
+    }
+    
+    .stock-out-quantity {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #C62828;
+    }
+
     /* Batch Info */
     .batch-info {
         max-height: 100px;
@@ -321,6 +334,7 @@
     
     .batch-quantity {
         color: #6c757d;
+        font-weight: 600;
     }
 
     /* Reason Styling */
@@ -335,6 +349,11 @@
     .date-text {
         font-size: 0.85rem;
         color: #6c757d;
+    }
+    
+    .time-text {
+        font-size: 0.75rem;
+        color: #adb5bd;
     }
 
     /* Stock Availability Styling */
@@ -466,6 +485,7 @@
         color: #6c757d;
         background-color: #f8f9fa;
     }
+    
     /* Header button group */
     .header-buttons {
         display: flex;
@@ -504,6 +524,10 @@
         .batch-info {
             max-height: 80px;
             font-size: 0.75rem;
+        }
+        
+        .stock-out-quantity {
+            font-size: 0.9rem;
         }
     }
 </style>
@@ -550,7 +574,7 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock-Out Management</h5>
         <div class="header-buttons">
-            <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+            <button class="btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
                 <i class="fas fa-minus-circle"></i> Stock-Out
             </button>
         </div>
@@ -600,7 +624,7 @@
                                     </div>
                                 </td>
                                 <td class="quantity-col">
-                                    <span class="fw-bold text-danger">{{ $stock->quantity }}</span>
+                                    <div class="stock-out-quantity">{{ $stock->quantity }}</div>
                                 </td>
                                 <td class="batch-col">
                                     @if($stock->stockInBatches->count() > 0)
@@ -620,7 +644,8 @@
                                     <div class="reason-text">{{ Str::limit($stock->reason, 30) }}</div>
                                 </td>
                                 <td class="date-col">
-                                    <div class="date-text">{{ $stock->created_at->format('Y-m-d H:i') }}</div>
+                                    <div class="date-text">{{ $stock->created_at->format('M j, Y') }}</div>
+                                    <div class="time-text">{{ $stock->created_at->format('H:i') }}</div>
                                 </td>
                                 <td class="action-col">
                                     <div class="action-buttons">
@@ -663,7 +688,7 @@
                 <h5 class="text-muted">No Stock-Out Records Found</h5>
                 <p class="text-muted mb-4">Add your first stock-out record to get started</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+                    <button class="btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
                         <i class="fas fa-minus-circle"></i> Add Stock-Out
                     </button>
                 </div>
@@ -735,7 +760,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-add-stock-out" id="saveBtn">
+                    <button type="submit" class="btn-add-stock-out" id="saveBtn">
                         <i class="fas fa-save me-1"></i> Save
                     </button>
                 </div>
@@ -822,14 +847,14 @@
                                     </td>
                                     <td>
                                         @if($product->has_variants)
-                                            <span class="badge bg-info">{{ $product->total_stock }}</span>
+                                            <span class="fw-bold text-info">{{ $product->total_stock }}</span>
                                         @else
                                             @if($product->stock_quantity > 10)
-                                                <span class="text-success">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-success">{{ $product->stock_quantity }}</span>
                                             @elseif($product->stock_quantity > 0)
-                                                <span class="text-warning">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-warning">{{ $product->stock_quantity }}</span>
                                             @else
-                                                <span class="text-danger">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-danger">{{ $product->stock_quantity }}</span>
                                             @endif
                                         @endif
                                     </td>

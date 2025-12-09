@@ -458,7 +458,7 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Brand Management</h5>
         <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
-            <i class="fas fa-user-plus"></i> Add Brand
+            Add Brand
         </button>
     </div>
     <div class="card-body p-0">

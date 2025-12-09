@@ -3,6 +3,20 @@
 @section('content')
 <style>
     /* === Consistent Green Theme === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -119,34 +133,96 @@
         background-color: #C8E6C9 !important;
     }
 
-    /* Stock Badges - Compact */
-    .stock-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
+    /* Stock Status - No badges, just text with indicators */
+    .status-text {
         font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 70px;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-
-    .badge-critical {
-        background-color: #FFEBEE;
+    
+    .status-text-critical {
         color: #C62828;
-        border: 1px solid #FFCDD2;
     }
-
-    .badge-warning {
-        background-color: #FFF8E1;
+    
+    .status-text-critical::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #C62828;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-text-warning {
         color: #F57C00;
-        border: 1px solid #FFE082;
+    }
+    
+    .status-text-warning::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #F57C00;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-text-low {
+        color: #2C8F0C;
+    }
+    
+    .status-text-low::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
-    .badge-low {
-        background-color: #E8F5E6;
+    /* Active/Inactive Status - Consistent with customers page */
+    .status-text-active {
         color: #2C8F0C;
-        border: 1px solid #C8E6C9;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+   /* Inactive Status - Consistent with customers page */
+.status-badge-inactive {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+    background-color: #FFF3CD;
+    color: #856404;
+    border: 1px solid #FFEAA7;
+}
 
     /* Product Info Cell - Compact */
     .product-info-cell {
@@ -198,33 +274,6 @@
     .stock-unit {
         color: #6c757d;
         font-size: 0.75rem;
-    }
-
-    /* Status Badge - Consistent with Products Page */
-    .status-badge-active {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 60px;
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-badge-inactive {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 60px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
     }
 
     /* Progress Bar - Compact */
@@ -395,18 +444,30 @@
             font-size: 0.8rem;
         }
         
-        .stock-badge {
-            min-width: 60px;
-            font-size: 0.7rem;
+        .status-text,
+        .status-text-active,
+        .status-text-critical,
+        .status-text-warning,
+        .status-text-low {
+            font-size: 0.8rem;
         }
         
-        .status-badge-active,
-        .status-badge-inactive {
-            min-width: 50px;
-            font-size: 0.7rem;
-        }
+        ./* Inactive Status - Consistent with customers page */
+.status-badge-inactive {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 60px;
+    background-color: #FFF3CD;
+    color: #856404;
+    border: 1px solid #FFEAA7;
+}
     }
 </style>
+
 
 <!-- Summary Cards -->
 <div class="row mb-4">
@@ -459,24 +520,24 @@
                             @php
                                 $stockLevel = 'low';
                                 $stockClass = 'stock-low';
-                                $badgeClass = 'badge-low';
                                 $statusText = 'Low Stock';
+                                $statusClass = 'status-text-low';
                                 
                                 if ($product->stock_quantity <= 0) {
                                     $stockLevel = 'critical';
                                     $stockClass = 'stock-critical';
-                                    $badgeClass = 'badge-critical';
                                     $statusText = 'Out of Stock';
+                                    $statusClass = 'status-text-critical';
                                 } elseif ($product->stock_quantity <= ceil($threshold * 0.3)) {
                                     $stockLevel = 'critical';
                                     $stockClass = 'stock-critical';
-                                    $badgeClass = 'badge-critical';
                                     $statusText = 'Critical';
+                                    $statusClass = 'status-text-critical';
                                 } elseif ($product->stock_quantity <= ceil($threshold * 0.6)) {
                                     $stockLevel = 'warning';
                                     $stockClass = 'stock-warning';
-                                    $badgeClass = 'badge-warning';
                                     $statusText = 'Warning';
+                                    $statusClass = 'status-text-warning';
                                 }
                                 
                                 $stockPercentage = min(100, ($product->stock_quantity / $threshold) * 100);
@@ -511,13 +572,13 @@
                                     <div class="stock-unit">units</div>
                                 </td>
                                 <td class="level-col">
-                                    <span class="stock-badge {{ $badgeClass }}">{{ $statusText }}</span>
+                                    <span class="status-text {{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
                                 <td class="status-col">
                                     @if($product->is_effectively_inactive)
                                         <span class="status-badge-inactive">Inactive</span>
                                     @else
-                                        <span class="status-badge-active">Active</span>
+                                        <span class="status-text-active">Active</span>
                                     @endif
                                 </td>
                                 <td class="ratio-col">
@@ -542,24 +603,24 @@
                             @php
                                 $stockLevel = 'low';
                                 $stockClass = 'stock-low';
-                                $badgeClass = 'badge-low';
                                 $statusText = 'Low Stock';
+                                $statusClass = 'status-text-low';
                                 
                                 if ($variant->stock_quantity <= 0) {
                                     $stockLevel = 'critical';
                                     $stockClass = 'stock-critical';
-                                    $badgeClass = 'badge-critical';
                                     $statusText = 'Out of Stock';
+                                    $statusClass = 'status-text-critical';
                                 } elseif ($variant->stock_quantity <= ceil($threshold * 0.3)) {
                                     $stockLevel = 'critical';
                                     $stockClass = 'stock-critical';
-                                    $badgeClass = 'badge-critical';
                                     $statusText = 'Critical';
+                                    $statusClass = 'status-text-critical';
                                 } elseif ($variant->stock_quantity <= ceil($threshold * 0.6)) {
                                     $stockLevel = 'warning';
                                     $stockClass = 'stock-warning';
-                                    $badgeClass = 'badge-warning';
                                     $statusText = 'Warning';
+                                    $statusClass = 'status-text-warning';
                                 }
                                 
                                 $stockPercentage = min(100, ($variant->stock_quantity / $threshold) * 100);
@@ -592,15 +653,15 @@
                                     <div class="stock-unit">units</div>
                                 </td>
                                 <td class="level-col">
-                                    <span class="stock-badge {{ $badgeClass }}">{{ $statusText }}</span>
+                                    <span class="status-text {{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
-                                <td class="status-col">
-                                    @if($variant->product->is_effectively_inactive || !$variant->is_active)
-                                        <span class="status-badge-inactive">Inactive</span>
-                                    @else
-                                        <span class="status-badge-active">Active</span>
-                                    @endif
-                                </td>
+                               <td class="status-col">
+    @if($product->is_effectively_inactive)
+        <span class="status-badge-inactive">Inactive</span>
+    @else
+        <span class="status-text-active">Active</span>
+    @endif
+</td>
                                 <td class="ratio-col">
                                     <div class="threshold-indicator">
                                         <div class="threshold-fill" 

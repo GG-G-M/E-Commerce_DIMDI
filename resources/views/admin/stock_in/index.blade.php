@@ -117,52 +117,61 @@
         background-color: #F8FDF8;
     }
 
-    /* Stock Usage Styling */
-    .stock-high {
-        color: #2C8F0C;
+    /* Stock Usage Styling - No badges */
+    .stock-usage-text {
         font-weight: 600;
         font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-
-    .stock-medium {
-        color: #FBC02D;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .stock-low {
+    
+    .stock-usage-high {
         color: #C62828;
-        font-weight: 600;
-        font-size: 0.85rem;
     }
-
-    /* Status Badges - Compact */
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
+    
+    .stock-usage-high::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
+        width: 8px;
+        height: 8px;
+        background-color: #C62828;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
     }
     
-    .badge-success {
-        background-color: #E8F5E6;
+    .stock-usage-medium {
+        color: #F57C00;
+    }
+    
+    .stock-usage-medium::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #F57C00;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .stock-usage-low {
         color: #2C8F0C;
-        border: 1px solid #C8E6C9;
     }
     
-    .badge-warning {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+    .stock-usage-low::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
     }
     
-    .badge-danger {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
     /* Modal Styling - Consistent */
@@ -342,16 +351,17 @@
         font-size: 0.8rem;
     }
 
-    /* Quantity Styling */
-    .quantity-badge {
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-        display: inline-block;
+    /* Quantity Styling - No badges */
+    .quantity-text {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #333;
+    }
+    
+    .remaining-quantity {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #333;
     }
 
     /* Date Styling */
@@ -369,6 +379,7 @@
     .usage-text {
         font-size: 0.8rem;
         color: #6c757d;
+        margin-top: 2px;
     }
 
     /* CSV Template Section */
@@ -456,14 +467,13 @@
             font-size: 0.8rem;
         }
         
-        .status-badge {
-            min-width: 70px;
-            font-size: 0.7rem;
+        .quantity-text,
+        .remaining-quantity {
+            font-size: 0.9rem;
         }
         
-        .quantity-badge {
+        .stock-usage-text {
             font-size: 0.8rem;
-            padding: 0.15rem 0.4rem;
         }
     }
 </style>
@@ -680,16 +690,13 @@
                                     : 0;
 
                                 if ($usagePercentage >= 80) {
-                                    $statusClass = 'stock-low';
-                                    $statusBadge = 'badge-danger';
+                                    $statusClass = 'stock-usage-high';
                                     $statusText = 'High Usage';
                                 } elseif ($usagePercentage >= 50) {
-                                    $statusClass = 'stock-medium';
-                                    $statusBadge = 'badge-warning';
+                                    $statusClass = 'stock-usage-medium';
                                     $statusText = 'Medium Usage';
                                 } else {
-                                    $statusClass = 'stock-high';
-                                    $statusBadge = 'badge-success';
+                                    $statusClass = 'stock-usage-low';
                                     $statusText = 'Low Usage';
                                 }
                             @endphp
@@ -739,10 +746,10 @@
                                     @endif
                                 </td>
                                 <td class="quantity-col">
-                                    <span class="quantity-badge">{{ $stock->quantity }}</span>
+                                    <div class="quantity-text">{{ $stock->quantity }}</div>
                                 </td>
                                 <td class="remaining-col">
-                                    <span class="{{ $statusClass }}">{{ $stock->remaining_quantity }}</span>
+                                    <div class="remaining-quantity">{{ $stock->remaining_quantity }}</div>
                                     <div class="usage-text">{{ number_format($usagePercentage, 1) }}% used</div>
                                 </td>
                                 <td class="price-col">
@@ -753,7 +760,7 @@
                                     @endif
                                 </td>
                                 <td class="status-col">
-                                    <span class="status-badge {{ $statusBadge }}">{{ $statusText }}</span>
+                                    <span class="stock-usage-text {{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
                                 <td class="reason-col">
                                     <div class="reason-text">{{ Str::limit($stock->reason, 30) }}</div>
@@ -973,14 +980,14 @@
                                     </td>
                                     <td>
                                         @if($product->has_variants)
-                                            <span class="badge bg-info">{{ $product->total_stock }}</span>
+                                            <span class="fw-bold text-info">{{ $product->total_stock }}</span>
                                         @else
                                             @if($product->stock_quantity > 10)
-                                                <span class="text-success">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-success">{{ $product->stock_quantity }}</span>
                                             @elseif($product->stock_quantity > 0)
-                                                <span class="text-warning">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-warning">{{ $product->stock_quantity }}</span>
                                             @else
-                                                <span class="text-danger">{{ $product->stock_quantity }}</span>
+                                                <span class="fw-bold text-danger">{{ $product->stock_quantity }}</span>
                                             @endif
                                         @endif
                                     </td>
