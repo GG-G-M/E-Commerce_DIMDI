@@ -461,7 +461,7 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Delivery Management</h5>
         <button class="btn btn-add-delivery" data-bs-toggle="modal" data-bs-target="#addDeliveryModal">
-            <i class="fas fa-user-plus"></i> Add Delivery
+        Add Delivery
         </button>
     </div>
     <div class="card-body p-0">

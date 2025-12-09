@@ -319,7 +319,7 @@
                 Total: {{ $banners->total() }} banners
             </span>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBannerModal">
-                <i class="fas fa-plus me-1"></i> Add Banner
+                 Add Banner
             </button>
         </div>
     </div>
