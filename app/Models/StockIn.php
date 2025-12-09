@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StockIn extends Model
 {
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
     protected $fillable = [
         'product_id',
         'product_variant_id',
@@ -15,6 +19,7 @@ class StockIn extends Model
         'stock_checker_id',  // added
         'quantity',
         'remaining_quantity',
+        'price',
         'reason',
     ];
 

@@ -277,16 +277,17 @@
     }
 
     /* Column widths - More compact */
-    .id-col { width: 70px; min-width: 70px; }
-    .product-col { width: 200px; min-width: 200px; }
-    .warehouse-col { width: 120px; min-width: 120px; }
-    .supplier-col { width: 120px; min-width: 120px; }
-    .checker-col { width: 140px; min-width: 140px; }
-    .quantity-col { width: 100px; min-width: 100px; }
-    .remaining-col { width: 110px; min-width: 110px; }
-    .status-col { width: 100px; min-width: 100px; }
-    .reason-col { width: 150px; min-width: 150px; }
-    .date-col { width: 120px; min-width: 120px; }
+    .id-col { width: 60px; min-width: 60px; }
+    .product-col { width: 180px; min-width: 180px; }
+    .warehouse-col { width: 100px; min-width: 100px; }
+    .supplier-col { width: 100px; min-width: 100px; }
+    .checker-col { width: 120px; min-width: 120px; }
+    .quantity-col { width: 80px; min-width: 80px; }
+    .remaining-col { width: 90px; min-width: 90px; }
+    .price-col { width: 100px; min-width: 100px; }
+    .status-col { width: 90px; min-width: 90px; }
+    .reason-col { width: 130px; min-width: 130px; }
+    .date-col { width: 100px; min-width: 100px; }
 
     /* Product Info Cell - Compact */
     .product-info-cell {
@@ -587,7 +588,7 @@
                         <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
                         <ul class="small mb-0">
                             <li>File must be CSV format</li>
-                            <li>Required columns: <code>product_id</code>, <code>variant_id</code>, <code>warehouse_id</code>, <code>supplier_id</code>, <code>stock_checker_id</code>, <code>quantity</code>, <code>reason</code></li>
+                            <li>Required columns: <code>product_id</code>, <code>variant_id</code>, <code>warehouse_id</code>, <code>supplier_id</code>, <code>stock_checker_id</code>, <code>quantity</code>, <code>price</code>, <code>reason</code></li>
                             <li>Ensure IDs correspond to existing products, variants, warehouses, suppliers, and stock checkers</li>
                         </ul>
                     </div>
@@ -646,6 +647,7 @@
                             <th class="checker-col">Stock Checker</th>
                             <th class="quantity-col">Quantity</th>
                             <th class="remaining-col">Remaining</th>
+                            <th class="price-col">Price</th>
                             <th class="status-col">Status</th>
                             <th class="reason-col">Reason</th>
                             <th class="date-col">Date</th>
@@ -723,6 +725,13 @@
                                 <td class="remaining-col">
                                     <span class="{{ $statusClass }}">{{ $stock->remaining_quantity }}</span>
                                     <div class="usage-text">{{ number_format($usagePercentage, 1) }}% used</div>
+                                </td>
+                                <td class="price-col">
+                                    @if($stock->price)
+                                        <span class="text-success fw-bold">₱{{ number_format($stock->price, 2) }}</span>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
                                 </td>
                                 <td class="status-col">
                                     <span class="status-badge {{ $statusBadge }}">{{ $statusText }}</span>
@@ -831,6 +840,16 @@
                         <label class="form-label">Quantity</label>
                         <input type="number" class="form-control" name="quantity" id="quantityInput"
                             min="1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Price (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" class="form-control" name="price" id="priceInput"
+                                   step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-text">Unit cost of the stock-in (optional)</div>
                     </div>
 
                     <div class="mb-3">

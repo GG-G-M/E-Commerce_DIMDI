@@ -50,6 +50,7 @@ class StockInController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'stock_checker_id' => 'required|exists:stock_checkers,id',
             'quantity' => 'required|integer|min:1',
+            'price' => 'nullable|numeric|min:0',
             'reason' => 'nullable|string|max:255',
         ]);
 
@@ -61,6 +62,7 @@ class StockInController extends Controller
                 'supplier_id',
                 'stock_checker_id',
                 'quantity',
+                'price',
                 'reason'
             ]),
             ['remaining_quantity' => $request->quantity]
@@ -81,6 +83,7 @@ class StockInController extends Controller
             'supplier_id' => 'required|exists:suppliers,id',
             'stock_checker_id' => 'required|exists:stock_checkers,id',
             'quantity' => 'required|integer|min:1',
+            'price' => 'nullable|numeric|min:0',
             'reason' => 'nullable|string|max:255',
         ]);
 
@@ -98,6 +101,7 @@ class StockInController extends Controller
                 'supplier_id',
                 'stock_checker_id',
                 'quantity',
+                'price',
                 'reason'
             ]),
             ['remaining_quantity' => $newRemaining]
@@ -134,7 +138,7 @@ class StockInController extends Controller
     public function downloadCsvTemplate()
     {
         $csv = Writer::createFromString('');
-        $csv->insertOne(['product_id', 'product_variant_id', 'warehouse_id', 'supplier_id', 'stock_checker_id', 'quantity', 'reason']);
+        $csv->insertOne(['product_id', 'product_variant_id', 'warehouse_id', 'supplier_id', 'stock_checker_id', 'quantity', 'price', 'reason']);
 
         $filename = 'stock_in_template.csv';
         return response((string) $csv, 200, [
@@ -164,6 +168,7 @@ class StockInController extends Controller
             // Convert empty strings to null for nullable columns
             $row['product_id'] = $row['product_id'] !== '' ? $row['product_id'] : null;
             $row['product_variant_id'] = $row['product_variant_id'] !== '' ? $row['product_variant_id'] : null;
+            $row['price'] = $row['price'] !== '' ? $row['price'] : null;
             $row['reason'] = $row['reason'] !== '' ? $row['reason'] : null;
 
             $validator = Validator::make($row, [
@@ -173,6 +178,7 @@ class StockInController extends Controller
                 'supplier_id' => 'required|exists:suppliers,id',
                 'stock_checker_id' => 'required|exists:stock_checkers,id',
                 'quantity' => 'required|integer|min:1',
+                'price' => 'nullable|numeric|min:0',
                 'reason' => 'nullable|string|max:255',
             ]);
 
