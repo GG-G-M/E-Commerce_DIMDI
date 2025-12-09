@@ -106,6 +106,28 @@
         color: white;
     }
     
+    .btn-archive {
+        background-color: white;
+        border-color: #FF9800;
+        color: #FF9800;
+    }
+
+    .btn-archive:hover {
+        background-color: #FF9800;
+        color: white;
+    }
+
+    .btn-unarchive {
+        background-color: white;
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .btn-unarchive:hover {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
     .btn-delete {
         background-color: white;
         border-color: #C62828;
@@ -183,17 +205,32 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-inactive {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-inactive {
+        color: #dc3545;
+    }
+
+    .status-text-inactive::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        opacity: 0.8;
+    }
+
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Modal Styling - Consistent */
@@ -431,6 +468,7 @@
                             <option value="">All Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
@@ -513,10 +551,12 @@
                                 </span>
                             </td>
                             <td class="status-col">
-                                @if($brand->is_active)
+                                @if($brand->is_archived)
+                                    <span class="status-text status-text-archived">Archived</span>
+                                @elseif($brand->is_active)
                                     <span class="status-text status-text-active">Active</span>
                                 @else
-                                    <span class="status-badge-inactive">Inactive</span>
+                                    <span class="status-text status-text-inactive">Inactive</span>
                                 @endif
                             </td>
                             <td class="sort-col">
@@ -531,14 +571,17 @@
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     
-                                    <form action="{{ route('admin.brands.destroy', $brand) }}" 
-                                          method="POST" class="d-inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="action-btn btn-delete deleteBtn">
-                                            <i class="fas fa-trash"></i>
+                                    @if($brand->is_archived)
+                                        <button type="button" class="action-btn btn-unarchive unarchiveBtn"
+                                                title="Unarchive Brand">
+                                            <i class="fas fa-box-open"></i>
                                         </button>
-                                    </form>
+                                    @else
+                                        <button type="button" class="action-btn btn-archive archiveBtn"
+                                                title="Archive Brand">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -757,17 +800,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
                 modal.hide();
                 location.reload();
+            } else if (data.redirect) {
+                location.href = data.redirect;
             } else {
-                alert('Error adding brand: ' + (data.message || 'Unknown error'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                 // Fallback if controller returns HTML (it does redirect)
+                 window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Network error. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+             // Fallback if controller returns HTML (it does redirect)
+             window.location.reload();
         });
     });
 
@@ -816,36 +859,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editBrandModal'));
                 modal.hide();
                 location.reload();
+            } else if (data.redirect) {
+                location.href = data.redirect;
             } else {
-                alert('Error updating brand: ' + (data.message || 'Unknown error'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                 // Fallback if controller returns HTML (it does redirect)
+                 window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Network error. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+             // Fallback if controller returns HTML (it does redirect)
+             window.location.reload();
         });
     });
 
-    /* === Delete Brand === */
-    document.querySelectorAll('.deleteBtn').forEach(btn => {
+    /* === Archive Brand === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this brand? This action cannot be undone.')) return;
+            if (!confirm('Are you sure you want to archive this brand?')) return;
             
-            const form = this.closest('.delete-form');
+            const row = this.closest('tr');
+            const brandId = row.dataset.id;
+            const brandSlug = row.querySelector('.brand-slug').textContent.trim();
             
             // Show loading state
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(form.action, {
+            fetch(`/admin/brands/${brandSlug}/archive`, {
                 method: 'POST',
                 headers: { 
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-HTTP-Method-Override': 'DELETE'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             })
             .then(res => res.json())
@@ -853,16 +899,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Failed to delete brand: ' + (data.message || 'Unknown error'));
+                    alert('Failed to archive brand: ' + (data.message || 'Unknown error'));
                     this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-trash"></i>';
+                    this.innerHTML = '<i class="fas fa-archive"></i>';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
                 this.disabled = false;
-                this.innerHTML = '<i class="fas fa-trash"></i>';
+                this.innerHTML = '<i class="fas fa-archive"></i>';
+            });
+        });
+    });
+
+    /* === Unarchive Brand === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to restore this brand?')) return;
+            
+            const row = this.closest('tr');
+            const brandId = row.dataset.id;
+            const brandSlug = row.querySelector('.brand-slug').textContent.trim();
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/brands/${brandSlug}/unarchive`, {
+                method: 'POST',
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to restore brand: ' + (data.message || 'Unknown error'));
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-box-open"></i>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-box-open"></i>';
             });
         });
     });

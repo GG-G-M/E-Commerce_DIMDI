@@ -560,7 +560,7 @@
             <form method="GET" action="{{ route('admin.customers.index') }}" id="filterForm">
                 <div class="row">
                     <!-- Search by Name or Email -->
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                         <div class="mb-3 position-relative">
                             <label for="search" class="form-label fw-bold">Search Customers</label>
                             <input type="text" class="form-control" id="search" name="search"
@@ -574,7 +574,7 @@
                     </div>
 
                     <!-- Filter by Status (Active / Archived) -->
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="mb-3">
                             <label for="status" class="form-label fw-bold">Filter by Status</label>
                             <select class="form-select" id="status" name="status">

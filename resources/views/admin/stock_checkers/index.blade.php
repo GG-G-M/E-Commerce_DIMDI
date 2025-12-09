@@ -194,17 +194,18 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-archived {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Modal Styling - Consistent */
@@ -489,7 +490,7 @@
                             </td>
                             <td class="status-col">
                                 @if ($checker->is_archived)
-                                    <span class="status-badge-archived">Archived</span>
+                                    <span class="status-text status-text-archived">Archived</span>
                                 @else
                                     <span class="status-text status-text-active">Active</span>
                                 @endif

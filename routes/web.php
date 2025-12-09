@@ -279,9 +279,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/{category}/archive', [AdminCategoryController::class, 'archive'])->name('categories.archive');
+    Route::post('/categories/{category}/unarchive', [AdminCategoryController::class, 'unarchive'])->name('categories.unarchive');
 
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    Route::post('/brands/{brand}/archive', [BrandController::class, 'archive'])->name('brands.archive');
+    Route::post('/brands/{brand}/unarchive', [BrandController::class, 'unarchive'])->name('brands.unarchive');
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
 
     // INVENTORY REPORTS

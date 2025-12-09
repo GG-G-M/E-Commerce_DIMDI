@@ -74,7 +74,6 @@
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
     }
     
     .action-btn {
@@ -88,11 +87,35 @@
         transition: all 0.2s ease;
         border: 2px solid;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
     }
     
     .action-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .action-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
     }
     
     .btn-edit {
@@ -103,6 +126,28 @@
     
     .btn-edit:hover {
         background-color: #2C8F0C;
+        color: white;
+    }
+    
+    .btn-archive {
+        background-color: white;
+        border-color: #FF9800;
+        color: #FF9800;
+    }
+
+    .btn-archive:hover {
+        background-color: #FF9800;
+        color: white;
+    }
+
+    .btn-unarchive {
+        background-color: white;
+        border-color: #17a2b8;
+        color: #17a2b8;
+    }
+
+    .btn-unarchive:hover {
+        background-color: #17a2b8;
         color: white;
     }
     
@@ -183,17 +228,32 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-inactive {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-inactive {
+        color: #dc3545;
+    }
+
+    .status-text-inactive::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        opacity: 0.8;
+    }
+
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Modal Styling - Consistent */
@@ -245,16 +305,18 @@
         position: relative;
     }
 
-    /* Category Icon */
+    /* Category Icon - Fixed Size */
     .category-icon {
         width: 40px;
         height: 40px;
+        min-height: 40px;
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
+        flex-shrink: 0;
     }
 
     /* Tips Box */
@@ -303,17 +365,17 @@
     }
 
     /* Column widths for consistency */
+    .id-col { min-width: 40px; width: 40px; }
     .name-col { min-width: 200px; width: 250px; }
-    .id-col { min-width: 80px; width: 100px; }
-    .slug-col { min-width: 150px; width: 200px; }
-    .products-col { min-width: 100px; width: 120px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
+    .slug-col { min-width: 150px; width: 150px; }
+    .products-col { min-width: 100px; width: 100px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
 
     /* Category Info Cell */
     .category-info-cell {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
     }
     
@@ -321,6 +383,7 @@
         font-weight: 600;
         color: #333;
         font-size: 0.95rem;
+        line-height: 1.3;
     }
     
     .category-slug {
@@ -332,8 +395,9 @@
     .category-description {
         color: #6c757d;
         font-size: 0.85rem;
-        max-width: 250px;
-        word-break: break-word;
+        line-height: 1.3;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     /* Products Count */
@@ -379,12 +443,7 @@
     }
 
 
-    /* ID styling */
-    .category-id {
-        font-family: monospace;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
+
 </style>
 
 <!-- Filters and Search - Consistent -->
@@ -414,6 +473,7 @@
                             <option value="">All Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
@@ -450,8 +510,8 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="name-col">Name</th>
                             <th class="id-col">ID</th>
+                            <th class="name-col">Name</th>
                             <th class="slug-col">Slug</th>
                             <th class="products-col">Products</th>
                             <th class="status-col">Status</th>
@@ -461,6 +521,9 @@
                     <tbody>
                         @foreach($categories as $category)
                         <tr data-id="{{ $category->id }}">
+                            <td class="id-col">
+                                <span class="text-muted">#{{ $category->id }}</span>
+                            </td>
                             <td class="name-col">
                                 <div class="category-info-cell">
                                     <div class="category-icon">
@@ -476,9 +539,6 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="id-col">
-                                <span class="category-id">#{{ $category->id }}</span>
-                            </td>
                             <td class="slug-col">
                                 <code class="category-slug">{{ $category->slug }}</code>
                             </td>
@@ -489,28 +549,35 @@
                                 </span>
                             </td>
                             <td class="status-col">
-                                @if($category->is_active)
+                                @if($category->is_archived)
+                                    <span class="status-text status-text-archived">Archived</span>
+                                @elseif($category->is_active)
                                     <span class="status-text status-text-active">Active</span>
                                 @else
-                                    <span class="status-badge-inactive">Inactive</span>
+                                    <span class="status-text status-text-inactive">Inactive</span>
                                 @endif
                             </td>
                             <td class="action-col">
                                 <div class="action-buttons">
-                                    <a href="{{ route('admin.categories.edit', $category) }}" 
-                                       class="action-btn btn-edit" title="Edit Category">
+                                    <button class="action-btn btn-edit editBtn" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editCategoryModal"
+                                            data-category='@json($category)'
+                                            title="Edit Category">
                                         <i class="fas fa-edit"></i>
-                                    </a>
+                                    </button>
                                     
-                                    <form action="{{ route('admin.categories.destroy', $category) }}" 
-                                          method="POST" class="d-inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="action-btn btn-delete deleteBtn" 
-                                                title="Delete Category">
-                                            <i class="fas fa-trash"></i>
+                                    @if($category->is_archived)
+                                        <button type="button" class="action-btn btn-unarchive unarchiveBtn" 
+                                                title="Unarchive Category">
+                                            <i class="fas fa-box-open"></i>
                                         </button>
-                                    </form>
+                                    @else
+                                        <button type="button" class="action-btn btn-archive archiveBtn" 
+                                                title="Archive Category">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -590,6 +657,51 @@
     </div>
 </div>
 
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="editCategoryForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="edit_name" class="form-label">Category Name *</label>
+                            <input type="text" id="edit_name" name="name" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label for="edit_description" class="form-label">Description</label>
+                            <textarea id="edit_description" name="description" class="form-control" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="edit_is_active" name="is_active" value="1">
+                                <label class="form-check-label" for="edit_is_active">Active Category</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Category</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -646,41 +758,60 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                // Close modal and reload
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
-                modal.hide();
-                location.reload();
+            // Note: If success, the page might reload or redirect. 
+            // The controller redirects, so we might need to handle it.
+            // Since the controller returns a redirect, fetch might follow it.
+            // But if we want JSON, we should have updated the controller to return JSON or handle the redirect.
+            // For now, let's assume standard form submission behavior or handle redirect.
+            if (data.redirect || (res.redirected && res.url)) {
+                 window.location.href = data.redirect || res.url;
             } else {
-                alert('Error adding category: ' + (data.message || 'Unknown error'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                 // Fallback if controller returns HTML (it does redirect)
+                 window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Network error. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+            // If it's a redirect, it might have been followed and returned HTML, causing JSON parse error
+            window.location.reload();
         });
     });
 
-    /* === Delete Category === */
-    document.querySelectorAll('.deleteBtn').forEach(btn => {
+    /* === Edit Category === */
+    document.querySelectorAll('.editBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this category? This action cannot be undone.')) return;
+            const category = JSON.parse(this.dataset.category);
+            const form = document.getElementById('editCategoryForm');
             
-            const form = this.closest('.delete-form');
+            // Set form action
+            form.action = `/admin/categories/${category.slug}`;
+            
+            // Fill form fields
+            document.getElementById('edit_name').value = category.name || '';
+            document.getElementById('edit_description').value = category.description || '';
+            document.getElementById('edit_is_active').checked = category.is_active;
+        });
+    });
+
+    /* === Archive Category === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to archive this category? It will be hidden from the public lists.')) return;
+            
+            const row = this.closest('tr');
+            const categoryId = row.dataset.id;
+            const categorySlug = row.querySelector('.category-slug').textContent.trim();
             
             // Show loading state
             this.disabled = true;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(form.action, {
+            fetch(`/admin/categories/${categorySlug}/archive`, {
                 method: 'POST',
                 headers: { 
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-HTTP-Method-Override': 'DELETE'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
             })
             .then(res => res.json())
@@ -688,16 +819,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Failed to delete category: ' + (data.message || 'Unknown error'));
+                    alert('Failed to archive category: ' + (data.message || 'Unknown error'));
                     this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-trash"></i>';
+                    this.innerHTML = '<i class="fas fa-archive"></i>';
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
                 this.disabled = false;
-                this.innerHTML = '<i class="fas fa-trash"></i>';
+                this.innerHTML = '<i class="fas fa-archive"></i>';
+            });
+        });
+    });
+
+    /* === Unarchive Category === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to restore this category?')) return;
+            
+            const row = this.closest('tr');
+            const categoryId = row.dataset.id;
+            const categorySlug = row.querySelector('.category-slug').textContent.trim();
+            
+            // Show loading state
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/categories/${categorySlug}/unarchive`, {
+                method: 'POST',
+                headers: { 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to restore category: ' + (data.message || 'Unknown error'));
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-box-open"></i>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-box-open"></i>';
             });
         });
     });

@@ -16,11 +16,13 @@ class Brand extends Model
         'slug',
         'description',
         'is_active',
+        'is_archived',
         'sort_order'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_archived' => 'boolean',
         'sort_order' => 'integer'
     ];
 
@@ -54,7 +56,7 @@ class Brand extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)->where('is_archived', false);
     }
 
     public function scopeOrdered($query)

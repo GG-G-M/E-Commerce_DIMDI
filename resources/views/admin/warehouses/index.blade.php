@@ -194,17 +194,18 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-archived {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Modal Styling - Consistent */
@@ -381,7 +382,7 @@
         <form method="GET" action="{{ route('admin.warehouses.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name -->
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Warehouses</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -406,7 +407,7 @@
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
@@ -467,7 +468,7 @@
                             </td>
                             <td class="status-col">
                                 @if ($warehouse->is_archived)
-                                    <span class="status-badge-archived">Archived</span>
+                                    <span class="status-text status-text-archived">Archived</span>
                                 @else
                                     <span class="status-text status-text-active">Active</span>
                                 @endif
