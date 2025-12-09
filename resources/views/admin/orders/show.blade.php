@@ -102,15 +102,6 @@
         overflow: hidden;
     }
     
-    .shipping-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--primary-green);
-    }
     
     .shipping-header {
         display: flex;
