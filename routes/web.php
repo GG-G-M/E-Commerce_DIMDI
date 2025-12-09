@@ -26,6 +26,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\BrandController;
@@ -85,7 +86,6 @@ Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloa
 Route::get('/address/provinces', [AddressController::class, 'provinces']);
 Route::get('/address/cities/{provinceCode}', [AddressController::class, 'cities']);
 Route::get('/address/barangays/{cityCode}', [AddressController::class, 'barangays']);
-
 
 // Authenticated User Routes (All logged-in users)
 Route::middleware('auth')->group(function () {
