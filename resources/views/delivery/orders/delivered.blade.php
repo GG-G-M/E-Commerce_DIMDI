@@ -137,22 +137,7 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    /* Status Badges - Compact */
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 100px;
-    }
-    
-    .badge-delivered {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
+   
 
     /* Delivery Time Styling */
     .delivery-time-recent {
@@ -390,11 +375,6 @@
             padding: 0.5rem 0.25rem;
         }
         
-        .status-badge {
-            min-width: 80px;
-            font-size: 0.7rem;
-        }
-        
         .customer-name {
             font-size: 0.8rem;
         }
@@ -421,18 +401,6 @@
     }
 </style>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Delivered Orders</h1>
-            <p class="mb-0 text-muted">View your completed delivery orders and track your performance</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted fw-bold">Total Delivered: {{ $orders->total() }}</small>
-        </div>
-    </div>
-</div>
 
 <!-- Filter and Search Section -->
 <div class="card card-custom mb-4">
@@ -540,7 +508,7 @@
                             <td class="order-col">
                                 <strong class="text-dark">#{{ $order->order_number }}</strong>
                                 <div class="mt-1">
-                                    <span class="status-badge badge-delivered">
+                                    <span >
                                         <i class="fas fa-check-circle me-1"></i>Delivered
                                     </span>
                                 </div>

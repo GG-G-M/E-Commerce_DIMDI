@@ -158,23 +158,6 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    /* Status Badges - Compact */
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 120px;
-    }
-    
-    .badge-ready {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-
     /* Priority Styling */
     .priority-high {
         border-left: 4px solid #C62828;
@@ -217,7 +200,7 @@
     .amount-col { width: 100px; min-width: 100px; }
     .items-col { width: 100px; min-width: 100px; }
     .date-col { width: 100px; min-width: 100px; }
-    .action-col { width: 100px; min-width: 100px; }
+    .action-col { width: 80px; min-width: 80px; }
 
     /* Customer Info */
     .customer-name {
@@ -353,17 +336,6 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
     
-    .btn-view {
-        background-color: white;
-        border-color: #2C8F0C;
-        color: #2C8F0C;
-    }
-    
-    .btn-view:hover {
-        background-color: #2C8F0C;
-        color: white;
-    }
-    
     .btn-pickup {
         background-color: white;
         border-color: #FBC02D;
@@ -479,6 +451,49 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
+    /* Confirmation Modal Styles */
+    .confirmation-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #FBC02D, #FFB300);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        color: white;
+    }
+    
+    .order-details-card {
+        background: #F8FDF8;
+        border: 1px solid #C8E6C9;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .order-detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed #dee2e6;
+    }
+    
+    .order-detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .order-detail-label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .order-detail-value {
+        font-weight: 600;
+        color: #333;
+    }
+
     /* Make table more compact on mobile */
     @media (max-width: 768px) {
         .header-buttons {
@@ -489,11 +504,6 @@
         .table th,
         .table td {
             padding: 0.5rem 0.25rem;
-        }
-        
-        .status-badge {
-            min-width: 100px;
-            font-size: 0.7rem;
         }
         
         .btn-outline-success-custom,
@@ -516,18 +526,6 @@
     <div class="loading-spinner"></div>
 </div>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Orders Ready for Pickup</h1>
-            <p class="mb-0 text-muted">Pick up orders from the warehouse and start delivery process</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted fw-bold">Available for Pickup: {{ $orders->total() }}</small>
-        </div>
-    </div>
-</div>
 
 <!-- Bulk Action Bar (Initially Hidden) -->
 <div class="bulk-action-bar" id="bulkActionBar" style="display: none;">
@@ -655,7 +653,7 @@
                             <th class="amount-col">Amount</th>
                             <th class="items-col">Items</th>
                             <th class="date-col">Order Date</th>
-                            <th class="action-col">Actions</th>
+                            <th class="action-col">Pickup</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -669,15 +667,14 @@
                                 <input type="checkbox" class="table-checkbox order-checkbox" 
                                        value="{{ $order->id }}" 
                                        data-order-number="{{ $order->order_number }}"
-                                       data-customer-name="{{ $order->customer_name }}">
+                                       data-customer-name="{{ $order->customer_name }}"
+                                       data-order-amount="{{ $order->total_amount }}"
+                                       data-item-count="{{ $itemCount }}"
+                                       data-customer-phone="{{ $order->customer_phone }}"
+                                       data-shipping-address="{{ $order->shipping_address }}">
                             </td>
                             <td class="order-col">
                                 <strong class="text-dark">#{{ $order->order_number }}</strong>
-                                <div class="mt-1">
-                                    <span class="status-badge badge-ready">
-                                        <i class="fas fa-box me-1"></i>Ready for Pickup
-                                    </span>
-                                </div>
                             </td>
                             <td class="customer-col">
                                 <div class="customer-name">{{ $order->customer_name }}</div>
@@ -686,9 +683,11 @@
                                 <div class="customer-phone">
                                     <i class="fas fa-phone me-1"></i>{{ $order->customer_phone }}
                                 </div>
+                                @if($order->customer_email)
                                 <div class="customer-email">
                                     <i class="fas fa-envelope me-1"></i>{{ Str::limit($order->customer_email, 15) }}
                                 </div>
+                                @endif
                             </td>
                             <td class="address-col">
                                 <div class="address-text">{{ Str::limit($order->shipping_address, 50) }}</div>
@@ -698,6 +697,7 @@
                             </td>
                             <td class="items-col">
                                 <div class="items-count">{{ $itemCount }} items</div>
+                                @if($itemCount > 0)
                                 <div class="text-muted" style="font-size: 0.75rem;">
                                     @foreach($order->orderItems->take(2) as $item)
                                     {{ $item->product->name ?? 'Item' }}{{ !$loop->last ? ', ' : '' }}
@@ -706,6 +706,7 @@
                                     +{{ $itemCount - 2 }} more
                                     @endif
                                 </div>
+                                @endif
                             </td>
                             <td class="date-col">
                                 <div class="date-text">{{ $order->created_at->format('M j, Y') }}</div>
@@ -715,18 +716,17 @@
                             </td>
                             <td class="action-col">
                                 <div class="action-buttons">
-                                    <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn btn-view" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    
-                                    <form action="{{ route('delivery.orders.markAsPickedUp', $order) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="action-btn btn-pickup single-pickup-btn" 
-                                                onclick="return confirm('Mark order #{{ $order->order_number }} as picked up?')"
-                                                title="Mark as Picked Up">
-                                            <i class="fas fa-box"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="action-btn btn-pickup pickup-confirm-btn" 
+                                            data-order-id="{{ $order->id }}"
+                                            data-order-number="{{ $order->order_number }}"
+                                            data-customer-name="{{ $order->customer_name }}"
+                                            data-order-amount="{{ $order->total_amount }}"
+                                            data-item-count="{{ $itemCount }}"
+                                            data-customer-phone="{{ $order->customer_phone }}"
+                                            data-shipping-address="{{ $order->shipping_address }}"
+                                            title="Pick Up Order">
+                                        <i class="fas fa-box"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -773,6 +773,72 @@
                 </div>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- Single Pickup Confirmation Modal -->
+<div class="modal fade" id="pickupConfirmationModal" tabindex="-1" aria-labelledby="pickupConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pickupConfirmationModalLabel">
+                    <i class="fas fa-box me-2"></i>Confirm Order Pickup
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                
+                <h4 class="text-center mb-4" style="color: #2C8F0C;">Confirm Pickup?</h4>
+                <p class="text-center text-muted mb-4">
+                    Are you sure you want to pick up this order? This action will assign the order to you and mark it as picked up.
+                </p>
+                
+                <div class="order-details-card">
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Order Number:</span>
+                        <span class="order-detail-value" id="modalOrderNumber">#00000</span>
+                    </div>
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Customer:</span>
+                        <span class="order-detail-value" id="modalCustomerName">Customer Name</span>
+                    </div>
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Contact:</span>
+                        <span class="order-detail-value" id="modalCustomerPhone">000-000-0000</span>
+                    </div>
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Total Amount:</span>
+                        <span class="order-detail-value" id="modalOrderAmount">₱0.00</span>
+                    </div>
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Number of Items:</span>
+                        <span class="order-detail-value" id="modalItemCount">0 items</span>
+                    </div>
+                    <div class="order-detail-row">
+                        <span class="order-detail-label">Delivery Address:</span>
+                        <span class="order-detail-value" id="modalShippingAddress" style="text-align: right; max-width: 60%;">Address here</span>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning border-warning mt-3" style="background-color: #FFF3CD; border-color: #FFEAA7;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Note:</strong> Once picked up, this order will be assigned to you and moved to "My Orders" section.
+                </div>
+                
+                <form id="singlePickupForm" method="POST" action="" style="display: none;">
+                    @csrf
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success-custom" id="confirmSinglePickupBtn">
+                    <i class="fas fa-box-check me-1"></i> Yes, Pick Up Order
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -869,6 +935,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingOverlay = document.getElementById('loadingOverlay');
     const bulkModeInfo = document.getElementById('bulkModeInfo');
     
+    // Single Pickup Modal Elements
+    const pickupConfirmationModal = new bootstrap.Modal(document.getElementById('pickupConfirmationModal'));
+    const pickupConfirmBtns = document.querySelectorAll('.pickup-confirm-btn');
+    const modalOrderNumber = document.getElementById('modalOrderNumber');
+    const modalCustomerName = document.getElementById('modalCustomerName');
+    const modalCustomerPhone = document.getElementById('modalCustomerPhone');
+    const modalOrderAmount = document.getElementById('modalOrderAmount');
+    const modalItemCount = document.getElementById('modalItemCount');
+    const modalShippingAddress = document.getElementById('modalShippingAddress');
+    const confirmSinglePickupBtn = document.getElementById('confirmSinglePickupBtn');
+    const singlePickupForm = document.getElementById('singlePickupForm');
+    
+    // Single Pickup Confirmation
+    let currentOrderId = null;
+    
+    pickupConfirmBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentOrderId = this.dataset.orderId;
+            
+            // Populate modal with order details
+            modalOrderNumber.textContent = `#${this.dataset.orderNumber}`;
+            modalCustomerName.textContent = this.dataset.customerName;
+            modalCustomerPhone.textContent = this.dataset.customerPhone;
+            modalOrderAmount.textContent = `₱${parseFloat(this.dataset.orderAmount).toFixed(2)}`;
+            modalItemCount.textContent = `${this.dataset.itemCount} items`;
+            modalShippingAddress.textContent = this.dataset.shippingAddress;
+            
+            // Set form action
+            singlePickupForm.action = `/delivery/orders/${currentOrderId}/pickup`;
+            
+            // Show modal
+            pickupConfirmationModal.show();
+        });
+    });
+    
+    // Confirm Single Pickup
+    confirmSinglePickupBtn.addEventListener('click', function() {
+        // Disable button and show loading
+        this.disabled = true;
+        const originalButtonText = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+        
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+        }
+        
+        // Submit form
+        setTimeout(() => {
+            singlePickupForm.submit();
+        }, 500);
+    });
+    
     // Toggle Bulk Mode
     enableBulkModeBtn.addEventListener('click', function() {
         isBulkMode = !isBulkMode;
@@ -883,7 +1001,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bulkModeInfo.style.display = 'inline';
             
             // Hide individual pickup buttons
-            document.querySelectorAll('.single-pickup-btn').forEach(btn => {
+            document.querySelectorAll('.pickup-confirm-btn').forEach(btn => {
                 btn.style.display = 'none';
             });
         } else {
@@ -906,8 +1024,8 @@ document.addEventListener('DOMContentLoaded', function() {
         bulkModeInfo.style.display = 'none';
         
         // Show individual pickup buttons
-        document.querySelectorAll('.single-pickup-btn').forEach(btn => {
-            btn.style.display = 'inline-block';
+        document.querySelectorAll('.pickup-confirm-btn').forEach(btn => {
+            btn.style.display = 'flex';
         });
         
         // Uncheck all checkboxes
@@ -978,7 +1096,6 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedOrders.forEach(orderId => {
             const checkbox = document.querySelector(`.order-checkbox[value="${orderId}"]`);
             
-            // Check if checkbox exists
             if (!checkbox) {
                 console.error(`Checkbox for order ${orderId} not found`);
                 return;
@@ -986,108 +1103,43 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const orderNumber = checkbox.dataset.orderNumber || `#${orderId}`;
             const customerName = checkbox.dataset.customerName || 'Customer';
+            const itemCount = parseInt(checkbox.dataset.itemCount) || 1;
             
             const orderItem = document.createElement('div');
-            orderItem.className = 'selected-order-item';
+            orderItem.className = 'selected-order-item mb-2 p-2 border-bottom';
             orderItem.innerHTML = `
-                <div>
-                    <span class="order-number-badge">#${orderNumber}</span>
-                    <span class="ms-2">${customerName}</span>
-                </div>
-                <div>
-                    <small class="text-muted">
-                        <i class="fas fa-box me-1"></i>
-                        <span class="order-items-count">Loading...</span> items
-                    </small>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-success">#${orderNumber}</span>
+                        <span class="ms-2 fw-semibold">${customerName}</span>
+                    </div>
+                    <div>
+                        <small class="text-muted">
+                            <i class="fas fa-box me-1"></i>
+                            ${itemCount} item${itemCount > 1 ? 's' : ''}
+                        </small>
+                    </div>
                 </div>
             `;
             selectedOrderList.appendChild(orderItem);
             
-            // Get item count for this order - with error handling
-            try {
-                const row = checkbox.closest('tr');
-                if (row) {
-                    // Get the Items cell (7th td, index 6 because we added checkbox column)
-                    const itemsCell = row.querySelector('td:nth-child(7)');
-                    
-                    if (itemsCell) {
-                        // Find the item count from the cell text
-                        const cellText = itemsCell.textContent;
-                        const match = cellText.match(/(\d+)/);
-                        
-                        if (match) {
-                            const itemCount = parseInt(match[0]);
-                            totalItems += itemCount;
-                            
-                            // Update the item count in the list
-                            setTimeout(() => {
-                                const countElement = orderItem.querySelector('.order-items-count');
-                                if (countElement) {
-                                    countElement.textContent = itemCount;
-                                }
-                            }, 100);
-                        } else {
-                            // If no number found, default to 1
-                            totalItems += 1;
-                            setTimeout(() => {
-                                const countElement = orderItem.querySelector('.order-items-count');
-                                if (countElement) {
-                                    countElement.textContent = '1';
-                                }
-                            }, 100);
-                        }
-                    } else {
-                        // Items cell not found, default to 1
-                        totalItems += 1;
-                        setTimeout(() => {
-                            const countElement = orderItem.querySelector('.order-items-count');
-                            if (countElement) {
-                                countElement.textContent = '1';
-                            }
-                        }, 100);
-                    }
-                } else {
-                    // Row not found, default to 1
-                    totalItems += 1;
-                    setTimeout(() => {
-                        const countElement = orderItem.querySelector('.order-items-count');
-                        if (countElement) {
-                            countElement.textContent = '1';
-                        }
-                    }, 100);
-                }
-            } catch (error) {
-                console.error('Error getting item count for order', orderId, ':', error);
-                // Default to 1 on error
-                totalItems += 1;
-                setTimeout(() => {
-                    const countElement = orderItem.querySelector('.order-items-count');
-                    if (countElement) {
-                        countElement.textContent = '1';
-                    }
-                }, 100);
-            }
+            totalItems += itemCount;
         });
         
-        // Update summary after a short delay to allow all async updates
-        setTimeout(() => {
-            summaryTotalItems.textContent = totalItems;
-            
-            // Calculate estimated volume
-            let estimatedVolume = 'Small';
-            if (totalItems > 20) {
-                estimatedVolume = 'Large';
-            } else if (totalItems > 10) {
-                estimatedVolume = 'Medium';
-            }
-            const summaryVolumeElement = document.getElementById('summaryVolume');
-            if (summaryVolumeElement) {
-                summaryVolumeElement.textContent = estimatedVolume;
-            }
-            
-            // Show modal
-            bulkPickupModal.show();
-        }, 300);
+        // Update summary
+        summaryTotalItems.textContent = totalItems;
+        
+        // Calculate estimated volume
+        let estimatedVolume = 'Small';
+        if (totalItems > 20) {
+            estimatedVolume = 'Large';
+        } else if (totalItems > 10) {
+            estimatedVolume = 'Medium';
+        }
+        document.getElementById('summaryVolume').textContent = estimatedVolume;
+        
+        // Show modal
+        bulkPickupModal.show();
     });
     
     // Confirm Bulk Pickup
@@ -1133,16 +1185,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Error: Could not find bulk pickup form. Please try again.');
             }
         }, 1000);
-    });
-    
-    // Add confirmation for individual pickups
-    const pickupForms = document.querySelectorAll('form[action*="markAsPickedUp"]');
-    pickupForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (!confirm('Are you sure you want to mark this order as picked up?')) {
-                e.preventDefault();
-            }
-        });
     });
     
     // Keyboard shortcuts
