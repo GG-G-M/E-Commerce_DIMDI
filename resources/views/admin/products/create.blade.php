@@ -389,14 +389,14 @@
             
             <div class="row">
                 <div class="col-md-6">
-                    <label class="form-label">Base Stock Quantity *</label>
+                    <label class="form-label">Base Stock Quantity</label>
                     <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
-                           name="stock_quantity" value="{{ old('stock_quantity', 0) }}" 
-                           id="stock_quantity" required>
+                           name="stock_quantity" value="0" 
+                           id="stock_quantity" readonly>
                     @error('stock_quantity')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                    <small class="text-muted">Used when variants are disabled</small>
+                    <small class="text-muted">Stock is managed through Stock-In/Stock-Out system</small>
                 </div>
             </div>
             
@@ -445,11 +445,11 @@
                                     </div>
                                     
                                     <div class="col-md-6">
-                                        <label class="form-label">Stock Quantity *</label>
+                                        <label class="form-label">Stock Quantity</label>
                                         <input type="number" class="form-control stock-input" 
                                                name="variants[{{ $index }}][stock]" 
-                                               value="{{ $variant['stock'] ?? 0 }}" 
-                                               min="0" required>
+                                               value="0" 
+                                               min="0" readonly>
                                     </div>
                                     
                                     <div class="col-12">
@@ -507,8 +507,8 @@
                             <div class="stock-value" id="totalVariants">{{ old('variants') ? count(old('variants')) : 0 }}</div>
                         </div>
                         <div class="stock-item">
-                            <div class="stock-label">Total Stock</div>
-                            <div class="stock-value" id="totalStock">0 units</div>
+                            <div class="stock-label">Stock Management</div>
+                            <div class="stock-value">Stock-In/Out System</div>
                         </div>
                     </div>
                 </div>
@@ -631,10 +631,10 @@
                     </div>
                     
                     <div class="col-md-6">
-                        <label class="form-label">Stock Quantity *</label>
+                        <label class="form-label">Stock Quantity</label>
                         <input type="number" class="form-control stock-input" 
                                name="variants[${variantCount}][stock]" 
-                               value="0" min="0" required>
+                               value="0" min="0" readonly>
                     </div>
                     
                     <div class="col-12">
