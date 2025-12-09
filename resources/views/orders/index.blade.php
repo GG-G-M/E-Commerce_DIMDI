@@ -37,10 +37,10 @@
     /* Filter Card */
     .filter-card {
         background: white;
-        border-radius: 12px;
+        border-radius: 51px;
         border: 1px solid var(--gray-200);
         margin-bottom: 2rem;
-        padding: 1.5rem;
+
     }
 
     .filter-grid {
