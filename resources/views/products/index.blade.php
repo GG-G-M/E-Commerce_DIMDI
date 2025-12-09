@@ -1237,14 +1237,30 @@
                     <div class="empty-state-icon">
                         <i class="fas fa-search"></i>
                     </div>
-                    <h3 class="empty-state-title">No Products Available</h3>
+                    <h3 class="empty-state-title">
+                        @if(request()->has('search') || request()->has('brands') || request()->has('min_price') || request()->has('max_price'))
+                            No Matching Products Found
+                        @else
+                            No Products Available
+                        @endif
+                    </h3>
                     <p class="empty-state-text">
-                        We're currently updating our inventory. Please check back later for new arrivals
-                        or try browsing different categories.
+                        @if(request()->has('search') || request()->has('brands') || request()->has('min_price') || request()->has('max_price'))
+                            We couldn't find any products matching your search criteria. Try adjusting your filters or browse different categories.
+                        @else
+                            We're currently updating our inventory. Please check back later for new arrivals or try browsing different categories.
+                        @endif
                     </p>
-                    <a href="{{ route('products.index') }}" class="btn btn-success-hover">
-                        <i class="fas fa-store me-2"></i>Browse All Categories
-                    </a>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap">
+                        @if(request()->has('search') || request()->has('brands') || request()->has('min_price') || request()->has('max_price'))
+                            <a href="{{ route('products.index') }}" class="btn btn-success-hover">
+                                <i class="fas fa-times me-2"></i>Clear Filters
+                            </a>
+                        @endif
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-success">
+                            <i class="fas fa-store me-2"></i>Browse All Products
+                        </a>
+                    </div>
                 </div>
             @endif
         </div>
@@ -1319,8 +1335,8 @@
             updateSelectedBrands();
             updateActiveFilterCount();
 
-            // Show modal if no products found and there was a search
-            @if ($products->count() === 0 && request()->has('search'))
+            // Show modal if no products found and there was active search/filter criteria
+            @if ($products->count() === 0 && (request()->has('search') || request()->has('brands') || request()->has('min_price') || request()->has('max_price')))
                 const noProductsModal = new bootstrap.Modal(document.getElementById('noProductsModal'));
                 noProductsModal.show();
             @endif
@@ -1637,28 +1653,49 @@
                         })
                         .then(response => response.text())
                         .then(html => {
-                            if (html.trim() === '') {
-                                hasMore = false;
-                                endOfResults.style.display = 'block';
-                                loadingIndicator.style.display = 'none';
-                                return;
-                            }
-
                             // Create a temporary container to parse the HTML
                             const tempContainer = document.createElement('div');
                             tempContainer.innerHTML = html;
 
-                            // Extract products from the response
+                            // Check if we got any products back
                             const newProducts = tempContainer.querySelector('#products-container');
                             if (!newProducts) {
+                                // No products container means no more products
                                 hasMore = false;
                                 endOfResults.style.display = 'block';
                                 loadingIndicator.style.display = 'none';
+                                isLoading = false;
                                 return;
                             }
 
-                            // Append new products to existing container
-                            productsContainer.innerHTML += newProducts.innerHTML;
+                            // Extract only the product rows (not the header or other elements)
+                            const productRows = newProducts.querySelectorAll('.row .col-lg-3, .row .col-md-6');
+                            
+                            if (productRows.length === 0) {
+                                // No product rows found, we're at the end
+                                hasMore = false;
+                                endOfResults.style.display = 'block';
+                                loadingIndicator.style.display = 'none';
+                                isLoading = false;
+                                return;
+                            }
+
+                            // Find the existing products grid and append new products
+                            const existingProductsGrid = productsContainer.querySelector('.row');
+                            if (existingProductsGrid) {
+                                // Get the HTML for the new product rows only
+                                const newProductsHTML = Array.from(productRows)
+                                    .map(row => row.outerHTML)
+                                    .join('');
+                                
+                                existingProductsGrid.insertAdjacentHTML('beforeend', newProductsHTML);
+                            } else {
+                                // If no existing grid, append the entire new products section
+                                const newProductsSection = newProducts.querySelector('.row');
+                                if (newProductsSection) {
+                                    productsContainer.appendChild(newProductsSection.cloneNode(true));
+                                }
+                            }
 
                             // Update products count
                             const newCount = tempContainer.querySelector('#products-count');
@@ -1668,18 +1705,13 @@
 
                             isLoading = false;
                             loadingIndicator.style.display = 'none';
-
-                            // Check if we've reached the end
-                            const productCards = newProducts.querySelectorAll('.col-lg-3, .col-md-6');
-                            if (productCards.length === 0) {
-                                hasMore = false;
-                                endOfResults.style.display = 'block';
-                            }
                         })
                         .catch(error => {
                             console.error('Error loading more products:', error);
                             isLoading = false;
                             loadingIndicator.style.display = 'none';
+                            // Reset page on error to avoid getting stuck
+                            page--;
                         });
                 }
 
