@@ -144,66 +144,9 @@
         border-color: #2C8F0C !important;
     }
 
-    /* Status Badges - Compact */
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 100px;
-    }
+   
     
-    .badge-processing {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-    
-    .badge-shipped {
-        background-color: #D1ECF1;
-        color: #0C5460;
-        border: 1px solid #BEE5EB;
-    }
-    
-    .badge-out-for-delivery {
-        background-color: #FFE5CC;
-        color: #663C00;
-        border: 1px solid #FFD8B2;
-    }
-    
-    .badge-delivered {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-cancelled {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-
-    /* Assignment Badges */
-    .badge-available {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-my-order {
-        background-color: #D1ECF1;
-        color: #0C5460;
-        border: 1px solid #BEE5EB;
-    }
-    
-    .badge-assigned {
-        background-color: #E0E0E0;
-        color: #616161;
-        border: 1px solid #BDBDBD;
-    }
-
+   
     /* Empty State */
     .empty-state {
         text-align: center;
@@ -324,11 +267,7 @@
             padding: 0.5rem 0.25rem;
         }
         
-        .status-badge {
-            min-width: 80px;
-            font-size: 0.7rem;
-        }
-        
+       
         .customer-name {
             font-size: 0.8rem;
         }
@@ -341,18 +280,6 @@
     }
 </style>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">All Delivery Orders</h1>
-            <p class="mb-0 text-muted">Manage and track all delivery orders in one place</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted fw-bold">Total Orders: {{ $orders->total() }}</small>
-        </div>
-    </div>
-</div>
 
 <!-- Filter and Search Section -->
 <div class="card card-custom mb-4">
@@ -498,18 +425,18 @@
                             </td>
                             <td class="status-col">
                                 @php
-                                    $statusClass = 'badge-' . str_replace('_', '-', $order->order_status);
+                                    $statusClass = '' . str_replace('_', '-', $order->order_status);
                                     $statusText = ucfirst(str_replace('_', ' ', $order->order_status));
                                 @endphp
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                <span class="{{ $statusClass }}">{{ $statusText }}</span>
                             </td>
                             <td class="assignment-col">
                                 @if(is_null($order->delivery_id))
-                                    <span class="status-badge badge-available">Available</span>
+                                    <span >Available</span>
                                 @elseif($order->delivery_id == Auth::id())
-                                    <span class="status-badge badge-my-order">My Order</span>
+                                    <span >My Order</span>
                                 @else
-                                    <span class="status-badge badge-assigned">Assigned</span>
+                                    <span>Assigned</span>
                                 @endif
                             </td>
                             <td class="date-col">

@@ -145,24 +145,7 @@
         background-color: var(--green-lighter);
     }
     
-    /* Badges */
-    .badge-success {
-        background-color: var(--green-light);
-        color: var(--green-primary);
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-warning {
-        background-color: var(--orange-light);
-        color: var(--orange-primary);
-        border: 1px solid #FFE0B2;
-    }
-    
-    .badge-primary {
-        background-color: #E3F2FD;
-        color: #1976D2;
-        border: 1px solid #BBDEFB;
-    }
+   
     
     /* Buttons */
     .btn-success {
@@ -456,7 +439,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h6 class="mb-0 fw-bold text-dark">#{{ $order->order_number }}</h6>
-                                            <span class="badge badge-success">Ready for Pickup</span>
+                                            <span >Ready for Pickup</span>
                                         </div>
                                         <p class="mb-1 text-muted">
                                             <i class="fas fa-user me-1"></i>{{ $order->customer_name }}
@@ -516,7 +499,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h6 class="mb-0 fw-bold text-dark">#{{ $order->order_number }}</h6>
-                                            <span class="badge badge-warning">{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
+                                            <span >{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
                                         </div>
                                         <p class="mb-1 text-muted">
                                             <i class="fas fa-user me-1"></i>{{ $order->customer_name }}
@@ -535,7 +518,7 @@
                                                     </button>
                                                 </form>
                                                 @else
-                                                <span class="badge badge-primary">In Transit</span>
+                                                <span>In Transit</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -608,7 +591,7 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <span class="badge badge-success">Delivered</span>
+                                        <span >Delivered</span>
                                     </td>
                                 </tr>
                                 @endforeach

@@ -136,48 +136,6 @@
         border-color: #2C8F0C;
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
-
-    /* Status Badges - Compact */
-    .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-        text-align: center;
-        min-width: 120px;
-    }
-    
-    .badge-processing {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-    
-    .badge-shipped {
-        background-color: #D1ECF1;
-        color: #0C5460;
-        border: 1px solid #BEE5EB;
-    }
-    
-    .badge-out-for-delivery {
-        background-color: #FFE5CC;
-        color: #663C00;
-        border: 1px solid #FFD8B2;
-    }
-    
-    .badge-delivered {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-cancelled {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-
     /* Empty State */
     .empty-state {
         text-align: center;
@@ -280,23 +238,6 @@
         justify-content: center;
     }
     
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        border: 2px solid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
     
     .btn-view {
         background-color: white;
@@ -415,10 +356,6 @@
             padding: 0.5rem 0.25rem;
         }
         
-        .status-badge {
-            min-width: 100px;
-            font-size: 0.7rem;
-        }
         
         .customer-name {
             font-size: 0.8rem;
@@ -438,18 +375,7 @@
     }
 </style>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">My Active Orders</h1>
-            <p class="mb-0 text-muted">Manage and track orders assigned to you for delivery</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted fw-bold">Total Orders: {{ $orders->total() }}</small>
-        </div>
-    </div>
-</div>
+
 
 @if(session('success'))
     <div class="alert alert-success-custom alert-dismissible fade show" role="alert">
@@ -561,7 +487,7 @@
                             <th class="amount-col">Amount</th>
                             <th class="status-col">Status</th>
                             <th class="date-col">Assigned Date</th>
-                            <th class="action-col">Actions</th>
+                            <th class="action-col">Delivered</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -590,10 +516,10 @@
                             </td>
                             <td class="status-col">
                                 @php
-                                    $statusClass = 'badge-' . str_replace('_', '-', $order->order_status);
+                                    $statusClass =  str_replace('_', '-', $order->order_status);
                                     $statusText = ucfirst(str_replace('_', ' ', $order->order_status));
                                 @endphp
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                <span class="{{ $statusClass }}">{{ $statusText }}</span>
                                 @if(in_array($order->order_status, ['shipped', 'out_for_delivery']))
                                 <div class="progress">
                                     @if($order->order_status == 'shipped')
@@ -619,12 +545,8 @@
                                 @endif
                             </td>
                             <td class="action-col">
-                                <div class="action-buttons">
-                                    <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn btn-view" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
                                     
-                                    @if(in_array($order->order_status, ['shipped', 'out_for_delivery']))
+                                @if(in_array($order->order_status, ['shipped', 'out_for_delivery']))
                                     <form action="{{ route('delivery.orders.deliver-order', $order) }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="action-btn btn-deliver" 
