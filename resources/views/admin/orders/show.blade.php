@@ -520,12 +520,23 @@
                 <div class="product-row">
                     @php
                         $itemImage = $item->product->image_url;
+                        $displayUnitPrice = $item->unit_price;
+                        $displayTotalPrice = $item->total_price;
+                        
                         if ($item->selected_size && $item->selected_size !== 'Standard') {
                             $variant = $item->product->variants->first(function($v) use ($item) {
                                 return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
                             });
-                            if ($variant && $variant->image) {
-                                $itemImage = $variant->image_url;
+                            
+                            if ($variant) {
+                                // Use variant-specific image if available
+                                if ($variant->image_url) {
+                                    $itemImage = $variant->image_url;
+                                }
+                                
+                                // Use variant-specific price
+                                $displayUnitPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
+                                $displayTotalPrice = $displayUnitPrice * $item->quantity;
                             }
                         }
                     @endphp
@@ -537,9 +548,9 @@
                         <span class="product-size">{{ $item->selected_size }}</span>
                         @endif
                         <div class="product-details">
-                            <span class="product-price">₱{{ number_format($item->unit_price, 2) }}</span>
+                            <span class="product-price">₱{{ number_format($displayUnitPrice, 2) }}</span>
                             <span class="product-quantity">Qty: {{ $item->quantity }}</span>
-                            <span class="product-total">₱{{ number_format($item->total_price, 2) }}</span>
+                            <span class="product-total">₱{{ number_format($displayTotalPrice, 2) }}</span>
                         </div>
                     </div>
                 </div>
