@@ -29,13 +29,26 @@ class StockInController extends Controller
             ->latest()
             ->paginate($request->per_page ?? 10);
 
+        // Get paginated products for modal
+        $productPage = $request->get('product_page', 1);
+        $productPerPage = $request->get('product_per_page', 10);
+        $productsForModal = Product::with(['category', 'variants'])
+            ->when($request->get('product_search'), function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    $query->where('name', 'like', "%{$request->product_search}%")
+                          ->orWhere('sku', 'like', "%{$request->product_search}%");
+                });
+            })
+            ->orderBy('name')
+            ->paginate($productPerPage, ['*'], 'product_page', $productPage);
+
         $warehouses = Warehouse::all();
         $products = Product::all();
         $variants = ProductVariant::with('product')->get();
         $suppliers = Supplier::where('is_archived', false)->get();
         $stockCheckers = StockChecker::where('is_archived', false)->get();
 
-        return view('admin.stock_in.index', compact('stockIns', 'warehouses', 'products', 'variants', 'suppliers', 'stockCheckers'));
+        return view('admin.stock_in.index', compact('stockIns', 'warehouses', 'products', 'variants', 'suppliers', 'stockCheckers', 'productsForModal'));      
     }
 
     /**
@@ -206,6 +219,119 @@ class StockInController extends Controller
         return response()->json([
             'success' => true,
             'message' => "$createdCount stock-ins imported successfully.",
+        ]);
+    }
+
+    /**
+     * Get products for modal selection with pagination
+     */
+    public function getProducts(Request $request)
+    {
+        $page = $request->get('page', 1);
+        $search = $request->get('search', '');
+        $filter = $request->get('filter', 'active');
+        $perPage = 10;
+
+        $query = Product::with(['category', 'variants'])
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                          ->orWhere('sku', 'like', "%{$search}%");
+                });
+            })
+            ->when($filter === 'active', function ($q) {
+                $q->where('is_archived', false);
+            })
+            ->when($filter === 'archived', function ($q) {
+                $q->where('is_archived', true);
+            })
+            ->orderBy('name');
+
+        $products = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $productsData = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'category_name' => $product->category->name ?? 'N/A',
+                'image_url' => $product->image_url,
+                'is_archived' => $product->is_archived,
+                'has_variants' => $product->has_variants,
+                'variants_count' => $product->variants->count(),
+                'stock_quantity' => $product->stock_quantity,
+                'total_stock' => $product->total_stock,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'products' => $productsData,
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'first_item' => $products->firstItem(),
+                'last_item' => $products->lastItem(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get variants for modal selection with pagination
+     */
+    public function getVariants(Request $request)
+    {
+        $page = $request->get('page', 1);
+        $search = $request->get('search', '');
+        $productId = $request->get('product_id');
+        $perPage = $request->get('per_page', 10);
+
+        $query = ProductVariant::with(['product'])
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('variant_name', 'like', "%{$search}%")
+                          ->orWhere('sku', 'like', "%{$search}%")
+                          ->orWhereHas('product', function ($productQuery) use ($search) {
+                              $productQuery->where('name', 'like', "%{$search}%");
+                          });
+                });
+            })
+            ->when($productId, function ($q) use ($productId) {
+                $q->where('product_id', $productId);
+            })
+            ->orderBy('variant_name');
+
+        $variants = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $variantsData = $variants->map(function ($variant) {
+            return [
+                'id' => $variant->id,
+                'variant_name' => $variant->variant_name,
+                'sku' => $variant->sku,
+                'stock_quantity' => $variant->stock_quantity,
+                'price' => $variant->price,
+                'product' => [
+                    'id' => $variant->product->id,
+                    'name' => $variant->product->name,
+                    'sku' => $variant->product->sku,
+                    'image_url' => $variant->product->image_url,
+                ],
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'variants' => $variantsData,
+            'pagination' => [
+                'current_page' => $variants->currentPage(),
+                'last_page' => $variants->lastPage(),
+                'per_page' => $variants->perPage(),
+                'total' => $variants->total(),
+                'first_item' => $variants->firstItem(),
+                'last_item' => $variants->lastItem(),
+            ]
         ]);
     }
 }

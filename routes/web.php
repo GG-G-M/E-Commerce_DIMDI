@@ -239,6 +239,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // CSV
     Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');
     Route::post('/stock-ins/import-csv', [StockInController::class, 'importCsv'])->name('stock_in.import.csv');
+    Route::get('/stock-ins/products', [StockInController::class, 'getProducts'])->name('stock_in.products');
+    Route::get('/stock-ins/variants', [StockInController::class, 'getVariants'])->name('stock_in.variants');
 
     // Low Stocks
     Route::get('low-stock', [LowStockController::class, 'index'])->name('low_stock.index');
