@@ -261,7 +261,7 @@
     <div class="card-body">
         <form method="GET" action="{{ route('admin.banners.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Banners</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -273,7 +273,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
@@ -283,7 +283,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="sort_by" class="form-label fw-bold">Sort By</label>
                         <select class="form-select" id="sort_by" name="sort_by">

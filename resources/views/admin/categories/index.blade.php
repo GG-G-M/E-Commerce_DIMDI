@@ -3,6 +3,20 @@
 @section('content')
 <style>
     /* === Consistent Green Theme === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -30,7 +44,6 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
-        font-size: 1.25rem;
     }
 
     /* Improved Add Button */
@@ -39,13 +52,14 @@
         border: none;
         color: white;
         font-weight: 600;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        display: inline-flex;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
     }
     
     
@@ -96,7 +110,7 @@
     }
     
     .action-btn::after {
-        content: attr(title);
+        content: attr(data-title);
         position: absolute;
         bottom: -30px;
         left: 50%;
@@ -131,23 +145,23 @@
     
     .btn-archive {
         background-color: white;
-        border-color: #FF9800;
-        color: #FF9800;
+        border-color: #FBC02D;
+        color: #FBC02D;
     }
 
     .btn-archive:hover {
-        background-color: #FF9800;
+        background-color: #FBC02D;
         color: white;
     }
 
     .btn-unarchive {
         background-color: white;
-        border-color: #17a2b8;
-        color: #17a2b8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
     }
 
     .btn-unarchive:hover {
-        background-color: #17a2b8;
+        background-color: #2C8F0C;
         color: white;
     }
     
@@ -177,6 +191,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -260,9 +277,6 @@
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1.25rem;
     }
 
     .modal-title {
@@ -373,9 +387,10 @@
     .action-col { min-width: 80px; width: 80px; }
 
     /* Category Info Cell */
+    /* Category Info Cell */
     .category-info-cell {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
     }
     
@@ -452,7 +467,7 @@
         <form method="GET" action="{{ route('admin.categories.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Description -->
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Categories</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -479,7 +494,7 @@
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
@@ -563,18 +578,18 @@
                                             data-bs-toggle="modal" 
                                             data-bs-target="#editCategoryModal"
                                             data-category='@json($category)'
-                                            title="Edit Category">
+                                            data-title="Edit Category">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     
                                     @if($category->is_archived)
                                         <button type="button" class="action-btn btn-unarchive unarchiveBtn" 
-                                                title="Unarchive Category">
+                                                data-title="Unarchive Category">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
                                         <button type="button" class="action-btn btn-archive archiveBtn" 
-                                                title="Archive Category">
+                                                data-title="Archive Category">
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @endif

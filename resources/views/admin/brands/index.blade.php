@@ -447,7 +447,7 @@
         <form method="GET" action="{{ route('admin.brands.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Description -->
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Brands</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -474,7 +474,7 @@
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
