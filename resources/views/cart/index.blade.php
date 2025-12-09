@@ -342,32 +342,37 @@
                                     @endif
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="quantity-control">
-                                        <form action="{{ route('cart.update', $item) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="selected_size" value="{{ $item->selected_size }}">
-                                            <button type="submit" name="quantity" value="{{ $item->quantity - 1 }}"
-                                                class="quantity-btn"
-                                                {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
-                                        </form>
+                                    <div class="quantity-control" style="position: relative;">
+                                        <!-- Completely isolated quantity controls -->
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <button type="button" 
+                                                    class="quantity-btn"
+                                                    onclick="decrementQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
+                                                    {{ $item->quantity <= 1 ? 'disabled' : '' }}>-</button>
 
-                                        <input type="number" 
-                                               class="quantity-input" 
-                                               value="{{ $item->quantity }}" 
-                                               min="1" 
-                                               max="{{ $maxQuantity }}"
-                                               data-item-id="{{ $item->id }}"
-                                               id="quantity-input-{{ $item->id }}">
+                                            <input type="number" 
+                                                   class="quantity-input" 
+                                                   value="{{ $item->quantity }}" 
+                                                   min="1" 
+                                                   max="{{ $maxQuantity }}"
+                                                   data-item-id="{{ $item->id }}"
+                                                   id="quantity-input-{{ $item->id }}"
+                                                   name=""
+                                                   form=""
+                                                   data-selected-size="{{ $item->selected_size }}"
+                                                   data-update-url="{{ route('cart.update', $item) }}"
+                                                   autocomplete="off"
+                                                   style="width: 60px; text-align: center; border: 1px solid #ddd; border-radius: 5px; padding: 5px;"
+                                                   onfocus="handleQuantityFocus(this)"
+                                                   onblur="handleQuantityBlur(this)"
+                                                   oninput="handleQuantityInput(this)"
+                                                   onkeydown="handleQuantityKeydown(event, this)">
 
-                                        <form action="{{ route('cart.update', $item) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="selected_size" value="{{ $item->selected_size }}">
-                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}"
-                                                class="quantity-btn"
-                                                {{ !$isVariantAvailable || $item->quantity >= $maxQuantity ? 'disabled' : '' }}>+</button>
-                                        </form>
+                                            <button type="button" 
+                                                    class="quantity-btn"
+                                                    onclick="incrementQuantity({{ $item->id }}, {{ $item->quantity + 1 }})"
+                                                    {{ !$isVariantAvailable || $item->quantity >= $maxQuantity ? 'disabled' : '' }}>+</button>
+                                        </div>
                                     </div>
                                     @if ($isVariantAvailable && $maxQuantity)
                                         <small class="text-muted stock-warning">Max: {{ $maxQuantity }}</small>
@@ -504,6 +509,121 @@
     </div>
 
     <script>
+        // Global form validation prevention for quantity inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add global event listeners to prevent form validation
+            document.addEventListener('submit', function(e) {
+                // Check if submit was triggered by a quantity input
+                const activeElement = document.activeElement;
+                if (activeElement && activeElement.classList.contains('quantity-input')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, true);
+        });
+
+        // Global functions for quantity input handling
+        function handleQuantityFocus(input) {
+            // Store original value
+            input.setAttribute('data-original-value', input.value);
+            
+            // Prevent form validation by disabling any nearby forms temporarily
+            const cartItem = input.closest('.cart-item');
+            if (cartItem) {
+                const forms = cartItem.querySelectorAll('form');
+                forms.forEach(form => {
+                    form.setAttribute('data-validation-temporarily-disabled', 'true');
+                    form.setAttribute('novalidate', 'true');
+                });
+            }
+        }
+
+        function handleQuantityBlur(input) {
+            const itemId = input.getAttribute('data-item-id');
+            const cartItem = input.closest('.cart-item');
+            const errorDiv = document.getElementById(`quantity-error-${itemId}`);
+            const originalValue = input.getAttribute('data-original-value') || input.value;
+            const maxQuantity = parseInt(cartItem.getAttribute('data-max-quantity')) || 999;
+            
+            // Validate quantity
+            let quantity = parseInt(input.value);
+            if (isNaN(quantity) || quantity < 1) {
+                quantity = 1;
+                input.value = 1;
+            }
+
+            if (quantity > maxQuantity) {
+                // Show error
+                input.classList.add('error');
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                }
+                // Reset to original value or max quantity
+                input.value = Math.min(originalValue, maxQuantity);
+                showToast(`Quantity cannot exceed ${maxQuantity} available items.`, 'error');
+                return;
+            }
+
+            // Clear error if valid
+            input.classList.remove('error');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+
+            // Only update if quantity changed and quantity is valid
+            if (quantity !== parseInt(originalValue) && quantity >= 1 && quantity <= maxQuantity) {
+                updateCartQuantity(itemId, quantity);
+            }
+            
+            // Re-enable form validation
+            const forms = cartItem.querySelectorAll('form');
+            forms.forEach(form => {
+                form.removeAttribute('data-validation-temporarily-disabled');
+                form.removeAttribute('novalidate');
+            });
+        }
+
+        function handleQuantityInput(input) {
+            const itemId = input.getAttribute('data-item-id');
+            const cartItem = input.closest('.cart-item');
+            const errorDiv = document.getElementById(`quantity-error-${itemId}`);
+            const maxQuantity = parseInt(cartItem.getAttribute('data-max-quantity')) || 999;
+            const value = parseInt(input.value);
+            
+            // Only validate if there's an actual value entered
+            if (input.value !== '' && !isNaN(value)) {
+                if (value > maxQuantity) {
+                    input.classList.add('error');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                    }
+                } else if (value < 1) {
+                    input.classList.add('error');
+                    if (errorDiv) {
+                        errorDiv.style.display = 'block';
+                        errorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Quantity must be at least 1.';
+                    }
+                } else {
+                    if (errorDiv) {
+                        errorDiv.style.display = 'none';
+                    }
+                    input.classList.remove('error');
+                }
+            }
+        }
+
+        function handleQuantityKeydown(event, input) {
+            // Prevent form submission on Enter key
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.stopPropagation();
+                // Trigger blur to validate and update
+                input.blur();
+                return false;
+            }
+        }
+
         function confirmClear() {
             return confirm('Are you sure you want to clear this cart? This action cannot be undone.');
         }
@@ -647,172 +767,93 @@
             });
         });
 
-        // Show loading when changing quantity
-        document.querySelectorAll('.quantity-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const form = this.closest('form');
-                const cartItem = form.closest('.cart-item');
-                if (cartItem) {
-                    const itemId = cartItem.id.replace('cart-item-', '');
-                    const loadingSpinner = document.getElementById(`loading-${itemId}`);
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'block';
-                    }
-                }
-            });
-        });
 
-        // Handle direct quantity input
-        document.querySelectorAll('.quantity-input[type="number"]').forEach(input => {
-            const itemId = input.getAttribute('data-item-id');
-            const cartItem = document.getElementById(`cart-item-${itemId}`);
-            const errorDiv = document.getElementById(`quantity-error-${itemId}`);
-            let originalValue = input.value;
 
-            // Function to get current max quantity dynamically
-            function getMaxQuantity() {
-                return parseInt(cartItem.getAttribute('data-max-quantity')) || 999;
-            }
 
-            // Store original value on focus
-            input.addEventListener('focus', function() {
-                originalValue = this.value;
-            });
 
-            // Validate on blur or Enter key
-            input.addEventListener('blur', function() {
-                const currentMaxQuantity = getMaxQuantity();
-                validateAndUpdateQuantity(input, itemId, currentMaxQuantity, errorDiv, originalValue);
-            });
-
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const currentMaxQuantity = getMaxQuantity();
-                    validateAndUpdateQuantity(input, itemId, currentMaxQuantity, errorDiv, originalValue);
-                    input.blur();
-                }
-            });
-
-            // Validate on input to prevent exceeding max
-            input.addEventListener('input', function() {
-                const value = parseInt(this.value);
-                const currentMaxQuantity = getMaxQuantity();
-                if (!isNaN(value) && value > currentMaxQuantity) {
-                    this.classList.add('error');
-                    if (errorDiv) {
-                        errorDiv.style.display = 'block';
-                    }
-                } else {
-                    if (errorDiv) {
-                        errorDiv.style.display = 'none';
-                    }
-                    this.classList.remove('error');
-                }
-            });
-        });
-
-        function validateAndUpdateQuantity(input, itemId, maxQuantity, errorDiv, originalValue) {
-            let quantity = parseInt(input.value);
-
-            // Validate quantity
-            if (isNaN(quantity) || quantity < 1) {
-                quantity = 1;
-                input.value = 1;
-            }
-
-            if (quantity > maxQuantity) {
-                // Show error
-                input.classList.add('error');
-                if (errorDiv) {
-                    errorDiv.style.display = 'block';
-                }
-                // Reset to original value or max quantity
-                input.value = Math.min(originalValue, maxQuantity);
-                showToast(`Quantity cannot exceed ${maxQuantity} available items.`, 'error');
-                return;
-            }
-
-            // Clear error if valid
-            input.classList.remove('error');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
-
-            // Only update if quantity changed
-            if (quantity !== parseInt(originalValue)) {
-                updateCartQuantity(itemId, quantity);
+        // Functions for increment/decrement buttons
+        function decrementQuantity(itemId, newQuantity) {
+            if (newQuantity >= 1) {
+                updateCartQuantity(itemId, newQuantity);
             }
         }
+
+        function incrementQuantity(itemId, newQuantity) {
+            const cartItem = document.getElementById(`cart-item-${itemId}`);
+            const maxQuantity = parseInt(cartItem.getAttribute('data-max-quantity')) || 999;
+            
+            if (newQuantity <= maxQuantity) {
+                updateCartQuantity(itemId, newQuantity);
+            }
+        }
+
+
 
         function updateCartQuantity(itemId, quantity) {
             const cartItem = document.getElementById(`cart-item-${itemId}`);
             const loadingSpinner = document.getElementById(`loading-${itemId}`);
             
-            // Find any form in the cart item to get the route
-            const forms = cartItem.querySelectorAll('form');
-            const firstForm = forms[0];
+            // Get selected size and update URL from the quantity input
+            const quantityInput = document.getElementById(`quantity-input-${itemId}`);
+            const selectedSize = quantityInput ? quantityInput.getAttribute('data-selected-size') : '';
+            const updateUrl = quantityInput ? quantityInput.getAttribute('data-update-url') : '';
             
-            if (firstForm) {
-                // Get the update route from the form action
-                const updateUrl = firstForm.action;
-                
-                // Get selected_size from the form
-                const selectedSizeInput = firstForm.querySelector('input[name="selected_size"]');
-                const selectedSize = selectedSizeInput ? selectedSizeInput.value : '';
-
-                // Create form data
-                const formData = new FormData();
-                formData.append('_token', '{{ csrf_token() }}');
-                formData.append('_method', 'PUT');
-                formData.append('quantity', quantity);
-                if (selectedSize) {
-                    formData.append('selected_size', selectedSize);
-                }
-
-                if (loadingSpinner) {
-                    loadingSpinner.style.display = 'block';
-                }
-
-                fetch(updateUrl, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message || 'Cart updated successfully', 'success');
-                        // Update cart count if provided
-                        if (data.cart_count !== undefined) {
-                            const cartCountElements = document.querySelectorAll('.cart-count');
-                            cartCountElements.forEach(el => {
-                                el.textContent = data.cart_count;
-                            });
-                        }
-                        // Reload to get updated totals
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 500);
-                    } else {
-                        showToast(data.message || 'Error updating cart', 'error');
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while updating the cart', 'error');
-                    window.location.reload();
-                })
-                .finally(() => {
-                    if (loadingSpinner) {
-                        loadingSpinner.style.display = 'none';
-                    }
-                });
+            if (!updateUrl) {
+                showToast('Error: Could not find update URL', 'error');
+                return;
             }
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('_method', 'PUT');
+            formData.append('quantity', quantity);
+            if (selectedSize) {
+                formData.append('selected_size', selectedSize);
+            }
+
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'block';
+            }
+
+            fetch(updateUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message || 'Cart updated successfully', 'success');
+                    // Update cart count if provided
+                    if (data.cart_count !== undefined) {
+                        const cartCountElements = document.querySelectorAll('.cart-count');
+                        cartCountElements.forEach(el => {
+                            el.textContent = data.cart_count;
+                        });
+                    }
+                    // Reload to get updated totals
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    showToast(data.message || 'Error updating cart', 'error');
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while updating the cart', 'error');
+                window.location.reload();
+            })
+            .finally(() => {
+                if (loadingSpinner) {
+                    loadingSpinner.style.display = 'none';
+                }
+            });
         }
 
         // Upper middle toast notification function
