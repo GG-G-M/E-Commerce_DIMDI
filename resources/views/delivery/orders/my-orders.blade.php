@@ -296,10 +296,7 @@
         background-color: #f8f9fa;
     }
 
-    /* Card body padding fix */
-    .card-body {
-        padding: 0 !important;
-    }
+
 
     /* Header button group */
     .header-buttons {
@@ -393,67 +390,6 @@
     </div>
 @endif
 
-<!-- Filter and Search Section -->
-<div class="card card-custom mb-4">
-    <div class="card-body">
-        <form id="filterForm" method="GET" action="{{ route('delivery.orders.my-orders') }}">
-            <div class="row g-2 align-items-end">
-                <!-- Search Box -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Search Orders</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control search-box" name="search" 
-                                   placeholder="Search by order number, customer name..." 
-                                   value="{{ request('search') }}">
-                            <button class="btn btn-success-custom" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Order Status</label>
-                        <select class="form-select search-box" name="status" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">All Statuses</option>
-                            <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
-                            <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                            <option value="out_for_delivery" {{ request('status') == 'out_for_delivery' ? 'selected' : '' }}>Out for Delivery</option>
-                            <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Date Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Time Period</label>
-                        <select class="form-select search-box" name="date_filter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">All Time</option>
-                            <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Today</option>
-                            <option value="week" {{ request('date_filter') == 'week' ? 'selected' : '' }}>This Week</option>
-                            <option value="month" {{ request('date_filter') == 'month' ? 'selected' : '' }}>This Month</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reset Filters -->
-            @if(request()->hasAny(['search', 'status', 'date_filter']))
-            <div class="row mt-2">
-                <div class="col-12">
-                    <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-success-custom btn-sm">
-                        <i class="fas fa-times me-1"></i> Clear Filters
-                    </a>
-                </div>
-            </div>
-            @endif
-        </form>
-    </div>
-</div>
 
 <!-- Orders Table -->
 <div class="card card-custom">

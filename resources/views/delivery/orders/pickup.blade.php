@@ -547,66 +547,6 @@
     </div>
 </div>
 
-<!-- Filter and Search Section -->
-<div class="card card-custom mb-4">
-    <div class="card-body">
-        <form id="filterForm" method="GET" action="{{ route('delivery.orders.pickup') }}">
-            <div class="row g-2 align-items-end">
-                <!-- Search Box -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Search Orders</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control search-box" name="search" 
-                                   placeholder="Search by order number, customer name..." 
-                                   value="{{ request('search') }}">
-                            <button class="btn btn-success-custom" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Amount Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Order Amount</label>
-                        <select class="form-select search-box" name="amount_filter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">Any Amount</option>
-                            <option value="low" {{ request('amount_filter') == 'low' ? 'selected' : '' }}>Under ₱500</option>
-                            <option value="medium" {{ request('amount_filter') == 'medium' ? 'selected' : '' }}>₱500 - ₱2,000</option>
-                            <option value="high" {{ request('amount_filter') == 'high' ? 'selected' : '' }}>Over ₱2,000</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Items Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Number of Items</label>
-                        <select class="form-select search-box" name="items_filter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">Any Number</option>
-                            <option value="1-3" {{ request('items_filter') == '1-3' ? 'selected' : '' }}>1-3 Items</option>
-                            <option value="4-6" {{ request('items_filter') == '4-6' ? 'selected' : '' }}>4-6 Items</option>
-                            <option value="7+" {{ request('items_filter') == '7+' ? 'selected' : '' }}>7+ Items</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reset Filters -->
-            @if(request()->hasAny(['search', 'amount_filter', 'items_filter']))
-            <div class="row mt-2">
-                <div class="col-12">
-                    <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-outline-success-custom btn-sm">
-                        <i class="fas fa-times me-1"></i> Clear Filters
-                    </a>
-                </div>
-            </div>
-            @endif
-        </form>
-    </div>
-</div>
 
 <!-- Bulk Pickup Form -->
 <form id="bulkPickupForm" action="{{ route('delivery.orders.bulkPickup') }}" method="POST" style="display: none;">

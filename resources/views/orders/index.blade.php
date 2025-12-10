@@ -306,33 +306,40 @@
         color: white;
     }
 
-    /* Modal - Consistent styling */
+    /* Modal - Cleaner styling without icons */
     .modal-content {
         border: none;
         border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
 
     .modal-header {
-        background: var(--light-green);
+        background: #f8f9fa;
         border-bottom: 1px solid var(--medium-gray);
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem 1.75rem;
         border-radius: 16px 16px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .modal-title {
         font-weight: 600;
-        color: var(--text-dark);
+        color: #dc3545;
+        font-size: 1.25rem;
+        margin: 0;
     }
 
     .modal-body {
-        padding: 1.5rem;
+        padding: 2rem 1.75rem;
     }
 
     .modal-footer {
         border-top: 1px solid var(--medium-gray);
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem 1.75rem;
         border-radius: 0 0 16px 16px;
+        display: flex;
+        gap: 1rem;
     }
 
     /* Alert - Consistent styling */
@@ -354,6 +361,81 @@
         background: linear-gradient(135deg, #FEE2E2, #FECACA);
         color: #991B1B;
         border-left: 4px solid #EF4444;
+    }
+
+    /* Button Styles */
+    .btn-secondary {
+        background: transparent;
+        color: var(--dark-gray);
+        border: 2px solid var(--medium-gray);
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-secondary:hover {
+        background: var(--medium-gray);
+        border-color: var(--dark-gray);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.1);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #ef4444);
+        color: white;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+    }
+
+    /* Confirmation Text */
+    .confirmation-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .order-highlight {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #dc3545;
+    }
+
+    .order-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .order-detail:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-label {
+        color: var(--dark-gray);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--text-dark);
+        font-weight: 600;
     }
 
     /* Responsive Design */
@@ -415,6 +497,21 @@
 
         .empty-state p {
             font-size: 0.95rem;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 1.25rem;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+        }
+
+        .btn-secondary,
+        .btn-danger {
+            width: 100%;
         }
     }
 
@@ -533,6 +630,8 @@
                                     class="action-icon cancel-icon cancel-btn"
                                     data-order-id="{{ $order->id }}"
                                     data-order-number="{{ $order->order_number }}"
+                                    data-order-date="{{ $order->created_at->format('M d, Y') }}"
+                                    data-order-total="₱{{ number_format($order->total_amount, 2) }}"
                                     title="Cancel order">
                                     <i class="fas fa-times"></i>
                                 </button>
@@ -560,25 +659,44 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Cancel Order</h5>
+                    <h5 class="modal-title">Cancel Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="cancelOrderForm" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <p class="mb-3">Are you sure you want to cancel order <strong id="orderNumberText" class="text-danger"></strong>?</p>
+                        <p class="confirmation-text">
+                            Are you sure you want to cancel this order? This action cannot be undone.
+                        </p>
+                        
+                        <div class="order-highlight">
+                            <div class="order-detail">
+                                <span class="detail-label">Order Number:</span>
+                                <span class="detail-value" id="orderNumberText"></span>
+                            </div>
+                            <div class="order-detail">
+                                <span class="detail-label">Order Date:</span>
+                                <span class="detail-value" id="orderDateText"></span>
+                            </div>
+                            <div class="order-detail">
+                                <span class="detail-label">Total Amount:</span>
+                                <span class="detail-value" id="orderTotalText"></span>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Reason for cancellation</label>
-                            <textarea class="form-control" name="cancellation_reason" rows="3" required 
+                            <label for="cancellation_reason" class="form-label">Reason for cancellation</label>
+                            <textarea name="cancellation_reason" id="cancellation_reason" class="form-control" rows="3" required 
                                       placeholder="Please provide a reason for cancellation..."></textarea>
+                            <div class="form-text">Your reason will help us improve our service.</div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i>Close
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
                         </button>
                         <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash-alt me-1"></i>Confirm Cancellation
+                            Confirm Cancellation
                         </button>
                     </div>
                 </form>
@@ -665,42 +783,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelButtons = document.querySelectorAll(".cancel-btn");
     const modal = new bootstrap.Modal(document.getElementById("cancelOrderModal"));
     const form = document.getElementById("cancelOrderForm");
-    const orderText = document.getElementById("orderNumberText");
+    const orderNumberText = document.getElementById("orderNumberText");
+    const orderDateText = document.getElementById("orderDateText");
+    const orderTotalText = document.getElementById("orderTotalText");
 
     cancelButtons.forEach(button => {
         button.addEventListener("click", () => {
             const orderId = button.getAttribute("data-order-id");
             const orderNumber = button.getAttribute("data-order-number");
+            const orderDate = button.getAttribute("data-order-date");
+            const orderTotal = button.getAttribute("data-order-total");
             
             form.action = `/orders/${orderId}/cancel`;
-            orderText.textContent = orderNumber;
+            orderNumberText.textContent = orderNumber;
+            orderDateText.textContent = orderDate;
+            orderTotalText.textContent = orderTotal;
             modal.show();
         });
-    });
-
-    // Auto-submit filters
-    const filterForm = document.getElementById('filterForm');
-    const searchInput = document.getElementById('search');
-    const sortBySelect = document.getElementById('sort_by');
-    const searchLoading = document.getElementById('searchLoading');
-    
-    let searchTimeout;
-
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchLoading.style.display = 'block';
-        
-        searchTimeout = setTimeout(() => {
-            filterForm.submit();
-        }, 500);
-    });
-
-    sortBySelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
-    filterForm.addEventListener('submit', function() {
-        searchLoading.style.display = 'none';
     });
 
     // Handle form submission success
