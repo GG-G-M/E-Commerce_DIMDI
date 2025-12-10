@@ -30,7 +30,6 @@
         </div>
     </div>
 
-    <!-- Alerts -->
     @if($user->isSuperAdmin() && $user->id !== auth()->id())
     <div class="alert alert-warning border-warning border-2 alert-dismissible fade show shadow-sm" role="alert">
         <div class="d-flex align-items-center">

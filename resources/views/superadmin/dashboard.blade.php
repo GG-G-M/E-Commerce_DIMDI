@@ -584,8 +584,7 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
-
+<div class="actions-card">
     <div class="card-body p-3">
         <div class="row g-2">
             <div class="col-md-3">
