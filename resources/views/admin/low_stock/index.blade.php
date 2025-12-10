@@ -48,7 +48,7 @@
         font-size: 1.25rem;
     }
 
-    /* CSV Download Button - Consistent with Import */
+    /* CSV Download Button - Applied stock-in button design */
     .btn-download-csv {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
@@ -62,6 +62,7 @@
         transition: all 0.3s ease;
         box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
         height: 46px;
+        text-decoration: none;
     }
     
     .btn-download-csv:hover {
@@ -69,6 +70,17 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
         color: white;
+        text-decoration: none;
+    }
+
+    .btn-download-csv:active {
+        transform: translateY(0);
+        text-decoration: none;
+    }
+
+    .btn-download-csv:visited {
+        color: white;
+        text-decoration: none;
     }
 
     /* Filter Section - Matching stock_in structure */
@@ -635,7 +647,7 @@
         <h5 class="mb-0">Low Stock Items (Threshold: {{ $threshold }})</h5>
         <div class="header-buttons">
             <a href="{{ route('admin.low_stock.download_csv', array_merge(request()->query(), ['threshold' => $threshold])) }}" class="btn-download-csv">
-                <i class="fas fa-file-download"></i> Download CSV
+                Download CSV
             </a>
         </div>
     </div>
@@ -863,6 +875,11 @@
                     <i class="fas fa-check-circle me-2" style="color: #2C8F0C;"></i>
                     <strong style="color: #2C8F0C;">Great job!</strong> 
                     <span style="color: #2C8F0C;">Your inventory is well-stocked above the threshold level.</span>
+                </div>
+                <div class="d-flex gap-3 justify-content-center mt-3">
+                    <a href="{{ route('admin.low_stock.download_csv', array_merge(request()->query(), ['threshold' => $threshold])) }}" class="btn-download-csv">
+                        Download CSV
+                    </a>
                 </div>
             </div>
         @endif

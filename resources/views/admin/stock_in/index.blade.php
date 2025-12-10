@@ -737,7 +737,7 @@
             </button>
             <button class="btn btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
                 {{-- <i class="fas fa-plus"></i> --}}
-                Add Stock-In
+                Stock-In
             </button>
         </div>
     </div>
