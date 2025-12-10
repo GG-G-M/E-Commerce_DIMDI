@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.Nofooter')
 
 @section('content')
 <style>
@@ -258,7 +258,9 @@
         margin-bottom: 0.5rem;
     }
 
-    .form-control, .form-select {
+    /* Form controls - but NOT the navbar search input */
+    .form-control:not(#searchInput), 
+    .form-select {
         border: 1px solid var(--medium-gray);
         border-radius: 10px;
         padding: 0.625rem 0.75rem;
@@ -266,7 +268,8 @@
         transition: all 0.3s ease;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:not(#searchInput):focus, 
+    .form-select:focus {
         border-color: var(--primary-green);
         box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
         outline: none;

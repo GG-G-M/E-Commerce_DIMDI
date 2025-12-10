@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.Nofooter')
 
 @section('content')
 <style>
@@ -204,7 +204,7 @@
         font-size: 1.1rem;
     }
 
-    /* Form Elements - Consistent styling */
+    /* Form Elements - Consistent styling (but NOT navbar search) */
     .form-label {
         font-weight: 500;
         color: var(--text-dark);
@@ -213,7 +213,8 @@
         display: block;
     }
 
-    .form-control, .form-select {
+    .form-control:not(#searchInput), 
+    .form-select {
         border: 1px solid var(--medium-gray);
         border-radius: 10px;
         padding: 0.75rem 1rem;
@@ -223,7 +224,8 @@
         width: 100%;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:not(#searchInput):focus, 
+    .form-select:focus {
         border-color: var(--primary-green);
         box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
         outline: none;
