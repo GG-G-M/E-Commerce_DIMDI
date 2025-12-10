@@ -104,6 +104,60 @@
         margin-top: 1rem;
         border: 1px solid #2C8F0C;
     }
+
+    /* === Green Gradient Buttons (matching Add Product button from index) === */
+    .btn-custom-green {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+
+    .btn-custom-green:active {
+        transform: translateY(0);
+    }
+
+    /* Secondary green button for cancel */
+    .btn-custom-green-secondary {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green-secondary:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #495057;
+    }
 </style>
 
 <!-- Header -->
@@ -332,11 +386,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <strong>Total Variants:</strong> 
-                                    <span class="badge bg-info" id="totalVariants">0</span>
+                                    <span id="totalVariants">0</span>
                                 </div>
                                 <div class="col-md-6">
                                     <strong>Total Stock:</strong> 
-                                    <span class="badge bg-success" id="totalStock">0 units</span>
+                                    <span id="totalStock">0 units</span>
                                 </div>
                             </div>
                         </div>
@@ -373,8 +427,14 @@
             </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-md-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create Product</button>
+                <a href="{{ route('admin.products.index') }}" class="btn-custom-green-secondary me-md-2">
+                    {{-- <i class="fas fa-times"></i> --}}
+                    Cancel
+                </a>
+                <button type="submit" class="btn-custom-green">
+                    {{-- <i class="fas fa-plus"></i> --}}
+                    Create Product
+                </button>
             </div>
         </form>
     </div>
