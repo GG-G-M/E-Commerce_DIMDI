@@ -44,6 +44,7 @@ class ProductController extends Controller
             ->appends($request->except('page'));
 
         $categories = Category::active()->get();
+        $brands = Brand::all();
         $statuses = [
             'active' => 'Active',
             'inactive' => 'Inactive',
@@ -52,7 +53,7 @@ class ProductController extends Controller
             'all' => 'All'
         ];
 
-        return view('admin.products.index', compact('products', 'categories', 'statuses'));
+        return view('admin.products.index', compact('products', 'categories', 'brands', 'statuses'));
     }
 
     public function create()
@@ -69,7 +70,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
+            'stock_quantity' => 'required_without:has_variants|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -101,13 +102,12 @@ class ProductController extends Controller
         }
 
         // Create product
-        $product = Product::create([
+        $productData = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'stock_quantity' => $request->stock_quantity,
             'sku' => 'SKU-' . strtoupper(Str::random(8)),
             'image' => $imagePath,
             'is_featured' => $request->has('is_featured'),
@@ -115,7 +115,16 @@ class ProductController extends Controller
             'is_archived' => false,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-        ]);
+        ];
+        
+        // Add stock_quantity only if variants are not enabled
+        if (!$request->has('has_variants') || !$request->has_variants) {
+            $productData['stock_quantity'] = $request->stock_quantity ?? 0;
+        } else {
+            $productData['stock_quantity'] = 0; // Default to 0 when using variants
+        }
+        
+        $product = Product::create($productData);
 
         // Create variants if enabled
         if ($request->has('has_variants') && $request->has_variants && $request->variants) {
@@ -145,6 +154,14 @@ class ProductController extends Controller
 
             // Update product stock to sum of variants
             $product->updateTotalStock();
+        }
+
+        // Check if this is an AJAX request
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully!'
+            ]);
         }
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
@@ -224,7 +241,9 @@ class ProductController extends Controller
         } else {
             // No variants, use product stock
             $product->variants()->delete();
-            $product->update(['stock_quantity' => $validated['stock_quantity']]);
+            if (isset($validated['stock_quantity'])) {
+                $product->update(['stock_quantity' => $validated['stock_quantity']]);
+            }
         }
 
         return redirect()->route('admin.products.index')

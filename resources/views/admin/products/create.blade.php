@@ -170,7 +170,8 @@
                             <div class="mb-3">
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
-                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" readonly>
+                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" 
+                                       min="0" {{ old('has_variants') ? '' : 'required' }}>
                                 @error('stock_quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -266,10 +267,10 @@
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label class="form-label">Stock Quantity *</label>
-                                                <input type="number" class="form-control" 
+                                                <input type="number" class="form-control stock-input" 
                                                        name="variants[{{ $index }}][stock]" 
                                                        value="{{ $variant['stock'] ?? 0 }}" 
-                                                       min="0" readonly>
+                                                       min="0" required>
                                             </div>
                                         </div>
                                     </div>
@@ -387,7 +388,20 @@
     // Toggle variants section
     document.getElementById('has_variants').addEventListener('change', function() {
         const variantsSection = document.getElementById('variantsSection');
+        const stockQuantityInput = document.getElementById('stock_quantity');
+        
         variantsSection.style.display = this.checked ? 'block' : 'none';
+        
+        // Enable/disable stock quantity field based on variants
+        if (this.checked) {
+            stockQuantityInput.readOnly = true;
+            stockQuantityInput.removeAttribute('required');
+            stockQuantityInput.value = '0';
+        } else {
+            stockQuantityInput.readOnly = false;
+            stockQuantityInput.setAttribute('required', 'required');
+        }
+        
         updateSummary();
     });
 
@@ -422,7 +436,7 @@
                             <label class="form-label">Stock Quantity *</label>
                             <input type="number" class="form-control stock-input" 
                                    name="variants[${variantCount}][stock]" 
-                                   value="0" min="0" readonly>
+                                   value="0" min="0" required>
                         </div>
                     </div>
                 </div>
@@ -563,10 +577,73 @@
                 alert('Please add at least one variant when variants are enabled.');
                 return false;
             }
+            
+            // Clear stock_quantity when variants are enabled
+            document.getElementById('stock_quantity').value = '0';
+        } else {
+            // Ensure stock_quantity has a value when variants are disabled
+            const stockQuantity = document.getElementById('stock_quantity').value;
+            if (!stockQuantity || stockQuantity < 0) {
+                e.preventDefault();
+                alert('Please enter a valid stock quantity when variants are disabled.');
+                return false;
+            }
         }
     });
 
     // Initial summary update
     updateSummary();
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
 </script>
 @endpush
