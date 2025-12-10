@@ -108,14 +108,14 @@
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
-        padding: 0.75rem 0.5rem;
+        padding: 0.75rem 1rem;
         white-space: nowrap;
         text-align: center;
         vertical-align: middle;
     }
 
     .table td {
-        padding: 0.75rem 0.5rem;
+        padding: 0.75rem 1rem;
         vertical-align: middle;
         border-bottom: 1px solid #e9ecef;
         text-align: center;
@@ -522,7 +522,7 @@
         
         .table th,
         .table td {
-            padding: 0.5rem 0.25rem;
+            padding: 0.5rem 0.5rem;
         }
         
         .product-img {
