@@ -554,71 +554,118 @@
         box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
     }
 
-    /* Header Section */
+    /* === Premium Modern Header Section === */
     .view-header-section {
         background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e6 100%);
-        border-radius: 12px;
-        padding: 2rem;
+        border-radius: 20px;
+        padding: 2.5rem;
         margin-bottom: 2rem;
-        border: 1px solid #c8e6c9;
+        border: 2px solid #c8e6c9;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(44, 143, 12, 0.1);
     }
 
+    .view-header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #2C8F0C, #4CAF50, #66BB6A, #81C784);
+        border-radius: 20px 20px 0 0;
+    }
+
+    /* === Centered Card Layout === */
     .view-product-showcase {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 3rem;
         align-items: center;
-        gap: 2rem;
-        flex-wrap: wrap;
+        text-align: center;
     }
 
     .view-product-image-container {
-        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .view-product-image {
-        width: 120px;
-        height: 120px;
+        width: 150px;
+        height: 150px;
         object-fit: cover;
-        border-radius: 12px;
-        border: 3px solid #2C8F0C;
+        border-radius: 20px;
+        border: 4px solid #2C8F0C;
         background-color: #f8f9fa;
-        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.15);
+        box-shadow: 0 8px 32px rgba(44, 143, 12, 0.2);
         display: block;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .view-product-image:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 20px 60px rgba(44, 143, 12, 0.3);
     }
 
     .view-product-info {
-        flex: 1;
-        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
     }
 
     .view-product-name {
         color: #2C8F0C;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        line-height: 1.3;
+        margin: 0;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .view-product-meta {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
+        gap: 1.5rem;
         flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
     }
 
     .view-product-sku {
-        color: #6c757d;
-        font-size: 0.9rem;
+        color: #495057;
+        font-size: 1rem;
         font-family: 'SF Mono', Monaco, monospace;
-        background: #f8f9fa;
-        padding: 0.25rem 0.5rem;
-        border-radius: 6px;
-        border: 1px solid #dee2e6;
+        background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #dee2e6;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .view-product-sku:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        border-color: #2C8F0C;
     }
 
     .view-product-id {
         color: #6c757d;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         font-weight: 600;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #dee2e6;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
     /* Content Sections */
@@ -710,27 +757,35 @@
         display: block;
     }
 
-    .view-product-name {
-        color: #2C8F0C;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin-bottom: 0.25rem;
-        text-align: center;
-    }
-
-    .view-product-sku {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        text-align: center;
-        font-family: 'SF Mono', Monaco, monospace;
-    }
-
-    .view-product-id {
-        color: #6c757d;
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
-        text-align: center;
+    /* === Responsive Design === */
+    @media (max-width: 768px) {
+        .view-product-showcase {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            text-align: center;
+        }
+        
+        .view-product-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .view-product-name {
+            font-size: 1.5rem;
+        }
+        
+        .view-product-meta {
+            justify-content: center;
+        }
+        
+        .view-price-display {
+            padding: 1.5rem;
+        }
+        
+        .view-current-price {
+            font-size: 1.8rem;
+        }
     }
 
     /* Compact grid layout for cards */
@@ -748,64 +803,136 @@
         grid-column: span 1;
     }
 
+    /* === Enhanced Status Badges === */
     .view-status-badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: 2rem;
-        font-weight: 600;
-        font-size: 0.875rem;
-        border: none;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 3px solid;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .view-status-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .view-status-badge:hover::before {
+        left: 100%;
+    }
+
+    .view-status-badge:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
     .view-status-active {
         background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
         color: #166534;
+        border-color: #22C55E;
     }
 
     .view-status-inactive {
         background: linear-gradient(135deg, #FEE2E2, #FECACA);
         color: #991B1B;
+        border-color: #EF4444;
     }
 
     .view-status-archived {
         background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
         color: #4B5563;
+        border-color: #9CA3AF;
     }
 
+    /* === Premium Price Display Card === */
     .view-price-display {
         background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 2px solid #2C8F0C;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 3px solid #2C8F0C;
         text-align: center;
-        margin-top: 1rem;
+        box-shadow: 0 10px 40px rgba(44, 143, 12, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .view-price-display::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: shimmer 4s infinite;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { transform: rotate(0deg); opacity: 0.5; }
+        50% { transform: rotate(180deg); opacity: 1; }
+    }
+
+    .view-price-display:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px rgba(44, 143, 12, 0.3);
     }
 
     .view-current-price {
-        font-size: 2rem;
-        font-weight: 700;
+        font-size: 2.5rem;
+        font-weight: 900;
         color: #2C8F0C;
         line-height: 1;
+        margin: 0;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1;
     }
 
     .view-original-price {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         color: #6c757d;
         text-decoration: line-through;
-        margin-top: 0.5rem;
+        margin-top: 0.75rem;
+        position: relative;
+        z-index: 1;
     }
 
     .view-discount-badge {
         background: linear-gradient(135deg, #EF4444, #DC2626);
         color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.875rem;
-        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-size: 1rem;
+        font-weight: 700;
         display: inline-block;
-        margin-top: 0.5rem;
+        margin-top: 1rem;
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        position: relative;
+        z-index: 1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3); }
+        50% { box-shadow: 0 6px 30px rgba(220, 53, 69, 0.5); }
     }
 
     .view-variants-list {
@@ -1380,23 +1507,28 @@
                     aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Header Section -->
+                <!-- Premium Header Section -->
                 <div class="view-header-section">
                     <div class="view-product-showcase">
+                        <!-- Product Image -->
                         <div class="view-product-image-container">
                             <img src="" alt="Product Image" class="view-product-image" id="viewProductImage">
                         </div>
+                        
+                        <!-- Product Information -->
                         <div class="view-product-info">
-                            <div class="view-product-name" id="viewProductName">-</div>
+                            <h1 class="view-product-name" id="viewProductName">Product Name</h1>
                             <div class="view-product-meta">
                                 <span class="view-product-sku" id="viewProductSku">SKU: -</span>
-                                <span class="view-product-id" id="viewProductId">Product ID: #-</span>
+                                <span class="view-product-id" id="viewProductId">ID: #-</span>
                             </div>
                             <div id="viewProductStatus" class="view-status-badge view-status-active">
-                                Active
+                                <i class="fas fa-check-circle"></i>
+                                <span>Active</span>
                             </div>
                         </div>
-                        <!-- Price Display -->
+                        
+                        <!-- Price Display Card -->
                         <div class="view-price-display" id="viewPriceDisplay" style="display: none;">
                             <div id="viewDiscountBadge" class="view-discount-badge" style="display: none;"></div>
                             <div class="view-current-price" id="viewCurrentPrice">₱0.00</div>
@@ -1603,10 +1735,10 @@
                             </td>
                             <td class="price-col">
                                 @if($product->has_discount)
-                                    <div class="price-current">₱{{ number_format($product->sale_price, 2) }}</div>
-                                    <div class="price-original">₱{{ number_format($product->price, 2) }}</div>
+                                    <div class="price-current">₱{{ number_format($product->sale_price, 2, '.', ',') }}</div>
+                                    <div class="price-original">₱{{ number_format($product->price, 2, '.', ',') }}</div>
                                 @else
-                                    <div class="price-current">₱{{ number_format($product->price, 2) }}</div>
+                                    <div class="price-current">₱{{ number_format($product->price, 2, '.', ',') }}</div>
                                 @endif
                             </td>
                             <td class="stock-col">
@@ -1925,7 +2057,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const discountText = hasVariantDiscount ? 
                         `<div class="view-variant-discount">
                             <i class="fas fa-tag me-1"></i>
-                            ₱${price.toFixed(2)} → ₱${salePrice.toFixed(2)} (${discountPercentage}% off)
+                            ₱${price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} → ₱${salePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${discountPercentage}% off)
                         </div>` : '';
                     
                     // Handle variant stock
@@ -1951,7 +2083,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                                 <div class="view-variant-price">
                                     <i class="fas fa-peso-sign me-1"></i>
-                                    ₱${currentPrice.toFixed(2)}
+                                    ₱${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                 </div>
                                 ${discountText}
                                 ${stockText}
@@ -1991,25 +2123,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const discountPercentage = Math.round(((basePrice - salePrice) / basePrice) * 100);
                 document.getElementById('viewDiscountBadge').style.display = 'inline-block';
                 document.getElementById('viewDiscountBadge').textContent = `${discountPercentage}% OFF`;
-                document.getElementById('viewCurrentPrice').textContent = `₱${salePrice.toFixed(2)}`;
+                document.getElementById('viewCurrentPrice').textContent = `₱${salePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 document.getElementById('viewOriginalPrice').style.display = 'block';
-                document.getElementById('viewOriginalPrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewOriginalPrice').textContent = `₱${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 
                 // Update pricing card - always show both prices
                 document.getElementById('viewSalePriceRow').style.display = 'flex';
                 document.getElementById('viewDiscountRow').style.display = 'flex';
-                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toFixed(2)}`;
-                document.getElementById('viewProductSalePrice').textContent = `₱${salePrice.toFixed(2)}`;
+                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('viewProductSalePrice').textContent = `₱${salePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 document.getElementById('viewProductDiscount').textContent = `${discountPercentage}%`;
             } else {
                 document.getElementById('viewDiscountBadge').style.display = 'none';
-                document.getElementById('viewCurrentPrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewCurrentPrice').textContent = `₱${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 document.getElementById('viewOriginalPrice').style.display = 'none';
                 
                 // Update pricing card - show base price and indicate no sale price
                 document.getElementById('viewSalePriceRow').style.display = 'flex';
                 document.getElementById('viewDiscountRow').style.display = 'none';
-                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 document.getElementById('viewProductSalePrice').textContent = 'No sale price';
             }
 
