@@ -46,10 +46,18 @@ class LowStockController extends Controller
 
         $csv = Writer::createFromString('');
         $csv->insertOne([
-            'product_id', 'product_variant_id', 'warehouse_id', 'supplier_id', 'stock_checker_id', 'quantity', 'reason'
+            'product_id', 'product_variant_id', 'warehouse_id', 'supplier_id', 'stock_checker_id', 'quantity', 'price', 'reason'
         ]);
 
         foreach ($products as $p) {
+            // Get the latest price from stock_in records for this product
+            $latestStockIn = StockIn::where('product_id', $p->id)
+                ->whereNotNull('price')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $price = $latestStockIn ? $latestStockIn->price : '';
+
             $csv->insertOne([
                 $p->id,
                 '',
@@ -57,11 +65,20 @@ class LowStockController extends Controller
                 '', // supplier_id can be filled by user
                 '', // stock_checker_id can be filled by user
                 $p->stock_quantity,
+                $price,
                 ''
             ]);
         }
 
         foreach ($variants as $v) {
+            // Get the latest price from stock_in records for this variant
+            $latestStockIn = StockIn::where('product_variant_id', $v->id)
+                ->whereNotNull('price')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            $price = $latestStockIn ? $latestStockIn->price : '';
+
             $csv->insertOne([
                 '',
                 $v->id,
@@ -69,6 +86,7 @@ class LowStockController extends Controller
                 '', // supplier_id
                 '', // stock_checker_id
                 $v->stock_quantity,
+                $price,
                 ''
             ]);
         }

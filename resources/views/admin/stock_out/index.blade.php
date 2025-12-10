@@ -646,7 +646,7 @@
         <div class="ms-auto d-flex gap-2">
             <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
                 {{-- <i class="fas fa-minus-circle"></i> --}}
-                Add Stock-Out
+                Stock-Out
             </button>
         </div>
     </div>
