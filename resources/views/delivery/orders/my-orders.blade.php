@@ -83,46 +83,50 @@
         background-color: #F8FDF8;
     }
 
-    /* Button Styles - Consistent */
-    .btn-success-custom {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
-    }
-    
-    .btn-success-custom:hover {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
-        color: white;
-    }
+   /* Update the button styles to match pick up button design */
+.btn-outline-success-custom {
+    background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
+    text-decoration: none;
+}
 
-    .btn-outline-success-custom {
-        background: white;
-        border: 2px solid #2C8F0C;
-        color: #2C8F0C;
-        font-weight: 600;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-outline-success-custom:hover {
-        background: #2C8F0C;
-        color: white;
-        transform: translateY(-1px);
-    }
+.btn-outline-success-custom:hover {
+    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+}
+
+/* If you want the active button to look different */
+.btn-outline-success-custom.active {
+    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.3);
+}
+
+/* Update quick filter buttons to also match */
+.btn-outline-success-custom {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Make sure header buttons have proper spacing */
+.header-buttons .btn {
+    margin: 0;
+    font-size: 0.9rem;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 
     /* Search Box */
     .search-box {
