@@ -127,20 +127,46 @@
         vertical-align: middle;
     }
     
-    /* Product column specific styling - keep content readable */
+    /* Product column - center aligned */
     .table td.name-col {
-        text-align: left;
-        padding-left: 0.75rem;
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+    }
+    
+    .table th.name-col {
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+    }
+    
+    /* Product column content centering */
+    .table td.name-col .text-center {
+        text-align: center;
+        width: 100%;
     }
     
     .table td.name-col .product-name,
     .table td.name-col .product-sku {
-        text-align: left;
+        text-align: center;
         display: block;
-        width: 100%;
+        margin: 0 auto;
     }
     
-    .table th.name-col {
+    /* Product name and SKU specific styling */
+    .product-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+        line-height: 1.2;
+        margin-bottom: 2px;
+        text-align: center;
+    }
+    
+    .product-sku {
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin-top: 0;
         text-align: center;
     }
     
@@ -318,18 +344,7 @@
         background-color: #f8f9fa;
     }
     
-    .product-name {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.9rem;
-        line-height: 1.2;
-    }
-    
-    .product-sku {
-        color: #6c757d;
-        font-size: 0.75rem;
-        margin-top: 2px;
-    }
+
     
 
 
@@ -1375,8 +1390,10 @@
                                      class="product-img">
                             </td>
                             <td class="name-col">
-                                <div class="product-name">{{ Str::limit($product->name, 30) }}</div>
-                                <div class="product-sku">{{ $product->sku }}</div>
+                                <div class="text-center">
+                                    <div class="product-name">{{ Str::limit($product->name, 30) }}</div>
+                                    <div class="product-sku">{{ $product->sku }}</div>
+                                </div>
                             </td>
                             <td class="brand-col">
                                 @if($product->brand_id && $product->brand)
