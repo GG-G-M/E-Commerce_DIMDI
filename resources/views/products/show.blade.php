@@ -367,10 +367,10 @@
     </nav>
 
     <div class="row">
-        <div class="col-lg-6 mb-4">
+        <div class="col-lg-5 mb-4">
             <div class="position-relative">
-                <img src="{{ $product->image_url }}" 
-                     class="img-fluid rounded shadow-sm product-main-image" 
+                <img src="{{ $product->image_url }}"
+                     class="img-fluid rounded shadow-sm product-main-image"
                      alt="{{ $product->name }}"
                      id="product-main-image"
                      style="width: 100%; height: 400px; object-fit: cover;">
@@ -382,7 +382,7 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
+        <div class="col-lg-7">
             <h1 class="h2 fw-bold text-success">{{ $product->name }}</h1>
             
             <!-- Display Brand -->
@@ -879,8 +879,11 @@
                         </div>
                     </div>
 
-                    <!-- All Reviews List -->
-                    <div class="reviews-list mt-5">
+                    <!-- Rating Distribution -->
+                    @php
+                        $distribution = $product->getRatingDistribution();
+                        $percentages = $product->getRatingDistributionPercentages();
+                    @endphp
                         <h5 class="text-success mb-4">Customer Reviews ({{ $product->ratings->count() }})</h5>
                         @if($product->ratings->count() > 0)
                             @foreach($product->ratings()->with('user')->latest()->get() as $rating)
@@ -1210,54 +1213,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Toast notification function
+    // Toast notification function - Clean and consistent design
     function showToast(message, type = 'success') {
         // Remove existing toasts
         document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
-        
+
         const bgColors = {
             'success': '#2C8F0C',
             'error': '#dc3545',
             'warning': '#ffc107',
             'info': '#17a2b8'
         };
-        
+
         const icons = {
             'success': 'fa-check-circle',
             'error': 'fa-exclamation-triangle',
             'warning': 'fa-exclamation-circle',
             'info': 'fa-info-circle'
         };
-        
+
         const bgColor = bgColors[type] || bgColors.success;
         const icon = icons[type] || icons.success;
         const textColor = type === 'warning' ? 'text-dark' : 'text-white';
-        
+
         const toast = document.createElement('div');
-        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x';
         toast.style.cssText = `
             top: 100px;
             z-index: 9999;
-            min-width: 300px;
+            min-width: 400px;
+            max-width: 500px;
             text-align: center;
+            padding: 1rem;
         `;
-        
+
         toast.innerHTML = `
-            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 12px; border: none;">
                 <div class="d-flex justify-content-center align-items-center p-3">
-                    <div class="toast-body ${textColor} d-flex align-items-center">
-                        <i class="fas ${icon} me-2 fs-5"></i>
-                        <span class="fw-semibold">${message}</span>
+                    <div class="toast-body ${textColor} d-flex align-items-center justify-content-center">
+                        <i class="fas ${icon} me-3 fs-4"></i>
+                        <span class="fw-semibold fs-6">${message}</span>
                     </div>
                 </div>
             </div>
         `;
         document.body.appendChild(toast);
-        
-        // Auto remove after 3 seconds
+
+        // Auto remove after 3 seconds with smooth animation
         setTimeout(() => {
             if (toast.parentNode) {
-                toast.remove();
+                // Add fade out animation
+                toast.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-30px) scale(0.95)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 400);
             }
         }, 3000);
     }

@@ -526,7 +526,7 @@
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="form-control search-input"
-                        placeholder="Search products or categories..." id="searchInput" autocomplete="off">
+                        placeholder="      Search products or categories..." id="searchInput" autocomplete="off">
                     <div class="search-results" id="searchResults"></div>
                 </div>
 
