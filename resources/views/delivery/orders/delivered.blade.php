@@ -339,11 +339,6 @@
         background-color: #f8f9fa;
     }
 
-    /* Card body padding fix */
-    .card-body {
-        padding: 0 !important;
-    }
-
     /* Header button group */
     .header-buttons {
         display: flex;
@@ -402,67 +397,7 @@
 </style>
 
 
-<!-- Filter and Search Section -->
-<div class="card card-custom mb-4">
-    <div class="card-body">
-        <form id="filterForm" method="GET" action="{{ route('delivery.orders.delivered') }}">
-            <div class="row g-2 align-items-end">
-                <!-- Search Box -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Search Orders</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control search-box" name="search" 
-                                   placeholder="Search by order number, customer name..." 
-                                   value="{{ request('search') }}">
-                            <button class="btn btn-success-custom" type="submit">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Date Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Delivery Date</label>
-                        <select class="form-select search-box" name="date_filter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">All Time</option>
-                            <option value="today" {{ request('date_filter') == 'today' ? 'selected' : '' }}>Today</option>
-                            <option value="week" {{ request('date_filter') == 'week' ? 'selected' : '' }}>This Week</option>
-                            <option value="month" {{ request('date_filter') == 'month' ? 'selected' : '' }}>This Month</option>
-                            <option value="last_month" {{ request('date_filter') == 'last_month' ? 'selected' : '' }}>Last Month</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Amount Filter -->
-                <div class="col-md-4">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold">Order Amount</label>
-                        <select class="form-select search-box" name="amount_filter" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">Any Amount</option>
-                            <option value="low" {{ request('amount_filter') == 'low' ? 'selected' : '' }}>Under ₱500</option>
-                            <option value="medium" {{ request('amount_filter') == 'medium' ? 'selected' : '' }}>₱500 - ₱2,000</option>
-                            <option value="high" {{ request('amount_filter') == 'high' ? 'selected' : '' }}>Over ₱2,000</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reset Filters -->
-            @if(request()->hasAny(['search', 'date_filter', 'amount_filter']))
-            <div class="row mt-2">
-                <div class="col-12">
-                    <a href="{{ route('delivery.orders.delivered') }}" class="btn btn-outline-success-custom btn-sm">
-                        <i class="fas fa-times me-1"></i> Clear Filters
-                    </a>
-                </div>
-            </div>
-            @endif
-        </form>
-    </div>
-</div>
 
 <!-- Orders Table -->
 <div class="card card-custom">
