@@ -33,7 +33,7 @@
         font-size: 1.25rem;
     }
 
-    /* Improved Add Button */
+    /* Add Stock-In Button - Matching Add Product Button */
     .btn-add-stock-in {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
@@ -56,9 +56,13 @@
         color: white;
     }
 
-    /* CSV Import Button */
+    .btn-add-stock-in:active {
+        transform: translateY(0);
+    }
+
+    /* CSV Import Button - Matching Import CSV Button */
     .btn-import-csv {
-        background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
         color: white;
         font-weight: 600;
@@ -68,15 +72,19 @@
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(23, 162, 184, 0.2);
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
         height: 46px;
     }
     
     .btn-import-csv:hover {
-        background: linear-gradient(135deg, #138496, #5a32a3);
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
         transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(23, 162, 184, 0.3);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
         color: white;
+    }
+
+    .btn-import-csv:active {
+        transform: translateY(0);
     }
 
     /* Table Styling - Compact */
@@ -87,7 +95,14 @@
         border-spacing: 0;
         font-size: 0.9rem;
     }
-
+    
+    /* Center align all table headers and cells */
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -95,12 +110,15 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 0.75rem 0.5rem;
         white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .table td {
         padding: 0.75rem 0.5rem;
         vertical-align: middle;
         border-bottom: 1px solid #e9ecef;
+        text-align: center;
     }
 
     .table tbody tr:hover {
@@ -174,24 +192,37 @@
         100% { opacity: 1; }
     }
 
-    /* Modal Styling - Consistent */
+    /* Modal Styling - Matching products page */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
+    }
+    
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
-        padding: 1rem;
+        padding: 1rem 1.5rem;
     }
 
     .modal-title {
         font-weight: 700;
         font-size: 1.1rem;
     }
-
-    .modal-content {
-        border-radius: 12px;
+    
+    .btn-close {
+        background: none;
         border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        color: white;
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+    
+    .btn-close:hover {
+        opacity: 1;
     }
 
     /* Form Styling */
@@ -263,24 +294,39 @@
     /* Empty State */
     .empty-state {
         text-align: center;
-        padding: 2rem 1rem;
+        padding: 3rem 1rem;
     }
 
     .empty-state i {
-        font-size: 3rem;
+        font-size: 4rem;
         color: #C8E6C9;
         margin-bottom: 1rem;
     }
 
-    /* Table Container */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
         max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
     }
 
-    /* Summary Cards - Compact */
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
+    }
+
+    /* Summary Cards - Consistent with products page */
     .summary-card {
         background: linear-gradient(135deg, #E8F5E6, #F8FDF8);
         border: none;
@@ -304,20 +350,20 @@
         font-weight: 600;
     }
 
-    /* Column widths - More compact */
-    .id-col { width: 60px; min-width: 60px; }
-    .product-col { width: 180px; min-width: 180px; }
-    .warehouse-col { width: 100px; min-width: 100px; }
-    .supplier-col { width: 100px; min-width: 100px; }
-    .checker-col { width: 120px; min-width: 120px; }
-    .quantity-col { width: 80px; min-width: 80px; }
-    .remaining-col { width: 90px; min-width: 90px; }
-    .price-col { width: 100px; min-width: 100px; }
-    .status-col { width: 90px; min-width: 90px; }
-    .reason-col { width: 130px; min-width: 130px; }
-    .date-col { width: 100px; min-width: 100px; }
+    /* Column widths - Consistent with products page */
+    .id-col { width: 60px; min-width: 60px; text-align: center; }
+    .product-col { width: 180px; min-width: 180px; text-align: center; }
+    .warehouse-col { width: 100px; min-width: 100px; text-align: center; }
+    .supplier-col { width: 100px; min-width: 100px; text-align: center; }
+    .checker-col { width: 120px; min-width: 120px; text-align: center; }
+    .quantity-col { width: 80px; min-width: 80px; text-align: center; }
+    .remaining-col { width: 90px; min-width: 90px; text-align: center; }
+    .price-col { width: 100px; min-width: 100px; text-align: center; }
+    .status-col { width: 90px; min-width: 90px; text-align: center; }
+    .reason-col { width: 130px; min-width: 130px; text-align: center; }
+    .date-col { width: 100px; min-width: 100px; text-align: center; }
 
-    /* Product Info Cell - Compact */
+    /* Product Info Cell - Matching products page */
     .product-info-cell {
         display: flex;
         align-items: center;
@@ -331,6 +377,8 @@
         border-radius: 6px;
         border: 1px solid #e9ecef;
         background-color: #f8f9fa;
+        margin: 0 auto;
+        display: block;
     }
     
     .product-name {
@@ -338,17 +386,20 @@
         color: #333;
         font-size: 0.85rem;
         line-height: 1.2;
+        text-align: center;
     }
     
     .product-type {
         color: #6c757d;
         font-size: 0.75rem;
         font-style: italic;
+        text-align: center;
     }
     
     .variant-name {
         color: #6c757d;
         font-size: 0.8rem;
+        text-align: center;
     }
 
     /* Quantity Styling - No badges */
@@ -382,7 +433,7 @@
         margin-top: 2px;
     }
 
-    /* CSV Template Section */
+    /* CSV Import Modal styling - Consistent with products page */
     .csv-template-section {
         background-color: #F8FDF8;
         border: 1px dashed #2C8F0C;
@@ -392,7 +443,6 @@
         margin-bottom: 1rem;
     }
 
-    /* CSV Instructions */
     .csv-instructions {
         background-color: #F8F9FA;
         border-left: 3px solid #2C8F0C;
@@ -400,6 +450,26 @@
         padding: 0.75rem;
         font-size: 0.85rem;
         margin-bottom: 1rem;
+    }
+    
+    .btn-download-csv {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-download-csv:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        color: white;
+        transform: translateY(-2px);
     }
 
     /* Pagination styling - Consistent */
@@ -599,50 +669,55 @@
             <form action="{{ route('admin.stock_in.import.csv') }}" method="POST" enctype="multipart/form-data" id="csvUploadForm">
                 @csrf
                 <div class="modal-body">
-                    <!-- Template Download -->
-                    <div class="csv-template-section">
+                    <!-- Template Download Section -->
+                    <div class="template-download" style="background: #e8f5e9; border: 1px dashed #2C8F0C; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
                         <h6 class="text-success mb-3">
                             <i class="fas fa-download me-2"></i>Download CSV Template
                         </h6>
                         <p class="text-muted mb-3">
                             Use our template to ensure your CSV file has the correct format.
                         </p>
-                        <a href="{{ route('admin.stock_in.csv.template') }}" class="btn-download-csv">
-                            <i class="fas fa-file-download"></i> Download Template
+                        <a href="{{ route('admin.stock_in.csv.template') }}" class="btn btn-success">
+                            <i class="fas fa-file-download me-2"></i>Download Template
                         </a>
                     </div>
 
                     <!-- Instructions -->
-                    <div class="csv-instructions">
+                    <div class="csv-instructions" style="background: #f8f9fa; border-left: 4px solid #2C8F0C; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
                         <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
                         <ul class="small mb-0">
-                            <li>File must be CSV format</li>
+                            <li>File must be in CSV format (Comma Separated Values)</li>
+                            <li>First row must contain column headers</li>
                             <li>Required columns: <code>product_id</code>, <code>variant_id</code>, <code>warehouse_id</code>, <code>supplier_id</code>, <code>stock_checker_id</code>, <code>quantity</code>, <code>price</code>, <code>reason</code></li>
                             <li>Ensure IDs correspond to existing products, variants, warehouses, suppliers, and stock checkers</li>
+                            <li>Make sure all required IDs exist in your database</li>
                         </ul>
                     </div>
 
-                    <!-- File Input -->
+                    <!-- File Upload -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Select CSV File</label>
-                        <input type="file" name="csv_file" class="form-control" accept=".csv" required>
-                        <div class="form-text">Only CSV files allowed, max 10MB</div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="progress mb-3" style="height: 6px; display: none;" id="uploadProgress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success"
-                            role="progressbar" style="width:0%" aria-valuenow="0" aria-valuemin="0"
-                            aria-valuemax="100">
+                        <label for="csv_file" class="form-label fw-bold">Select CSV File</label>
+                        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                        <div class="form-text">
+                            Only .csv files are allowed. Maximum file size: 10MB
                         </div>
                     </div>
 
+                    <!-- Progress Bar (Hidden by default) -->
+                    <div class="progress mb-3" style="height: 20px; display: none;" id="uploadProgress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <span class="progress-text">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Status Messages -->
                     <div id="uploadStatus" class="alert" style="display: none;"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-import-csv" id="uploadCsvBtn">
-                        <i class="fas fa-upload"></i> Upload CSV
+                        <i class="fas fa-upload me-2"></i>Upload CSV
                     </button>
                 </div>
             </form>
@@ -654,19 +729,20 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock-In Management</h5>
-        <div class="header-buttons">
-            <button class="btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                <i class="fas fa-file-csv"></i> Import CSV
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                {{-- <i class="fas fa-file-csv"></i> --}}
+                Import CSV
             </button>
-            <button class="btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
-                <i class="fas fa-plus"></i> Add Stock-In
+            <button class="btn btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
+                {{-- <i class="fas fa-plus"></i> --}}
+                Add Stock-In
             </button>
         </div>
     </div>
     <div class="card-body p-0">
         @if ($stockIns->count() > 0)
-            <div class="table-container">
-                <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
@@ -705,19 +781,21 @@
                                     <small class="text-muted">#{{ $stock->id }}</small>
                                 </td>
                                 <td class="product-col">
-                                    <div class="product-info-cell">
-                                        @if($stock->product && $stock->product->image_url)
-                                            <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
-                                                 class="product-img">
-                                        @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
-                                            <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
-                                                 class="product-img">
-                                        @else
-                                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-box text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <div>
+                                    <div class="text-center">
+                                        <div class="product-info-cell">
+                                            @if($stock->product && $stock->product->image_url)
+                                                <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
+                                                     class="product-img">
+                                            @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
+                                                <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
+                                                     class="product-img">
+                                            @else
+                                                <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                                    <i class="fas fa-box text-muted"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div class="mt-2">
                                             @if($stock->product && !$stock->variant)
                                                 <div class="product-name">{{ Str::limit($stock->product->name, 25) }}</div>
                                                 <div class="product-type">Main Product</div>
@@ -773,7 +851,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
 
             @if($stockIns->hasPages())
             <div class="d-flex justify-content-center p-3">
@@ -786,11 +863,13 @@
                 <h5 class="text-muted">No Stock-In Records</h5>
                 <p class="text-muted mb-4">Start by adding your first stock-in record or importing via CSV.</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                        <i class="fas fa-file-csv"></i> Import CSV
+                    <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                        {{-- <i class="fas fa-file-csv"></i> --}}
+                        Import CSV
                     </button>
-                    <button class="btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
-                        <i class="fas fa-plus"></i> Add First Stock-In
+                    <button class="btn btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
+                        {{-- <i class="fas fa-plus"></i> --}}
+                        Add First Stock-In
                     </button>
                 </div>
             </div>
@@ -894,7 +973,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-add-stock-in" id="saveBtn">
-                        <i class="fas fa-save me-1"></i> Save
+                        <i class="fas fa-save me-1"></i> Save Stock-In
                     </button>
                 </div>
             </form>
@@ -1337,59 +1416,84 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // --- CSV Upload functionality ---
+    // --- CSV Upload functionality - Matching products page ---
     const csvUploadForm = document.getElementById('csvUploadForm');
-    if (csvUploadForm) {
-        const uploadProgress = document.getElementById('uploadProgress');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const uploadCsvBtn = document.getElementById('uploadCsvBtn');
-        const progressBar = uploadProgress.querySelector('.progress-bar');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+    const progressBar = uploadProgress.querySelector('.progress-bar');
+    const progressText = uploadProgress.querySelector('.progress-text');
 
+    if (csvUploadForm) {
         csvUploadForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
             const formData = new FormData(this);
-
+            
+            // Show progress bar
             uploadProgress.style.display = 'block';
             uploadStatus.style.display = 'none';
             uploadCsvBtn.disabled = true;
-            uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Uploading...';
-
+            uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+            
+            // Simulate progress (in real implementation, you'd use AJAX with progress events)
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress <= 100) {
+                    progressBar.style.width = progress + '%';
+                    progressBar.setAttribute('aria-valuenow', progress);
+                    progressText.textContent = progress + '%';
+                }
+            }, 100);
+            
+            // Submit the form
             fetch(this.action, {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+                
                 if (data.success) {
                     showUploadStatus('success', data.message);
-                    setTimeout(() => window.location.reload(), 2000);
+                    // Refresh the page after 2 seconds to show new data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
                 } else {
-                    showUploadStatus('danger', data.message || 'Upload failed.');
+                    showUploadStatus('danger', data.message || 'Upload failed. Please check your CSV file.');
                 }
             })
-            .catch(err => {
-                showUploadStatus('danger', 'Upload failed: ' + err.message);
+            .catch(error => {
+                clearInterval(progressInterval);
+                showUploadStatus('danger', 'Upload failed: ' + error.message);
             })
             .finally(() => {
                 uploadCsvBtn.disabled = false;
-                uploadCsvBtn.innerHTML = '<i class="fas fa-upload"></i> Upload CSV';
+                uploadCsvBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload CSV';
             });
-
-            function showUploadStatus(type, message) {
-                uploadStatus.className = `alert alert-${type}`;
-                uploadStatus.innerHTML = message;
-                uploadStatus.style.display = 'block';
-                uploadProgress.style.display = 'none';
-            }
         });
-
+        
+        function showUploadStatus(type, message) {
+            uploadStatus.className = `alert alert-${type}`;
+            uploadStatus.innerHTML = message;
+            uploadStatus.style.display = 'block';
+        }
+        
+        // Reset form when modal is closed
         document.getElementById('csvUploadModal').addEventListener('hidden.bs.modal', function() {
             csvUploadForm.reset();
             uploadProgress.style.display = 'none';
             uploadStatus.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
         });
     }
 
@@ -1679,6 +1783,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Toast notification function - Matching products page
+function showToast(message, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+    
+    const bgColors = {
+        'success': '#2C8F0C',
+        'error': '#dc3545',
+        'warning': '#ffc107',
+        'info': '#17a2b8'
+    };
+    
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-triangle',
+        'warning': 'fa-exclamation-circle',
+        'info': 'fa-info-circle'
+    };
+    
+    const bgColor = bgColors[type] || bgColors.success;
+    const icon = icons[type] || icons.success;
+    const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+    
+    const toast = document.createElement('div');
+    toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+    toast.style.cssText = `
+        top: 100px;
+        z-index: 9999;
+        min-width: 300px;
+        text-align: center;
+    `;
+    
+    toast.innerHTML = `
+        <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+            <div class="d-flex justify-content-center align-items-center p-3">
+                <div class="toast-body ${textColor} d-flex align-items-center">
+                    <i class="fas ${icon} me-2 fs-5"></i>
+                    <span class="fw-semibold">${message}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 3000);
+}
 </script>
 @endpush
 @endsection
