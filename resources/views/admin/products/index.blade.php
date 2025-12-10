@@ -438,7 +438,7 @@
         color: white;
     }
 
-    /* View Modal Styling - Adapted from customers */
+    /* Modern View Modal Styling */
     .view-modal-content {
         border: none;
         border-radius: 12px;
@@ -446,57 +446,148 @@
         box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
     }
 
-    .view-info-card {
-        background: white;
-        border: 1px solid #e9ecef;
+    /* Header Section */
+    .view-header-section {
+        background: linear-gradient(135deg, #f8fdf8 0%, #e8f5e6 100%);
         border-radius: 12px;
-        padding: 1.25rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-        height: 100%;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid #c8e6c9;
     }
 
-    .view-info-card:hover {
+    .view-product-showcase {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .view-product-image-container {
+        flex-shrink: 0;
+    }
+
+    .view-product-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 3px solid #2C8F0C;
+        background-color: #f8f9fa;
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.15);
+    }
+
+    .view-product-info {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .view-product-name {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .view-product-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .view-product-sku {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-family: 'SF Mono', Monaco, monospace;
+        background: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .view-product-id {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* Content Sections */
+    .view-content-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .view-section {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .view-section:hover {
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         border-color: #2C8F0C;
     }
 
-    .view-info-card .form-label {
+    .view-section-header {
+        background: linear-gradient(135deg, #E8F5E6, #f8fdf8);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #c8e6c9;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .view-section-header i {
+        color: #2C8F0C;
+        font-size: 1.1rem;
+    }
+
+    .view-section-header h4 {
         color: #2C8F0C;
         font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 1rem;
-        display: block;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #E8F5E6;
+        font-size: 1.1rem;
+        margin: 0;
     }
 
-    .view-detail-item {
+    .view-section-content {
+        padding: 1.5rem;
+    }
+
+    .view-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .view-info-group {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #f8f9fa;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
-    .view-detail-item:last-child {
-        border-bottom: none;
+    .view-info-group.full-width {
+        grid-column: 1 / -1;
     }
 
-    .view-detail-label {
+    .view-info-label {
+        color: #6c757d;
         font-weight: 600;
-        color: #495057;
-        font-size: 0.9rem;
-        flex: 0 0 100px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .view-detail-value {
+    .view-info-value {
         color: #212529;
-        font-size: 0.9rem;
-        text-align: right;
-        flex: 1;
+        font-size: 1rem;
+        font-weight: 500;
         word-break: break-word;
-        margin-left: 0.5rem;
+        line-height: 1.4;
     }
 
     .view-product-image {
@@ -689,12 +780,39 @@
     }
 
     @media (max-width: 768px) {
-        .view-cards-grid {
+        .view-product-showcase {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .view-product-image {
+            width: 100px;
+            height: 100px;
+        }
+
+        .view-product-meta {
+            justify-content: center;
+        }
+
+        .view-info-grid {
             grid-template-columns: 1fr;
         }
 
-        .view-cards-grid .view-info-card {
+        .view-info-group.full-width {
             grid-column: 1 / -1;
+        }
+
+        .view-section-content {
+            padding: 1rem;
+        }
+
+        .view-section-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .view-section-header h4 {
+            font-size: 1rem;
         }
     }
 
@@ -935,17 +1053,22 @@
                     aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <!-- Product Image and Basic Info -->
-                    <div class="col-md-3 text-center">
-                        <img src="" alt="Product Image" class="view-product-image" id="viewProductImage">
-                        <div class="view-product-name" id="viewProductName">-</div>
-                        <div class="view-product-sku" id="viewProductSku">SKU: -</div>
-                        <div class="view-product-id" id="viewProductId">Product ID: #-</div>
-                        <div id="viewProductStatus" class="view-status-badge view-status-active">
-                            Active
+                <!-- Header Section -->
+                <div class="view-header-section">
+                    <div class="view-product-showcase">
+                        <div class="view-product-image-container">
+                            <img src="" alt="Product Image" class="view-product-image" id="viewProductImage">
                         </div>
-                        
+                        <div class="view-product-info">
+                            <div class="view-product-name" id="viewProductName">-</div>
+                            <div class="view-product-meta">
+                                <span class="view-product-sku" id="viewProductSku">SKU: -</span>
+                                <span class="view-product-id" id="viewProductId">Product ID: #-</span>
+                            </div>
+                            <div id="viewProductStatus" class="view-status-badge view-status-active">
+                                Active
+                            </div>
+                        </div>
                         <!-- Price Display -->
                         <div class="view-price-display" id="viewPriceDisplay" style="display: none;">
                             <div id="viewDiscountBadge" class="view-discount-badge" style="display: none;"></div>
@@ -953,110 +1076,119 @@
                             <div class="view-original-price" id="viewOriginalPrice" style="display: none;">₱0.00</div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Information Cards Grid -->
-                    <div class="col-md-9">
-                        <div class="view-cards-grid">
-                            <!-- Product Information Card -->
-                            <div class="view-info-card">
-                                <label class="form-label">
-                                    <i class="fas fa-info-circle me-2"></i>Product Information
-                                </label>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Product ID:</span>
-                                    <span class="view-detail-value" id="viewProductIdField">-</span>
+                <!-- Main Content Sections -->
+                <div class="view-content-sections">
+                    <!-- Product Details Section -->
+                    <div class="view-section">
+                        <div class="view-section-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h4>Product Details</h4>
+                        </div>
+                        <div class="view-section-content">
+                            <div class="view-info-grid">
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Product ID</div>
+                                    <div class="view-info-value" id="viewProductIdField">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Name:</span>
-                                    <span class="view-detail-value" id="viewProductNameField">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Product Name</div>
+                                    <div class="view-info-value" id="viewProductNameField">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Description:</span>
-                                    <span class="view-detail-value" id="viewProductDescription">-</span>
+                                <div class="view-info-group full-width">
+                                    <div class="view-info-label">Description</div>
+                                    <div class="view-info-value" id="viewProductDescription">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">SKU:</span>
-                                    <span class="view-detail-value" id="viewProductSkuField">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">SKU</div>
+                                    <div class="view-info-value" id="viewProductSkuField">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Created:</span>
-                                    <span class="view-detail-value" id="viewProductCreatedAt">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Created</div>
+                                    <div class="view-info-value" id="viewProductCreatedAt">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Updated:</span>
-                                    <span class="view-detail-value" id="viewProductUpdatedAt">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Updated</div>
+                                    <div class="view-info-value" id="viewProductUpdatedAt">-</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Category & Brand Card -->
-                            <div class="view-info-card">
-                                <label class="form-label">
-                                    <i class="fas fa-tags me-2"></i>Category & Brand
-                                </label>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Category:</span>
-                                    <span class="view-detail-value" id="viewProductCategory">-</span>
+                    <!-- Category & Brand Section -->
+                    <div class="view-section">
+                        <div class="view-section-header">
+                            <i class="fas fa-tags"></i>
+                            <h4>Category & Brand</h4>
+                        </div>
+                        <div class="view-section-content">
+                            <div class="view-info-grid">
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Category</div>
+                                    <div class="view-info-value" id="viewProductCategory">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Brand:</span>
-                                    <span class="view-detail-value" id="viewProductBrand">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Brand</div>
+                                    <div class="view-info-value" id="viewProductBrand">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Featured:</span>
-                                    <span class="view-detail-value" id="viewProductFeatured">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Featured</div>
+                                    <div class="view-info-value" id="viewProductFeatured">-</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Stock & Inventory Card -->
-                            <div class="view-info-card">
-                                <label class="form-label">
-                                    <i class="fas fa-warehouse me-2"></i>Stock & Inventory
-                                </label>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Has Variants:</span>
-                                    <span class="view-detail-value" id="viewProductHasVariants">-</span>
+                    <!-- Inventory & Pricing Section -->
+                    <div class="view-section">
+                        <div class="view-section-header">
+                            <i class="fas fa-warehouse"></i>
+                            <h4>Inventory & Pricing</h4>
+                        </div>
+                        <div class="view-section-content">
+                            <div class="view-info-grid">
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Has Variants</div>
+                                    <div class="view-info-value" id="viewProductHasVariants">-</div>
                                 </div>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Variant Count:</span>
-                                    <span class="view-detail-value" id="viewProductVariantCount">-</span>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Variant Count</div>
+                                    <div class="view-info-value" id="viewProductVariantCount">-</div>
                                 </div>
-                                <div class="view-detail-item" id="viewMainStockRow" style="display: none;">
-                                    <span class="view-detail-label">Stock Quantity:</span>
-                                    <span class="view-detail-value" id="viewProductStockQuantity">-</span>
+                                <div class="view-info-group" id="viewMainStockRow" style="display: none;">
+                                    <div class="view-info-label">Stock Quantity</div>
+                                    <div class="view-info-value" id="viewProductStockQuantity">-</div>
                                 </div>
-                                <div class="view-detail-item" id="viewTotalStockRow" style="display: none;">
-                                    <span class="view-detail-label">Total Stock:</span>
-                                    <span class="view-detail-value" id="viewProductTotalStock">-</span>
+                                <div class="view-info-group" id="viewTotalStockRow" style="display: none;">
+                                    <div class="view-info-label">Total Stock</div>
+                                    <div class="view-info-value" id="viewProductTotalStock">-</div>
+                                </div>
+                                <div class="view-info-group">
+                                    <div class="view-info-label">Base Price</div>
+                                    <div class="view-info-value" id="viewProductBasePrice">-</div>
+                                </div>
+                                <div class="view-info-group" id="viewSalePriceRow" style="display: none;">
+                                    <div class="view-info-label">Sale Price</div>
+                                    <div class="view-info-value" id="viewProductSalePrice">-</div>
+                                </div>
+                                <div class="view-info-group" id="viewDiscountRow" style="display: none;">
+                                    <div class="view-info-label">Discount</div>
+                                    <div class="view-info-value" id="viewProductDiscount">-</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Pricing Card -->
-                            <div class="view-info-card">
-                                <label class="form-label">
-                                    <i class="fas fa-dollar-sign me-2"></i>Pricing Information
-                                </label>
-                                <div class="view-detail-item">
-                                    <span class="view-detail-label">Base Price:</span>
-                                    <span class="view-detail-value" id="viewProductBasePrice">-</span>
-                                </div>
-                                <div class="view-detail-item" id="viewSalePriceRow" style="display: none;">
-                                    <span class="view-detail-label">Sale Price:</span>
-                                    <span class="view-detail-value" id="viewProductSalePrice">-</span>
-                                </div>
-                                <div class="view-detail-item" id="viewDiscountRow" style="display: none;">
-                                    <span class="view-detail-label">Discount:</span>
-                                    <span class="view-detail-value" id="viewProductDiscount">-</span>
-                                </div>
-                            </div>
-
-                            <!-- Product Variants Card -->
-                            <div class="view-info-card" id="viewVariantsCard" style="display: none;">
-                                <label class="form-label">
-                                    <i class="fas fa-layer-group me-2"></i>Product Variants
-                                </label>
-                                <div id="viewVariantsList">
-                                    <!-- Variants will be populated here -->
-                                </div>
+                    <!-- Product Variants Section -->
+                    <div class="view-section" id="viewVariantsSection" style="display: none;">
+                        <div class="view-section-header">
+                            <i class="fas fa-layer-group"></i>
+                            <h4>Product Variants</h4>
+                        </div>
+                        <div class="view-section-content">
+                            <div id="viewVariantsList">
+                                <!-- Variants will be populated here -->
                             </div>
                         </div>
                     </div>
@@ -1421,8 +1553,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('viewProductStockQuantity').textContent = product.stock_quantity || '0';
             }
 
-            // Handle variants display - Always show the card for debugging and ensure display
-            document.getElementById('viewVariantsCard').style.display = 'block'; // Force show for debugging
+            // Handle variants display
+            const variantsSection = document.getElementById('viewVariantsSection');
             const variantsList = document.getElementById('viewVariantsList');
             variantsList.innerHTML = '';
             
@@ -1434,6 +1566,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('===================');
             
             if (variantsCount > 0) {
+                // Show the variants section
+                variantsSection.style.display = 'block';
+                
                 // Use the variantsArray which we already prepared
                 const variants = variantsArray;
                 
@@ -1489,14 +1624,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log('Variants displayed successfully');
             } else {
-                // Show message when no variants found
-                variantsList.innerHTML = `
-                    <div class="view-no-variants">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No variants found for this product.
-                    </div>
-                `;
-                console.log('No variants found, showing message');
+                // Hide the variants section when no variants found
+                variantsSection.style.display = 'none';
+                console.log('No variants found, hiding section');
             }
 
             // Handle pricing
