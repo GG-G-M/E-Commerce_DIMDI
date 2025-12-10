@@ -119,6 +119,42 @@
         border-spacing: 0;
         font-size: 0.9rem;
     }
+    
+    /* Center align all table headers and cells */
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    /* Product column specific styling - keep content readable */
+    .table td.name-col {
+        text-align: left;
+        padding-left: 0.75rem;
+    }
+    
+    .table td.name-col .product-name,
+    .table td.name-col .product-sku {
+        text-align: left;
+        display: block;
+        width: 100%;
+    }
+    
+    .table th.name-col {
+        text-align: center;
+    }
+    
+    /* Ensure image column is properly centered */
+    .table td.image-col,
+    .table th.image-col {
+        text-align: center;
+        padding: 0.75rem 0.25rem;
+    }
+    
+    .table td.image-col .product-img {
+        margin: 0 auto;
+        display: block;
+    }
 
     .table th {
         background-color: #E8F5E6;
@@ -127,12 +163,15 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 0.75rem 0.5rem;
         white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .table td {
         padding: 0.75rem 0.5rem;
         vertical-align: middle;
         border-bottom: 1px solid #e9ecef;
+        text-align: center;
     }
 
     .table tbody tr:hover {
@@ -258,16 +297,16 @@
     }
 
     /* Column widths */
-    .id-col { width: 60px; min-width: 60px; }
-    .image-col { width: 70px; min-width: 70px; }
-    .name-col { width: 180px; min-width: 180px; }
-    .brand-col { width: 100px; min-width: 100px; }
-    .category-col { width: 100px; min-width: 100px; }
-    .variants-col { width: 80px; min-width: 80px; }
-    .price-col { width: 90px; min-width: 90px; }
-    .stock-col { width: 80px; min-width: 80px; }
-    .status-col { width: 80px; min-width: 80px; }
-    .action-col { width: 80px; min-width: 80px; }
+    .id-col { width: 60px; min-width: 60px; text-align: center; }
+    .image-col { width: 70px; min-width: 70px; text-align: center; }
+    .name-col { width: 180px; min-width: 180px; text-align: center; }
+    .brand-col { width: 100px; min-width: 100px; text-align: center; }
+    .category-col { width: 100px; min-width: 100px; text-align: center; }
+    .variants-col { width: 80px; min-width: 80px; text-align: center; }
+    .price-col { width: 90px; min-width: 90px; text-align: center; }
+    .stock-col { width: 80px; min-width: 80px; text-align: center; }
+    .status-col { width: 80px; min-width: 80px; text-align: center; }
+    .action-col { width: 120px; min-width: 120px; text-align: center; }
 
     /* Product Image */
     .product-img {
@@ -371,22 +410,25 @@
     /* Action Buttons - Consistent with other pages */
     .action-buttons {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         flex-wrap: nowrap;
         justify-content: center;
+        align-items: center;
+        padding: 2px 0;
     }
     
     .action-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         transition: all 0.2s ease;
-        border: 2px solid;
+        border: 1.5px solid;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        flex-shrink: 0;
     }
     
     .action-btn:hover {
@@ -403,6 +445,7 @@
     .btn-view:hover {
         background-color: #4CAF50;
         color: white;
+        transform: translateY(-1px);
     }
     
     .btn-edit {
@@ -414,6 +457,7 @@
     .btn-edit:hover {
         background-color: #2C8F0C;
         color: white;
+        transform: translateY(-1px);
     }
     
     .btn-archive {
@@ -425,6 +469,7 @@
     .btn-archive:hover {
         background-color: #FBC02D;
         color: white;
+        transform: translateY(-1px);
     }
     
     .btn-unarchive {
@@ -436,6 +481,37 @@
     .btn-unarchive:hover {
         background-color: #2C8F0C;
         color: white;
+        transform: translateY(-1px);
+    }
+    
+    /* Ensure forms don't interfere with button layout */
+    .action-buttons form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .action-buttons form button {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Prevent action column from wrapping */
+    .action-col {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Ensure table cells don't expand */
+    .table td.action-col {
+        overflow: hidden;
+    }
+    
+    /* Fix table layout for better action button display */
+    .table {
+        table-layout: fixed;
+        word-wrap: break-word;
     }
 
     /* Modern View Modal Styling */
@@ -849,10 +925,19 @@
             padding: 0.5rem 0.25rem;
         }
         
+        .action-col { 
+            width: 100px; 
+            min-width: 100px; 
+        }
+        
         .action-btn {
-            width: 32px;
-            height: 32px;
-            font-size: 0.85rem;
+            width: 28px;
+            height: 28px;
+            font-size: 0.75rem;
+        }
+        
+        .action-buttons {
+            gap: 2px;
         }
         
         .product-img {
@@ -870,6 +955,26 @@
         
         .status-text {
             font-size: 0.8rem;
+        }
+    }
+    
+    /* Extra small screens - stack action buttons vertically */
+    @media (max-width: 576px) {
+        .action-col { 
+            width: 90px; 
+            min-width: 90px; 
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 2px;
+            align-items: center;
+        }
+        
+        .action-btn {
+            width: 26px;
+            height: 26px;
+            font-size: 0.7rem;
         }
     }
 </style>
@@ -1333,7 +1438,7 @@
                                     <button class="action-btn btn-view viewBtn" data-bs-toggle="modal"
                                         data-bs-target="#viewProductModal" 
                                         data-product='{{ json_encode(array_merge($product->toArray(), ['image_url' => $product->image_url, 'variants' => $product->variants->map(function($variant) { return array_merge($variant->toArray(), ['image_url' => $variant->image_url]); })->toArray()])) }}'
-                                        data-title="View Product">
+                                        data-title="View Product" title="View Product">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <a href="{{ route('admin.products.edit', $product) }}" 
