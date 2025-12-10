@@ -223,11 +223,11 @@
         gap: 6px;
     }
     
-    .status-active {
+    .status-text-active {
         color: #2C8F0C;
     }
     
-    .status-active::before {
+    .status-text-active::before {
         content: "";
         display: inline-block;
         width: 8px;
@@ -237,11 +237,11 @@
         animation: pulse 2s infinite;
     }
     
-    .status-inactive {
+    .status-text-inactive {
         color: #6c757d;
     }
     
-    .status-inactive::before {
+    .status-text-inactive::before {
         content: "";
         display: inline-block;
         width: 8px;
@@ -251,9 +251,18 @@
         animation: pulse 2s infinite;
     }
     
-    .status-archived {
+    .status-text-archived {
         color: #6c757d;
-        font-style: italic;
+    }
+    
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
     
     .status-featured {
@@ -262,9 +271,17 @@
     }
     
     @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.6; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+
+        100% {
+            opacity: 1;
+        }
     }
 
     /* Stock Level Styling */
@@ -1438,12 +1455,12 @@
                             </td>
                             <td class="status-col">
                                 @if($product->is_archived)
-                                    <span class="status-archived">Archived</span>
+                                    <span class="status-text status-text-archived">Archived</span>
                                 @else
                                     @if($product->is_effectively_inactive)
-                                        <span class="status-text status-inactive">Inactive</span>
+                                        <span class="status-text status-text-inactive">Inactive</span>
                                     @else
-                                        <span class="status-text status-active">Active</span>
+                                        <span class="status-text status-text-active">Active</span>
                                     @endif
                                     @if($product->is_featured)
                                         <div class="status-featured small mt-1">Featured</div>
@@ -1464,23 +1481,15 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @if($product->is_archived)
-                                        <form action="{{ route('admin.products.unarchive', $product) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="action-btn btn-unarchive"
-                                                    onclick="return confirm('Are you sure you want to unarchive this product?')"
-                                                    title="Unarchive Product">
-                                                <i class="fas fa-box-open"></i>
-                                            </button>
-                                        </form>
+                                        <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $product->id }}"
+                                            title="Unarchive Product">
+                                            <i class="fas fa-box-open"></i>
+                                        </button>
                                     @else
-                                        <form action="{{ route('admin.products.archive', $product) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="action-btn btn-archive"
-                                                    onclick="return confirm('Are you sure you want to archive this product?')"
-                                                    title="Archive Product">
-                                                <i class="fas fa-archive"></i>
-                                            </button>
-                                        </form>
+                                        <button class="action-btn btn-archive archiveBtn" data-id="{{ $product->id }}"
+                                            title="Archive Product">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
                                     @endif
                                 </div>
                             </td>
@@ -1666,14 +1675,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Populate status
             const statusElement = document.getElementById('viewProductStatus');
             if (product.is_archived) {
-                statusElement.className = 'view-status-badge view-status-archived';
-                statusElement.innerHTML = '<i class="fas fa-archive"></i> Archived';
+                statusElement.className = 'status-text status-text-archived';
+                statusElement.innerHTML = 'Archived';
             } else if (product.is_effectively_inactive) {
-                statusElement.className = 'view-status-badge view-status-inactive';
-                statusElement.innerHTML = '<i class="fas fa-pause-circle"></i> Inactive';
+                statusElement.className = 'status-text status-text-inactive';
+                statusElement.innerHTML = 'Inactive';
             } else {
-                statusElement.className = 'view-status-badge view-status-active';
-                statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Active';
+                statusElement.className = 'status-text status-text-active';
+                statusElement.innerHTML = 'Active';
             }
 
             // Handle featured status
@@ -1857,6 +1866,82 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             window.location.href = `/admin/products/${product.id}/edit`;
         }, 300);
+    });
+
+    /* === Archive Product === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm(
+                    'Are you sure you want to archive this product? This will make it inactive but preserve its data.'
+                    )) return;
+
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/products/${id}/archive`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to archive product: ' + (data.message ||
+                            'Unknown error'));
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Network error. Please try again.');
+                    location.reload();
+                });
+        });
+    });
+
+    /* === Unarchive Product === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm(
+                    'Are you sure you want to unarchive this product? It will become active again.'
+                    )) return;
+
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/products/${id}/unarchive`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to unarchive product: ' + (data.message ||
+                            'Unknown error'));
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Network error. Please try again.');
+                    location.reload();
+                });
+        });
     });
 });
 
