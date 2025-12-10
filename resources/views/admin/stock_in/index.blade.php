@@ -845,7 +845,7 @@
                                 </td>
                                 <td class="date-col">
                                     <div class="date-text">{{ $stock->created_at->format('M j, Y') }}</div>
-                                    <div class="time-text">{{ $stock->created_at->format('H:i') }}</div>
+                                    <div class="time-text">{{ $stock->created_at->format('h:i A') }}</div>
                                 </td>
                             </tr>
                         @endforeach

@@ -662,7 +662,7 @@
                             <th class="batch-col">Stock-In Batches (FIFO)</th>
                             <th class="reason-col">Reason</th>
                             <th class="date-col">Date</th>
-                            <th class="action-col">Actions</th>
+                            {{-- <th class="action-col">Actions</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -716,9 +716,9 @@
                                 </td>
                                 <td class="date-col">
                                     <div class="date-text">{{ $stock->created_at->format('M j, Y') }}</div>
-                                    <div class="time-text">{{ $stock->created_at->format('H:i') }}</div>
+                                    <div class="time-text">{{ $stock->created_at->format('h:i A') }}</div>
                                 </td>
-                                <td class="action-col">
+                                {{-- <td class="action-col">
                                     <div class="action-buttons">
                                         <button class="action-btn btn-edit editStockBtn" 
                                                 data-id="{{ $stock->id }}"
@@ -741,7 +741,7 @@
                                             </button>
                                         </form>
                                     </div>
-                                </td>
+                                </td> --}}
                             </tr>
                         @endforeach
                     </tbody>
