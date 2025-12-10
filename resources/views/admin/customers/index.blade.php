@@ -899,14 +899,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                {{-- <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i>Close
                     </button>
                     <button type="button" class="btn btn-primary" id="editFromViewBtn">
                         <i class="fas fa-edit me-1"></i>Edit Customer
                     </button>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
