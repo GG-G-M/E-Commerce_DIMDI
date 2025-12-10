@@ -74,7 +74,6 @@
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
     }
     
     .action-btn {
@@ -108,23 +107,23 @@
     
     .btn-archive {
         background-color: white;
-        border-color: #FF9800;
-        color: #FF9800;
+        border-color: #FBC02D;
+        color: #FBC02D;
     }
-
+    
     .btn-archive:hover {
-        background-color: #FF9800;
+        background-color: #FBC02D;
         color: white;
     }
-
+    
     .btn-unarchive {
         background-color: white;
-        border-color: #17a2b8;
-        color: #17a2b8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
     }
-
+    
     .btn-unarchive:hover {
-        background-color: #17a2b8;
+        background-color: #2C8F0C;
         color: white;
     }
     
@@ -154,6 +153,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -167,7 +169,7 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Alternating row colors */
+    /* Alternating row colors for better readability */
     .table tbody tr:nth-child(even) {
         background-color: #f8f9fa;
     }
@@ -292,62 +294,9 @@
         align-items: center;
         justify-content: center;
         color: white;
-    }
-
-    /* Tips Box */
-    .tips-box {
-        background-color: #F8FDF8;
-        border-left: 4px solid #2C8F0C;
-        border-radius: 8px;
-        padding: 1rem;
+        font-weight: bold;
         font-size: 0.9rem;
-        color: #2C8F0C;
     }
-
-    .tips-box i {
-        color: #2C8F0C;
-        margin-right: 5px;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        color: #C8E6C9;
-        margin-bottom: 1rem;
-    }
-
-    /* Table Container for consistency */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-    }
-    
-    /* Responsive adjustments */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
-        .table {
-            table-layout: fixed;
-        }
-    }
-
-    /* Column widths for consistency */
-    .name-col { min-width: 200px; width: 250px; }
-    .id-col { min-width: 80px; width: 100px; }
-    .slug-col { min-width: 150px; width: 180px; }
-    .description-col { min-width: 200px; max-width: 250px; width: 250px; }
-    .products-col { min-width: 100px; width: 120px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .sort-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
 
     /* Brand Info Cell */
     .brand-info-cell {
@@ -375,6 +324,34 @@
         word-break: break-word;
     }
 
+    /* Tooltip styling for buttons */
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
     /* Products Count */
     .products-count {
         font-weight: 600;
@@ -383,6 +360,66 @@
         display: flex;
         align-items: center;
         gap: 5px;
+    }
+
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
+    }
+
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .slug-col { min-width: 90px; width: 90px; }
+    .description-col { min-width: 120px; width: 120px; }
+    .products-col { min-width: 70px; width: 70px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .sort-col { min-width: 70px; width: 70px; }
+    .action-col { min-width: 80px; width: 80px; }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #C8E6C9;
+        margin-bottom: 1rem;
+    }
+
+    /* Tips Box */
+    .tips-box {
+        background-color: #F8FDF8;
+        border-left: 4px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: #2C8F0C;
+    }
+
+    .tips-box i {
+        color: #2C8F0C;
+        margin-right: 5px;
     }
 
     /* Pagination styling - Consistent */
@@ -505,8 +542,8 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="name-col">Brand</th>
                             <th class="id-col">ID</th>
+                            <th class="name-col">Brand</th>
                             <th class="slug-col">Slug</th>
                             <th class="description-col">Description</th>
                             <th class="products-col">Products</th>
@@ -518,6 +555,9 @@
                     <tbody>
                         @foreach($brands as $brand)
                         <tr data-id="{{ $brand->id }}">
+                            <td class="id-col">
+                                <span class="text-muted">#{{ $brand->id }}</span>
+                            </td>
                             <td class="name-col">
                                 <div class="brand-info-cell">
                                     <div class="brand-icon">
@@ -525,12 +565,8 @@
                                     </div>
                                     <div>
                                         <div class="brand-name">{{ $brand->name }}</div>
-                                        <div class="brand-slug">{{ $brand->slug }}</div>
                                     </div>
                                 </div>
-                            </td>
-                            <td class="id-col">
-                                <span class="brand-id">#{{ $brand->id }}</span>
                             </td>
                             <td class="slug-col">
                                 <code class="brand-slug">{{ $brand->slug }}</code>
@@ -546,7 +582,7 @@
                             </td>
                             <td class="products-col">
                                 <span class="products-count">
-                                    <i class="fas fa-box"></i>
+                                    {{-- <i class="fas fa-box"></i> --}}
                                     {{ $brand->products->count() }}
                                 </span>
                             </td>
@@ -567,18 +603,21 @@
                                     <button class="action-btn btn-edit editBtn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editBrandModal"
-                                            data-brand='@json($brand)'>
+                                            data-brand='@json($brand)'
+                                            data-title="Edit Brand">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     
                                     @if($brand->is_archived)
                                         <button type="button" class="action-btn btn-unarchive unarchiveBtn"
-                                                title="Unarchive Brand">
+                                                data-id="{{ $brand->id }}"
+                                                data-title="Unarchive Brand">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
                                         <button type="button" class="action-btn btn-archive archiveBtn"
-                                                title="Archive Brand">
+                                                data-id="{{ $brand->id }}"
+                                                data-title="Archive Brand">
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @endif
@@ -878,21 +917,16 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             if (!confirm('Are you sure you want to archive this brand?')) return;
             
-            const row = this.closest('tr');
-            const brandId = row.dataset.id;
-            const brandSlug = row.querySelector('.brand-slug').textContent.trim();
-            
-            // Show loading state
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const id = this.dataset.id;
+            const button = this;
 
-            fetch(`/admin/brands/${brandSlug}/archive`, {
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/brands/${id}/archive`, {
                 method: 'POST',
-                headers: { 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
             .then(res => res.json())
             .then(data => {
@@ -900,15 +934,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to archive brand: ' + (data.message || 'Unknown error'));
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-archive"></i>';
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                this.disabled = false;
-                this.innerHTML = '<i class="fas fa-archive"></i>';
+                location.reload();
             });
         });
     });
@@ -916,39 +948,32 @@ document.addEventListener('DOMContentLoaded', function() {
     /* === Unarchive Brand === */
     document.querySelectorAll('.unarchiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to restore this brand?')) return;
+            if (!confirm('Are you sure you want to unarchive this brand?')) return;
             
-            const row = this.closest('tr');
-            const brandId = row.dataset.id;
-            const brandSlug = row.querySelector('.brand-slug').textContent.trim();
-            
-            // Show loading state
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const id = this.dataset.id;
+            const button = this;
 
-            fetch(`/admin/brands/${brandSlug}/unarchive`, {
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/brands/${id}/unarchive`, {
                 method: 'POST',
-                headers: { 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Failed to restore brand: ' + (data.message || 'Unknown error'));
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-box-open"></i>';
+                    alert('Failed to unarchive brand: ' + (data.message || 'Unknown error'));
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                this.disabled = false;
-                this.innerHTML = '<i class="fas fa-box-open"></i>';
+                location.reload();
             });
         });
     });
@@ -981,6 +1006,7 @@ document.addEventListener('DOMContentLoaded', function() {
         editSlugInput.value = slug;
     });
 
+
     // Fix table layout on window resize
     window.addEventListener('resize', function() {
         const tableContainer = document.querySelector('.table-container');
@@ -995,6 +1021,8 @@ document.addEventListener('DOMContentLoaded', function() {
             table.style.tableLayout = 'fixed';
         }
     });
+
+
 });
 </script>
 @endpush
