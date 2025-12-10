@@ -2,45 +2,58 @@
 
 @section('content')
 <style>
+    /* 🌿 Enhanced Green Theme - Consistent with Products & Notifications */
     :root {
-        --primary: #2C8F0C;
-        --primary-light: #E8F5E9;
-        --primary-dark: #1B5E20;
-        --gray-50: #F9FAFB;
-        --gray-100: #F3F4F6;
-        --gray-200: #E5E7EB;
-        --gray-600: #4B5563;
-        --gray-700: #374151;
-        --gray-800: #1F2937;
+        --primary-green: #2C8F0C;
+        --dark-green: #1E6A08;
+        --light-green: #E8F5E6;
+        --accent-green: #4CAF50;
+        --light-gray: #F8F9FA;
+        --medium-gray: #E9ECEF;
+        --dark-gray: #6C757D;
+        --text-dark: #212529;
     }
 
-    /* Modern Header */
-    .page-header {
-        text-align: center;
-        margin-bottom: 3rem;
-        padding-bottom: 2rem;
-        border-bottom: 1px solid var(--gray-200);
+    /* Full-width header at the top - matching other pages */
+    .orders-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50) !important;
+        color: white;
+        border-radius: 0 0 16px 16px;
+        padding: 2.5rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: -1.5rem;
     }
 
-    .page-header h1 {
+    .orders-header h1 {
         font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 0.5rem;
         font-size: 2rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
     }
 
-    .page-header .subtitle {
-        color: var(--gray-600);
-        font-size: 1rem;
+    .orders-header .subtitle {
+        margin-bottom: 0;
+        opacity: 0.95;
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 
-    /* Filter Card */
+    /* Filter Card - Consistent styling */
     .filter-card {
         background: white;
-        border-radius: 51px;
-        border: 1px solid var(--gray-200);
+        border-radius: 16px;
+        border: 1px solid var(--medium-gray);
+        padding: 1.75rem;
         margin-bottom: 2rem;
-
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .filter-grid {
@@ -49,18 +62,20 @@
         gap: 1rem;
     }
 
-    /* Orders Table */
+    /* Orders Table Container - Consistent card design */
     .orders-table-container {
         background: white;
-        border-radius: 12px;
-        border: 1px solid var(--gray-200);
+        border-radius: 16px;
+        border: 1px solid var(--medium-gray);
         overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
     }
 
     .table-header {
-        background: var(--gray-50);
+        background: var(--light-green);
         padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--gray-200);
+        border-bottom: 1px solid var(--medium-gray);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -68,7 +83,7 @@
 
     .table-header h2 {
         font-weight: 600;
-        color: var(--gray-800);
+        color: var(--text-dark);
         margin: 0;
         font-size: 1.25rem;
     }
@@ -79,32 +94,34 @@
     }
 
     .orders-table thead {
-        background: var(--gray-50);
+        background: var(--light-gray);
     }
 
     .orders-table th {
         padding: 1rem 1.5rem;
         text-align: left;
         font-weight: 600;
-        color: var(--gray-700);
+        color: var(--dark-gray);
         font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        border-bottom: 1px solid var(--gray-200);
+        border-bottom: 1px solid var(--medium-gray);
     }
 
     .orders-table tbody tr {
-        border-bottom: 1px solid var(--gray-200);
-        transition: background-color 0.2s ease;
+        border-bottom: 1px solid var(--medium-gray);
+        transition: all 0.3s ease;
     }
 
     .orders-table tbody tr:hover {
-        background: var(--gray-50);
+        background: var(--light-green);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(44, 143, 12, 0.1);
     }
 
     .orders-table td {
         padding: 1.25rem 1.5rem;
-        color: var(--gray-700);
+        color: var(--text-dark);
         vertical-align: middle;
     }
 
@@ -112,180 +129,200 @@
     .order-number {
         font-family: 'SF Mono', Monaco, monospace;
         font-weight: 600;
-        color: var(--gray-800);
+        color: var(--text-dark);
         font-size: 0.95rem;
     }
 
-    /* Status Badges */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.375rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8125rem;
+    /* Status Display - Simplified (no color badges) */
+    .status-text {
         font-weight: 500;
-        gap: 0.375rem;
-    }
-
-    .status-pending {
-        background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-        color: #92400E;
-    }
-
-    .status-processing {
-        background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
-        color: #0369A1;
-    }
-
-    .status-shipped {
-        background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
-        color: #3730A3;
-    }
-
-    .status-delivered {
-        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
-        color: #166534;
-    }
-
-    .status-cancelled {
-        background: linear-gradient(135deg, #FEE2E2, #FECACA);
-        color: #991B1B;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     /* Price Display */
     .price-display {
         font-weight: 600;
-        color: var(--gray-800);
+        color: var(--text-dark);
+        font-size: 1rem;
     }
 
-    /* Action Buttons */
-    .action-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        border: 1px solid transparent;
+    /* Action Buttons - Consistent with products/notifications */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
     }
 
-    /* Unified icon-style action button (green) */
+    /* Icon buttons - consistent with notifications */
     .action-icon {
         background: transparent;
-        color: var(--primary);
-        border: 1.5px solid var(--primary);
-        padding: 0.35rem;
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
         width: 36px;
         height: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 0.95rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
     }
 
     .action-icon:hover {
-        background: var(--primary-light);
-        color: var(--primary-dark);
+        background: var(--primary-green);
+        color: white;
         text-decoration: none;
         transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(44, 143, 12, 0.2);
     }
 
-    .btn-cancel {
-        /* keep for forms but visually replace in-table cancel with icon style */
-        background: #FEF2F2;
-        color: #DC2626;
-        border-color: rgba(220, 38, 38, 0.2);
+    /* Cancel icon style */
+    .action-icon.cancel-icon {
+        color: #dc3545;
+        border-color: #dc3545;
     }
 
-    .btn-cancel:hover {
-        background: rgba(220, 38, 38, 0.1);
-        color: #991B1B;
+    .action-icon.cancel-icon:hover {
+        background: #dc3545;
+        color: white;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+    }
+
+    /* Primary button for continue shopping */
+    .btn-primary-rounded {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        cursor: pointer;
+        min-height: 40px;
+    }
+
+    .btn-primary-rounded:hover:not(:disabled) {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
         text-decoration: none;
     }
 
-    /* Empty State */
+    /* Empty State - Consistent with other pages */
     .empty-state {
         text-align: center;
-        padding: 4rem 2rem;
+        padding: 5rem 2rem;
+        color: var(--dark-gray);
+        background: linear-gradient(135deg, #f8fff8, #f0f9f0);
+        border-radius: 20px;
+        margin: 2rem 0;
     }
 
-    .empty-state-icon {
-        color: var(--gray-300);
-        font-size: 3rem;
-        margin-bottom: 1.5rem;
+    .empty-state i {
+        font-size: 5rem;
+        color: var(--primary-green);
+        margin-bottom: 2rem;
+        opacity: 0.7;
     }
 
     .empty-state h3 {
-        color: var(--gray-600);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-green);
+        margin-bottom: 1rem;
     }
 
     .empty-state p {
-        color: var(--gray-500);
+        font-size: 1.05rem;
+        color: var(--dark-gray);
         margin-bottom: 2rem;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        border-radius: 8px;
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(135deg, var(--primary-dark), #1B5E20);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        line-height: 1.6;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     /* Form Elements */
     .form-label {
         font-weight: 500;
-        color: var(--gray-700);
+        color: var(--text-dark);
         font-size: 0.875rem;
         margin-bottom: 0.5rem;
     }
 
     .form-control, .form-select {
-        border: 1px solid var(--gray-300);
-        border-radius: 8px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 10px;
         padding: 0.625rem 0.75rem;
         font-size: 0.875rem;
+        transition: all 0.3s ease;
     }
 
     .form-control:focus, .form-select:focus {
-        border-color: var(--primary);
+        border-color: var(--primary-green);
         box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
+        outline: none;
     }
 
-    /* Pagination */
+    /* Pagination - Consistent with notifications */
     .pagination-container {
         margin-top: 2rem;
         padding-top: 1.5rem;
-        border-top: 1px solid var(--gray-200);
+        border-top: 1px solid var(--medium-gray);
     }
 
-    /* Modal */
+    .pagination {
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        border-radius: 25px;
+        margin: 0 0.25rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--medium-gray);
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: var(--light-green);
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+        border-color: var(--primary-green);
+        color: white;
+    }
+
+    /* Modal - Consistent styling */
     .modal-content {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     .modal-header {
-        border-bottom: 1px solid var(--gray-200);
+        background: var(--light-green);
+        border-bottom: 1px solid var(--medium-gray);
         padding: 1.25rem 1.5rem;
+        border-radius: 16px 16px 0 0;
     }
 
     .modal-title {
         font-weight: 600;
-        color: var(--gray-800);
+        color: var(--text-dark);
     }
 
     .modal-body {
@@ -293,44 +330,24 @@
     }
 
     .modal-footer {
-        border-top: 1px solid var(--gray-200);
+        border-top: 1px solid var(--medium-gray);
         padding: 1.25rem 1.5rem;
+        border-radius: 0 0 16px 16px;
     }
 
-    .btn-secondary {
-        background: var(--gray-200);
-        color: var(--gray-700);
-        border: none;
-        border-radius: 8px;
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #DC2626, #B91C1C);
-        border: none;
-        border-radius: 8px;
-    }
-
-    /* Loading Indicator */
-    .search-loading {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        display: none;
-    }
-
-    /* Alert */
+    /* Alert - Consistent styling */
     .alert {
-        border-radius: 8px;
+        border-radius: 12px;
         border: none;
         margin-bottom: 2rem;
         padding: 1rem 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .alert-success {
         background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
         color: #166534;
-        border-left: 4px solid #22C55E;
+        border-left: 4px solid var(--primary-green);
     }
 
     .alert-danger {
@@ -338,79 +355,138 @@
         color: #991B1B;
         border-left: 4px solid #EF4444;
     }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .orders-header {
+            padding: 1.75rem 1.5rem;
+            border-radius: 0 0 12px 12px;
+            margin-top: -0.75rem;
+        }
+
+        .orders-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .filter-card {
+            padding: 1.5rem 1.25rem;
+            border-radius: 12px;
+        }
+
+        .orders-table-container {
+            border-radius: 12px;
+        }
+
+        .table-header {
+            padding: 1rem 1.25rem;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 0.875rem 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .orders-header {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .orders-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .btn-primary-rounded {
+            width: 100%;
+            justify-content: center;
+        }
+    }
 </style>
 
 <!-- Success/Error Messages -->
 @if(session('success'))
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    <i class="fas fa-check-circle me-2"></i>
-    {{ session('success') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="container mt-4">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
 </div>
 @endif
 
 @if(session('error'))
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <i class="fas fa-exclamation-circle me-2"></i>
-    {{ session('error') }}
-    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="container mt-4">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
 </div>
 @endif
 
-<div class="container py-5">
-    <!-- Page Header -->
-    <div class="page-header">
-        <h1>My Orders</h1>
-        <p class="subtitle">Track your purchases and order history</p>
-    </div>
-
-    @if($orders->count() > 0)
-    <!-- Search and Filters -->
-    <div class="filter-card">
-        <form method="GET" action="{{ route('orders.index') }}" id="filterForm">
-            <div class="filter-grid">
-                <div class="position-relative">
-                    <label for="search" class="form-label">Search Orders</label>
-                    <input type="text" class="form-control" id="search" name="search"
-                           value="{{ request('search') }}" placeholder="Order number or customer name">
-                    <div class="search-loading" id="searchLoading">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <label for="status" class="form-label">Filter by Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="">All Status</option>
-                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
-                        <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                        <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="sort_by" class="form-label">Sort By</label>
-                    <select class="form-select" id="sort_by" name="sort_by">
-                        <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Date Created</option>
-                        <option value="order_number" {{ request('sort_by') == 'order_number' ? 'selected' : '' }}>Order Number</option>
-                        <option value="total_amount" {{ request('sort_by') == 'total_amount' ? 'selected' : '' }}>Total Amount</option>
-                    </select>
-                </div>
+<!-- Full-width header at the top -->
+<div class="orders-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+            <div class="flex-grow-1">
+                <h1>
+                    <i class="fas fa-shopping-bag me-2"></i>My Orders
+                </h1>
+                <p class="subtitle">Track your purchases and order history</p>
             </div>
-        </form>
+            <div class="header-actions">
+                <a href="{{ route('products.index') }}" class="btn btn-primary-rounded">
+                    <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
+<!-- Main Content Container -->
+<div class="container py-4">
+    @if($orders->count() > 0)
     <!-- Orders Table -->
     <div class="orders-table-container">
         <div class="table-header">
-            <h2>Order History</h2>
-            <a href="{{ route('products.index') }}" class="btn btn-primary">
-                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
-            </a>
+            <h2><i class="fas fa-history me-2"></i>Order History</h2>
+            <div class="text-muted">{{ $orders->count() }} orders found</div>
         </div>
         
         <div class="table-responsive">
@@ -433,40 +509,31 @@
                         </td>
                         <td>
                             <div class="text-muted">{{ $order->created_at->format('M d, Y') }}</div>
-                            <div class="text-muted" style="font-size: 0.8rem; color: var(--gray-500);">{{ $order->created_at->format('h:i A') }}</div>
+                            <div class="text-muted" style="font-size: 0.8rem; color: var(--dark-gray);">{{ $order->created_at->format('h:i A') }}</div>
                         </td>
                         <td>{{ $order->customer_name }}</td>
                         <td>
                             <span class="price-display">₱{{ number_format($order->total_amount, 2) }}</span>
                         </td>
                         <td>
-                            @php
-                                $statusClasses = [
-                                    'pending' => 'status-pending',
-                                    'processing' => 'status-processing',
-                                    'shipped' => 'status-shipped',
-                                    'delivered' => 'status-delivered',
-                                    'cancelled' => 'status-cancelled'
-                                ];
-                            @endphp
-                            <span class="status-badge {{ $statusClasses[$order->order_status] ?? 'status-pending' }}">
-                                <i class="fas fa-circle fa-xs"></i>
+                            <span class="status-text">
+                                <i class="fas fa-circle fa-xs text-{{ $order->order_status == 'delivered' ? 'success' : ($order->order_status == 'cancelled' ? 'danger' : 'warning') }}"></i>
                                 {{ ucfirst($order->order_status) }}
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('orders.show', $order) }}" class="action-btn action-icon" title="View order {{ $order->order_number }}" aria-label="View">
+                            <div class="action-buttons">
+                                <a href="{{ route('orders.show', $order) }}" class="action-icon" title="View order details">
                                     <i class="fas fa-eye"></i>
                                 </a>
 
                                 @if($order->canBeCancelled())
                                 <button 
                                     type="button" 
-                                    class="action-btn action-icon cancel-btn"
+                                    class="action-icon cancel-icon cancel-btn"
                                     data-order-id="{{ $order->id }}"
                                     data-order-number="{{ $order->order_number }}"
-                                    title="Cancel order {{ $order->order_number }}" aria-label="Cancel">
+                                    title="Cancel order">
                                     <i class="fas fa-times"></i>
                                 </button>
                                 @endif
@@ -480,22 +547,26 @@
     </div>
 
     <!-- Pagination -->
+    @if($orders->hasPages())
     <div class="pagination-container">
-        {{ $orders->links('pagination::bootstrap-5') }}
+        <div class="d-flex justify-content-center">
+            {{ $orders->links('pagination::bootstrap-5') }}
+        </div>
     </div>
+    @endif
 
     <!-- Cancel Order Modal -->
     <div class="modal fade" id="cancelOrderModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cancel Order</h5>
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Cancel Order</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form id="cancelOrderForm" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <p class="mb-3">Are you sure you want to cancel order <strong id="orderNumberText"></strong>?</p>
+                        <p class="mb-3">Are you sure you want to cancel order <strong id="orderNumberText" class="text-danger"></strong>?</p>
                         <div class="mb-3">
                             <label class="form-label">Reason for cancellation</label>
                             <textarea class="form-control" name="cancellation_reason" rows="3" required 
@@ -503,8 +574,12 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Close
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-1"></i>Confirm Cancellation
+                        </button>
                     </div>
                 </form>
             </div>
@@ -514,13 +589,11 @@
     @else
     <!-- Empty State -->
     <div class="empty-state">
-        <div class="empty-state-icon">
-            <i class="fas fa-receipt"></i>
-        </div>
+        <i class="fas fa-receipt"></i>
         <h3>No orders yet</h3>
         <p>You haven't placed any orders. Start shopping to see your orders here.</p>
-        <a href="{{ route('products.index') }}" class="btn btn-primary">
-            <i class="fas fa-shopping-bag me-2"></i> Start Shopping
+        <a href="{{ route('products.index') }}" class="btn btn-primary-rounded">
+            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
         </a>
     </div>
     @endif
@@ -528,6 +601,66 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    // Toast notification function (consistent with other pages)
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                // Add fade out animation
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+    }
+
     // Cancel Order Modal
     const cancelButtons = document.querySelectorAll(".cancel-btn");
     const modal = new bootstrap.Modal(document.getElementById("cancelOrderModal"));
@@ -548,7 +681,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Auto-submit filters
     const filterForm = document.getElementById('filterForm');
     const searchInput = document.getElementById('search');
-    const statusSelect = document.getElementById('status');
     const sortBySelect = document.getElementById('sort_by');
     const searchLoading = document.getElementById('searchLoading');
     
@@ -563,10 +695,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 500);
     });
 
-    statusSelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
     sortBySelect.addEventListener('change', function() {
         filterForm.submit();
     });
@@ -574,6 +702,17 @@ document.addEventListener("DOMContentLoaded", () => {
     filterForm.addEventListener('submit', function() {
         searchLoading.style.display = 'none';
     });
+
+    // Handle form submission success
+    if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+        // Check if we have a success/error message in session
+        @if(session('success'))
+            showToast("{{ session('success') }}", 'success');
+        @endif
+        @if(session('error'))
+            showToast("{{ session('error') }}", 'error');
+        @endif
+    }
 });
 </script>
 @endsection
