@@ -22,6 +22,7 @@
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
+        overflow: hidden;
     }
 
     .card-custom:hover {
@@ -70,15 +71,59 @@
         color: white;
     }
 
-    /* Table Styling - Compact */
+    /* Filter Section - Matching stock_in structure */
+    .search-section {
+        background-color: #F8FDF8;
+        border: 1px solid #E8F5E6;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Tips Box - Matching stock_in */
+    .tips-box {
+        background-color: #F8FDF8;
+        border-left: 3px solid #2C8F0C;
+        border-radius: 6px;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+        color: #2C8F0C;
+    }
+
+    .tips-box i {
+        color: #2C8F0C;
+        margin-right: 5px;
+    }
+
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    /* Table Styling - Matching stock_out structure */
     .table {
         margin-bottom: 0;
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
         font-size: 0.9rem;
+        table-layout: fixed;
     }
-
+    
+    /* Center align all table headers and cells */
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -92,6 +137,9 @@
         padding: 0.75rem 0.5rem;
         vertical-align: middle;
         border-bottom: 1px solid #e9ecef;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .table tbody tr:hover {
@@ -210,25 +258,26 @@
         animation: pulse 2s infinite;
     }
     
-   /* Inactive Status - Consistent with customers page */
-.status-badge-inactive {
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-    text-align: center;
-    min-width: 60px;
-    background-color: #FFF3CD;
-    color: #856404;
-    border: 1px solid #FFEAA7;
-}
+    /* Inactive Status - Consistent with customers page */
+    .status-badge-inactive {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        text-align: center;
+        min-width: 60px;
+        background-color: #FFF3CD;
+        color: #856404;
+        border: 1px solid #FFEAA7;
+    }
 
-    /* Product Info Cell - Compact */
+    /* Product Info Cell - Matching stock_out style */
     .product-info-cell {
         display: flex;
         align-items: center;
         gap: 8px;
+        justify-content: center;
     }
     
     .product-img {
@@ -238,6 +287,8 @@
         border-radius: 6px;
         border: 1px solid #e9ecef;
         background-color: #f8f9fa;
+        margin: 0 auto;
+        display: block;
     }
     
     .product-name {
@@ -245,12 +296,14 @@
         color: #333;
         font-size: 0.85rem;
         line-height: 1.2;
+        text-align: center;
     }
     
     .variant-name {
         color: #6c757d;
         font-size: 0.8rem;
         font-style: italic;
+        text-align: center;
     }
     
     .product-sku {
@@ -336,21 +389,14 @@
         font-weight: 600;
     }
 
-    /* Table Container */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-        max-width: 100%;
-    }
-
-    /* Column widths - More compact */
-    .id-col { width: 70px; min-width: 70px; }
-    .product-col { width: 220px; min-width: 220px; }
-    .stock-col { width: 100px; min-width: 100px; }
-    .level-col { width: 100px; min-width: 100px; }
-    .status-col { width: 80px; min-width: 80px; }
-    .ratio-col { width: 140px; min-width: 140px; }
+    /* Column widths - Matching stock_out structure */
+    .id-col { width: 70px; min-width: 70px; text-align: center; }
+    .image-col { width: 80px; min-width: 80px; text-align: center; }
+    .product-col { width: 160px; min-width: 160px; text-align: center; }
+    .stock-col { width: 100px; min-width: 100px; text-align: center; }
+    .level-col { width: 120px; min-width: 120px; text-align: center; }
+    .status-col { width: 100px; min-width: 100px; text-align: center; }
+    .ratio-col { width: 140px; min-width: 140px; text-align: center; }
 
     /* Legend Styling */
     .legend-container {
@@ -379,7 +425,7 @@
         color: #495057;
     }
 
-    /* Pagination styling - Consistent */
+    /* Pagination styling - Matching stock_out */
     .pagination .page-item .page-link {
         color: #2C8F0C;
         border: 1px solid #dee2e6;
@@ -419,7 +465,7 @@
         font-size: 0.9rem;
     }
 
-    /* Make table more compact on mobile */
+    /* Make table more compact on mobile - Matching stock_out */
     @media (max-width: 768px) {
         .header-buttons {
             flex-direction: column;
@@ -452,38 +498,58 @@
             font-size: 0.8rem;
         }
         
-        ./* Inactive Status - Consistent with customers page */
-.status-badge-inactive {
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-    text-align: center;
-    min-width: 60px;
-    background-color: #FFF3CD;
-    color: #856404;
-    border: 1px solid #FFEAA7;
-}
+        .status-badge-inactive {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+            background-color: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEAA7;
+        }
     }
 </style>
 
 
 <!-- Summary Cards -->
 <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="summary-card">
             <div class="summary-number">{{ $products->count() + $variants->count() }}</div>
             <div class="summary-label">Total Low Stock Items</div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <div class="summary-card">
+            <div class="summary-number">
+                @php
+                    $criticalCount = 0;
+                    foreach($products as $product) {
+                        if ($product->stock_quantity <= 0 || $product->stock_quantity <= ceil($threshold * 0.3)) {
+                            $criticalCount++;
+                        }
+                    }
+                    foreach($variants as $variant) {
+                        if ($variant->stock_quantity <= 0 || $variant->stock_quantity <= ceil($threshold * 0.3)) {
+                            $criticalCount++;
+                        }
+                    }
+                    echo $criticalCount;
+                @endphp
+            </div>
+            <div class="summary-label">Critical Items</div>
+        </div>
+    </div>
+    <div class="col-md-3">
         <div class="summary-card">
             <div class="summary-number">{{ $products->count() }}</div>
             <div class="summary-label">Main Products</div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="summary-card">
             <div class="summary-number">{{ $variants->count() }}</div>
             <div class="summary-label">Product Variants</div>
@@ -491,23 +557,96 @@
     </div>
 </div>
 
+<!-- Filters and Search -->
+<div class="card card-custom mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.low_stock.index') }}" id="filterForm">
+            <div class="row g-2">
+
+                <!-- Search -->
+                <div class="col-md-6">
+                    <div class="mb-2 position-relative">
+                        <label for="search" class="form-label fw-bold">Search Products/Variants</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                            value="{{ request('search') }}" placeholder="Search by name, SKU, or brand...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Threshold Filter -->
+                <div class="col-md-2">
+                    <div class="mb-2 position-relative">
+                        <label for="threshold" class="form-label fw-bold">Stock Threshold</label>
+                        <input type="number" class="form-control" id="threshold" name="threshold" 
+                            value="{{ request('threshold', 10) }}" min="1" placeholder="Threshold">
+                        <div class="search-loading" id="thresholdLoading" style="display: none;">
+                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Level Filter -->
+                <div class="col-md-2">
+                    <div class="mb-2">
+                        <label for="stock_level" class="form-label fw-bold">Stock Level</label>
+                        <select class="form-select" id="stock_level" name="stock_level">
+                            <option value="">All Levels</option>
+                            <option value="critical" {{ request('stock_level') == 'critical' ? 'selected' : '' }}>Critical</option>
+                            <option value="warning" {{ request('stock_level') == 'warning' ? 'selected' : '' }}>Warning</option>
+                            <option value="low" {{ request('stock_level') == 'low' ? 'selected' : '' }}>Low Stock</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Items per page selection -->
+                <div class="col-md-2">
+                    <div class="mb-2">
+                        <label for="per_page" class="form-label fw-bold">Items per page</label>
+                        <select class="form-select" id="per_page" name="per_page">
+                            @foreach([5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 15) == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Tips Box -->
+        {{-- <div class="tips-box mt-3">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Tip:</strong> Use the filters above to quickly find specific low stock items. The threshold determines what counts as "low stock" - items at or below this number will be displayed.
+        </div> --}}
+    </div>
+</div>
+
+
 <!-- Low Stock Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Low Stock Items (Threshold: {{ $threshold }})</h5>
         <div class="header-buttons">
-            <a href="{{ route('admin.low_stock.download_csv', ['threshold' => $threshold]) }}" class="btn-download-csv">
+            <a href="{{ route('admin.low_stock.download_csv', array_merge(request()->query(), ['threshold' => $threshold])) }}" class="btn-download-csv">
                 <i class="fas fa-file-download"></i> Download CSV
             </a>
         </div>
     </div>
     <div class="card-body p-0">
         @if($products->count() > 0 || $variants->count() > 0)
-            <div class="table-container">
+            <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
+                            <th class="image-col">Image</th>
                             <th class="product-col">Product / Variant</th>
                             <th class="stock-col">Current Stock</th>
                             <th class="level-col">Stock Level</th>
@@ -546,25 +685,25 @@
                                 <td class="id-col">
                                     <small class="text-muted">#{{ $product->id }}</small>
                                 </td>
-                                <td class="product-col">
-                                    <div class="product-info-cell">
-                                        @if($product->image_url)
-                                            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
-                                                 class="product-img">
-                                        @else
-                                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-box text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <div class="product-name">{{ Str::limit($product->name, 30) }}</div>
-                                            @if($product->sku)
-                                                <div class="product-sku">{{ $product->sku }}</div>
-                                            @endif
-                                            @if($product->brand)
-                                                <div class="product-brand">{{ $product->brand->name }}</div>
-                                            @endif
+                                <td class="image-col">
+                                    @if($product->image_url)
+                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" 
+                                             class="product-img">
+                                    @else
+                                        <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-box text-muted"></i>
                                         </div>
+                                    @endif
+                                </td>
+                                <td class="product-col">
+                                    <div>
+                                        <div class="product-name">{{ Str::limit($product->name, 25) }}</div>
+                                        @if($product->sku)
+                                            <div class="product-sku">{{ $product->sku }}</div>
+                                        @endif
+                                        @if($product->brand)
+                                            <div class="product-brand">{{ $product->brand->name }}</div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="stock-col">
@@ -629,23 +768,23 @@
                                 <td class="id-col">
                                     <small class="text-muted">#{{ $variant->id }}</small>
                                 </td>
-                                <td class="product-col">
-                                    <div class="product-info-cell">
-                                        @if($variant->product->image_url)
-                                            <img src="{{ $variant->product->image_url }}" alt="{{ $variant->product->name }}" 
-                                                 class="product-img">
-                                        @else
-                                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-box text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <div class="product-name">{{ Str::limit($variant->product->name, 25) }}</div>
-                                            <div class="variant-name">{{ Str::limit($variant->variant_name, 20) }}</div>
-                                            @if($variant->sku)
-                                                <div class="product-sku">{{ $variant->sku }}</div>
-                                            @endif
+                                <td class="image-col">
+                                    @if($variant->product->image_url)
+                                        <img src="{{ $variant->product->image_url }}" alt="{{ $variant->product->name }}" 
+                                             class="product-img">
+                                    @else
+                                        <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-box text-muted"></i>
                                         </div>
+                                    @endif
+                                </td>
+                                <td class="product-col">
+                                    <div>
+                                        <div class="product-name">{{ Str::limit($variant->product->name, 20) }}</div>
+                                        <div class="variant-name">{{ Str::limit($variant->variant_name, 15) }}</div>
+                                        @if($variant->sku)
+                                            <div class="product-sku">{{ $variant->sku }}</div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="stock-col">
@@ -655,13 +794,13 @@
                                 <td class="level-col">
                                     <span class="status-text {{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
-                               <td class="status-col">
-    @if($product->is_effectively_inactive)
-        <span class="status-badge-inactive">Inactive</span>
-    @else
-        <span class="status-text-active">Active</span>
-    @endif
-</td>
+                                <td class="status-col">
+                                    @if($variant->is_effectively_inactive)
+                                        <span class="status-badge-inactive">Inactive</span>
+                                    @else
+                                        <span class="status-text-active">Active</span>
+                                    @endif
+                                </td>
                                 <td class="ratio-col">
                                     <div class="threshold-indicator">
                                         <div class="threshold-fill" 
@@ -729,4 +868,67 @@
         @endif
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Auto-search functionality ---
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const thresholdInput = document.getElementById('threshold');
+    const stockLevelSelect = document.getElementById('stock_level');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    const thresholdLoading = document.getElementById('thresholdLoading');
+    let searchTimeout;
+    let thresholdTimeout;
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            if (searchLoading) searchLoading.style.display = 'block';
+            searchTimeout = setTimeout(() => filterForm.submit(), 800);
+        });
+    }
+
+    if (thresholdInput) {
+        thresholdInput.addEventListener('input', function() {
+            clearTimeout(thresholdTimeout);
+            if (thresholdLoading) thresholdLoading.style.display = 'block';
+            thresholdTimeout = setTimeout(() => filterForm.submit(), 1000);
+        });
+    }
+
+    // Auto-submit other filters immediately
+    [stockLevelSelect, perPageSelect].forEach(el => {
+        if (el) {
+            el.addEventListener('change', () => filterForm.submit());
+        }
+    });
+
+    if (filterForm) {
+        filterForm.addEventListener('submit', () => {
+            if (searchLoading) searchLoading.style.display = 'none';
+            if (thresholdLoading) thresholdLoading.style.display = 'none';
+        });
+    }
+
+    // --- CSV Download Loading State ---
+    const csvButton = document.querySelector('.btn-download-csv');
+    if (csvButton) {
+        csvButton.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Preparing CSV...';
+            this.style.pointerEvents = 'none';
+            
+            // Reset button after 3 seconds (in case of slow download)
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.style.pointerEvents = 'auto';
+            }, 3000);
+        });
+    }
+});
+</script>
+@endpush
 @endsection

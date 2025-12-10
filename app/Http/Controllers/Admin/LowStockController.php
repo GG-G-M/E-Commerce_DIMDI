@@ -20,17 +20,109 @@ class LowStockController extends Controller
     public function index(Request $request)
     {
         $threshold = $request->threshold ?? 10;
+        $search = $request->search ?? '';
+        $stockLevel = $request->stock_level ?? '';
+        $perPage = $request->per_page ?? 15;
 
-        // Fetch products/variants below threshold
-        $products = Product::where('stock_quantity', '<=', $threshold)->get();
-        $variants = ProductVariant::with('product')->where('stock_quantity', '<=', $threshold)->get();
+        // Build query for products
+        $productQuery = Product::query();
+        
+        // Apply search filter for products
+        if (!empty($search)) {
+            $productQuery->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('sku', 'LIKE', "%{$search}%")
+                  ->orWhereHas('brand', function($brandQuery) use ($search) {
+                      $brandQuery->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Apply stock level filter
+        if (!empty($stockLevel)) {
+            switch ($stockLevel) {
+                case 'critical':
+                    $productQuery->where(function($q) use ($threshold) {
+                        $q->where('stock_quantity', '<=', 0)
+                          ->orWhere('stock_quantity', '<=', ceil($threshold * 0.3));
+                    });
+                    break;
+                case 'warning':
+                    $productQuery->whereBetween('stock_quantity', [
+                        ceil($threshold * 0.3) + 1, 
+                        ceil($threshold * 0.6)
+                    ]);
+                    break;
+                case 'low':
+                    $productQuery->whereBetween('stock_quantity', [
+                        ceil($threshold * 0.6) + 1, 
+                        $threshold
+                    ]);
+                    break;
+            }
+        } else {
+            $productQuery->where('stock_quantity', '<=', $threshold);
+        }
+        
+        $products = $productQuery->with('brand')
+            ->orderBy('stock_quantity', 'asc')
+            ->paginate($perPage);
 
+        // Build query for variants
+        $variantQuery = ProductVariant::query();
+        
+        // Apply search filter for variants
+        if (!empty($search)) {
+            $variantQuery->where(function($q) use ($search) {
+                $q->where('variant_name', 'LIKE', "%{$search}%")
+                  ->orWhere('sku', 'LIKE', "%{$search}%")
+                  ->orWhereHas('product', function($productQuery) use ($search) {
+                      $productQuery->where('name', 'LIKE', "%{$search}%")
+                                   ->orWhere('sku', 'LIKE', "%{$search}%")
+                                   ->orWhereHas('brand', function($brandQuery) use ($search) {
+                                       $brandQuery->where('name', 'LIKE', "%{$search}%");
+                                   });
+                  });
+            });
+        }
+        
+        // Apply stock level filter
+        if (!empty($stockLevel)) {
+            switch ($stockLevel) {
+                case 'critical':
+                    $variantQuery->where(function($q) use ($threshold) {
+                        $q->where('stock_quantity', '<=', 0)
+                          ->orWhere('stock_quantity', '<=', ceil($threshold * 0.3));
+                    });
+                    break;
+                case 'warning':
+                    $variantQuery->whereBetween('stock_quantity', [
+                        ceil($threshold * 0.3) + 1, 
+                        ceil($threshold * 0.6)
+                    ]);
+                    break;
+                case 'low':
+                    $variantQuery->whereBetween('stock_quantity', [
+                        ceil($threshold * 0.6) + 1, 
+                        $threshold
+                    ]);
+                    break;
+            }
+        } else {
+            $variantQuery->where('stock_quantity', '<=', $threshold);
+        }
+        
+        $variants = $variantQuery->with('product.brand')
+            ->orderBy('stock_quantity', 'asc')
+            ->paginate($perPage);
+
+        // Keep additional data for forms if needed
         $warehouses = Warehouse::all();
         $suppliers = Supplier::where('is_archived', false)->get();
         $stockCheckers = StockChecker::where('is_archived', false)->get();
 
         return view('admin.low_stock.index', compact(
-            'products', 'variants', 'warehouses', 'suppliers', 'stockCheckers', 'threshold'
+            'products', 'variants', 'warehouses', 'suppliers', 'stockCheckers', 'threshold', 'search', 'stockLevel', 'perPage'
         ));
     }
 

@@ -583,7 +583,7 @@
         <form method="GET" action="{{ route('admin.stock_in.index') }}" id="filterForm">
             <div class="row g-2">
                 <!-- Search -->
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="mb-2 position-relative">
                         <label for="search" class="form-label fw-bold">Search Stock-Ins</label>
                         <input type="text" class="form-control" id="search" name="search" 
