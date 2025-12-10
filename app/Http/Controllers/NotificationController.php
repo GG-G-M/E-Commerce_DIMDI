@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
 use App\Models\Order;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,8 +38,8 @@ class NotificationController extends Controller
         // Mark notification as read
         $notification->markAsRead();
         
-        // Redirect to order page which has receipt
-        return redirect()->route('orders.show', $order);
+        // Render receipt view (allows download/preview using the notification id)
+        return view('receipt.view', compact('order', 'notification'));
     }
     
     public function downloadReceipt($id)
@@ -139,12 +139,33 @@ class NotificationController extends Controller
     
     public function checkNew()
     {
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            // For unauthenticated users, redirect to login
+            return redirect()->route('login')
+                ->with('info', 'Please log in to view your notifications.');
+        }
+        
         $count = Auth::user()->unreadNotifications()->count();
         
-        return response()->json([
-            'has_new' => $count > 0,
-            'count' => $count
-        ]);
+        // Check if this is an AJAX request
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'has_new' => $count > 0,
+                'count' => $count
+            ]);
+        }
+        
+        // For direct browser visits, redirect to notifications index
+        // If there are new notifications, redirect with a flash message
+        if ($count > 0) {
+            return redirect()->route('notifications.index')
+                ->with('info', "You have {$count} new notification(s)");
+        }
+        
+        // If no new notifications, redirect to notifications index
+        return redirect()->route('notifications.index')
+            ->with('info', 'No new notifications at the moment');
     }
     
     public function getUnreadCount()

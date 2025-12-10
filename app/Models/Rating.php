@@ -1,5 +1,4 @@
 <?php
-// app/Models/Rating.php
 
 namespace App\Models;
 
@@ -15,9 +14,14 @@ class Rating extends Model
         'product_id',
         'order_id',
         'rating',
-        'review'
+        'review',
     ];
 
+    protected $casts = [
+        'rating' => 'integer',
+    ];
+
+    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -31,5 +35,35 @@ class Rating extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    // Scopes
+    public function scopeForProduct($query, $productId)
+    {
+        return $query->where('product_id', $productId);
+    }
+
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeRecent($query, $limit = 10)
+    {
+        return $query->orderBy('created_at', 'desc')->limit($limit);
+    }
+
+    // Helper methods
+    public function getStarRatingAttribute()
+    {
+        $stars = '';
+        for ($i = 1; $i <= 5; $i++) {
+            if ($i <= $this->rating) {
+                $stars .= '★';
+            } else {
+                $stars .= '☆';
+            }
+        }
+        return $stars;
     }
 }

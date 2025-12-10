@@ -8,6 +8,8 @@ use App\Notifications\PaymentReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 
 class PaymentController extends Controller
@@ -123,11 +125,18 @@ class PaymentController extends Controller
             
             // Notify customer with receipt links
             if ($order->user) {
-                $order->user->notify(new PaymentReceived($order));
+                try {
+                    $order->user->notify(new PaymentReceived($order));
+                } catch (\Throwable $e) {
+                    // fallback: resolve user model and send via Notification facade
+                    $u = User::find($order->user_id);
+                    if ($u) {
+                        Notification::send($u, new PaymentReceived($order));
+                    }
+                }
             }
             
-            // Reduce stock for confirmed orders
-            $order->reduceStock();
+            // Stock reduction is handled by Order::updateStatus('confirmed')
             
             // Clear selected items from cart if multi-select was used
             $selectedItemIds = session()->get('selected_cart_items');

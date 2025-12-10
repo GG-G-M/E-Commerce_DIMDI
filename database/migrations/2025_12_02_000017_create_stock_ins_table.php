@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('stock_checker_id')->nullable()->constrained('stock_checkers')->onDelete('set null');
             $table->integer('quantity')->default(0);
             $table->integer('remaining_quantity')->default(0);
+            $table->decimal('price', 10, 2)->nullable();
             $table->string('reason')->nullable();
             $table->boolean('is_archived')->default(false);
             $table->timestamps();

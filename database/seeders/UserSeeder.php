@@ -193,7 +193,7 @@ class UserSeeder extends Seeder
             ['email' => 'jessica.navarro@gmail.com', 'first_name' => 'Jessica', 'last_name' => 'Navarro', 'phone' => '09521234567'],
             ['email' => 'enrique.molina@gmail.com', 'first_name' => 'Enrique', 'last_name' => 'Molina', 'phone' => '09531234567'],
             ['email' => 'laura.acosta@gmail.com', 'first_name' => 'Laura', 'last_name' => 'Acosta', 'phone' => '09541234567'],
-            ['email' => 'felipe.dominguez@gmail.com', 'first_name' => 'Felipe', 'last_name' => 'Dominguez', 'phone' => '09551234567'],
+            ['email' => 'rocky@gmail.com', 'first_name' => 'Rocky', 'last_name' => 'Adaya', 'phone' => '09551234567'],
         ];
 
         foreach ($customers as $index => $customer) {

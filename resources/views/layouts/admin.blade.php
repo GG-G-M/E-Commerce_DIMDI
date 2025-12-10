@@ -186,6 +186,11 @@
                     <h4 class="text-center mb-4">
                         <i class="fas fa-cogs me-2"></i>DIMDI Admin
                     </h4>
+                    @if(auth()->check() && auth()->user()->isSuperAdmin())
+                        <div class="text-center mb-2">
+                            <a href="{{ route('superadmin.dashboard') }}" class="btn btn-sm btn-outline-light">← Super Admin Panel</a>
+                        </div>
+                    @endif
                     <ul class="nav flex-column">
 
                         <li class="nav-item">
@@ -223,6 +228,14 @@
                                 id="managementMenu">
 
                                 <ul class="nav flex-column ms-3">
+
+                                    {{-- <li class="nav-item">
+                                        <a class="nav-link {{ request()->routeIs('admin.abouts.*') ? 'active' : '' }}"
+                                            href="{{ route('admin.abouts.index') }}">
+                                            <i class="fas fa-info-circle me-2"></i>About
+                                        </a>
+                                    </li> --}}
+
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}"
                                             href="{{ route('admin.suppliers.index') }}">
@@ -244,12 +257,12 @@
                                         </a>
                                     </li>
 
-                                    <li class="nav-item">
+                                    {{-- <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
                                             href="{{ route('admin.deliveries.index') }}">
                                             <i class="fas fa-truck me-2"></i>Delivery
                                         </a>
-                                    </li>
+                                    </li> --}}
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
@@ -398,20 +411,6 @@
 
                 <!-- Page content -->
                 <div class="container-fluid py-4">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
                     @yield('content')
                 </div>
             </main>

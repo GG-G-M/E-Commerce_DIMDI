@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        // Get date range based on filter
+        // Get date range based on filter (in Philippine Time)
         $dateRange = $this->getDateRange($filter, $startDate, $endDate);
 
         $stats = [
@@ -52,9 +52,28 @@ class DashboardController extends Controller
         ));
     }
 
+    /**
+     * Convert to Philippine Time (UTC+8)
+     */
+    private function toPhilippineTime(Carbon $date): Carbon
+    {
+        return $date->copy()->setTimezone('Asia/Manila');
+    }
+
+    /**
+     * Convert UTC time to Philippine Time string for database queries
+     */
+    private function convertToPhTimeForQuery($column, $format = null)
+    {
+        if ($format) {
+            return DB::raw("DATE_FORMAT(CONVERT_TZ($column, '+00:00', '+08:00'), '$format')");
+        }
+        return DB::raw("CONVERT_TZ($column, '+00:00', '+08:00')");
+    }
+
     private function getDateRange($filter, $startDate = null, $endDate = null)
     {
-        $now = Carbon::now();
+        $now = $this->toPhilippineTime(Carbon::now());
 
         switch ($filter) {
             case 'today':
@@ -83,9 +102,11 @@ class DashboardController extends Controller
             
             case 'custom':
                 if ($startDate && $endDate) {
+                    $start = $this->toPhilippineTime(Carbon::parse($startDate));
+                    $end = $this->toPhilippineTime(Carbon::parse($endDate));
                     return [
-                        'start' => Carbon::parse($startDate)->startOfDay(),
-                        'end' => Carbon::parse($endDate)->endOfDay()
+                        'start' => $start->startOfDay(),
+                        'end' => $end->endOfDay()
                     ];
                 }
                 // Fall through to 'all' if custom dates not provided
@@ -101,7 +122,10 @@ class DashboardController extends Controller
         $query = Product::query();
         
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                $this->convertToPhTimeForQuery('created_at'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
         
         return $query->count();
@@ -112,7 +136,10 @@ class DashboardController extends Controller
         $query = Order::query();
         
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                $this->convertToPhTimeForQuery('created_at'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
         
         return $query->count();
@@ -123,7 +150,10 @@ class DashboardController extends Controller
         $query = User::where('role', 'customer');
         
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                $this->convertToPhTimeForQuery('created_at'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
         
         return $query->count();
@@ -134,7 +164,10 @@ class DashboardController extends Controller
         $query = Order::where('order_status', '!=', 'cancelled');
         
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                $this->convertToPhTimeForQuery('created_at'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
         
         return $query->sum('total_amount');
@@ -145,7 +178,10 @@ class DashboardController extends Controller
         $query = Order::where('order_status', 'pending');
         
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                $this->convertToPhTimeForQuery('created_at'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
         
         return $query->count();
@@ -171,7 +207,10 @@ class DashboardController extends Controller
 
         if ($dateRange) {
             $query->whereHas('order', function($query) use ($dateRange) {
-                $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+                $query->whereBetween(
+                    DB::raw('CONVERT_TZ(created_at, "+00:00", "+08:00")'), 
+                    [$dateRange['start'], $dateRange['end']]
+                );
             });
         }
 
@@ -195,7 +234,10 @@ class DashboardController extends Controller
 
         if ($dateRange) {
             $soldProductsQuery->whereHas('order', function($query) use ($dateRange) {
-                $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+                $query->whereBetween(
+                    DB::raw('CONVERT_TZ(created_at, "+00:00", "+08:00")'), 
+                    [$dateRange['start'], $dateRange['end']]
+                );
             });
         }
 
@@ -249,15 +291,18 @@ class DashboardController extends Controller
         $query = Order::where('order_status', '!=', 'cancelled');
 
         if ($dateRange) {
-            $query->whereBetween('created_at', [$dateRange['start'], $dateRange['end']]);
+            $query->whereBetween(
+                DB::raw('CONVERT_TZ(created_at, "+00:00", "+08:00")'), 
+                [$dateRange['start'], $dateRange['end']]
+            );
         }
 
-        // Group by different time intervals based on filter
+        // Group by different time intervals based on filter (using Philippine Time)
         switch ($filter) {
             case 'today':
                 // Group by hours for today
                 $salesData = $query->select(
-                    DB::raw('HOUR(created_at) as period'),
+                    DB::raw('HOUR(CONVERT_TZ(created_at, "+00:00", "+08:00")) as period'),
                     DB::raw('COUNT(*) as order_count'),
                     DB::raw('SUM(total_amount) as revenue')
                 )
@@ -270,7 +315,7 @@ class DashboardController extends Controller
                 for ($hour = 0; $hour < 24; $hour++) {
                     $data = $salesData->where('period', $hour)->first();
                     $result[] = [
-                        'period' => $hour . ':00',
+                        'period' => sprintf('%02d:00', $hour),
                         'order_count' => $data ? $data->order_count : 0,
                         'revenue' => $data ? $data->revenue : 0
                     ];
@@ -280,8 +325,8 @@ class DashboardController extends Controller
             case 'week':
                 // Group by days for week
                 $salesData = $query->select(
-                    DB::raw('DAYNAME(created_at) as period'),
-                    DB::raw('DAYOFWEEK(created_at) as day_order'),
+                    DB::raw('DAYNAME(CONVERT_TZ(created_at, "+00:00", "+08:00")) as period'),
+                    DB::raw('DAYOFWEEK(CONVERT_TZ(created_at, "+00:00", "+08:00")) as day_order'),
                     DB::raw('COUNT(*) as order_count'),
                     DB::raw('SUM(total_amount) as revenue')
                 )
@@ -294,7 +339,7 @@ class DashboardController extends Controller
                 foreach ($days as $index => $day) {
                     $data = $salesData->where('period', $day)->first();
                     $result[] = [
-                        'period' => $day,
+                        'period' => substr($day, 0, 3),
                         'order_count' => $data ? $data->order_count : 0,
                         'revenue' => $data ? $data->revenue : 0
                     ];
@@ -304,7 +349,9 @@ class DashboardController extends Controller
             case 'month':
                 // Group by weeks for month
                 $salesData = $query->select(
-                    DB::raw('WEEK(created_at, 1) - WEEK(DATE_SUB(created_at, INTERVAL DAYOFMONTH(created_at)-1 DAY), 1) + 1 as period'),
+                    DB::raw('WEEK(CONVERT_TZ(created_at, "+00:00", "+08:00"), 1) - 
+                            WEEK(DATE_SUB(CONVERT_TZ(created_at, "+00:00", "+08:00"), 
+                            INTERVAL DAYOFMONTH(CONVERT_TZ(created_at, "+00:00", "+08:00"))-1 DAY), 1) + 1 as period'),
                     DB::raw('COUNT(*) as order_count'),
                     DB::raw('SUM(total_amount) as revenue')
                 )
@@ -326,8 +373,8 @@ class DashboardController extends Controller
             case 'year':
                 // Group by months for year
                 $salesData = $query->select(
-                    DB::raw('MONTHNAME(created_at) as period'),
-                    DB::raw('MONTH(created_at) as month_order'),
+                    DB::raw('MONTHNAME(CONVERT_TZ(created_at, "+00:00", "+08:00")) as period'),
+                    DB::raw('MONTH(CONVERT_TZ(created_at, "+00:00", "+08:00")) as month_order'),
                     DB::raw('COUNT(*) as order_count'),
                     DB::raw('SUM(total_amount) as revenue')
                 )
@@ -353,7 +400,7 @@ class DashboardController extends Controller
             default:
                 // Group by months for all time or custom range
                 $salesData = $query->select(
-                    DB::raw('DATE_FORMAT(created_at, "%Y-%m") as period'),
+                    DB::raw('DATE_FORMAT(CONVERT_TZ(created_at, "+00:00", "+08:00"), "%Y-%m") as period'),
                     DB::raw('COUNT(*) as order_count'),
                     DB::raw('SUM(total_amount) as revenue')
                 )

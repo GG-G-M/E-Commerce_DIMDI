@@ -385,4 +385,57 @@ class SalesReportController extends Controller
         
         return $monthlySales;
     }
+
+    public function exportPdf(Request $request)
+    {
+        $query = Order::where('order_status', 'delivered');
+        
+        // Apply filters
+        $query = $this->applyFilters($query, $request);
+        
+        // Get sales data for charts
+        $salesData = $this->getSalesData($request);
+        $orders = $query->with('user', 'items')->orderBy('delivered_at', 'desc')->get();
+        
+        // Generate PDF
+        $pdf = \PDF::loadView('admin.sales-report.pdf', compact('orders', 'salesData'));
+        
+        $fileName = 'sales-report-' . date('Y-m-d-H-i-s') . '.pdf';
+        
+        return $pdf->download($fileName);
+    }
+
+    public function exportComparisonPdf(Request $request)
+    {
+        $year1 = $request->get('year1', date('Y'));
+        $year2 = $request->get('year2', date('Y') - 1);
+        
+        $year1Sales = $this->getMonthlySalesData($year1);
+        $year2Sales = $this->getMonthlySalesData($year2);
+        
+        $growthData = [];
+        $totalYear1 = array_sum($year1Sales);
+        $totalYear2 = array_sum($year2Sales);
+        $totalGrowth = $totalYear2 > 0 ? (($totalYear1 - $totalYear2) / $totalYear2) * 100 : ($totalYear1 > 0 ? 100 : 0);
+        
+        foreach ($year1Sales as $month => $sales1) {
+            $sales2 = $year2Sales[$month];
+            $growth = $sales2 > 0 ? (($sales1 - $sales2) / $sales2) * 100 : ($sales1 > 0 ? 100 : 0);
+            $growthData[$month] = round($growth, 2);
+        }
+        
+        // Generate PDF
+        $pdf = \PDF::loadView('admin.sales-report.comparison-pdf', compact(
+            'year1', 
+            'year2', 
+            'year1Sales', 
+            'year2Sales',
+            'growthData',
+            'totalGrowth'
+        ));
+        
+        $fileName = 'sales-comparison-' . $year1 . '-vs-' . $year2 . '-' . date('Y-m-d-H-i-s') . '.pdf';
+        
+        return $pdf->download($fileName);
+    }
 }

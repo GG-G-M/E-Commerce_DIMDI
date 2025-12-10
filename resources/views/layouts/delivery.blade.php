@@ -288,6 +288,11 @@
                     <h4 class="text-center mb-4">
                         <i class="fas fa-truck me-2"></i>DIMDI Delivery
                     </h4>
+                    @if(auth()->check() && auth()->user()->isSuperAdmin())
+                        <div class="text-center mb-2">
+                            <a href="{{ route('superadmin.dashboard') }}" class="btn btn-sm btn-outline-light">← Super Admin Panel</a>
+                        </div>
+                    @endif
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('delivery.dashboard') ? 'active' : '' }}"

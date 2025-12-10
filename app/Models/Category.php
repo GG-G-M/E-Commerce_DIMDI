@@ -11,11 +11,13 @@ class Category extends Model
         'name',
         'slug',
         'description',
-        'is_active'
+        'is_active',
+        'is_archived'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'is_archived' => 'boolean'
     ];
 
     public function products(): HasMany
@@ -33,7 +35,7 @@ class Category extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_active', true)->where('is_archived', false);
     }
 
     public function getRouteKeyName()

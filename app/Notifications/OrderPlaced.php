@@ -31,7 +31,7 @@ class OrderPlaced extends Notification implements ShouldQueue
             ->greeting('Hello ' . $this->order->customer_name . '!')
             ->line('Thank you for your order!')
             ->line('Order Number: ' . $this->order->order_number)
-            ->line('Total Amount: ₱' . number_format($this->order->total_amount, 2))
+            ->line('Total Amount: ₱' . number_format((float) $this->order->total_amount, 2))
             ->action('View Order', route('orders.show', $this->order))
             ->line('You can download your receipt from your order details page.')
             ->salutation('Thank you for shopping with us!');
@@ -47,8 +47,8 @@ class OrderPlaced extends Notification implements ShouldQueue
             'message' => "Your order #{$this->order->order_number} has been placed successfully.",
             'total_amount' => $this->order->total_amount,
             'status' => $this->order->order_status,
-            'receipt_url' => route('notifications.receipt.view', ['notification' => $this->id]),
-            'receipt_download_url' => route('notifications.receipt.download', ['notification' => $this->id]),
+            // Do not reference $this->id here — the notification id isn't available during serialization.
+            // Build receipt links using the notification id when rendering the notification list instead.
             'order_url' => route('orders.show', $this->order),
             'timestamp' => now()->toDateTimeString()
         ];

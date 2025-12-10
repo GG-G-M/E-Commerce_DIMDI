@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Http\Controllers\Admin\StockOutController;
 
 class Order extends Model
 {
@@ -39,6 +40,8 @@ class Order extends Model
         'refund_method',
         'refund_notes',
         'refund_processed_at',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
@@ -211,10 +214,8 @@ class Order extends Model
             $this->restoreStock();
         }
 
-        // CHANGED: Now only reduces stock on 'confirmed' status
-        if ($status === 'confirmed') {
-            $this->reduceStock();
-        }
+        // NOTE: physical stock deduction is performed when order is marked 'shipped'.
+        // Do not perform stock reduction on 'confirmed' to ensure FIFO is applied only once at 'shipped'.
 
         return $this;
     }
@@ -276,13 +277,8 @@ class Order extends Model
             'order_status' => 'delivered',
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order successfully delivered to customer',
-            ]);
-        }
+        // NOTE: Status history is created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }
@@ -319,9 +315,28 @@ class Order extends Model
     {
         foreach ($this->items as $item) {
             if ($item->product) {
-                // Make sure we don't reduce below 0
-                $newStock = max(0, $item->product->stock - $item->quantity);
-                $item->product->update(['stock' => $newStock]);
+                // If a variant was selected, deduct from variant stock
+                if ($item->selected_size) {
+                    $variant = $item->product->variants()
+                        ->where('variant_name', $item->selected_size)
+                        ->first();
+
+                    if ($variant) {
+                        // Deduct from variant stock
+                        $newVariantStock = max(0, $variant->stock_quantity - $item->quantity);
+                        $variant->update(['stock_quantity' => $newVariantStock]);
+
+                        // Update main product stock as sum of all variants
+                        if ($item->product->has_variants) {
+                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
+                            $item->product->update(['stock_quantity' => $totalVariantStock]);
+                        }
+                    }
+                } else {
+                    // No variant selected, deduct from main product stock
+                    $newStock = max(0, $item->product->stock_quantity - $item->quantity);
+                    $item->product->update(['stock_quantity' => $newStock]);
+                }
             }
         }
 
@@ -333,10 +348,40 @@ class Order extends Model
      */
     public function restoreStock(): self
     {
-        foreach ($this->items as $item) {
-            if ($item->product) {
-                $item->product->increment('stock', $item->quantity);
+        // Only restore stock if there are StockOut records associated with this order.
+        $stockOuts = \App\Models\StockOut::where('reason', 'like', '%Order #' . $this->id . '%')->get();
+
+        if ($stockOuts->isEmpty()) {
+            // Nothing to restore (no physical stock-out performed yet)
+            return $this;
+        }
+
+        foreach ($stockOuts as $stockOut) {
+            // Restore remaining_quantity on batches
+            foreach ($stockOut->stockInBatches as $batch) {
+                $batch->increment('remaining_quantity', $batch->pivot->deducted_quantity);
             }
+
+            // Restore product/variant totals
+            if ($stockOut->product_variant_id) {
+                $variant = \App\Models\ProductVariant::find($stockOut->product_variant_id);
+                if ($variant) {
+                    $variant->increment('stock_quantity', $stockOut->quantity);
+                    // Sync parent product total
+                    if (method_exists($variant->product, 'updateTotalStock')) {
+                        $variant->product->updateTotalStock();
+                    }
+                }
+            } else {
+                $product = \App\Models\Product::find($stockOut->product_id);
+                if ($product) {
+                    $product->increment('stock_quantity', $stockOut->quantity);
+                }
+            }
+
+            // Detach pivot records and delete the StockOut log
+            $stockOut->stockInBatches()->detach();
+            $stockOut->delete();
         }
 
         return $this;
@@ -474,6 +519,8 @@ class Order extends Model
         });
     }
 
+
+
     // ========== ADDED METHODS FOR DELIVERY FLOW ==========
 
     /**
@@ -527,13 +574,8 @@ class Order extends Model
             'delivered_at' => now(),
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order delivered to customer by delivery personnel',
-            ]);
-        }
+        // NOTE: Status history should be created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }

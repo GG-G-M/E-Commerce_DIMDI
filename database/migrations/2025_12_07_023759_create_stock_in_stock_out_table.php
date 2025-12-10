@@ -10,6 +10,18 @@ return new class extends Migration
     {
         Schema::create('stock_in_stock_out', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('stock_in_id')
+                ->constrained('stock_ins')
+                ->cascadeOnDelete();
+
+            $table->foreignId('stock_out_id')
+                ->constrained('stock_outs')
+                ->cascadeOnDelete();
+
+            // Quantity deducted from this specific stock-in batch
+            $table->integer('deducted_quantity');
+
             $table->timestamps();
         });
     }

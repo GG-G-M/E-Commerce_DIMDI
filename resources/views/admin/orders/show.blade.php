@@ -19,7 +19,6 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border-left: 4px solid var(--primary-green);
     }
     
     /* Modern Info Grid */
@@ -102,15 +101,6 @@
         overflow: hidden;
     }
     
-    .shipping-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--primary-green);
-    }
     
     .shipping-header {
         display: flex;
@@ -352,35 +342,57 @@
     
     .timeline-item {
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .timeline-item.current .timeline-marker {
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 3px var(--primary-green);
+        transform: scale(1.3);
+        animation: pulse 2s infinite;
     }
     
     .timeline-marker {
         position: absolute;
         left: -30px;
         top: 5px;
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         background: #6c757d;
         transition: all 0.3s ease;
         z-index: 2;
     }
     
-    .timeline-item.current .timeline-marker {
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 2px var(--primary-green);
-        transform: scale(1.2);
-    }
-    
     .timeline-content {
-        padding-bottom: 10px;
+        padding-bottom: 15px;
         border-left: 2px solid #e9ecef;
-        padding-left: 20px;
+        padding-left: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
     }
     
     .timeline-item:last-child .timeline-content {
         border-left-color: transparent;
+    }
+    
+    .timeline-item:hover .timeline-marker {
+        transform: scale(1.4);
+    }
+    
+    .timeline-item:hover .timeline-content {
+        border-left-color: var(--primary-green);
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin-left: -5px;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
     }
     
     .timeline-marker.bg-pending { background-color: #ffc107 !important; }
@@ -473,13 +485,15 @@
     </div>
 
     <!-- Shipping Address -->
-    <div class="shipping-card">
-        <div class="shipping-header">
+    <div class="info-section">
+        <div class="info-header">
             <i class="fas fa-map-marker-alt"></i>
-            <h6>Shipping Address</h6>
+            <h5>Shipping Address</h5>
         </div>
-        <div class="address-content">
-            {!! nl2br(e($order->shipping_address)) !!}
+        <div class="info-content">
+            <div class="address-content">
+                {!! nl2br(e($order->shipping_address)) !!}
+            </div>
         </div>
     </div>
 </div>
@@ -497,12 +511,23 @@
                 <div class="product-row">
                     @php
                         $itemImage = $item->product->image_url;
+                        $displayUnitPrice = $item->unit_price;
+                        $displayTotalPrice = $item->total_price;
+                        
                         if ($item->selected_size && $item->selected_size !== 'Standard') {
                             $variant = $item->product->variants->first(function($v) use ($item) {
                                 return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
                             });
-                            if ($variant && $variant->image) {
-                                $itemImage = $variant->image_url;
+                            
+                            if ($variant) {
+                                // Use variant-specific image if available
+                                if ($variant->image_url) {
+                                    $itemImage = $variant->image_url;
+                                }
+                                
+                                // Use variant-specific price
+                                $displayUnitPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
+                                $displayTotalPrice = $displayUnitPrice * $item->quantity;
                             }
                         }
                     @endphp
@@ -514,9 +539,9 @@
                         <span class="product-size">{{ $item->selected_size }}</span>
                         @endif
                         <div class="product-details">
-                            <span class="product-price">₱{{ number_format($item->unit_price, 2) }}</span>
+                            <span class="product-price">₱{{ number_format($displayUnitPrice, 2) }}</span>
                             <span class="product-quantity">Qty: {{ $item->quantity }}</span>
-                            <span class="product-total">₱{{ number_format($item->total_price, 2) }}</span>
+                            <span class="product-total">₱{{ number_format($displayTotalPrice, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -534,8 +559,17 @@
                 @if($order->statusHistory->count() > 0)
                 <div class="timeline">
                     @foreach($order->statusHistory as $history)
-                    <div class="timeline-item {{ $loop->first ? 'current' : '' }}">
-                        <div class="timeline-marker bg-{{ $history->status }}"></div>
+                    @php
+                        $isCurrentStatus = $history->status === $order->order_status;
+                    @endphp
+                    <div class="timeline-item {{ $isCurrentStatus ? 'current' : '' }}">
+                        <div class="timeline-marker 
+                            {{ $history->status === 'cancelled' ? 'bg-danger' : 
+                               ($history->status === 'delivered' ? 'bg-success' : 
+                               ($history->status === 'shipped' ? 'bg-primary' : 
+                               ($history->status === 'confirmed' ? 'bg-info' : 
+                               ($history->status === 'processing' ? 'bg-success' : 'bg-warning')))) }}">
+                        </div>
                         <div class="timeline-content">
                             <h6 class="mb-1 text-{{ $history->status === 'cancelled' ? 'danger' : 
                                ($history->status === 'delivered' ? 'success' : 
@@ -543,7 +577,9 @@
                                ($history->status === 'confirmed' ? 'info' : 
                                ($history->status === 'processing' ? 'success' : 'warning')))) }}">
                                 {{ ucfirst($history->status) }}
-                                @if($loop->first)<small class="text-muted">(Current)</small>@endif
+                                @if($isCurrentStatus)
+                                <small class="text-muted">(Current)</small>
+                                @endif
                             </h6>
                             <p class="text-muted mb-1 small">{{ $history->created_at->format('M j, Y g:i A') }}</p>
                             @if($history->notes && $history->notes !== 'Order created')
