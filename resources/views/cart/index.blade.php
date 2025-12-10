@@ -982,21 +982,21 @@
             function updateSummary(selectedIds) {
                 const summary = calculateSummary(selectedIds);
 
-                // Update display
+                // Update display with proper comma formatting
                 summaryQuantity.textContent = summary.quantity;
-                summarySubtotal.textContent = '₱' + summary.subtotal.toFixed(2);
+                summarySubtotal.textContent = '₱' + summary.subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
                 // Show/hide original price and savings
                 if (summary.hasDiscount && summary.savings > 0) {
                     originalPriceRow.style.display = 'block';
-                    summaryOriginal.textContent = '₱' + summary.originalTotal.toFixed(2);
-                    summarySavings.textContent = '-₱' + summary.savings.toFixed(2);
+                    summaryOriginal.textContent = '₱' + summary.originalTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    summarySavings.textContent = '-₱' + summary.savings.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 } else {
                     originalPriceRow.style.display = 'none';
                 }
 
                 // Update total
-                summaryTotal.textContent = '₱' + summary.total.toFixed(2);
+                summaryTotal.textContent = '₱' + summary.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
                 // Update checkout button
                 checkoutBtn.disabled = selectedIds.length === 0;

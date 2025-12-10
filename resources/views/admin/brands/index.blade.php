@@ -639,9 +639,9 @@
                 <i class="fas fa-tag"></i>
                 <h5 class="text-muted">No Brands Found</h5>
                 <p class="text-muted mb-4">Add your first brand to get started</p>
-                <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+                {{-- <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
                     <i class="fas fa-user-plus"></i> Add First Brand
-                </button>
+                </button> --}}
             </div>
         @endif
     </div>

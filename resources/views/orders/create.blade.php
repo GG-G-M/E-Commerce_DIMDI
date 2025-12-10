@@ -783,9 +783,9 @@
         const subtotal = SUBTOTAL;
         const total = subtotal + shippingFee;
 
-        // Update display elements
-        document.getElementById('display-shipping').textContent = '₱' + shippingFee.toFixed(2);
-        document.getElementById('display-total').textContent = '₱' + total.toFixed(2);
+        // Update display elements with proper comma formatting
+        document.getElementById('display-shipping').textContent = '₱' + shippingFee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('display-total').textContent = '₱' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         // Update shipping info text
         let infoText = '<i class="fas fa-truck me-1"></i>';

@@ -758,10 +758,10 @@
                 <h5 class="text-muted">No Stock-Out Records Found</h5>
                 <p class="text-muted mb-4">Add your first stock-out record to get started</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
-                        {{-- <i class="fas fa-minus-circle"></i> --}}
+                    {{-- <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+                        <i class="fas fa-minus-circle"></i>
                         Add First Stock-Out
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         @endif

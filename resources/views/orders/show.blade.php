@@ -542,10 +542,10 @@
                         <span class="info-label">Subtotal</span>
                         <span class="info-value">₱{{ number_format($order->subtotal, 2) }}</span>
                     </div>
-                    <div class="summary-item">
+                    {{-- <div class="summary-item">
                         <span class="info-label">Tax</span>
                         <span class="info-value">₱{{ number_format($order->tax_amount, 2) }}</span>
-                    </div>
+                    </div> --}}
                     <div class="summary-item">
                         <span class="info-label">Shipping</span>
                         <span class="info-value">₱{{ number_format($order->shipping_cost, 2) }}</span>

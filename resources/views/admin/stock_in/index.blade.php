@@ -863,14 +863,14 @@
                 <h5 class="text-muted">No Stock-In Records</h5>
                 <p class="text-muted mb-4">Start by adding your first stock-in record or importing via CSV.</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                        {{-- <i class="fas fa-file-csv"></i> --}}
+                    {{-- <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                        <i class="fas fa-file-csv"></i>
                         Import CSV
                     </button>
                     <button class="btn btn-add-stock-in" data-bs-toggle="modal" data-bs-target="#stockInModal">
-                        {{-- <i class="fas fa-plus"></i> --}}
+                        <i class="fas fa-plus"></i>
                         Add First Stock-In
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         @endif
@@ -1046,13 +1046,13 @@
                                     <td>{{ $product->category->name ?? 'N/A' }}</td>
                                     <td>
                                         @if($product->has_variants && $product->variants && $product->variants->count() > 0)
-                                            <span class="badge bg-info">
-                                                <i class="fas fa-layer-group me-1"></i>
+                                            <span>
+                                                {{-- <i class="fas fa-layer-group me-1"></i> --}}
                                                 {{ $product->variants->count() }} variant(s)
                                             </span>
                                         @else
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-box me-1"></i>
+                                            <span>
+                                                {{-- <i class="fas fa-box me-1"></i> --}}
                                                 No variants
                                             </span>
                                         @endif
