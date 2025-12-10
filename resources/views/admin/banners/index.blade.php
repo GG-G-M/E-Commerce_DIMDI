@@ -205,6 +205,49 @@
         font-weight: 600;
     }
 
+    /* Status styling - Consistent with suppliers */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
+        color: #2C8F0C;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-text-inactive {
+        color: #6c757d;
+    }
+
+    .status-text-inactive::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.8;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -377,12 +420,12 @@
                             </td>
                             <td>
                                 @if($banner->is_active)
-                                    <span class="status-active">
-                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    <span class="status-text status-text-active">
+                                        Active
                                     </span>
                                 @else
-                                    <span class="status-inactive">
-                                        <i class="fas fa-times-circle me-1"></i>Inactive
+                                    <span class="status-text status-text-inactive">
+                                        Inactive
                                     </span>
                                 @endif
                             </td>

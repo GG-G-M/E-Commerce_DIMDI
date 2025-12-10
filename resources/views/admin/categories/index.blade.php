@@ -559,7 +559,7 @@
                             </td>
                             <td class="products-col">
                                 <span class="products-count">
-                                    <i class="fas fa-box"></i>
+                                    {{-- <i class="fas fa-box"></i> --}}
                                     {{ $category->products_count ?? $category->products->count() }}
                                 </span>
                             </td>
