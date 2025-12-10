@@ -636,314 +636,326 @@
     </section>
     @endif
 
-    <!-- ================= IMPROVED RATINGS SECTION ONLY ================= -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Product Reviews & Ratings</h4>
-                </div>
-                <div class="card-body">
-                    
-                    <!-- Average Rating Display -->
-                    <div class="row mb-4">
-                        <div class="col-md-4 text-center mb-4 mb-md-0">
-                            <div class="rating-summary">
-                                <div class="rating-number">{{ number_format($product->average_rating, 1) }}</div>
-                                <div class="star-rating-display mb-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= floor($product->average_rating))
-                                            <i class="fas fa-star"></i>
-                                        @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
-                                            <i class="fas fa-star-half-alt"></i>
-                                        @else
-                                            <i class="far fa-star"></i>
-                                        @endif
-                                    @endfor
-                                </div>
-                                <div class="rating-total">Based on {{ $product->total_ratings }} reviews</div>
+   <!-- ================= IMPROVED RATINGS SECTION ONLY ================= -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-star me-2"></i>Product Reviews & Ratings</h4>
+            </div>
+            <div class="card-body">
+                
+                <!-- Average Rating Display -->
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center mb-4 mb-md-0">
+                        <div class="rating-summary">
+                            <div class="rating-number">{{ number_format($product->average_rating, 1) }}</div>
+                            <div class="star-rating-display mb-2">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= floor($product->average_rating))
+                                        <i class="fas fa-star"></i>
+                                    @elseif($i == ceil($product->average_rating) && fmod($product->average_rating, 1) != 0)
+                                        <i class="fas fa-star-half-alt"></i>
+                                    @else
+                                        <i class="far fa-star"></i>
+                                    @endif
+                                @endfor
                             </div>
+                            <div class="rating-total">Based on {{ $product->total_ratings }} reviews</div>
                         </div>
-                        <div class="col-md-8">
-                            <!-- User Rating Form -->
-                            @auth
-                                @if($product->canUserReview(auth()->user()))
-                                    <div class="user-rating-form">
-                                        <h5 class="text-success mb-3">Share Your Experience</h5>
-                                        <p class="text-muted mb-4">
-                                            You can leave a review for each delivered order containing this product.
-                                        </p>
-                                        
-                                        @php
-                                            $userOrders = $product->getUserDeliveredOrders(auth()->user());
-                                            $userRatings = [];
-                                            
-                                            foreach ($userOrders as $order) {
-                                                $rating = $product->getUserRatingForOrder($order->id, auth()->user());
-                                                if ($rating) {
-                                                    $userRatings[$order->id] = $rating;
-                                                }
-                                            }
-                                        @endphp
-                                        
-                                        @if($userOrders->count() > 0)
-                                            @foreach($userOrders as $order)
-                                                @php
-                                                    $existingRating = $userRatings[$order->id] ?? null;
-                                                @endphp
-                                                
-                                                <div class="review-card mb-4">
-                                                    <div class="review-header">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span>
-                                                                <i class="fas fa-shopping-bag me-1"></i>
-                                                                Order #{{ $order->order_number }} 
-                                                                <small class="opacity-75">({{ $order->created_at->format('M d, Y') }})</small>
-                                                            </span>
-                                                            @if($existingRating)
-                                                                <span class="badge-reviewed">
-                                                                    <i class="fas fa-check me-1"></i>Reviewed
-                                                                </span>
-                                                            @else
-                                                                <span class="badge-pending">
-                                                                    <i class="fas fa-clock me-1"></i>Pending Review
-                                                                </span>
-                                                            @endif
+                    </div>
+                    <div class="col-md-8">
+                        <!-- User Rating Form -->
+                        @auth
+                            @if($product->canUserReview(auth()->user()))
+                                @php
+                                    // Check if user already has a review for this product
+                                    $existingUserRating = $product->ratings()
+                                        ->where('user_id', auth()->id())
+                                        ->first();
+                                    
+                                    // Get user's delivered orders with this product for reference
+                                    $userOrders = $product->getUserDeliveredOrders(auth()->user());
+                                @endphp
+                                
+                                <div class="user-rating-form">
+                                    <h5 class="text-success mb-3">
+                                        @if($existingUserRating)
+                                            <i class="fas fa-edit me-2"></i>Your Review
+                                        @else
+                                            <i class="fas fa-comment-medical me-2"></i>Share Your Experience
+                                        @endif
+                                    </h5>
+                                    
+                                    @if($existingUserRating)
+                                        <!-- Display & Edit Existing Review -->
+                                        <div class="review-card mb-4">
+                                            <div class="review-header">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span>
+                                                        <i class="fas fa-user-check me-1"></i>
+                                                        Your Review
+                                                        <small class="opacity-75">(Submitted on {{ $existingUserRating->created_at->format('M d, Y') }})</small>
+                                                    </span>
+                                                    <span class="badge-reviewed">
+                                                        <i class="fas fa-check me-1"></i>Reviewed
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="review-body">
+                                                <div class="existing-review">
+                                                    <div class="reviewer-info">
+                                                        <div class="reviewer-avatar">
+                                                            {{ substr(auth()->user()->name, 0, 1) }}
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-0 fw-bold">{{ auth()->user()->name }}</h6>
+                                                            <small class="text-muted">
+                                                                Purchased {{ $userOrders->count() }} time{{ $userOrders->count() > 1 ? 's' : '' }}
+                                                                @if($userOrders->count() > 0)
+                                                                    <span class="ms-2">Last order: #{{ $userOrders->first()->order_number }}</span>
+                                                                @endif
+                                                            </small>
                                                         </div>
                                                     </div>
-                                                    <div class="review-body">
-                                                        @if($existingRating)
-                                                            <!-- Display Existing Review -->
-                                                            <div class="existing-review">
-                                                                <div class="reviewer-info">
-                                                                    <div class="reviewer-avatar">
-                                                                        {{ substr(auth()->user()->name, 0, 1) }}
-                                                                    </div>
-                                                                    <div>
-                                                                        <h6 class="mb-0 fw-bold">{{ auth()->user()->name }}</h6>
-                                                                        <small class="text-muted">
-                                                                            Reviewed on {{ $existingRating->created_at->format('M d, Y') }}
-                                                                        </small>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <div class="star-rating-display mb-3">
-                                                                    @for($i = 1; $i <= 5; $i++)
-                                                                        @if($i <= $existingRating->rating)
+                                                    
+                                                    <div class="star-rating-display mb-3">
+                                                        @for($i = 1; $i <= 5; $i++)
+                                                            @if($i <= $existingUserRating->rating)
+                                                                <i class="fas fa-star"></i>
+                                                            @else
+                                                                <i class="far fa-star"></i>
+                                                            @endif
+                                                        @endfor
+                                                        <span class="ms-2 fw-bold text-success">{{ $existingUserRating->rating }}/5</span>
+                                                    </div>
+                                                    
+                                                    <div class="review-text mb-3">
+                                                        {{ $existingUserRating->review }}
+                                                    </div>
+                                                    
+                                                    @if($existingUserRating->updated_at != $existingUserRating->created_at)
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-history me-1"></i>
+                                                            Updated on {{ $existingUserRating->updated_at->format('M d, Y') }}
+                                                        </small>
+                                                    @endif
+                                                    
+                                                    <!-- Edit/Delete Actions -->
+                                                    <div class="review-actions">
+                                                        <button class="btn btn-outline-success btn-review-action" 
+                                                                data-bs-toggle="collapse" 
+                                                                data-bs-target="#editUserReview">
+                                                            <i class="fas fa-edit me-1"></i>Edit Review
+                                                        </button>
+                                                        
+                                                        <form action="{{ route('ratings.destroy', $existingUserRating) }}" 
+                                                              method="POST" 
+                                                              class="d-inline"
+                                                              onsubmit="return confirm('Are you sure you want to delete your review?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-outline-danger btn-review-action">
+                                                                <i class="fas fa-trash me-1"></i>Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Edit Form (Collapsed) -->
+                                                <div class="collapse mt-4" id="editUserReview">
+                                                    <div class="review-form-card">
+                                                        <h5 class="review-form-header mb-4">
+                                                            <i class="fas fa-edit me-2"></i>Edit Your Review
+                                                        </h5>
+                                                        <form action="{{ route('ratings.update', $existingUserRating) }}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            @if($userOrders->count() > 0)
+                                                                <input type="hidden" name="order_id" value="{{ $userOrders->first()->id }}">
+                                                            @endif
+                                                            
+                                                            <div class="mb-4">
+                                                                <label class="form-label fw-semibold text-success mb-3">Update Your Rating</label>
+                                                                <div class="star-rating-input">
+                                                                    @for($i = 5; $i >= 1; $i--)
+                                                                        <input type="radio" id="edit_user_star_{{ $i }}" 
+                                                                               name="rating" value="{{ $i }}"
+                                                                               {{ $existingUserRating->rating == $i ? 'checked' : '' }} required>
+                                                                        <label for="edit_user_star_{{ $i }}">
                                                                             <i class="fas fa-star"></i>
-                                                                        @else
-                                                                            <i class="far fa-star"></i>
-                                                                        @endif
+                                                                        </label>
                                                                     @endfor
-                                                                    <span class="ms-2 fw-bold text-success">{{ $existingRating->rating }}/5</span>
-                                                                </div>
-                                                                
-                                                                <div class="review-text mb-3">
-                                                                    {{ $existingRating->review }}
-                                                                </div>
-                                                                
-                                                                @if($existingRating->updated_at != $existingRating->created_at)
-                                                                    <small class="text-muted">
-                                                                        <i class="fas fa-history me-1"></i>
-                                                                        Updated on {{ $existingRating->updated_at->format('M d, Y') }}
-                                                                    </small>
-                                                                @endif
-                                                                
-                                                                <!-- Edit/Delete Actions -->
-                                                                <div class="review-actions">
-                                                                    <button class="btn btn-outline-success btn-review-action" 
-                                                                            data-bs-toggle="collapse" 
-                                                                            data-bs-target="#editReview{{ $existingRating->id }}">
-                                                                        <i class="fas fa-edit me-1"></i>Edit Review
-                                                                    </button>
-                                                                    
-                                                                    <form action="{{ route('ratings.destroy', $existingRating) }}" 
-                                                                          method="POST" 
-                                                                          class="d-inline"
-                                                                          onsubmit="return confirm('Are you sure you want to delete this review?');">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="submit" class="btn btn-outline-danger btn-review-action">
-                                                                            <i class="fas fa-trash me-1"></i>Delete
-                                                                        </button>
-                                                                    </form>
                                                                 </div>
                                                             </div>
                                                             
-                                                            <!-- Edit Form (Collapsed) -->
-                                                            <div class="collapse mt-4" id="editReview{{ $existingRating->id }}">
-                                                                <div class="review-form-card">
-                                                                    <h5 class="review-form-header mb-4">
-                                                                        <i class="fas fa-edit me-2"></i>Edit Your Review
-                                                                    </h5>
-                                                                    <form action="{{ route('ratings.update', $existingRating) }}" method="POST">
-                                                                        @csrf
-                                                                        @method('PUT')
-                                                                        <input type="hidden" name="order_id" value="{{ $order->id }}">
-                                                                        
-                                                                        <div class="mb-4">
-                                                                            <label class="form-label fw-semibold text-success mb-3">Update Your Rating</label>
-                                                                            <div class="star-rating-input">
-                                                                                @for($i = 5; $i >= 1; $i--)
-                                                                                    <input type="radio" id="edit_star{{ $order->id }}_{{ $i }}" 
-                                                                                           name="rating" value="{{ $i }}"
-                                                                                           {{ $existingRating->rating == $i ? 'checked' : '' }} required>
-                                                                                    <label for="edit_star{{ $order->id }}_{{ $i }}">
-                                                                                        <i class="fas fa-star"></i>
-                                                                                    </label>
-                                                                                @endfor
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="mb-4">
-                                                                            <label for="edit_review{{ $order->id }}" class="form-label fw-semibold text-success">Your Review</label>
-                                                                            <textarea name="review" id="edit_review{{ $order->id }}" 
-                                                                                      class="form-control" rows="4" required>{{ $existingRating->review }}</textarea>
-                                                                            <div class="form-text">Your review helps other customers make better decisions.</div>
-                                                                        </div>
-                                                                        
-                                                                        <div class="d-flex gap-2">
-                                                                            <button type="submit" class="btn btn-success px-4 py-2">
-                                                                                <i class="fas fa-save me-2"></i>Save Changes
-                                                                            </button>
-                                                                            <button type="button" class="btn btn-outline-secondary px-4 py-2" 
-                                                                                    data-bs-toggle="collapse" 
-                                                                                    data-bs-target="#editReview{{ $existingRating->id }}">
-                                                                                Cancel
-                                                                            </button>
-                                                                        </div>
-                                                                    </form>
-                                                                </div>
+                                                            <div class="mb-4">
+                                                                <label for="edit_user_review" class="form-label fw-semibold text-success">Your Review</label>
+                                                                <textarea name="review" id="edit_user_review" 
+                                                                          class="form-control" rows="4" required>{{ $existingUserRating->review }}</textarea>
+                                                                <div class="form-text">Your review helps other customers make better decisions.</div>
                                                             </div>
-                                                        @else
-                                                            <!-- New Review Form -->
-                                                            <div class="review-form-card">
-                                                                <h5 class="review-form-header mb-4">
-                                                                    <i class="fas fa-comment-medical me-2"></i>Review Order #{{ $order->order_number }}
-                                                                </h5>
-                                                                <form action="{{ route('ratings.store', $product) }}" method="POST">
-                                                                    @csrf
-                                                                    <input type="hidden" name="order_id" value="{{ $order->id }}">
-                                                                    
-                                                                    <div class="mb-4">
-                                                                        <label class="form-label fw-semibold text-success mb-3">Rate Your Experience</label>
-                                                                        <div class="star-rating-input">
-                                                                            @for($i = 5; $i >= 1; $i--)
-                                                                                <input type="radio" id="star{{ $order->id }}_{{ $i }}" 
-                                                                                       name="rating" value="{{ $i }}" required>
-                                                                                <label for="star{{ $order->id }}_{{ $i }}">
-                                                                                    <i class="fas fa-star"></i>
-                                                                                </label>
-                                                                            @endfor
-                                                                        </div>
-                                                                        <div class="form-text mt-2">Click on a star to rate this product</div>
-                                                                    </div>
-                                                                    
-                                                                    <div class="mb-4">
-                                                                        <label for="review{{ $order->id }}" class="form-label fw-semibold text-success">Your Review</label>
-                                                                        <textarea name="review" id="review{{ $order->id }}" 
-                                                                                  class="form-control" rows="4" 
-                                                                                  placeholder="Share your experience with this product from order #{{ $order->order_number }}..." 
-                                                                                  required></textarea>
-                                                                        <div class="form-text">Be specific about what you liked or didn't like.</div>
-                                                                    </div>
-                                                                    
-                                                                    <button type="submit" class="btn btn-success px-4 py-2">
-                                                                        <i class="fas fa-paper-plane me-2"></i>Submit Review
-                                                                    </button>
-                                                                </form>
+                                                            
+                                                            <div class="d-flex gap-2">
+                                                                <button type="submit" class="btn btn-success px-4 py-2">
+                                                                    <i class="fas fa-save me-2"></i>Save Changes
+                                                                </button>
+                                                                <button type="button" class="btn btn-outline-secondary px-4 py-2" 
+                                                                        data-bs-toggle="collapse" 
+                                                                        data-bs-target="#editUserReview">
+                                                                    Cancel
+                                                                </button>
                                                             </div>
-                                                        @endif
+                                                        </form>
                                                     </div>
                                                 </div>
-                                            @endforeach
+                                            </div>
+                                        </div>
+                                    @else
+                                        <!-- New Review Form (only if no existing review) -->
+                                        <p class="text-muted mb-4">
+                                            You can leave one review for this product based on your purchase experience.
+                                        </p>
+                                        
+                                        @if($userOrders->count() > 0)
+                                            <div class="review-form-card">
+                                                <h5 class="review-form-header mb-4">
+                                                    <i class="fas fa-comment-medical me-2"></i>Write Your Review
+                                                </h5>
+                                                <form action="{{ route('ratings.store', $product) }}" method="POST">
+                                                    @csrf
+                                                    @if($userOrders->count() > 0)
+                                                        <input type="hidden" name="order_id" value="{{ $userOrders->first()->id }}">
+                                                    @endif
+                                                    
+                                                    <div class="mb-4">
+                                                        <label class="form-label fw-semibold text-success mb-3">Rate Your Experience</label>
+                                                        <div class="star-rating-input">
+                                                            @for($i = 5; $i >= 1; $i--)
+                                                                <input type="radio" id="user_star_{{ $i }}" 
+                                                                       name="rating" value="{{ $i }}" required>
+                                                                <label for="user_star_{{ $i }}">
+                                                                    <i class="fas fa-star"></i>
+                                                                </label>
+                                                            @endfor
+                                                        </div>
+                                                        <div class="form-text mt-2">Click on a star to rate this product</div>
+                                                    </div>
+                                                    
+                                                    <div class="mb-4">
+                                                        <label for="user_review" class="form-label fw-semibold text-success">Your Review</label>
+                                                        <textarea name="review" id="user_review" 
+                                                                  class="form-control" rows="4" 
+                                                                  placeholder="Share your overall experience with this product..." 
+                                                                  required></textarea>
+                                                        <div class="form-text">Be specific about what you liked or didn't like. You can edit this later.</div>
+                                                    </div>
+                                                    
+                                                    @if($userOrders->count() > 1)
+                                                        <div class="mb-4">
+                                                            <div class="alert alert-info">
+                                                                <i class="fas fa-info-circle me-2"></i>
+                                                                You've purchased this product {{ $userOrders->count() }} times. 
+                                                                Your review will represent your overall experience.
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    
+                                                    <button type="submit" class="btn btn-success px-4 py-2">
+                                                        <i class="fas fa-paper-plane me-2"></i>Submit Review
+                                                    </button>
+                                                </form>
+                                            </div>
                                         @else
                                             <div class="alert alert-info">
                                                 <i class="fas fa-info-circle me-2"></i>
                                                 You haven't received any orders containing this product yet.
                                             </div>
                                         @endif
-                                    </div>
-                                @else
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        You can review this product after purchase and delivery.
-                                    </div>
-                                @endif
+                                    @endif
+                                </div>
                             @else
                                 <div class="alert alert-info">
-                                    <i class="fas fa-sign-in-alt me-2"></i>
-                                    <a href="{{ route('login') }}" class="alert-link">Login</a> to review this product if you've purchased it.
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    You can review this product after purchase and delivery.
                                 </div>
-                            @endauth
-                        </div>
-                    </div>
-
-                    <!-- Rating Distribution -->
-                    @php
-                        $distribution = $product->getRatingDistribution();
-                        $percentages = $product->getRatingDistributionPercentages();
-                    @endphp
-                        <h5 class="text-success mb-4">Customer Reviews ({{ $product->ratings->count() }})</h5>
-                        @if($product->ratings->count() > 0)
-                            @foreach($product->ratings()->with('user')->latest()->get() as $rating)
-                                <div class="review-card">
-                                    <div class="review-body">
-                                        <div class="reviewer-info">
-                                            <div class="reviewer-avatar">
-                                                {{ substr($rating->user->name, 0, 1) }}
-                                            </div>
-                                            <div>
-                                                <h6 class="mb-0 fw-bold">{{ $rating->user->name }}</h6>
-                                                <div class="d-flex flex-wrap gap-2 mt-1">
-                                                    <small class="text-muted">
-                                                        {{ $rating->created_at->format('F d, Y') }}
-                                                    </small>
-                                                    @if($rating->order)
-                                                        <span class="order-badge">
-                                                            <i class="fas fa-receipt me-1"></i>Order #{{ $rating->order->order_number }}
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="star-rating-display mb-3">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                @if($i <= $rating->rating)
-                                                    <i class="fas fa-star"></i>
-                                                @else
-                                                    <i class="far fa-star"></i>
-                                                @endif
-                                            @endfor
-                                            <span class="ms-2 fw-bold text-success">{{ $rating->rating }}/5</span>
-                                        </div>
-                                        
-                                        <div class="review-text">
-                                            {{ $rating->review }}
-                                        </div>
-                                        
-                                        @if($rating->updated_at != $rating->created_at)
-                                            <div class="mt-3">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-history me-1"></i>
-                                                    Updated on {{ $rating->updated_at->format('M d, Y') }}
-                                                </small>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
+                            @endif
                         @else
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-comment-slash"></i>
-                                </div>
-                                <h5 class="text-muted mb-3">No Reviews Yet</h5>
-                                <p class="text-muted">Be the first to share your experience with this product!</p>
+                            <div class="alert alert-info">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                <a href="{{ route('login') }}" class="alert-link">Login</a> to review this product if you've purchased it.
                             </div>
-                        @endif
+                        @endauth
                     </div>
+                </div>
+
+                <!-- Rating Distribution -->
+                @php
+                    $distribution = $product->getRatingDistribution();
+                    $percentages = $product->getRatingDistributionPercentages();
+                @endphp
+                
+                <!-- Customer Reviews List -->
+                <div class="mt-5">
+                    <h5 class="text-success mb-4">Customer Reviews ({{ $product->ratings->count() }})</h5>
+                    @if($product->ratings->count() > 0)
+                        @foreach($product->ratings()->with('user')->latest()->get() as $rating)
+                            <div class="review-card">
+                                <div class="review-body">
+                                    <div class="reviewer-info">
+                                        <div class="reviewer-avatar">
+                                            {{ substr($rating->user->name, 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">{{ $rating->user->name }}</h6>
+                                            <div class="d-flex flex-wrap gap-2 mt-1">
+                                                <small class="text-muted">
+                                                    {{ $rating->created_at->format('F d, Y') }}
+                                                </small>
+                                                @if($rating->user_id == auth()->id())
+                                                    <span class="badge bg-info text-white">
+                                                        <i class="fas fa-user me-1"></i>Your Review
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="star-rating-display mb-3">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= $rating->rating)
+                                                <i class="fas fa-star"></i>
+                                            @else
+                                                <i class="far fa-star"></i>
+                                            @endif
+                                        @endfor
+                                        <span class="ms-2 fw-bold text-success">{{ $rating->rating }}/5</span>
+                                    </div>
+                                    
+                                    <div class="review-text">
+                                        {{ $rating->review }}
+                                    </div>
+                                    
+                                    @if($rating->updated_at != $rating->created_at)
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                <i class="fas fa-history me-1"></i>
+                                                Updated on {{ $rating->updated_at->format('M d, Y') }}
+                                            </small>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-comment-slash"></i>
+                            </div>
+                            <h5 class="text-muted mb-3">No Reviews Yet</h5>
+                            <p class="text-muted">Be the first to share your experience with this product!</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
