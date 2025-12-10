@@ -474,6 +474,7 @@
         border: 3px solid #2C8F0C;
         background-color: #f8f9fa;
         box-shadow: 0 4px 12px rgba(44, 143, 12, 0.15);
+        display: block;
     }
 
     .view-product-info {
@@ -774,9 +775,29 @@
 
     .view-no-variants {
         text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fdf8, #f0f8f0);
+        border-radius: 12px;
+        border: 1px dashed #c8e6c9;
+    }
+
+    .no-variants-icon {
+        font-size: 3rem;
+        color: #c8e6c9;
+        margin-bottom: 1rem;
+    }
+
+    .no-variants-text h5 {
         color: #6c757d;
-        font-style: italic;
-        padding: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-variants-text p {
+        color: #8c9aa5;
+        font-size: 0.9rem;
+        margin: 0;
+        line-height: 1.5;
     }
 
     @media (max-width: 768px) {
@@ -1310,7 +1331,8 @@
                             <td class="action-col">
                                 <div class="action-buttons">
                                     <button class="action-btn btn-view viewBtn" data-bs-toggle="modal"
-                                        data-bs-target="#viewProductModal" data-product='@json(array_merge($product->toArray(), ['variants' => $product->variants->toArray()]))'
+                                        data-bs-target="#viewProductModal" 
+                                        data-product='{{ json_encode(array_merge($product->toArray(), ['image_url' => $product->image_url, 'variants' => $product->variants->map(function($variant) { return array_merge($variant->toArray(), ['image_url' => $variant->image_url]); })->toArray()])) }}'
                                         data-title="View Product">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -1505,13 +1527,16 @@ document.addEventListener('DOMContentLoaded', function() {
     /* === View Product === */
     document.querySelectorAll('.viewBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            console.log('=== VIEW PRODUCT CLICKED ===');
-            console.log('Dataset product:', this.dataset.product);
             const product = JSON.parse(this.dataset.product);
-            console.log('Parsed product:', product);
 
-            // Populate basic info
-            document.getElementById('viewProductImage').src = product.image_url || '/images/noproduct.png';
+            // Simple and direct image handling
+            const productImage = document.getElementById('viewProductImage');
+            const imageUrl = product.image_url || '/images/noproduct.png';
+            
+
+            
+            productImage.src = imageUrl;
+            productImage.alt = product.name || 'Product Image';
             document.getElementById('viewProductName').textContent = product.name || 'N/A';
             document.getElementById('viewProductSku').textContent = `SKU: ${product.sku || 'N/A'}`;
             document.getElementById('viewProductId').textContent = `Product ID: #${product.id}`;
@@ -1558,12 +1583,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const variantsList = document.getElementById('viewVariantsList');
             variantsList.innerHTML = '';
             
-            console.log('=== VARIANTS DEBUG ===');
-            console.log('Has variants:', hasVariants);
-            console.log('Variants count:', variantsCount);
-            console.log('Variants array:', variantsArray);
-            console.log('Product variants:', product.variants);
-            console.log('===================');
+
             
             if (variantsCount > 0) {
                 // Show the variants section
@@ -1597,14 +1617,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             Stock: ${variant.stock_quantity}
                         </div>` : '';
                     
+                    // Get variant image URL
+                    const variantImageUrl = variant.image_url || '/images/noproduct.png';
+                    
                     variantDiv.innerHTML = `
                         <div class="view-variant-content">
-                            ${variant.image_url ? `
-                                <div class="view-variant-image">
-                                    <img src="${variant.image_url}" alt="${variant.variant_name || variant.name || 'Variant'}" 
-                                         class="variant-img" onerror="this.style.display='none'">
-                                </div>
-                            ` : ''}
+                            <div class="view-variant-image">
+                                <img src="${variantImageUrl}" alt="${variant.variant_name || variant.name || 'Variant'}" 
+                                     class="variant-img" onerror="this.src='/images/noproduct.png'">
+                            </div>
                             <div class="view-variant-details">
                                 <div class="view-variant-name">
                                     <i class="fas fa-cube me-2"></i>
@@ -1624,9 +1645,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log('Variants displayed successfully');
             } else {
-                // Hide the variants section when no variants found
-                variantsSection.style.display = 'none';
-                console.log('No variants found, hiding section');
+                // Show message when no variants found
+                variantsSection.style.display = 'block';
+                variantsList.innerHTML = `
+                    <div class="view-no-variants">
+                        <div class="no-variants-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="no-variants-text">
+                            <h5>No Variants Available</h5>
+                            <p>This product does not have any variants. All inventory is managed under the main product.</p>
+                        </div>
+                    </div>
+                `;
+                console.log('No variants found, showing message');
             }
 
             // Handle pricing
