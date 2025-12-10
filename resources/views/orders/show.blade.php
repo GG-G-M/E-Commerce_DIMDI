@@ -12,7 +12,6 @@
         --dark-gray: #6C757D;
         --text-dark: #212529;
     }
-
     .page-header {
         background: white;
         border-radius: 12px;
@@ -20,15 +19,12 @@
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-
-    /* Modern Info Grid */
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1rem;
         margin-bottom: 2rem;
     }
-
     .info-section {
         background: white;
         border-radius: 12px;
@@ -36,7 +32,6 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border: 1px solid var(--medium-gray);
     }
-
     .info-header {
         display: flex;
         align-items: center;
@@ -44,7 +39,6 @@
         padding-bottom: 0.75rem;
         border-bottom: 2px solid var(--light-green);
     }
-
     .info-header i {
         background: var(--light-green);
         color: var(--primary-green);
@@ -57,13 +51,11 @@
         margin-right: 0.75rem;
         font-size: 1rem;
     }
-
     .info-header h5 {
         margin: 0;
         color: var(--text-dark);
         font-weight: 600;
     }
-
     .info-item {
         display: flex;
         justify-content: space-between;
@@ -71,18 +63,15 @@
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--light-gray);
     }
-
     .info-item:last-child {
         border-bottom: none;
     }
-
     .info-label {
         font-weight: 500;
         color: var(--dark-gray);
         flex: 1;
         font-size: 0.9rem;
     }
-
     .info-value {
         color: var(--text-dark);
         font-weight: 500;
@@ -90,8 +79,6 @@
         flex: 1;
         font-size: 0.9rem;
     }
-
-    /* Shipping Address Modern Design */
     .shipping-card {
         background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
         border: 1px solid var(--light-green);
@@ -100,37 +87,29 @@
         position: relative;
         overflow: hidden;
     }
-
-
     .shipping-header {
         display: flex;
         align-items: center;
         margin-bottom: 1rem;
     }
-
     .shipping-header i {
         color: var(--primary-green);
         font-size: 1.25rem;
         margin-right: 0.5rem;
     }
-
     .shipping-header h6 {
         margin: 0;
         color: var(--text-dark);
         font-weight: 600;
     }
-
     .address-content {
         color: var(--text-dark);
         line-height: 1.6;
         font-size: 0.95rem;
     }
-
     .address-content p {
         margin: 0.25rem 0;
     }
-
-    /* Order Items Modern Design */
     .order-items-card {
         background: white;
         border-radius: 12px;
@@ -138,7 +117,6 @@
         margin-bottom: 1.5rem;
         overflow: hidden;
     }
-
     .order-items-header {
         background: white;
         padding: 1.25rem 1.5rem;
@@ -146,19 +124,16 @@
         display: flex;
         align-items: center;
     }
-
     .order-items-header i {
         color: var(--primary-green);
         margin-right: 0.5rem;
         font-size: 1.1rem;
     }
-
     .order-items-header h5 {
         margin: 0;
         color: var(--text-dark);
         font-weight: 600;
     }
-
     .product-row {
         display: flex;
         align-items: center;
@@ -166,15 +141,12 @@
         border-bottom: 1px solid var(--light-gray);
         transition: background-color 0.2s ease;
     }
-
     .product-row:hover {
         background-color: var(--light-gray);
     }
-
     .product-row:last-child {
         border-bottom: none;
     }
-
     .product-image {
         width: 60px;
         height: 60px;
@@ -184,24 +156,20 @@
         margin-right: 1rem;
         flex-shrink: 0;
     }
-
     .product-info {
         flex: 1;
     }
-
     .product-name {
         font-weight: 600;
         color: var(--text-dark);
         margin-bottom: 0.25rem;
         font-size: 0.95rem;
     }
-
     .product-sku {
         color: var(--dark-gray);
         font-size: 0.8rem;
         margin-bottom: 0.25rem;
     }
-
     .product-size {
         display: inline-block;
         background: var(--light-green);
@@ -211,30 +179,24 @@
         font-size: 0.75rem;
         font-weight: 500;
     }
-
     .product-details {
         display: flex;
         align-items: center;
         gap: 1.5rem;
         margin-top: 0.5rem;
     }
-
     .product-price, .product-quantity, .product-total {
         font-size: 0.9rem;
         color: var(--text-dark);
     }
-
     .product-price {
         font-weight: 600;
         color: var(--primary-green);
     }
-
     .product-total {
         font-weight: 700;
         color: var(--text-dark);
     }
-
-    /* Status Badge */
     .status-badge {
         padding: 0.5rem 1rem;
         border-radius: 20px;
@@ -244,15 +206,12 @@
         align-items: center;
         gap: 0.5rem;
     }
-
     .badge-pending { background: #FFF3CD; color: #856404; }
     .badge-confirmed { background: #D1ECF1; color: #0C5460; }
     .badge-processing { background: #E8F5E6; color: var(--primary-green); }
     .badge-shipped { background: #CCE5FF; color: #004085; }
     .badge-delivered { background: #D4EDDA; color: #155724; }
     .badge-cancelled { background: #F8D7DA; color: #721C24; }
-
-    /* Order Summary */
     .summary-item {
         display: flex;
         justify-content: space-between;
@@ -260,35 +219,28 @@
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--light-gray);
     }
-
     .summary-item:last-child {
         border-bottom: none;
     }
-
     .summary-total {
         font-size: 1.1rem;
         font-weight: 700;
         color: var(--primary-green);
     }
-
-    /* Timeline */
     .timeline {
         position: relative;
         padding-left: 30px;
     }
-
     .timeline-item {
         position: relative;
         margin-bottom: 25px;
     }
-
     .timeline-item.current .timeline-marker {
         border: 3px solid #fff;
         box-shadow: 0 0 0 3px var(--primary-green);
         transform: scale(1.3);
         animation: pulse 2s infinite;
     }
-
     .timeline-marker {
         position: absolute;
         left: -30px;
@@ -300,7 +252,6 @@
         transition: all 0.3s ease;
         z-index: 2;
     }
-
     .timeline-content {
         padding-bottom: 15px;
         border-left: 2px solid #e9ecef;
@@ -309,15 +260,12 @@
         position: relative;
         z-index: 1;
     }
-
     .timeline-item:last-child .timeline-content {
         border-left-color: transparent;
     }
-
     .timeline-item:hover .timeline-marker {
         transform: scale(1.4);
     }
-
     .timeline-item:hover .timeline-content {
         border-left-color: var(--primary-green);
         background-color: #f8f9fa;
@@ -325,21 +273,17 @@
         padding: 10px 15px;
         margin-left: -5px;
     }
-
     @keyframes pulse {
         0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
         70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
         100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
     }
-
     .timeline-marker.bg-pending { background-color: #ffc107 !important; }
     .timeline-marker.bg-confirmed { background-color: #17a2b8 !important; }
     .timeline-marker.bg-processing { background-color: var(--primary-green) !important; }
     .timeline-marker.bg-shipped { background-color: #007bff !important; }
     .timeline-marker.bg-delivered { background-color: #28a745 !important; }
     .timeline-marker.bg-cancelled { background-color: #dc3545 !important; }
-
-    /* Action buttons */
     .btn-primary-rounded {
         background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
         color: white;
@@ -356,14 +300,12 @@
         cursor: pointer;
         min-height: 40px;
     }
-
     .btn-primary-rounded:hover:not(:disabled) {
         background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
         text-decoration: none;
     }
-
     .btn-outline-danger {
         border: 2px solid #dc3545;
         color: #dc3545;
@@ -380,7 +322,6 @@
         cursor: pointer;
         min-height: 40px;
     }
-
     .btn-outline-danger:hover {
         background: #dc3545;
         color: white;
@@ -388,7 +329,6 @@
         box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         text-decoration: none;
     }
-
     .btn-outline-secondary {
         border: 2px solid var(--dark-gray);
         color: var(--dark-gray);
@@ -405,7 +345,6 @@
         cursor: pointer;
         min-height: 40px;
     }
-
     .btn-outline-secondary:hover {
         background: var(--dark-gray);
         color: white;
@@ -416,7 +355,6 @@
 </style>
 
 <div class="container py-4">
-    <!-- Page Header -->
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
@@ -442,9 +380,7 @@
         </div>
     </div>
 
-    <!-- Customer & Order Info Grid -->
     <div class="info-grid">
-        <!-- Customer Information -->
         <div class="info-section">
             <div class="info-header">
                 <i class="fas fa-user"></i>
@@ -470,7 +406,6 @@
             </div>
         </div>
 
-        <!-- Order Summary -->
         <div class="info-section">
             <div class="info-header">
                 <i class="fas fa-receipt"></i>
@@ -498,7 +433,6 @@
             </div>
         </div>
 
-        <!-- Shipping Address -->
         <div class="shipping-card">
             <div class="shipping-header">
                 <i class="fas fa-map-marker-alt"></i>
@@ -512,7 +446,6 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <!-- Order Items -->
             <div class="order-items-card">
                 <div class="order-items-header">
                     <i class="fas fa-shopping-basket"></i>
@@ -525,19 +458,14 @@
                             $itemImage = $item->product->image_url;
                             $displayUnitPrice = $item->unit_price;
                             $displayTotalPrice = $item->total_price;
-
                             if ($item->selected_size && $item->selected_size !== 'Standard') {
                                 $variant = $item->product->variants->first(function($v) use ($item) {
                                     return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
                                 });
-
                                 if ($variant) {
-                                    // Use variant-specific image if available
                                     if ($variant->image_url) {
                                         $itemImage = $variant->image_url;
                                     }
-
-                                    // Use variant-specific price
                                     $displayUnitPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
                                     $displayTotalPrice = $displayUnitPrice * $item->quantity;
                                 }
@@ -561,7 +489,6 @@
                 </div>
             </div>
 
-            <!-- Status History Timeline -->
             <div class="info-section">
                 <div class="info-header">
                     <i class="fas fa-history"></i>
@@ -575,19 +502,10 @@
                             $isCurrentStatus = $history->status === $order->order_status;
                         @endphp
                         <div class="timeline-item {{ $isCurrentStatus ? 'current' : '' }}">
-                            <div class="timeline-marker
-                                {{ $history->status === 'cancelled' ? 'bg-danger' :
-                                   ($history->status === 'delivered' ? 'bg-success' :
-                                   ($history->status === 'shipped' ? 'bg-primary' :
-                                   ($history->status === 'confirmed' ? 'bg-info' :
-                                   ($history->status === 'processing' ? 'bg-success' : 'bg-warning')))) }}">
+                            <div class="timeline-marker {{ $history->status === 'cancelled' ? 'bg-danger' : ($history->status === 'delivered' ? 'bg-success' : ($history->status === 'shipped' ? 'bg-primary' : ($history->status === 'confirmed' ? 'bg-info' : ($history->status === 'processing' ? 'bg-success' : 'bg-warning')))) }}">
                             </div>
                             <div class="timeline-content">
-                                <h6 class="mb-1 text-{{ $history->status === 'cancelled' ? 'danger' :
-                                   ($history->status === 'delivered' ? 'success' :
-                                   ($history->status === 'shipped' ? 'primary' :
-                                   ($history->status === 'confirmed' ? 'info' :
-                                   ($history->status === 'processing' ? 'success' : 'warning'))) }}">
+                                <h6 class="mb-1 text-{{ $history->status === 'cancelled' ? 'danger' : ($history->status === 'delivered' ? 'success' : ($history->status === 'shipped' ? 'primary' : ($history->status === 'confirmed' ? 'info' : ($history->status === 'processing' ? 'success' : 'warning')))) }}">
                                     {{ ucfirst($history->status) }}
                                     @if($isCurrentStatus)
                                     <small class="text-muted">(Current)</small>
@@ -614,7 +532,6 @@
         </div>
 
         <div class="col-lg-4">
-            <!-- Detailed Order Summary -->
             <div class="info-section">
                 <div class="info-header">
                     <i class="fas fa-calculator"></i>
@@ -640,7 +557,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="info-section">
                 <div class="info-header">
                     <i class="fas fa-cogs"></i>
@@ -652,7 +568,6 @@
                         <i class="fas fa-times-circle me-2"></i>Cancel Order
                     </button>
                     @endif
-
                     <a href="{{ route('orders.index') }}" class="btn btn-outline-secondary w-100">
                         <i class="fas fa-arrow-left me-2"></i>Back to Orders
                     </a>
@@ -676,9 +591,7 @@
                     <p>Are you sure you want to cancel this order? This action cannot be undone.</p>
                     <div class="mb-3">
                         <label for="cancellation_reason" class="form-label">Reason for cancellation:</label>
-                        <textarea name="cancellation_reason" id="cancellation_reason" 
-                                  class="form-control" rows="3" 
-                                  placeholder="Please provide a reason for cancellation" required></textarea>
+                        <textarea name="cancellation_reason" id="cancellation_reason" class="form-control" rows="3" placeholder="Please provide a reason for cancellation" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -690,80 +603,4 @@
     </div>
 </div>
 @endif
-
-<style>
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
-.timeline-item {
-    position: relative;
-    margin-bottom: 25px;
-}
-.timeline-item.current .timeline-marker {
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 3px #2C8F0C;
-    transform: scale(1.3);
-    animation: pulse 2s infinite;
-}
-.timeline-marker {
-    position: absolute;
-    left: -30px;
-    top: 5px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #6c757d;
-    transition: all 0.3s ease;
-    z-index: 2;
-}
-.timeline-content {
-    padding-bottom: 15px;
-    border-left: 2px solid #e9ecef;
-    padding-left: 25px;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
-}
-.timeline-item:last-child .timeline-content {
-    border-left-color: transparent;
-}
-.timeline-item:hover .timeline-marker {
-    transform: scale(1.4);
-}
-.timeline-item:hover .timeline-content {
-    border-left-color: #2C8F0C;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    padding: 10px 15px;
-    margin-left: -5px;
-}
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
-}
-
-/* Discount styling for order items */
-.sale-price {
-    color: #2C8F0C;
-    font-weight: bold;
-}
-
-.price {
-    color: #2C8F0C;
-    font-weight: 300;
-}
-
-.original-price {
-    text-decoration: line-through;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.savings-text {
-    color: #000000;
-    font-weight: 100;
-}
-</style>
 @endsection
