@@ -439,15 +439,15 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div>
                                 <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom btn-lg">
-                                    <i class="fas fa-times me-2"></i>Cancel
+                                    Cancel
                                 </a>
                             </div>
                             <div class="d-flex gap-3">
                                 <button type="reset" class="btn btn-outline-success-custom btn-lg">
-                                    <i class="fas fa-redo me-2"></i>Reset Form
+                                    <i class="fas fa-redo me-2"></i>
                                 </button>
                                 <button type="submit" class="btn btn-success-custom btn-lg px-5">
-                                    <i class="fas fa-user-plus me-2"></i>Create User
+                                    Create User
                                 </button>
                             </div>
                         </div>
