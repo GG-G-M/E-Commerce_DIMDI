@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('editStockCheckerForm');
             
             // Set form action
-            form.action = `/admin/stock_checkers/${checker.id}`;
+            form.action = `/admin/stock-checkers/${checker.id}`;
             
             // Fill form fields
             document.getElementById('edit_firstname').value = checker.firstname || '';
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(`/admin/stock_checkers/${id}/archive`, {
+            fetch(`/admin/stock-checkers/${id}/archive`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
@@ -893,7 +893,7 @@ document.addEventListener('DOMContentLoaded', function() {
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(`/admin/stock_checkers/${id}/unarchive`, {
+            fetch(`/admin/stock-checkers/${id}/unarchive`, {
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })

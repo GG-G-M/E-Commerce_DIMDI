@@ -42,7 +42,7 @@ class StockInController extends Controller
             ->orderBy('name')
             ->paginate($productPerPage, ['*'], 'product_page', $productPage);
 
-        $warehouses = Warehouse::all();
+        $warehouses = Warehouse::where('is_archived', false)->get();
         $products = Product::all();
         $variants = ProductVariant::with('product')->get();
         $suppliers = Supplier::where('is_archived', false)->get();
