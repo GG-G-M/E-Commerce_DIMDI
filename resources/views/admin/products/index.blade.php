@@ -394,6 +394,17 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
+    .btn-view {
+        background-color: white;
+        border-color: #4CAF50;
+        color: #4CAF50;
+    }
+    
+    .btn-view:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
+    
     .btn-edit {
         background-color: white;
         border-color: #2C8F0C;
@@ -425,6 +436,266 @@
     .btn-unarchive:hover {
         background-color: #2C8F0C;
         color: white;
+    }
+
+    /* View Modal Styling - Adapted from customers */
+    .view-modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
+    }
+
+    .view-info-card {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        height: 100%;
+    }
+
+    .view-info-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border-color: #2C8F0C;
+    }
+
+    .view-info-card .form-label {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: block;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #E8F5E6;
+    }
+
+    .view-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .view-detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .view-detail-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+        flex: 0 0 100px;
+    }
+
+    .view-detail-value {
+        color: #212529;
+        font-size: 0.9rem;
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
+        margin-left: 0.5rem;
+    }
+
+    .view-product-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        background-color: #f8f9fa;
+        margin: 0 auto 1rem;
+        display: block;
+    }
+
+    .view-product-name {
+        color: #2C8F0C;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+
+    .view-product-sku {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-family: 'SF Mono', Monaco, monospace;
+    }
+
+    .view-product-id {
+        color: #6c757d;
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    /* Compact grid layout for cards */
+    .view-cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .view-cards-grid .view-info-card:nth-child(1),
+    .view-cards-grid .view-info-card:nth-child(2),
+    .view-cards-grid .view-info-card:nth-child(3),
+    .view-cards-grid .view-info-card:nth-child(4) {
+        grid-column: span 1;
+    }
+
+    .view-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        border: none;
+    }
+
+    .view-status-active {
+        background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+        color: #166534;
+    }
+
+    .view-status-inactive {
+        background: linear-gradient(135deg, #FEE2E2, #FECACA);
+        color: #991B1B;
+    }
+
+    .view-status-archived {
+        background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+        color: #4B5563;
+    }
+
+    .view-price-display {
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px solid #2C8F0C;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .view-current-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2C8F0C;
+        line-height: 1;
+    }
+
+    .view-original-price {
+        font-size: 1.1rem;
+        color: #6c757d;
+        text-decoration: line-through;
+        margin-top: 0.5rem;
+    }
+
+    .view-discount-badge {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+
+    .view-variants-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .view-variant-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
+    .view-variant-content {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .view-variant-image {
+        flex-shrink: 0;
+    }
+
+    .variant-img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+
+    .view-variant-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .view-variant-item:hover {
+        background-color: #f8f9fa;
+        margin: 0 -1.25rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        border-radius: 8px;
+    }
+
+    .view-variant-item:last-child {
+        border-bottom: none;
+    }
+
+    .view-variant-name {
+        font-weight: 600;
+        color: #2C8F0C;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .view-variant-price {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+
+    .view-variant-discount {
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+
+    .view-variant-stock {
+        color: #2C8F0C;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        font-weight: 600;
+    }
+
+    .view-no-variants {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .view-cards-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .view-cards-grid .view-info-card {
+            grid-column: 1 / -1;
+        }
     }
 
     /* Make table more compact on mobile */
@@ -653,6 +924,156 @@
     </div>
 </div>
 
+<!-- View Product Modal -->
+<div class="modal fade" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content view-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewProductModalLabel">Product Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Product Image and Basic Info -->
+                    <div class="col-md-3 text-center">
+                        <img src="" alt="Product Image" class="view-product-image" id="viewProductImage">
+                        <div class="view-product-name" id="viewProductName">-</div>
+                        <div class="view-product-sku" id="viewProductSku">SKU: -</div>
+                        <div class="view-product-id" id="viewProductId">Product ID: #-</div>
+                        <div id="viewProductStatus" class="view-status-badge view-status-active">
+                            Active
+                        </div>
+                        
+                        <!-- Price Display -->
+                        <div class="view-price-display" id="viewPriceDisplay" style="display: none;">
+                            <div id="viewDiscountBadge" class="view-discount-badge" style="display: none;"></div>
+                            <div class="view-current-price" id="viewCurrentPrice">₱0.00</div>
+                            <div class="view-original-price" id="viewOriginalPrice" style="display: none;">₱0.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Information Cards Grid -->
+                    <div class="col-md-9">
+                        <div class="view-cards-grid">
+                            <!-- Product Information Card -->
+                            <div class="view-info-card">
+                                <label class="form-label">
+                                    <i class="fas fa-info-circle me-2"></i>Product Information
+                                </label>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Product ID:</span>
+                                    <span class="view-detail-value" id="viewProductIdField">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Name:</span>
+                                    <span class="view-detail-value" id="viewProductNameField">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Description:</span>
+                                    <span class="view-detail-value" id="viewProductDescription">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">SKU:</span>
+                                    <span class="view-detail-value" id="viewProductSkuField">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Created:</span>
+                                    <span class="view-detail-value" id="viewProductCreatedAt">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Updated:</span>
+                                    <span class="view-detail-value" id="viewProductUpdatedAt">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Category & Brand Card -->
+                            <div class="view-info-card">
+                                <label class="form-label">
+                                    <i class="fas fa-tags me-2"></i>Category & Brand
+                                </label>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Category:</span>
+                                    <span class="view-detail-value" id="viewProductCategory">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Brand:</span>
+                                    <span class="view-detail-value" id="viewProductBrand">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Featured:</span>
+                                    <span class="view-detail-value" id="viewProductFeatured">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Stock & Inventory Card -->
+                            <div class="view-info-card">
+                                <label class="form-label">
+                                    <i class="fas fa-warehouse me-2"></i>Stock & Inventory
+                                </label>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Has Variants:</span>
+                                    <span class="view-detail-value" id="viewProductHasVariants">-</span>
+                                </div>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Variant Count:</span>
+                                    <span class="view-detail-value" id="viewProductVariantCount">-</span>
+                                </div>
+                                <div class="view-detail-item" id="viewMainStockRow" style="display: none;">
+                                    <span class="view-detail-label">Stock Quantity:</span>
+                                    <span class="view-detail-value" id="viewProductStockQuantity">-</span>
+                                </div>
+                                <div class="view-detail-item" id="viewTotalStockRow" style="display: none;">
+                                    <span class="view-detail-label">Total Stock:</span>
+                                    <span class="view-detail-value" id="viewProductTotalStock">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Pricing Card -->
+                            <div class="view-info-card">
+                                <label class="form-label">
+                                    <i class="fas fa-dollar-sign me-2"></i>Pricing Information
+                                </label>
+                                <div class="view-detail-item">
+                                    <span class="view-detail-label">Base Price:</span>
+                                    <span class="view-detail-value" id="viewProductBasePrice">-</span>
+                                </div>
+                                <div class="view-detail-item" id="viewSalePriceRow" style="display: none;">
+                                    <span class="view-detail-label">Sale Price:</span>
+                                    <span class="view-detail-value" id="viewProductSalePrice">-</span>
+                                </div>
+                                <div class="view-detail-item" id="viewDiscountRow" style="display: none;">
+                                    <span class="view-detail-label">Discount:</span>
+                                    <span class="view-detail-value" id="viewProductDiscount">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Product Variants Card -->
+                            <div class="view-info-card" id="viewVariantsCard" style="display: none;">
+                                <label class="form-label">
+                                    <i class="fas fa-layer-group me-2"></i>Product Variants
+                                </label>
+                                <div id="viewVariantsList">
+                                    <!-- Variants will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+                <button type="button" class="btn btn-primary" id="editFromViewBtn">
+                    <i class="fas fa-edit me-1"></i>Edit Product
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Product Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
@@ -756,6 +1177,11 @@
                             </td>
                             <td class="action-col">
                                 <div class="action-buttons">
+                                    <button class="action-btn btn-view viewBtn" data-bs-toggle="modal"
+                                        data-bs-target="#viewProductModal" data-product='@json(array_merge($product->toArray(), ['variants' => $product->variants->toArray()]))'
+                                        data-title="View Product">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                     <a href="{{ route('admin.products.edit', $product) }}" 
                                        class="action-btn btn-edit" 
                                        title="Edit Product">
@@ -943,6 +1369,211 @@ document.addEventListener('DOMContentLoaded', function() {
             progressText.textContent = '0%';
         });
     }
+
+    /* === View Product === */
+    document.querySelectorAll('.viewBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            console.log('=== VIEW PRODUCT CLICKED ===');
+            console.log('Dataset product:', this.dataset.product);
+            const product = JSON.parse(this.dataset.product);
+            console.log('Parsed product:', product);
+
+            // Populate basic info
+            document.getElementById('viewProductImage').src = product.image_url || '/images/noproduct.png';
+            document.getElementById('viewProductName').textContent = product.name || 'N/A';
+            document.getElementById('viewProductSku').textContent = `SKU: ${product.sku || 'N/A'}`;
+            document.getElementById('viewProductId').textContent = `Product ID: #${product.id}`;
+
+            // Populate status
+            const statusElement = document.getElementById('viewProductStatus');
+            if (product.is_archived) {
+                statusElement.className = 'view-status-badge view-status-archived';
+                statusElement.innerHTML = '<i class="fas fa-archive"></i> Archived';
+            } else if (product.is_effectively_inactive) {
+                statusElement.className = 'view-status-badge view-status-inactive';
+                statusElement.innerHTML = '<i class="fas fa-pause-circle"></i> Inactive';
+            } else {
+                statusElement.className = 'view-status-badge view-status-active';
+                statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Active';
+            }
+
+            // Handle featured status
+            if (product.is_featured) {
+                statusElement.innerHTML += ' <i class="fas fa-star text-warning"></i>';
+            }
+
+            // Handle variants
+            const hasVariants = product.has_variants;
+            const variantsArray = product.variants && ((Array.isArray(product.variants) ? product.variants : (product.variants.data || [])));
+            const variantsCount = variantsArray ? variantsArray.length : 0;
+            
+            document.getElementById('viewProductHasVariants').textContent = hasVariants ? 'Yes' : 'No';
+            document.getElementById('viewProductVariantCount').textContent = variantsCount.toString();
+
+            // Show/hide stock rows based on variants
+            if (hasVariants) {
+                document.getElementById('viewMainStockRow').style.display = 'none';
+                document.getElementById('viewTotalStockRow').style.display = 'flex';
+                document.getElementById('viewProductTotalStock').textContent = product.total_stock || '0';
+            } else {
+                document.getElementById('viewMainStockRow').style.display = 'flex';
+                document.getElementById('viewTotalStockRow').style.display = 'none';
+                document.getElementById('viewProductStockQuantity').textContent = product.stock_quantity || '0';
+            }
+
+            // Handle variants display - Always show the card for debugging and ensure display
+            document.getElementById('viewVariantsCard').style.display = 'block'; // Force show for debugging
+            const variantsList = document.getElementById('viewVariantsList');
+            variantsList.innerHTML = '';
+            
+            console.log('=== VARIANTS DEBUG ===');
+            console.log('Has variants:', hasVariants);
+            console.log('Variants count:', variantsCount);
+            console.log('Variants array:', variantsArray);
+            console.log('Product variants:', product.variants);
+            console.log('===================');
+            
+            if (variantsCount > 0) {
+                // Use the variantsArray which we already prepared
+                const variants = variantsArray;
+                
+                variants.forEach((variant, index) => {
+                    const variantDiv = document.createElement('div');
+                    variantDiv.className = 'view-variant-item';
+                    
+                    // Handle variant pricing
+                    const price = parseFloat(variant.price || variant.current_price || 0);
+                    const salePrice = parseFloat(variant.sale_price || 0);
+                    const hasVariantDiscount = salePrice > 0 && salePrice < price;
+                    const discountPercentage = hasVariantDiscount ? 
+                        Math.round(((price - salePrice) / price) * 100) : 0;
+                    
+                    const currentPrice = hasVariantDiscount ? salePrice : price;
+                    const discountText = hasVariantDiscount ? 
+                        `<div class="view-variant-discount">
+                            <i class="fas fa-tag me-1"></i>
+                            ₱${price.toFixed(2)} → ₱${salePrice.toFixed(2)} (${discountPercentage}% off)
+                        </div>` : '';
+                    
+                    // Handle variant stock
+                    const stockText = variant.stock_quantity ? 
+                        `<div class="view-variant-stock">
+                            <i class="fas fa-boxes me-1"></i>
+                            Stock: ${variant.stock_quantity}
+                        </div>` : '';
+                    
+                    variantDiv.innerHTML = `
+                        <div class="view-variant-content">
+                            ${variant.image_url ? `
+                                <div class="view-variant-image">
+                                    <img src="${variant.image_url}" alt="${variant.variant_name || variant.name || 'Variant'}" 
+                                         class="variant-img" onerror="this.style.display='none'">
+                                </div>
+                            ` : ''}
+                            <div class="view-variant-details">
+                                <div class="view-variant-name">
+                                    <i class="fas fa-cube me-2"></i>
+                                    ${variant.variant_name || variant.name || 'Variant ' + (index + 1)}
+                                </div>
+                                <div class="view-variant-price">
+                                    <i class="fas fa-peso-sign me-1"></i>
+                                    ₱${currentPrice.toFixed(2)}
+                                </div>
+                                ${discountText}
+                                ${stockText}
+                            </div>
+                        </div>
+                    `;
+                    variantsList.appendChild(variantDiv);
+                });
+                
+                console.log('Variants displayed successfully');
+            } else {
+                // Show message when no variants found
+                variantsList.innerHTML = `
+                    <div class="view-no-variants">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No variants found for this product.
+                    </div>
+                `;
+                console.log('No variants found, showing message');
+            }
+
+            // Handle pricing
+            const basePrice = parseFloat(product.price || 0);
+            const salePrice = parseFloat(product.sale_price || 0);
+            const hasDiscount = product.has_discount && salePrice > 0 && salePrice < basePrice;
+
+            // Show price display
+            document.getElementById('viewPriceDisplay').style.display = 'block';
+            
+            if (hasDiscount) {
+                const discountPercentage = Math.round(((basePrice - salePrice) / basePrice) * 100);
+                document.getElementById('viewDiscountBadge').style.display = 'inline-block';
+                document.getElementById('viewDiscountBadge').textContent = `${discountPercentage}% OFF`;
+                document.getElementById('viewCurrentPrice').textContent = `₱${salePrice.toFixed(2)}`;
+                document.getElementById('viewOriginalPrice').style.display = 'block';
+                document.getElementById('viewOriginalPrice').textContent = `₱${basePrice.toFixed(2)}`;
+                
+                // Update pricing card - always show both prices
+                document.getElementById('viewSalePriceRow').style.display = 'flex';
+                document.getElementById('viewDiscountRow').style.display = 'flex';
+                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewProductSalePrice').textContent = `₱${salePrice.toFixed(2)}`;
+                document.getElementById('viewProductDiscount').textContent = `${discountPercentage}%`;
+            } else {
+                document.getElementById('viewDiscountBadge').style.display = 'none';
+                document.getElementById('viewCurrentPrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewOriginalPrice').style.display = 'none';
+                
+                // Update pricing card - show base price and indicate no sale price
+                document.getElementById('viewSalePriceRow').style.display = 'flex';
+                document.getElementById('viewDiscountRow').style.display = 'none';
+                document.getElementById('viewProductBasePrice').textContent = `₱${basePrice.toFixed(2)}`;
+                document.getElementById('viewProductSalePrice').textContent = 'No sale price';
+            }
+
+            // Populate product information
+            document.getElementById('viewProductIdField').textContent = `#${product.id}`;
+            document.getElementById('viewProductNameField').textContent = product.name || 'N/A';
+            document.getElementById('viewProductDescription').textContent = product.description || 'No description available';
+            document.getElementById('viewProductSkuField').textContent = product.sku || 'N/A';
+            document.getElementById('viewProductCreatedAt').textContent = product.created_at ? 
+                new Date(product.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'N/A';
+            document.getElementById('viewProductUpdatedAt').textContent = product.updated_at ? 
+                new Date(product.updated_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                }) : 'N/A';
+
+            // Populate category and brand
+            document.getElementById('viewProductCategory').textContent = product.category ? product.category.name : 'No category';
+            document.getElementById('viewProductBrand').textContent = product.brand ? product.brand.name : 'No brand';
+            document.getElementById('viewProductFeatured').textContent = product.is_featured ? 'Yes' : 'No';
+
+            // Set edit button data for later use
+            document.getElementById('editFromViewBtn').dataset.product = this.dataset.product;
+        });
+    });
+
+    /* === Edit from View Modal === */
+    document.getElementById('editFromViewBtn').addEventListener('click', function() {
+        const product = JSON.parse(this.dataset.product);
+
+        // Close view modal
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewProductModal'));
+        viewModal.hide();
+
+        // Redirect to edit page
+        setTimeout(() => {
+            window.location.href = `/admin/products/${product.id}/edit`;
+        }, 300);
+    });
 });
 
 // Toast notification function
