@@ -33,7 +33,7 @@
         font-size: 1.25rem;
     }
 
-    /* Improved Add Button */
+    /* Add Stock-Out Button - Matching Add Product Button */
     .btn-add-stock-out {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
@@ -56,12 +56,18 @@
         color: white;
     }
 
-    /* Enhanced Action Buttons - Consistent with other pages */
+    .btn-add-stock-out:active {
+        transform: translateY(0);
+    }
+
+    /* Action Buttons - Consistent with products page */
     .action-buttons {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         flex-wrap: nowrap;
         justify-content: center;
+        align-items: center;
+        padding: 2px 0;
     }
     
     .action-btn {
@@ -71,15 +77,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         transition: all 0.2s ease;
-        border: 2px solid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1.5px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        flex-shrink: 0;
     }
     
     .action-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     .btn-edit {
@@ -91,6 +98,7 @@
     .btn-edit:hover {
         background-color: #2C8F0C;
         color: white;
+        transform: translateY(-1px);
     }
     
     .btn-delete {
@@ -102,6 +110,37 @@
     .btn-delete:hover {
         background-color: #C62828;
         color: white;
+        transform: translateY(-1px);
+    }
+    
+    /* Ensure forms don't interfere with button layout */
+    .action-buttons form {
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .action-buttons form button {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Prevent action column from wrapping */
+    .action-col {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Ensure table cells don't expand */
+    .table td.action-col {
+        overflow: hidden;
+    }
+    
+    /* Fix table layout for better action button display */
+    .table {
+        table-layout: fixed;
+        word-wrap: break-word;
     }
 
     /* Table Styling - Compact */
@@ -112,7 +151,14 @@
         border-spacing: 0;
         font-size: 0.9rem;
     }
-
+    
+    /* Center align all table headers and cells */
+    .table th,
+    .table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
@@ -120,12 +166,15 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 0.75rem 0.5rem;
         white-space: nowrap;
+        text-align: center;
+        vertical-align: middle;
     }
 
     .table td {
         padding: 0.75rem 0.5rem;
         vertical-align: middle;
         border-bottom: 1px solid #e9ecef;
+        text-align: center;
     }
 
     .table tbody tr:hover {
@@ -142,24 +191,37 @@
         background-color: #F8FDF8;
     }
 
-    /* Modal Styling - Consistent */
+    /* Modal Styling - Matching products page */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(44, 143, 12, 0.15);
+    }
+    
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
-        padding: 1rem;
+        padding: 1rem 1.5rem;
     }
 
     .modal-title {
         font-weight: 700;
         font-size: 1.1rem;
     }
-
-    .modal-content {
-        border-radius: 12px;
+    
+    .btn-close {
+        background: none;
         border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        color: white;
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+    
+    .btn-close:hover {
+        opacity: 1;
     }
 
     /* Form Styling */
@@ -228,48 +290,52 @@
         margin-right: 5px;
     }
 
-    /* Empty State */
+    /* Empty State - Matching products page */
     .empty-state {
         text-align: center;
-        padding: 2rem 1rem;
+        padding: 3rem 1rem;
     }
 
     .empty-state i {
-        font-size: 3rem;
+        font-size: 4rem;
         color: #C8E6C9;
         margin-bottom: 1rem;
     }
 
-    /* Table Container - No overflow unless absolutely necessary */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
+    /* Table styling for no scroll bars - Matching products page */
+    .table {
+        width: 100%;
         max-width: 100%;
-    }
-    
-    /* Responsive adjustments */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
-        .table {
-            table-layout: auto;
-            width: 100%;
-        }
+        table-layout: fixed;
+        border-collapse: collapse;
     }
 
-    /* Column widths - More compact */
-    .id-col { width: 70px; min-width: 70px; }
-    .product-col { width: 200px; min-width: 200px; }
-    .quantity-col { width: 90px; min-width: 90px; }
-    .batch-col { width: 180px; min-width: 180px; }
-    .reason-col { width: 150px; min-width: 150px; }
-    .date-col { width: 120px; min-width: 120px; }
-    .action-col { width: 100px; min-width: 100px; }
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
 
-    /* Product Info Cell - Compact */
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
+    }
+
+    /* Column widths - Consistent with products page */
+    .id-col { width: 70px; min-width: 70px; text-align: center; }
+    .image-col { width: 70px; min-width: 70px; text-align: center; }
+    .product-col { width: 160px; min-width: 160px; text-align: center; }
+    .quantity-col { width: 90px; min-width: 90px; text-align: center; }
+    .batch-col { width: 180px; min-width: 180px; text-align: center; }
+    .reason-col { width: 150px; min-width: 150px; text-align: center; }
+    .date-col { width: 120px; min-width: 120px; text-align: center; }
+    .action-col { width: 100px; min-width: 100px; text-align: center; }
+
+    /* Product Info Cell - Matching products page */
     .product-info-cell {
         display: flex;
         align-items: center;
@@ -283,6 +349,8 @@
         border-radius: 6px;
         border: 1px solid #e9ecef;
         background-color: #f8f9fa;
+        margin: 0 auto;
+        display: block;
     }
     
     .product-name {
@@ -290,12 +358,14 @@
         color: #333;
         font-size: 0.85rem;
         line-height: 1.2;
+        text-align: center;
     }
     
     .variant-name {
         color: #6c757d;
         font-size: 0.8rem;
         font-style: italic;
+        text-align: center;
     }
 
     /* Quantity Styling - No badges */
@@ -486,7 +556,7 @@
         background-color: #f8f9fa;
     }
     
-    /* Header button group */
+    /* Header button group - Consistent with products page */
     .header-buttons {
         display: flex;
         gap: 8px;
@@ -573,19 +643,20 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock-Out Management</h5>
-        <div class="header-buttons">
-            <button class="btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
-                <i class="fas fa-minus-circle"></i> Stock-Out
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+                {{-- <i class="fas fa-minus-circle"></i> --}}
+                Add Stock-Out
             </button>
         </div>
     </div>
     <div class="card-body p-0">
         @if($stockOuts->count())
-            <div class="table-container">
-                <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
+                            <th class="image-col">Image</th>
                             <th class="product-col">Product / Variant</th>
                             <th class="quantity-col">Quantity</th>
                             <th class="batch-col">Stock-In Batches (FIFO)</th>
@@ -600,27 +671,27 @@
                                 <td class="id-col">
                                     <small class="text-muted">#{{ $stock->id }}</small>
                                 </td>
-                                <td class="product-col">
-                                    <div class="product-info-cell">
-                                        @if($stock->product && $stock->product->image_url)
-                                            <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
-                                                 class="product-img">
-                                        @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
-                                            <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
-                                                 class="product-img">
-                                        @else
-                                            <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                                <i class="fas fa-box text-muted"></i>
-                                            </div>
-                                        @endif
-                                        <div>
-                                            @if($stock->product)
-                                                <div class="product-name">{{ Str::limit($stock->product->name, 25) }}</div>
-                                            @elseif($stock->variant)
-                                                <div class="product-name">{{ Str::limit($stock->variant->product->name, 20) }}</div>
-                                                <div class="variant-name">{{ Str::limit($stock->variant->variant_name, 15) }}</div>
-                                            @endif
+                                <td class="image-col">
+                                    @if($stock->product && $stock->product->image_url)
+                                        <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
+                                             class="product-img">
+                                    @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
+                                        <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
+                                             class="product-img">
+                                    @else
+                                        <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-box text-muted"></i>
                                         </div>
+                                    @endif
+                                </td>
+                                <td class="product-col">
+                                    <div class="text-center">
+                                        @if($stock->product)
+                                            <div class="product-name">{{ Str::limit($stock->product->name, 25) }}</div>
+                                        @elseif($stock->variant)
+                                            <div class="product-name">{{ Str::limit($stock->variant->product->name, 20) }}</div>
+                                            <div class="variant-name">{{ Str::limit($stock->variant->variant_name, 15) }}</div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="quantity-col">
@@ -675,7 +746,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
 
             @if($stockOuts->hasPages())
             <div class="d-flex justify-content-center p-3">
@@ -688,8 +758,9 @@
                 <h5 class="text-muted">No Stock-Out Records Found</h5>
                 <p class="text-muted mb-4">Add your first stock-out record to get started</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
-                        <i class="fas fa-minus-circle"></i> Add Stock-Out
+                    <button class="btn btn-add-stock-out" data-bs-toggle="modal" data-bs-target="#stockOutModal">
+                        {{-- <i class="fas fa-minus-circle"></i> --}}
+                        Add First Stock-Out
                     </button>
                 </div>
             </div>
@@ -761,7 +832,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-add-stock-out" id="saveBtn">
-                        <i class="fas fa-save me-1"></i> Save
+                        <i class="fas fa-save me-1"></i> Save Stock-Out
                     </button>
                 </div>
             </form>
@@ -1667,6 +1738,58 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Toast notification function - Matching products page
+function showToast(message, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+    
+    const bgColors = {
+        'success': '#2C8F0C',
+        'error': '#dc3545',
+        'warning': '#ffc107',
+        'info': '#17a2b8'
+    };
+    
+    const icons = {
+        'success': 'fa-check-circle',
+        'error': 'fa-exclamation-triangle',
+        'warning': 'fa-exclamation-circle',
+        'info': 'fa-info-circle'
+    };
+    
+    const bgColor = bgColors[type] || bgColors.success;
+    const icon = icons[type] || icons.success;
+    const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+    
+    const toast = document.createElement('div');
+    toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+    toast.style.cssText = `
+        top: 100px;
+        z-index: 9999;
+        min-width: 300px;
+        text-align: center;
+    `;
+    
+    toast.innerHTML = `
+        <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+            <div class="d-flex justify-content-center align-items-center p-3">
+                <div class="toast-body ${textColor} d-flex align-items-center">
+                    <i class="fas ${icon} me-2 fs-5"></i>
+                    <span class="fw-semibold">${message}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 3000);
+}
 </script>
 @endpush
 @endsection

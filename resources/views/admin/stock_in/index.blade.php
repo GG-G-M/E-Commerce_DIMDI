@@ -352,7 +352,8 @@
 
     /* Column widths - Consistent with products page */
     .id-col { width: 60px; min-width: 60px; text-align: center; }
-    .product-col { width: 180px; min-width: 180px; text-align: center; }
+    .image-col { width: 70px; min-width: 70px; text-align: center; }
+    .product-col { width: 150px; min-width: 150px; text-align: center; }
     .warehouse-col { width: 100px; min-width: 100px; text-align: center; }
     .supplier-col { width: 100px; min-width: 100px; text-align: center; }
     .checker-col { width: 120px; min-width: 120px; text-align: center; }
@@ -746,6 +747,7 @@
                     <thead>
                         <tr>
                             <th class="id-col">ID</th>
+                            <th class="image-col">Image</th>
                             <th class="product-col">Product / Variant</th>
                             <th class="warehouse-col">Warehouse</th>
                             <th class="supplier-col">Supplier</th>
@@ -780,30 +782,28 @@
                                 <td class="id-col">
                                     <small class="text-muted">#{{ $stock->id }}</small>
                                 </td>
+                                <td class="image-col">
+                                    @if($stock->product && $stock->product->image_url)
+                                        <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
+                                             class="product-img">
+                                    @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
+                                        <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
+                                             class="product-img">
+                                    @else
+                                        <div class="product-img d-flex align-items-center justify-content-center bg-light">
+                                            <i class="fas fa-box text-muted"></i>
+                                        </div>
+                                    @endif
+                                </td>
                                 <td class="product-col">
                                     <div class="text-center">
-                                        <div class="product-info-cell">
-                                            @if($stock->product && $stock->product->image_url)
-                                                <img src="{{ $stock->product->image_url }}" alt="{{ $stock->product->name }}" 
-                                                     class="product-img">
-                                            @elseif($stock->variant && $stock->variant->product && $stock->variant->product->image_url)
-                                                <img src="{{ $stock->variant->product->image_url }}" alt="{{ $stock->variant->product->name }}" 
-                                                     class="product-img">
-                                            @else
-                                                <div class="product-img d-flex align-items-center justify-content-center bg-light">
-                                                    <i class="fas fa-box text-muted"></i>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="mt-2">
-                                            @if($stock->product && !$stock->variant)
-                                                <div class="product-name">{{ Str::limit($stock->product->name, 25) }}</div>
-                                                <div class="product-type">Main Product</div>
-                                            @elseif($stock->variant)
-                                                <div class="product-name">{{ Str::limit($stock->variant->product->name, 20) }}</div>
-                                                <div class="variant-name">{{ Str::limit($stock->variant->variant_name, 15) }}</div>
-                                            @endif
-                                        </div>
+                                        @if($stock->product && !$stock->variant)
+                                            <div class="product-name">{{ Str::limit($stock->product->name, 25) }}</div>
+                                            <div class="product-type">Main Product</div>
+                                        @elseif($stock->variant)
+                                            <div class="product-name">{{ Str::limit($stock->variant->product->name, 20) }}</div>
+                                            <div class="variant-name">{{ Str::limit($stock->variant->variant_name, 15) }}</div>
+                                        @endif
                                     </div>
                                 </td>
                                 <td class="warehouse-col">
