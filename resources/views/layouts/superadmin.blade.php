@@ -414,11 +414,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('delivery.dashboard') }}">
-                                <i class="fas fa-truck me-2"></i>Delivery Panel
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <i class="fas fa-store me-2"></i>View Store
                             </a>

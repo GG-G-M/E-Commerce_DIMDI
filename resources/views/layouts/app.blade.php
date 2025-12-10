@@ -93,33 +93,65 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Search results styling */
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            display: none;
-            max-height: 300px;
-            overflow-y: auto;
-        }
+        /* Search results styling - Fixed text color */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
 
-        .search-result-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+.search-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: #212529 !important; /* Force black text */
+}
 
-        .search-result-item:hover {
-            background-color: #f8f9fa;
-        }
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Force text colors for all elements inside search results */
+.search-results .result-type,
+.search-results .result-name,
+.search-results small,
+.search-results .text-muted {
+    color: #212529 !important; /* Black text */
+}
+
+.search-result-item .result-type {
+    font-size: 0.7rem;
+    color: #6c757d !important; /* Dark gray for type */
+    text-transform: uppercase;
+}
+
+.search-result-item .result-name {
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: #212529 !important; /* Black for name */
+}
+
+.search-result-item small,
+.search-result-item .text-muted {
+    color: #6c757d !important; /* Dark gray for price */
+}
+
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #6c757d !important; /* Dark gray for no results */
+}
 
         .result-type {
             font-size: 0.7rem;

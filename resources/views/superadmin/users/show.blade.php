@@ -15,31 +15,20 @@
         --gray-800: #1F2937;
     }
 
-    /* Page Header */
+    /* Remove page header card */
     .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
         margin-bottom: 2rem;
-        border-left: 4px solid var(--primary);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .page-header h1 {
         color: var(--gray-800);
         font-weight: 700;
         margin-bottom: 0.5rem;
-    }
-
-    .page-header .breadcrumb {
-        background: transparent;
-        padding: 0;
-        margin-bottom: 0.5rem;
-    }
-
-    .page-header .breadcrumb-item a {
-        color: var(--primary);
-        text-decoration: none;
+        font-size: 1.75rem;
     }
 
     /* Cards */
@@ -85,48 +74,19 @@
         box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
     }
 
-  
     .user-name {
         font-weight: 700;
         color: var(--gray-800);
         margin-bottom: 0.25rem;
+        text-align: center;
     }
 
     .user-email {
         color: var(--gray-600);
         font-size: 0.95rem;
         margin-bottom: 1rem;
+        text-align: center;
     }
-
-    /* Role Badge */
-    .role-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        gap: 0.5rem;
-    }
-
-    .role-super-admin { background: #FEE2E2; color: #991B1B; }
-    .role-admin { background: #E0F2FE; color: #0369A1; }
-    .role-delivery { background: #FEF3C7; color: #92400E; }
-    .role-customer { background: var(--gray-100); color: var(--gray-700); }
-
-    /* Status Badge */
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        gap: 0.5rem;
-    }
-
-    .status-active { background: #DCFCE7; color: #166534; }
-    .status-inactive { background: #FEE2E2; color: #991B1B; }
 
     /* Info Grid */
     .info-grid {
@@ -191,6 +151,7 @@
         flex-direction: column;
         gap: 0.75rem;
         margin-top: 1.5rem;
+        width: 100%;
     }
 
     .btn {
@@ -203,6 +164,7 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
+        width: 100%;
     }
 
     .btn-primary {
@@ -253,11 +215,13 @@
         align-items: center;
         gap: 1rem;
         margin-top: 1.5rem;
+        width: 100%;
     }
 
     .self-account-alert i {
         color: #0EA5E9;
         font-size: 1.25rem;
+        flex-shrink: 0;
     }
 
     .self-account-alert h6 {
@@ -376,31 +340,6 @@
     }
 </style>
 
-<!-- Page Header -->
-<div class="page-header">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('superadmin.dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('superadmin.users.index') }}">Users</a></li>
-            <li class="breadcrumb-item active">{{ $user->name }}</li>
-        </ol>
-    </nav>
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1>User Details</h1>
-            <p class="text-muted mb-0">View and manage user information</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline">
-                <i class="fas fa-arrow-left me-2"></i>Back
-            </a>
-            <a href="{{ route('superadmin.users.edit', $user) }}" class="btn btn-primary">
-                <i class="fas fa-edit me-2"></i>Edit User
-            </a>
-        </div>
-    </div>
-</div>
-
 <div class="row">
     <!-- Left Column - Profile Overview -->
     <div class="col-xl-4 col-lg-5">
@@ -415,39 +354,31 @@
                 <!-- User Info -->
                 <h3 class="user-name">{{ $user->name }}</h3>
                 <p class="user-email">{{ $user->email }}</p>
-                
-                <!-- Role Badge -->
+
+                <!-- Role - Simple Text -->
                 <div class="mb-3">
-                    @if($user->isSuperAdmin())
-                        <span class="role-badge role-super-admin">
-                            <i class="fas fa-crown"></i>Super Admin
-                        </span>
-                    @elseif($user->isAdmin())
-                        <span class="role-badge role-admin">
-                            <i class="fas fa-user-shield"></i>Admin
-                        </span>
-                    @elseif($user->isDelivery())
-                        <span class="role-badge role-delivery">
-                            <i class="fas fa-truck"></i>Delivery Staff
-                        </span>
-                    @else
-                        <span class="role-badge role-customer">
-                            <i class="fas fa-user"></i>Customer
-                        </span>
-                    @endif
+                    <div style="font-weight: 600; color: var(--gray-800);">
+                        @if($user->isSuperAdmin())
+                            Super Admin
+                        @elseif($user->isAdmin())
+                            Admin
+                        @elseif($user->isDelivery())
+                            Delivery Staff
+                        @else
+                            Customer
+                        @endif
+                    </div>
                 </div>
                 
-                <!-- Status Badge -->
+                <!-- Status - Simple Text -->
                 <div class="mb-3">
-                    @if($user->is_active)
-                        <span class="status-badge status-active">
-                            <i class="fas fa-check-circle"></i>Active
-                        </span>
-                    @else
-                        <span class="status-badge status-inactive">
-                            <i class="fas fa-times-circle"></i>Inactive
-                        </span>
-                    @endif
+                    <div style="font-weight: 600; @if($user->is_active) color: #166534; @else color: #991B1B; @endif">
+                        @if($user->is_active)
+                            Active
+                        @else
+                            Inactive
+                        @endif
+                    </div>
                 </div>
                 
                 <!-- Quick Stats -->
@@ -471,7 +402,6 @@
                 <!-- Self Account Alert -->
                 @if($user->id === auth()->id())
                 <div class="self-account-alert">
-                    <i class="fas fa-user-circle"></i>
                     <div>
                         <h6>Your Account</h6>
                         <p>You are viewing your own account details</p>
@@ -484,39 +414,39 @@
                     @if($user->id !== auth()->id())
                         <!-- Toggle Status -->
                         @if($user->is_active)
-                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST">
+                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST" class="w-100">
                                 @csrf
                                 <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-user-slash me-2"></i>Deactivate
+                                    Deactivate User
                                 </button>
                             </form>
                         @else
-                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST">
+                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST" class="w-100">
                                 @csrf
                                 <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-user-check me-2"></i>Activate
+                                    Activate User
                                 </button>
                             </form>
                         @endif
                         
                         <!-- Reset Password -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
-                            <i class="fas fa-key me-2"></i>Reset Password
+                            Reset Password
                         </button>
                         
                         <!-- Delete User -->
                         @if(!$user->isSuperAdmin())
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
-                            <i class="fas fa-trash-alt me-2"></i>Delete User
+                            Delete User
                         </button>
                         @endif
                     @else
                         <!-- Self Account Actions -->
                         <a href="{{ route('profile.show') }}" class="btn btn-primary">
-                            <i class="fas fa-user-edit me-2"></i>Edit Profile
+                            Edit Profile
                         </a>
                         <a href="{{ route('profile.password') }}" class="btn btn-primary">
-                            <i class="fas fa-key me-2"></i>Change Password
+                            Change Password
                         </a>
                     @endif
                 </div>
@@ -661,9 +591,9 @@
                             <div class="info-label">Email Verification</div>
                             <div class="info-value">
                                 @if($user->email_verified_at)
-                                    <span class="status-badge status-active">Verified</span>
+                                    <span style="color: #166534; font-weight: 600;">Verified</span>
                                 @else
-                                    <span class="status-badge status-inactive">Not Verified</span>
+                                    <span style="color: #991B1B; font-weight: 600;">Not Verified</span>
                                 @endif
                             </div>
                         </div>
@@ -671,9 +601,9 @@
                             <div class="info-label">Account Status</div>
                             <div class="info-value">
                                 @if($user->is_active)
-                                    <span class="status-badge status-active">Active</span>
+                                    <span style="color: #166534; font-weight: 600;">Active</span>
                                 @else
-                                    <span class="status-badge status-inactive">Inactive</span>
+                                    <span style="color: #991B1B; font-weight: 600;">Inactive</span>
                                 @endif
                             </div>
                         </div>

@@ -77,7 +77,7 @@
                                         </span>
                                         <input type="text" class="form-control ps-0 @error('first_name') is-invalid @enderror" 
                                                id="first_name" name="first_name" value="{{ old('first_name') }}" 
-                                               placeholder="John" required>
+                                               placeholder="     John" required>
                                     </div>
                                     @error('first_name')
                                         <div class="text-danger small mt-2">{{ $message }}</div>
@@ -128,7 +128,7 @@
                                         </span>
                                         <input type="email" class="form-control ps-0 @error('email') is-invalid @enderror" 
                                                id="email" name="email" value="{{ old('email') }}" 
-                                               placeholder="user@example.com" required>
+                                               placeholder="  user@example.com" required>
                                     </div>
                                     <div class="form-text mt-2">
                                         <i class="fas fa-info-circle text-success me-1"></i>
@@ -266,13 +266,13 @@
                                                     </p>
                                                     <div class="mt-3">
                                                         @if($key == 'superadmin')
-                                                            <span class="badge-text badge-superadmin">Full Access</span>
+                                                            <span >Full Access</span>
                                                         @elseif($key == 'admin')
-                                                            <span class="badge-text badge-admin">Management</span>
+                                                            <span >Management</span>
                                                         @elseif($key == 'delivery')
-                                                            <span class="badge-text badge-delivery">Delivery</span>
+                                                            <span>Delivery</span>
                                                         @else
-                                                            <span class="badge-text badge-customer">Basic</span>
+                                                            <span>Basic</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -439,15 +439,15 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div>
                                 <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom btn-lg">
-                                    <i class="fas fa-times me-2"></i>Cancel
+                                    </i>Cancel
                                 </a>
                             </div>
                             <div class="d-flex gap-3">
                                 <button type="reset" class="btn btn-outline-success-custom btn-lg">
-                                    <i class="fas fa-redo me-2"></i>Reset Form
+                                    Reset Form
                                 </button>
                                 <button type="submit" class="btn btn-success-custom btn-lg px-5">
-                                    <i class="fas fa-user-plus me-2"></i>Create User
+                                   Create User
                                 </button>
                             </div>
                         </div>
