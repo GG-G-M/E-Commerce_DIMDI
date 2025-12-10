@@ -15,7 +15,7 @@
         }
 
         .notifications-container {
-            max-width: 1000px;
+            max-width: 1200px; /* Made wider like profile page */
             margin: 0 auto;
             padding: 0 15px;
             margin-top: 1rem;
@@ -57,18 +57,18 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 2rem;
+            padding: 2.5rem 3rem; /* Increased padding for wider card */
             min-height: 400px;
             border: 1px solid var(--medium-gray);
         }
 
-        /* Enhanced notification cards matching product cards */
+        /* Enhanced notification cards matching product cards - Made wider */
         .notification-card {
             background: white;
             border: 1px solid var(--medium-gray);
             border-radius: 16px;
-            padding: 1.75rem;
-            margin-bottom: 1.25rem;
+            padding: 2rem; /* Increased padding */
+            margin-bottom: 1.5rem; /* Slightly more spacing */
             transition: all 0.3s ease;
             position: relative;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -92,10 +92,10 @@
             background: var(--light-gray);
         }
 
-        /* Enhanced icon wrapper */
+        /* Enhanced icon wrapper - slightly larger */
         .notification-icon-wrapper {
-            width: 56px;
-            height: 56px;
+            width: 60px; /* Increased from 56px */
+            height: 60px; /* Increased from 56px */
             border-radius: 14px;
             display: flex;
             align-items: center;
@@ -106,26 +106,26 @@
         }
 
         .notification-icon-wrapper i {
-            font-size: 1.4rem;
+            font-size: 1.5rem; /* Slightly larger */
             color: var(--primary-green);
         }
 
         .notification-content {
             flex: 1;
             min-width: 0;
-            padding-left: 1rem;
+            padding-left: 1.25rem; /* Slightly more padding */
         }
 
         .notification-title {
-            font-size: 1.1rem;
+            font-size: 1.15rem; /* Slightly larger */
             font-weight: 700;
             color: var(--text-dark);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.875rem; /* Slightly more spacing */
             line-height: 1.4;
         }
 
         .notification-message {
-            font-size: 0.95rem;
+            font-size: 1rem; /* Slightly larger */
             color: var(--dark-gray);
             line-height: 1.6;
             margin-bottom: 1rem;
@@ -136,13 +136,13 @@
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
-            margin-bottom: 1.25rem;
-            padding-top: 0.75rem;
+            margin-bottom: 1.5rem; /* Slightly more spacing */
+            padding-top: 0.875rem; /* Slightly more spacing */
             border-top: 1px solid var(--medium-gray);
         }
 
         .notification-time {
-            font-size: 0.875rem;
+            font-size: 0.9rem; /* Slightly larger */
             color: var(--dark-gray);
             display: flex;
             align-items: center;
@@ -151,8 +151,8 @@
 
         /* Enhanced badges matching product page */
         .notification-badge {
-            font-size: 0.8rem;
-            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem; /* Slightly larger */
+            padding: 0.45rem 1rem; /* Slightly more padding */
             border-radius: 20px;
             font-weight: 600;
             display: inline-flex;
@@ -168,9 +168,9 @@
         /* Enhanced action buttons - MATCHING PRODUCT PAGE STYLE */
         .notification-actions {
             display: flex;
-            gap: 0.875rem;
+            gap: 1rem; /* Slightly more spacing */
             flex-wrap: wrap;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem; /* Slightly more spacing */
         }
 
         /* Consistent button styles with products page */
@@ -179,8 +179,8 @@
             color: #2C8F0C;
             border: 2px solid #2C8F0C;
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 16px; /* Slightly larger */
+            font-size: 0.9rem; /* Slightly larger */
             font-weight: 500;
             transition: all 0.3s ease;
             display: inline-flex;
@@ -189,7 +189,7 @@
             gap: 0.5rem;
             text-decoration: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 44px; /* Slightly taller */
         }
 
         .btn-view-details:hover {
@@ -204,8 +204,8 @@
             color: white;
             border: 2px solid transparent;
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 16px; /* Slightly larger */
+            font-size: 0.9rem; /* Slightly larger */
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
@@ -213,7 +213,7 @@
             gap: 0.5rem;
             text-decoration: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 44px; /* Slightly taller */
         }
 
         .btn-add-cart:hover:not(:disabled) {
@@ -229,8 +229,8 @@
             color: #28a745;
             border: 2px solid #28a745;
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 16px; /* Slightly larger */
+            font-size: 0.9rem; /* Slightly larger */
             font-weight: 500;
             transition: all 0.3s ease;
             display: inline-flex;
@@ -239,7 +239,7 @@
             gap: 0.5rem;
             text-decoration: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 44px; /* Slightly taller */
         }
 
         .btn-success-hover:hover {
@@ -255,8 +255,8 @@
             color: var(--text-dark);
             border: 2px solid var(--medium-gray);
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 16px; /* Slightly larger */
+            font-size: 0.9rem; /* Slightly larger */
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
@@ -264,7 +264,7 @@
             gap: 0.5rem;
             text-decoration: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 44px; /* Slightly taller */
         }
 
         .btn-outline-rounded:hover {
@@ -281,8 +281,8 @@
             color: white;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px;
-            padding: 8px 12px;
-            font-size: 0.85rem;
+            padding: 10px 16px; /* Slightly larger */
+            font-size: 0.9rem; /* Slightly larger */
             font-weight: 500;
             transition: all 0.3s ease;
             display: inline-flex;
@@ -291,7 +291,7 @@
             gap: 0.5rem;
             text-decoration: none;
             cursor: pointer;
-            min-height: 40px;
+            min-height: 44px; /* Slightly taller */
         }
 
         .btn-light-rounded:hover {
@@ -375,11 +375,28 @@
             color: white;
         }
 
-        /* Responsive Design */
+        /* Responsive Design - Adjusted for wider layout */
+        @media (max-width: 1400px) {
+            .notifications-container {
+                max-width: 1100px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .notifications-container {
+                max-width: 95%;
+            }
+            
+            .notifications-body {
+                padding: 2rem 2.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .notifications-container {
                 padding: 0 0.5rem;
                 margin-top: 0.5rem;
+                max-width: 100%;
             }
 
             .notifications-header {
@@ -522,7 +539,7 @@
     </div>
 
     <!-- Main Content Container -->
-    <div class="container py-4">
+    <div class="container-fluid px-xxl-5 py-4"> <!-- Changed to container-fluid for more width -->
         <div class="notifications-container">
             <!-- Notifications Body -->
             <div class="notifications-body">
