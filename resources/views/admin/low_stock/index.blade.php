@@ -348,7 +348,7 @@
         background-color: #e9ecef;
         border-radius: 3px;
         overflow: hidden;
-        margin: 4px 0;
+        margin: 0 auto 4px auto;
     }
 
     .threshold-fill {
@@ -357,12 +357,34 @@
         transition: width 0.3s ease;
     }
 
+    /* Stock Ratio Column - Enhanced alignment */
+    .ratio-col {
+        text-align: center;
+        vertical-align: middle;
+    }
+    
+    .ratio-col > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .ratio-col .threshold-indicator {
+        margin: 0 auto 4px auto;
+        width: 100px;
+        min-width: 100px;
+    }
+
     /* Percentage Text */
     .percentage-text {
         font-size: 0.8rem;
         color: #6c757d;
         text-align: center;
         margin-top: 2px;
+        line-height: 1.2;
+        width: 100%;
     }
 
     /* Empty State */
@@ -733,18 +755,20 @@
                                     @endif
                                 </td>
                                 <td class="ratio-col">
-                                    <div class="threshold-indicator">
-                                        <div class="threshold-fill" 
-                                             style="width: {{ $stockPercentage }}%; 
-                                                    background-color: 
-                                                    @if($stockLevel == 'critical') #C62828
-                                                    @elseif($stockLevel == 'warning') #FBC02D
-                                                    @else #2C8F0C
-                                                    @endif">
+                                    <div class="d-flex flex-column align-items-center justify-content-center">
+                                        <div class="threshold-indicator mb-1">
+                                            <div class="threshold-fill" 
+                                                 style="width: {{ $stockPercentage }}%; 
+                                                        background-color: 
+                                                        @if($stockLevel == 'critical') #C62828
+                                                        @elseif($stockLevel == 'warning') #FBC02D
+                                                        @else #2C8F0C
+                                                        @endif">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="percentage-text">
-                                        {{ number_format($stockPercentage, 1) }}% of threshold
+                                        <div class="percentage-text">
+                                            {{ number_format($stockPercentage, 1) }}% of threshold
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -814,18 +838,20 @@
                                     @endif
                                 </td>
                                 <td class="ratio-col">
-                                    <div class="threshold-indicator">
-                                        <div class="threshold-fill" 
-                                             style="width: {{ $stockPercentage }}%; 
-                                                    background-color: 
-                                                    @if($stockLevel == 'critical') #C62828
-                                                    @elseif($stockLevel == 'warning') #FBC02D
-                                                    @else #2C8F0C
-                                                    @endif">
+                                    <div class="d-flex flex-column align-items-center justify-content-center">
+                                        <div class="threshold-indicator mb-1">
+                                            <div class="threshold-fill" 
+                                                 style="width: {{ $stockPercentage }}%; 
+                                                        background-color: 
+                                                        @if($stockLevel == 'critical') #C62828
+                                                        @elseif($stockLevel == 'warning') #FBC02D
+                                                        @else #2C8F0C
+                                                        @endif">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="percentage-text">
-                                        {{ number_format($stockPercentage, 1) }}% of threshold
+                                        <div class="percentage-text">
+                                            {{ number_format($stockPercentage, 1) }}% of threshold
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
