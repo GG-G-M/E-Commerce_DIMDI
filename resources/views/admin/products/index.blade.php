@@ -1058,9 +1058,15 @@
                 </div>
                 <div class="col-md-2">
                     <div class="mb-3">
-                        <label for="brand" class="form-label fw-bold">Brand</label>
-                        <input type="text" class="form-control" id="brand" name="brand" 
-                            value="{{ request('brand') }}" placeholder="Filter by brand...">
+                        <label for="brand_id" class="form-label fw-bold">Brand</label>
+                        <select class="form-select" id="brand_id" name="brand_id">
+                            <option value="">All Brands</option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->name }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -1528,7 +1534,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filterForm');
     const searchInput = document.getElementById('search');
-    const brandInput = document.getElementById('brand');
+    const brandSelect = document.getElementById('brand_id');
     const categorySelect = document.getElementById('category_id');
     const statusSelect = document.getElementById('status');
     const perPageSelect = document.getElementById('per_page');
@@ -1546,14 +1552,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 800);
     });
 
-    // Auto-submit brand filter with delay
-    brandInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchLoading.style.display = 'block';
-        
-        searchTimeout = setTimeout(() => {
-            filterForm.submit();
-        }, 800);
+    // Auto-submit brand filter immediately
+    brandSelect.addEventListener('change', function() {
+        filterForm.submit();
     });
 
     // Auto-submit other filters immediately

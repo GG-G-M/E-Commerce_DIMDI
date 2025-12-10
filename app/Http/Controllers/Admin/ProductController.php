@@ -20,6 +20,7 @@ class ProductController extends Controller
     {
         $search = $request->get('search');
         $categoryId = $request->get('category_id');
+        $brandId = $request->get('brand_id');
         $status = $request->get('status', 'active');
 
         // Respect per_page selection from the UI (fall back to 10)
@@ -35,6 +36,9 @@ class ProductController extends Controller
             })
             ->when($categoryId, function ($query) use ($categoryId) {
                 return $query->filterByCategory($categoryId);
+            })
+            ->when($brandId, function ($query) use ($brandId) {
+                return $query->where('brand_id', $brandId);
             })
             ->when($status, function ($query) use ($status) {
                 return $query->filterByStatus($status);
