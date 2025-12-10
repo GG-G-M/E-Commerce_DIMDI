@@ -72,40 +72,57 @@
             font-size: 0.9rem;
         }
 
-        .search-input {
-            border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 0.4rem 1rem 0.4rem 2.5rem;
-            transition: all 0.3s ease;
-            width: 100%;
-            font-size: 0.9rem;
+       /* Search Box - FIXED: Always white text */
+.search-input {
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white !important; /* Force white text */
+    padding: 0.4rem 1rem 0.4rem 2.5rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+/* Force white text specifically for the search input */
+#searchInput,
+.search-input,
+.form-control.search-input {
+    color: white !important;
+}
+
+/* Change placeholder color to be more visible */
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.9rem;
+}
+
+/* When input is focused, keep text white */
+.search-input:focus {
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    color: white !important;
+    box-shadow: none !important;
+}
+
+/* Remove any Bootstrap styling that makes text black */
+.search-input.form-control:focus {
+    color: white !important;
+}
+
+        /* Search results styling - FIXED - Separate container */
+        .search-results-container {
+            position: fixed;
+            z-index: 9999;
+            display: none;
         }
 
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        .search-input:focus {
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Search results styling */
         .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
             background: white;
             border: 1px solid #dee2e6;
             border-top: none;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            display: none;
             max-height: 300px;
             overflow-y: auto;
         }
@@ -115,6 +132,7 @@
             border-bottom: 1px solid #eee;
             cursor: pointer;
             transition: background-color 0.2s;
+            color: #212529 !important;
         }
 
         .search-result-item:hover {
@@ -123,20 +141,20 @@
 
         .result-type {
             font-size: 0.7rem;
-            color: #6c757d;
+            color: #6c757d !important;
             text-transform: uppercase;
         }
 
         .result-name {
             font-weight: 500;
             margin-bottom: 2px;
-            color: #212529;
+            color: #212529 !important;
         }
 
         .no-results {
             padding: 15px;
             text-align: center;
-            color: #6c757d;
+            color: #6c757d !important;
         }
 
         /* Updated nav styling - text only */
@@ -195,19 +213,19 @@
         }
 
         .notification-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            font-size: 0.65rem;
-            padding: 0.15rem 0.35rem;
-            min-width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            font-weight: 600;
-            text-align: center;
+            position: absolute !important;
+            top: -2px !important;
+            right: -2px !important;
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.35rem !important;
+            min-width: 18px !important;
+            height: 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            font-weight: 600 !important;
+            text-align: center !important;
         }
 
         .notification-dropdown {
@@ -421,6 +439,8 @@
 
         footer {
             padding: 3rem 0 1.5rem;
+            background-color: #2C8F0C !important;
+            color: white !important;
         }
 
         .footer-title {
@@ -474,52 +494,52 @@
         .custom-toast.error {
             border-left-color: #dc3545;
         }
-       /* Fix notification badge positioning - move it closer */
-.notification-badge {
-    position: absolute !important;
-    top: -2px !important;  /* Changed from 0 */
-    right: -2px !important; /* Changed from 0 */
-    font-size: 0.65rem !important;
-    padding: 0.15rem 0.35rem !important;
-    min-width: 18px !important;
-    height: 18px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-    font-weight: 600 !important;
-    text-align: center !important;
-    transform: translate(0%, -0%) !important; /* Remove the 50% translate */
-}
 
-/* For cart badge too */
-.cart-badge {
-    position: absolute !important;
-    top: -3px !important;  /* Move it up more */
-    right: 0px !important;  /* Move it right more */
-    font-size: 0.7rem !important;
-    padding: 0.2rem 0.4rem !important;
-    min-width: 18px !important;
-    height: 18px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1 !important;
-}
+        /* Fix notification badge positioning */
+        .notification-badge {
+            position: absolute !important;
+            top: -2px !important;
+            right: -2px !important;
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.35rem !important;
+            min-width: 18px !important;
+            height: 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            font-weight: 600 !important;
+            text-align: center !important;
+        }
 
-/* Mobile bottom nav badges */
-.mobile-nav-item .badge {
-    position: absolute !important;
-    top: -3px !important;
-    right: -3px !important;
-    font-size: 0.65rem !important;
-    padding: 0.15rem 0.35rem !important;
-    min-width: 16px !important;
-    height: 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
+        /* For cart badge too */
+        .cart-badge {
+            position: absolute !important;
+            top: -3px !important;
+            right: 0px !important;
+            font-size: 0.7rem !important;
+            padding: 0.2rem 0.4rem !important;
+            min-width: 18px !important;
+            height: 18px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        /* Mobile bottom nav badges */
+        .mobile-nav-item .badge {
+            position: absolute !important;
+            top: -3px !important;
+            right: -3px !important;
+            font-size: 0.65rem !important;
+            padding: 0.15rem 0.35rem !important;
+            min-width: 16px !important;
+            height: 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
 
         @keyframes slideIn {
             from {
@@ -532,12 +552,54 @@
                 opacity: 1;
             }
         }
+        /* NUCLEAR OPTION - Add this at the VERY END of your CSS */
+#searchInput {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    caret-color: white !important; /* Makes the cursor white too */
+}
+
+#searchInput:focus,
+#searchInput:active,
+#searchInput:hover,
+#searchInput:focus-visible,
+#searchInput:focus-within {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
+
+/* Override ALL Bootstrap form-control styles for this specific input */
+.navbar .form-control#searchInput,
+.navbar input[type="text"]#searchInput {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+}
+
+/* Specific override for Bootstrap's :focus state */
+.form-control#searchInput:focus {
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Chrome autofill override */
+input#searchInput:-webkit-autofill,
+input#searchInput:-webkit-autofill:hover,
+input#searchInput:-webkit-autofill:focus,
+input#searchInput:-webkit-autofill:active {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
     </style>
 </head>
 
 <body>
     <!-- Toast Notification Container -->
     <div class="toast-container"></div>
+    
+    <!-- Search Results Container (Separate from footer) -->
+    <div id="searchResultsContainer" class="search-results-container"></div>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg shadow-sm" id="mainNavbar">
@@ -573,7 +635,6 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="form-control search-input"
                         placeholder="      Search products or categories..." id="searchInput" autocomplete="off">
-                    <div class="search-results" id="searchResults"></div>
                 </div>
 
                 <!-- Right Section -->
@@ -795,53 +856,43 @@
     </main>
 
     <!-- Footer -->
-    <footer style="background-color: #2C8F0C !important; color: white !important;">
+    <footer>
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">DIMDI Store</h5>
-                    <p style="color: white !important; font-size: 0.9rem;">Your trusted destination for premium
+                    <h5 class="footer-title">DIMDI Store</h5>
+                    <p>Your trusted destination for premium
                         appliances and furniture that transform houses into homes.</p>
                     <div class="social-links mt-3">
-                        <a href="#" style="color: white !important;"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" style="color: white !important;"><i class="fab fa-twitter"></i></a>
-                        <a href="#" style="color: white !important;"><i class="fab fa-instagram"></i></a>
-                        <a href="#" style="color: white !important;"><i class="fab fa-pinterest"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">Shop</h5>
+                    <h5 class="footer-title">Shop</h5>
                     <ul class="footer-links">
-                        <li><a href="{{ url('/products') }}" style="color: white !important; font-size: 0.9rem;">All
-                                Products</a></li>
-                        <li><a href="{{ url('/products?category=appliances') }}"
-                                style="color: white !important; font-size: 0.9rem;">Appliances</a></li>
-                        <li><a href="{{ url('/products?category=furniture') }}"
-                                style="color: white !important; font-size: 0.9rem;">Furniture</a></li>
-                        <li><a href="{{ url('/products?sort=newest') }}"
-                                style="color: white !important; font-size: 0.9rem;">New Arrivals</a></li>
-                        <li><a href="{{ url('/products?sort=popular') }}"
-                                style="color: white !important; font-size: 0.9rem;">Best Sellers</a></li>
+                        <li><a href="{{ url('/products') }}">All Products</a></li>
+                        <li><a href="{{ url('/products?category=appliances') }}">Appliances</a></li>
+                        <li><a href="{{ url('/products?category=furniture') }}">Furniture</a></li>
+                        <li><a href="{{ url('/products?sort=newest') }}">New Arrivals</a></li>
+                        <li><a href="{{ url('/products?sort=popular') }}">Best Sellers</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">Help</h5>
+                    <h5 class="footer-title">Help</h5>
                     <ul class="footer-links">
-                        <li><a href="{{ url('/contact') }}"
-                                style="color: white !important; font-size: 0.9rem;">Customer Service</a></li>
-                        <li><a href="{{ url('/track-order') }}"
-                                style="color: white !important; font-size: 0.9rem;">Track Order</a></li>
-                        <li><a href="{{ url('/returns') }}"
-                                style="color: white !important; font-size: 0.9rem;">Returns & Exchanges</a></li>
-                        <li><a href="{{ url('/shipping') }}"
-                                style="color: white !important; font-size: 0.9rem;">Shipping Info</a></li>
-                        <li><a href="{{ url('/faq') }}" style="color: white !important; font-size: 0.9rem;">FAQ</a>
-                        </li>
+                        <li><a href="{{ url('/contact') }}">Customer Service</a></li>
+                        <li><a href="{{ url('/track-order') }}">Track Order</a></li>
+                        <li><a href="{{ url('/returns') }}">Returns & Exchanges</a></li>
+                        <li><a href="{{ url('/shipping') }}">Shipping Info</a></li>
+                        <li><a href="{{ url('/faq') }}">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">
-                    <h5 class="footer-title" style="color: white !important; font-size: 1.1rem;">Newsletter</h5>
-                    <p style="color: white !important; font-size: 0.9rem;">Subscribe to get special offers, free
+                    <h5 class="footer-title">Newsletter</h5>
+                    <p>Subscribe to get special offers, free
                         giveaways, and new product updates.</p>
                     <div class="input-group mb-3" style="max-width: 300px;">
                         <input type="email" class="form-control" placeholder="Your email address"
@@ -854,14 +905,12 @@
             <div class="footer-bottom">
                 <div class="row">
                     <div class="col-md-6">
-                        <p style="color: white !important; font-size: 0.85rem;">&copy; 2024 DIMDI Store. All rights
-                            reserved.</p>
+                        <p>&copy; 2024 DIMDI Store. All rights reserved.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <a href="{{ url('/privacy') }}"
-                            style="color: white !important; margin-right: 1rem; font-size: 0.85rem;">Privacy Policy</a>
-                        <a href="{{ url('/terms') }}" style="color: white !important; font-size: 0.85rem;">Terms of
-                            Service</a>
+                            style="margin-right: 1rem;">Privacy Policy</a>
+                        <a href="{{ url('/terms') }}">Terms of Service</a>
                     </div>
                 </div>
             </div>
@@ -953,13 +1002,9 @@
                         if (url && url !== '#') {
                             window.location.href = url;
                         }
-
-                        // Show toast
-                        // this.showToast('Notification marked as read', 'success');
                     }
                 } catch (error) {
                     console.error('Error marking notification as read:', error);
-                    // this.showToast('Error marking notification as read', 'error');
                 }
             }
 
@@ -1126,10 +1171,10 @@
             }
         }
 
-        // Search functionality (your existing code)
+        // Search functionality - FIXED
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
-        const searchResults = document.getElementById('searchResults');
+        const searchResultsContainer = document.getElementById('searchResultsContainer');
 
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
@@ -1138,12 +1183,19 @@
                 clearTimeout(searchTimeout);
 
                 if (query.length === 0) {
-                    searchResults.style.display = 'none';
+                    searchResultsContainer.style.display = 'none';
                     return;
                 }
 
-                searchResults.innerHTML = '<div class="no-results">Searching...</div>';
-                searchResults.style.display = 'block';
+                // Position the dropdown under the search input
+                const searchInputRect = searchInput.getBoundingClientRect();
+                searchResultsContainer.style.position = 'fixed';
+                searchResultsContainer.style.top = (searchInputRect.bottom + window.scrollY) + 'px';
+                searchResultsContainer.style.left = (searchInputRect.left + window.scrollX) + 'px';
+                searchResultsContainer.style.width = searchInputRect.width + 'px';
+                
+                searchResultsContainer.innerHTML = '<div class="no-results">Searching...</div>';
+                searchResultsContainer.style.display = 'block';
 
                 searchTimeout = setTimeout(() => {
                     performSearch(query);
@@ -1151,8 +1203,8 @@
             });
 
             document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                    searchResults.style.display = 'none';
+                if (!searchInput.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+                    searchResultsContainer.style.display = 'none';
                 }
             });
 
@@ -1208,11 +1260,11 @@
 
         function displaySearchResults(results) {
             if (!results || results.length === 0) {
-                searchResults.innerHTML = '<div class="no-results">No products found</div>';
+                searchResultsContainer.innerHTML = '<div class="no-results">No products found</div>';
                 return;
             }
 
-            let html = '';
+            let html = '<div class="search-results">';
             results.forEach(item => {
                 html += `
                     <div class="search-result-item" onclick="selectResult('${item.slug}', '${item.type}')">
@@ -1222,17 +1274,43 @@
                     </div>
                 `;
             });
-
-            searchResults.innerHTML = html;
+            html += '</div>';
+            
+            searchResultsContainer.innerHTML = html;
         }
 
         function selectResult(slug, type) {
+            searchResultsContainer.style.display = 'none';
+            searchInput.value = '';
+            
             if (type === 'Product') {
                 window.location.href = `/products/${slug}`;
             } else {
                 window.location.href = `/products?category=${slug}`;
             }
         }
+
+        // Add this to your existing JavaScript
+if (searchInput) {
+    // Force white text on input
+    searchInput.style.color = 'white';
+    
+    // Add input event to maintain white text
+    searchInput.addEventListener('input', function() {
+        this.style.color = 'white';
+    });
+    
+    // Also force white text on focus
+    searchInput.addEventListener('focus', function() {
+        this.style.color = 'white';
+    });
+    
+    // And on blur
+    searchInput.addEventListener('blur', function() {
+        this.style.color = 'white';
+    });
+    
+}
     </script>
     @stack('scripts')
 </body>

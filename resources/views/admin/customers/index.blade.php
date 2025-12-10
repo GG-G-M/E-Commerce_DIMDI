@@ -249,6 +249,26 @@
             transition: all 0.2s ease;
             border: 2px solid;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            background: white;
+            user-select: none;
+            padding: 0;
+            line-height: 1;
+            text-decoration: none;
+            outline: none;
+        }
+        
+        .action-btn:hover {
+            cursor: pointer;
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .action-btn i {
+            pointer-events: none;
         }
 
         .action-btn:hover {
@@ -707,12 +727,14 @@
                                     <i class="fas fa-edit"></i>
                                 </button> --}}
                                     @if ($customer->is_archived)
-                                        <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}"
+                                        <button type="button" class="action-btn btn-unarchive unarchiveBtn" 
+                                            onclick="unarchiveCustomer({{ $customer->id }}, this)"
                                             data-title="Unarchive Customer">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
-                                        <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}"
+                                        <button type="button" class="action-btn btn-archive archiveBtn" 
+                                            onclick="archiveCustomer({{ $customer->id }}, this)"
                                             data-title="Archive Customer">
                                             <i class="fas fa-archive"></i>
                                         </button>
@@ -920,6 +942,10 @@
                 const perPageSelect = document.getElementById('per_page');
                 const searchLoading = document.getElementById('searchLoading');
 
+                // Define route URLs for archive/unarchive operations
+                const archiveUrl = (id) => `/admin/customers/${id}/archive`;
+                const unarchiveUrl = (id) => `/admin/customers/${id}/unarchive`;
+
                 let searchTimeout;
 
                 // Auto-submit search with delay
@@ -946,6 +972,28 @@
                 filterForm.addEventListener('submit', function() {
                     searchLoading.style.display = 'none';
                 });
+
+                // Utility function for showing notifications
+                function showNotification(message, type = 'info') {
+                    // Create notification element
+                    const notification = document.createElement('div');
+                    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+                    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    notification.innerHTML = `
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    // Add to body
+                    document.body.appendChild(notification);
+                    
+                    // Auto remove after 5 seconds
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 5000);
+                }
 
                 /* === View Customer === */
                 document.querySelectorAll('.viewBtn').forEach(btn => {
@@ -1163,80 +1211,88 @@
                 });
 
                 /* === Archive Customer === */
-                document.querySelectorAll('.archiveBtn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (!confirm(
-                                'Are you sure you want to archive this customer? This will make them inactive but preserve their data.'
-                                )) return;
+                function archiveCustomer(id, button) {
+                    console.log('Archive function called for customer ID:', id);
+                    
+                    if (!confirm('Are you sure you want to archive this customer? This will make them inactive but preserve their data.')) {
+                        return;
+                    }
 
-                        const id = this.dataset.id;
-                        const button = this;
+                    const originalContent = button.innerHTML;
+                    
+                    // Visual feedback
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    button.style.opacity = '0.6';
 
-                        // Disable button during processing
-                        button.disabled = true;
-                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-                        fetch(`/admin/customers/${id}/archive`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    location.reload();
-                                } else {
-                                    alert('Failed to archive customer: ' + (data.message ||
-                                        'Unknown error'));
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('Network error. Please try again.');
-                                location.reload();
-                            });
+                    // Make the actual request
+                    fetch(`/admin/customers/${id}/archive`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Customer archived successfully', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            throw new Error(data.message || 'Archive failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Archive error:', error);
+                        button.disabled = false;
+                        button.innerHTML = originalContent;
+                        button.style.opacity = '1';
+                        showNotification('Failed to archive customer: ' + error.message, 'error');
                     });
-                });
+                }
 
                 /* === Unarchive Customer === */
-                document.querySelectorAll('.unarchiveBtn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        if (!confirm(
-                                'Are you sure you want to unarchive this customer? They will become active again.'
-                                )) return;
+                function unarchiveCustomer(id, button) {
+                    console.log('Unarchive function called for customer ID:', id);
+                    
+                    if (!confirm('Are you sure you want to unarchive this customer? They will become active again.')) {
+                        return;
+                    }
 
-                        const id = this.dataset.id;
-                        const button = this;
+                    const originalContent = button.innerHTML;
+                    
+                    // Visual feedback
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    button.style.opacity = '0.6';
 
-                        // Disable button during processing
-                        button.disabled = true;
-                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-                        fetch(`/admin/customers/${id}/unarchive`, {
-                                method: 'POST',
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    location.reload();
-                                } else {
-                                    alert('Failed to unarchive customer: ' + (data.message ||
-                                        'Unknown error'));
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error:', error);
-                                alert('Network error. Please try again.');
-                                location.reload();
-                            });
+                    // Make the actual request
+                    fetch(`/admin/customers/${id}/unarchive`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showNotification('Customer unarchived successfully', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            throw new Error(data.message || 'Unarchive failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Unarchive error:', error);
+                        button.disabled = false;
+                        button.innerHTML = originalContent;
+                        button.style.opacity = '1';
+                        showNotification('Failed to unarchive customer: ' + error.message, 'error');
                     });
-                });
+                }
 
                 // Ensure table fits container on all screen sizes
                 window.addEventListener('resize', function() {
