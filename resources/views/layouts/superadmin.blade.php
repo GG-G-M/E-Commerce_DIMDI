@@ -427,7 +427,7 @@
                         <!-- Logout -->
                         <li class="nav-item mt-4">
                             <a href="{{ route('logout') }}" class="nav-link"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="logoutWithConfirm(event);">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -507,6 +507,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @include('components.ui-elements')
     <script>
         // Auto-collapse other menus when one is opened
         document.addEventListener('DOMContentLoaded', function() {

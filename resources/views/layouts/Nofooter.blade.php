@@ -691,7 +691,7 @@
                             <li>
                                 <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                     @csrf
-                                    <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="#" onclick="logoutWithConfirm(event);">
                                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                                     </a>
                                 </form>
@@ -760,6 +760,7 @@
     
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @include('components.ui-elements')
     <script>
         // Notification System
         class NotificationSystem {

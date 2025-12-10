@@ -78,11 +78,11 @@
                                 <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i class="fas fa-shopping-bag me-2"></i>Orders</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">
+                                        <a class="dropdown-item" href="#" onclick="logoutWithConfirm(event);">
                                             <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                        </button>
+                                        </a>
                                     </form>
                                 </li>
                             </ul>
@@ -197,7 +197,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+    @include('components.ui-elements')
     @stack('scripts')
 </body>
 </html>

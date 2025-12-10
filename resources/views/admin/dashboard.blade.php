@@ -671,7 +671,7 @@
 
 <div class="row mt-4">
     <!-- Quick Stats -->
-    <div class="col-md-4">
+    {{-- <div class="col-md-4">
         <div class="card section-card">
             <div class="card-header">
                 <h6 class="m-0 font-weight-bold">
@@ -695,10 +695,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Quick Actions -->
-    <div class="col-md-8">
+    {{-- <div class="col-md-8">
         <div class="card section-card">
             <div class="card-header">
                 <h6 class="m-0 font-weight-bold">
@@ -725,7 +725,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <script>
