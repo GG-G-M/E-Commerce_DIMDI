@@ -1810,14 +1810,14 @@
                 <h5 class="text-muted">No Products Found</h5>
                 <p class="text-muted mb-4">Try adjusting your search or filter criteria</p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-                        {{-- <i class="fas fa-file-csv"></i> --}}
+                    {{-- <button class="btn btn-import-csv" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                        <i class="fas fa-file-csv"></i>
                         Import CSV
                     </button>
                     <a href="{{ route('admin.products.create') }}" class="btn btn-add-product">
-                        {{-- <i class="fas fa-plus"></i> --}}
+                        <i class="fas fa-plus"></i>
                         Add First Product
-                    </a>
+                    </a> --}}
                 </div>
             </div>
         @endif

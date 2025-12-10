@@ -19,7 +19,8 @@ class ProductController extends Controller
     {
         $query = Product::with(['category', 'brand'])
             ->where('is_active', true)
-            ->where('stock_quantity', '>', 0);
+            ->where('stock_quantity', '>', 0)
+            ->where('is_archived', false);
 
         // Search functionality
         if ($request->filled('search')) {

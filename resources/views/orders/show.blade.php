@@ -364,13 +364,13 @@
             <div>
                 @php
                     $statusClass = [
-                        'pending' => 'badge-pending',
-                        'confirmed' => 'badge-confirmed',
-                        'processing' => 'badge-processing',
-                        'shipped' => 'badge-shipped',
-                        'delivered' => 'badge-delivered',
-                        'cancelled' => 'badge-cancelled'
-                    ][$order->order_status] ?? 'badge-pending';
+                        'pending' => '1badge-pending',
+                        'confirmed' => '1badge-confirmed',
+                        'processing' => '1badge-processing',
+                        'shipped' => '1badge-shipped',
+                        'delivered' => '1badge-delivered',
+                        'cancelled' => '1badge-cancelled'
+                    ][$order->order_status] ?? '1badge-pending';
                 @endphp
                 <span class="status-badge {{ $statusClass }}">
                     <i class="fas fa-{{ $order->order_status == 'pending' ? 'clock' : ($order->order_status == 'confirmed' ? 'check' : ($order->order_status == 'processing' ? 'cog' : ($order->order_status == 'shipped' ? 'shipping-fast' : ($order->order_status == 'delivered' ? 'check-circle' : 'times')))) }}"></i>
