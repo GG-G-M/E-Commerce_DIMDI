@@ -474,6 +474,52 @@
         .custom-toast.error {
             border-left-color: #dc3545;
         }
+       /* Fix notification badge positioning - move it closer */
+.notification-badge {
+    position: absolute !important;
+    top: -2px !important;  /* Changed from 0 */
+    right: -2px !important; /* Changed from 0 */
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.35rem !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    transform: translate(0%, -0%) !important; /* Remove the 50% translate */
+}
+
+/* For cart badge too */
+.cart-badge {
+    position: absolute !important;
+    top: -3px !important;  /* Move it up more */
+    right: 0px !important;  /* Move it right more */
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+
+/* Mobile bottom nav badges */
+.mobile-nav-item .badge {
+    position: absolute !important;
+    top: -3px !important;
+    right: -3px !important;
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.35rem !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 
         @keyframes slideIn {
             from {

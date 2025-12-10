@@ -374,6 +374,7 @@
             border-color: var(--primary-green);
             color: white;
         }
+        
 
         /* Responsive Design - Adjusted for wider layout */
         @media (max-width: 1400px) {
