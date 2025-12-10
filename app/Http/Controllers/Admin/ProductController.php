@@ -9,6 +9,8 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -301,14 +303,88 @@ class ProductController extends Controller
 
     public function archive(Product $product)
     {
-        $product->archive();
-        return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+        try {
+            // Log the archive attempt
+            Log::info('Archiving product', ['product_id' => $product->id, 'user_id' => Auth::id()]);
+            
+            // Archive the product
+            $product->archive();
+            
+            // Log successful archive
+            Log::info('Product archived successfully', ['product_id' => $product->id]);
+            
+            // Handle AJAX requests (return JSON)
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product archived successfully!'
+                ]);
+            }
+            
+            // Handle regular form submissions (redirect)
+            return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to archive product', [
+                'product_id' => $product->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Handle AJAX requests with error response
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to archive product: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Handle regular form submissions with error redirect
+            return redirect()->route('admin.products.index')->with('error', 'Failed to archive product: ' . $e->getMessage());
+        }
     }
 
     public function unarchive(Product $product)
     {
-        $product->unarchive();
-        return redirect()->route('admin.products.index')->with('success', 'Product unarchived successfully!');
+        try {
+            // Log the unarchive attempt
+            Log::info('Unarchiving product', ['product_id' => $product->id, 'user_id' => Auth::id()]);
+            
+            // Unarchive the product
+            $product->unarchive();
+            
+            // Log successful unarchive
+            Log::info('Product unarchived successfully', ['product_id' => $product->id]);
+            
+            // Handle AJAX requests (return JSON)
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product unarchived successfully!'
+                ]);
+            }
+            
+            // Handle regular form submissions (redirect)
+            return redirect()->route('admin.products.index')->with('success', 'Product unarchived successfully!');
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to unarchive product', [
+                'product_id' => $product->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Handle AJAX requests with error response
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to unarchive product: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Handle regular form submissions with error redirect
+            return redirect()->route('admin.products.index')->with('error', 'Failed to unarchive product: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Product $product)

@@ -1009,6 +1009,169 @@
             font-size: 0.7rem;
         }
     }
+
+    /* === Custom Confirmation Dialog === */
+    .custom-confirm-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(2px);
+    }
+
+    .custom-confirm-dialog {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(44, 143, 12, 0.3);
+        max-width: 400px;
+        width: 90%;
+        transform: scale(0.9);
+        animation: confirmModalIn 0.3s ease-out forwards;
+        overflow: hidden;
+        border: 2px solid #E8F5E6;
+    }
+
+    @keyframes confirmModalIn {
+        to {
+            transform: scale(1);
+        }
+    }
+
+    .custom-confirm-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .custom-confirm-header::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    }
+
+    .custom-confirm-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .custom-confirm-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .custom-confirm-body {
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f8fdf8 0%, #f0f8f0 100%);
+    }
+
+    .custom-confirm-message {
+        font-size: 1rem;
+        color: #495057;
+        line-height: 1.6;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .custom-confirm-buttons {
+        display: flex;
+        gap: 0.75rem;
+        padding: 1.5rem 2rem 2rem;
+        background: white;
+        justify-content: center;
+    }
+
+    .custom-confirm-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .custom-confirm-btn-cancel {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+    }
+
+    .custom-confirm-btn-cancel:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #495057;
+    }
+
+    .custom-confirm-btn-confirm {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        border: 2px solid #2C8F0C;
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.3);
+    }
+
+    .custom-confirm-btn-confirm:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        border-color: #1E6A08;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(44, 143, 12, 0.4);
+    }
+
+    .custom-confirm-btn-confirm.danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border-color: #dc3545;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    .custom-confirm-btn-confirm.danger:hover {
+        background: linear-gradient(135deg, #c82333, #bd2130);
+        border-color: #bd2130;
+        box-shadow: 0 6px 16px rgba(220, 53, 69, 0.4);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .custom-confirm-dialog {
+            width: 95%;
+            margin: 1rem;
+        }
+        
+        .custom-confirm-body {
+            padding: 1.5rem;
+        }
+        
+        .custom-confirm-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        
+        .custom-confirm-btn {
+            width: 100%;
+        }
+    }
 </style>
 
 <!-- Summary Cards -->
@@ -1487,12 +1650,12 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @if($product->is_archived)
-                                        <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $product->id }}"
+                                        <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $product->slug }}"
                                             title="Unarchive Product">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
-                                        <button class="action-btn btn-archive archiveBtn" data-id="{{ $product->id }}"
+                                        <button class="action-btn btn-archive archiveBtn" data-id="{{ $product->slug }}"
                                             title="Archive Product">
                                             <i class="fas fa-archive"></i>
                                         </button>
@@ -1526,6 +1689,29 @@
                 </div>
             </div>
         @endif
+    </div>
+</div>
+
+<!-- Custom Confirmation Dialog -->
+<div id="customConfirmDialog" class="custom-confirm-overlay" style="display: none;">
+    <div class="custom-confirm-dialog">
+        <div class="custom-confirm-header">
+            <i class="fas fa-question-circle custom-confirm-icon"></i>
+            <h3 class="custom-confirm-title">Confirm Action</h3>
+        </div>
+        <div class="custom-confirm-body">
+            <p class="custom-confirm-message"></p>
+        </div>
+        <div class="custom-confirm-buttons">
+            <button type="button" class="custom-confirm-btn custom-confirm-btn-cancel">
+                <i class="fas fa-times"></i>
+                <span>Cancel</span>
+            </button>
+            <button type="button" class="custom-confirm-btn custom-confirm-btn-confirm">
+                <i class="fas fa-check"></i>
+                <span>Confirm</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1869,80 +2055,219 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
+    /* === Custom Confirmation Dialog Functions === */
+    function showCustomConfirm(message, callback, options = {}) {
+        const dialog = document.getElementById('customConfirmDialog');
+        const messageEl = dialog.querySelector('.custom-confirm-message');
+        const titleEl = dialog.querySelector('.custom-confirm-title');
+        const iconEl = dialog.querySelector('.custom-confirm-icon');
+        const confirmBtn = dialog.querySelector('.custom-confirm-btn-confirm');
+        const cancelBtn = dialog.querySelector('.custom-confirm-btn-cancel');
+        
+        // Set options
+        const config = {
+            title: options.title || 'Confirm Action',
+            message: message,
+            confirmText: options.confirmText || 'Confirm',
+            cancelText: options.cancelText || 'Cancel',
+            icon: options.icon || 'fa-question-circle',
+            isDanger: options.isDanger || false
+        };
+        
+        // Update dialog content
+        titleEl.textContent = config.title;
+        messageEl.textContent = config.message;
+        iconEl.className = `fas ${config.icon} custom-confirm-icon`;
+        confirmBtn.querySelector('span').textContent = config.confirmText;
+        cancelBtn.querySelector('span').textContent = config.cancelText;
+        
+        // Update confirm button style
+        if (config.isDanger) {
+            confirmBtn.classList.add('danger');
+        } else {
+            confirmBtn.classList.remove('danger');
+        }
+        
+        // Show dialog
+        dialog.style.display = 'flex';
+        
+        // Handle confirm
+        const confirmHandler = () => {
+            dialog.style.display = 'none';
+            callback(true);
+            cleanup();
+        };
+        
+        // Handle cancel
+        const cancelHandler = () => {
+            dialog.style.display = 'none';
+            callback(false);
+            cleanup();
+        };
+        
+        // Handle backdrop click
+        const backdropHandler = (e) => {
+            if (e.target === dialog) {
+                cancelHandler();
+            }
+        };
+        
+        // Handle escape key
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                cancelHandler();
+            }
+        };
+        
+        // Cleanup function
+        const cleanup = () => {
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            dialog.removeEventListener('click', backdropHandler);
+            document.removeEventListener('keydown', escapeHandler);
+        };
+        
+        // Add event listeners
+        confirmBtn.addEventListener('click', confirmHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+        dialog.addEventListener('click', backdropHandler);
+        document.addEventListener('keydown', escapeHandler);
+    }
+
     /* === Archive Product === */
     document.querySelectorAll('.archiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm(
-                    'Are you sure you want to archive this product? This will make it inactive but preserve its data.'
-                    )) return;
+            showCustomConfirm(
+                'Are you sure you want to archive this product? This will make it inactive but preserve its data.',
+                (confirmed) => {
+                    if (!confirmed) return;
 
-            const id = this.dataset.id;
-            const button = this;
+                    const id = this.dataset.id;
+                    const button = this;
 
-            // Disable button during processing
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    // Disable button during processing
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(`/admin/products/${id}/archive`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Failed to archive product: ' + (data.message ||
-                            'Unknown error'));
-                        location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Network error. Please try again.');
-                    location.reload();
-                });
-        });
+                    console.log('Archiving product with ID:', id);
+                    console.log('CSRF Token:', '{{ csrf_token() }}');
+
+                    fetch(`/admin/products/${id}/archive`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({})
+                        })
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            console.log('Response headers:', response.headers);
+                            
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                showToast('Product archived successfully!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                showToast('Failed to archive product: ' + (data.message || 'Unknown error'), 'error');
+                                button.disabled = false;
+                                button.innerHTML = '<i class="fas fa-archive"></i>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Archive error:', error);
+                            showToast('Network error. Please try again. Error details: ' + error.message, 'error');
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-archive"></i>';
+                        });
+                },
+                {
+                    title: 'Archive Product',
+                    confirmText: 'Archive',
+                    cancelText: 'Cancel',
+                    icon: 'fa-archive',
+                    isDanger: true
+                }
+            );
+        }.bind(btn));
     });
 
     /* === Unarchive Product === */
     document.querySelectorAll('.unarchiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm(
-                    'Are you sure you want to unarchive this product? It will become active again.'
-                    )) return;
+            showCustomConfirm(
+                'Are you sure you want to unarchive this product? It will become active again.',
+                (confirmed) => {
+                    if (!confirmed) return;
 
-            const id = this.dataset.id;
-            const button = this;
+                    const id = this.dataset.id;
+                    const button = this;
 
-            // Disable button during processing
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    // Disable button during processing
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(`/admin/products/${id}/unarchive`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Failed to unarchive product: ' + (data.message ||
-                            'Unknown error'));
-                        location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Network error. Please try again.');
-                    location.reload();
-                });
-        });
+                    console.log('Unarchiving product with ID:', id);
+                    console.log('CSRF Token:', '{{ csrf_token() }}');
+
+                    fetch(`/admin/products/${id}/unarchive`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({})
+                        })
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            console.log('Response headers:', response.headers);
+                            
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.success) {
+                                showToast('Product unarchived successfully!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            } else {
+                                showToast('Failed to unarchive product: ' + (data.message || 'Unknown error'), 'error');
+                                button.disabled = false;
+                                button.innerHTML = '<i class="fas fa-box-open"></i>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Unarchive error:', error);
+                            showToast('Network error. Please try again. Error details: ' + error.message, 'error');
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fas fa-box-open"></i>';
+                        });
+                },
+                {
+                    title: 'Unarchive Product',
+                    confirmText: 'Unarchive',
+                    cancelText: 'Cancel',
+                    icon: 'fa-box-open',
+                    isDanger: false
+                }
+            );
+        }.bind(btn));
     });
 });
 

@@ -841,27 +841,17 @@
 
 <!-- Clean Bottom Actions -->
 <div class="bottom-actions">
-    <!-- Archive/Unarchive Form -->
+    <!-- Archive/Unarchive Buttons -->
     @if($product->is_archived)
-        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="is_archived" value="0">
-            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Unarchive this product?')">
-                <i class="fas fa-box-open"></i>
-                Unarchive
-            </button>
-        </form>
+        <button class="action-btn btn-secondary unarchive-view-btn" data-id="{{ $product->id }}">
+            <i class="fas fa-box-open"></i>
+            Unarchive
+        </button>
     @else
-        <form action="{{ route('admin.products.update', $product) }}" method="POST" class="d-inline">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="is_archived" value="1">
-            <button type="submit" class="action-btn btn-secondary" onclick="return confirm('Archive this product?')">
-                <i class="fas fa-archive"></i>
-                Archive
-            </button>
-        </form>
+        <button class="action-btn btn-secondary archive-view-btn" data-id="{{ $product->id }}">
+            <i class="fas fa-archive"></i>
+            Archive
+        </button>
     @endif
     
     <!-- Feature/Unfeature Form -->
@@ -892,5 +882,153 @@
         Edit Product
     </a>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    /* === Archive Product === */
+    document.querySelectorAll('.archive-view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm(
+                    'Are you sure you want to archive this product? This will make it inactive but preserve its data.'
+                )) return;
+
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            fetch(`{{ route('admin.products.archive', '__ID__') }}`.replace('__ID__', id), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Product archived successfully!', 'success');
+                        // Redirect back to products list
+                        setTimeout(() => {
+                            window.location.href = '{{ route("admin.products.index") }}';
+                        }, 1500);
+                    } else {
+                        alert('Failed to archive product: ' + (data.message || 'Unknown error'));
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-archive"></i> Archive';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Network error. Please try again.');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-archive"></i> Archive';
+                });
+        });
+    });
+
+    /* === Unarchive Product === */
+    document.querySelectorAll('.unarchive-view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm(
+                    'Are you sure you want to unarchive this product? It will become active again.'
+                )) return;
+
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            fetch(`{{ route('admin.products.unarchive', '__ID__') }}`.replace('__ID__', id), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Product unarchived successfully!', 'success');
+                        // Redirect back to products list
+                        setTimeout(() => {
+                            window.location.href = '{{ route("admin.products.index") }}';
+                        }, 1500);
+                    } else {
+                        alert('Failed to unarchive product: ' + (data.message || 'Unknown error'));
+                        button.disabled = false;
+                        button.innerHTML = '<i class="fas fa-box-open"></i> Unarchive';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Network error. Please try again.');
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fas fa-box-open"></i> Unarchive';
+                });
+        });
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
+});
+</script>
+@endpush
 
 @endsection
