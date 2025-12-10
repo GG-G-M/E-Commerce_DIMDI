@@ -453,7 +453,7 @@
                                                 <form action="{{ route('delivery.orders.markAsPickedUp', $order) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn-pickup btn-sm">
-                                                        <i class="fas fa-hand-paper me-1"></i>Pick Up Order
+                                                        <i class="fas fa-hand-paper me-1"></i>
                                                     </button>
                                                 </form>
                                             </div>

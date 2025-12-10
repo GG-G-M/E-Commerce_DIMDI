@@ -271,30 +271,67 @@
         border-top: 1px solid var(--gray-200);
     }
 
-    /* Modal */
+    .pagination {
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        border-radius: 25px;
+        margin: 0 0.25rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--medium-gray);
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+        background: var(--light-green);
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+        transform: translateY(-2px);
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
+        border-color: var(--primary-green);
+        color: white;
+    }
+
+    /* Modal - Cleaner styling without icons */
     .modal-content {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     }
 
     .modal-header {
-        border-bottom: 1px solid var(--gray-200);
-        padding: 1.25rem 1.5rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid var(--medium-gray);
+        padding: 1.5rem 1.75rem;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .modal-title {
         font-weight: 600;
-        color: var(--gray-800);
+        color: #dc3545;
+        font-size: 1.25rem;
+        margin: 0;
     }
 
     .modal-body {
-        padding: 1.5rem;
+        padding: 2rem 1.75rem;
     }
 
     .modal-footer {
-        border-top: 1px solid var(--gray-200);
-        padding: 1.25rem 1.5rem;
+        border-top: 1px solid var(--medium-gray);
+        padding: 1.5rem 1.75rem;
+        border-radius: 0 0 16px 16px;
+        display: flex;
+        gap: 1rem;
     }
 
     .btn-secondary {
@@ -337,6 +374,178 @@
         background: linear-gradient(135deg, #FEE2E2, #FECACA);
         color: #991B1B;
         border-left: 4px solid #EF4444;
+    }
+
+    /* Button Styles */
+    .btn-secondary {
+        background: transparent;
+        color: var(--dark-gray);
+        border: 2px solid var(--medium-gray);
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-secondary:hover {
+        background: var(--medium-gray);
+        border-color: var(--dark-gray);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.1);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #ef4444);
+        color: white;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+        background: linear-gradient(135deg, #c82333, #dc3545);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+    }
+
+    /* Confirmation Text */
+    .confirmation-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .order-highlight {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #dc3545;
+    }
+
+    .order-detail {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .order-detail:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-label {
+        color: var(--dark-gray);
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .orders-header {
+            padding: 1.75rem 1.5rem;
+            border-radius: 0 0 12px 12px;
+            margin-top: -0.75rem;
+        }
+
+        .orders-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .filter-card {
+            padding: 1.5rem 1.25rem;
+            border-radius: 12px;
+        }
+
+        .orders-table-container {
+            border-radius: 12px;
+        }
+
+        .table-header {
+            padding: 1rem 1.25rem;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .orders-table th,
+        .orders-table td {
+            padding: 0.875rem 1rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.95rem;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 1.25rem;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+        }
+
+        .btn-secondary,
+        .btn-danger {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .orders-header {
+            padding: 1.5rem 1.25rem;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .orders-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .btn-primary-rounded {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -466,7 +675,9 @@
                                     class="action-btn action-icon cancel-btn"
                                     data-order-id="{{ $order->id }}"
                                     data-order-number="{{ $order->order_number }}"
-                                    title="Cancel order {{ $order->order_number }}" aria-label="Cancel">
+                                    data-order-date="{{ $order->created_at->format('M d, Y') }}"
+                                    data-order-total="₱{{ number_format($order->total_amount, 2) }}"
+                                    title="Cancel order">
                                     <i class="fas fa-times"></i>
                                 </button>
                                 @endif
@@ -495,16 +706,39 @@
                 <form id="cancelOrderForm" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <p class="mb-3">Are you sure you want to cancel order <strong id="orderNumberText"></strong>?</p>
+                        <p class="confirmation-text">
+                            Are you sure you want to cancel this order? This action cannot be undone.
+                        </p>
+                        
+                        <div class="order-highlight">
+                            <div class="order-detail">
+                                <span class="detail-label">Order Number:</span>
+                                <span class="detail-value" id="orderNumberText"></span>
+                            </div>
+                            <div class="order-detail">
+                                <span class="detail-label">Order Date:</span>
+                                <span class="detail-value" id="orderDateText"></span>
+                            </div>
+                            <div class="order-detail">
+                                <span class="detail-label">Total Amount:</span>
+                                <span class="detail-value" id="orderTotalText"></span>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Reason for cancellation</label>
-                            <textarea class="form-control" name="cancellation_reason" rows="3" required 
+                            <label for="cancellation_reason" class="form-label">Reason for cancellation</label>
+                            <textarea name="cancellation_reason" id="cancellation_reason" class="form-control" rows="3" required 
                                       placeholder="Please provide a reason for cancellation..."></textarea>
+                            <div class="form-text">Your reason will help us improve our service.</div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            Confirm Cancellation
+                        </button>
                     </div>
                 </form>
             </div>
@@ -532,48 +766,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelButtons = document.querySelectorAll(".cancel-btn");
     const modal = new bootstrap.Modal(document.getElementById("cancelOrderModal"));
     const form = document.getElementById("cancelOrderForm");
-    const orderText = document.getElementById("orderNumberText");
+    const orderNumberText = document.getElementById("orderNumberText");
+    const orderDateText = document.getElementById("orderDateText");
+    const orderTotalText = document.getElementById("orderTotalText");
 
     cancelButtons.forEach(button => {
         button.addEventListener("click", () => {
             const orderId = button.getAttribute("data-order-id");
             const orderNumber = button.getAttribute("data-order-number");
+            const orderDate = button.getAttribute("data-order-date");
+            const orderTotal = button.getAttribute("data-order-total");
             
             form.action = `/orders/${orderId}/cancel`;
-            orderText.textContent = orderNumber;
+            orderNumberText.textContent = orderNumber;
+            orderDateText.textContent = orderDate;
+            orderTotalText.textContent = orderTotal;
             modal.show();
         });
     });
 
-    // Auto-submit filters
-    const filterForm = document.getElementById('filterForm');
-    const searchInput = document.getElementById('search');
-    const statusSelect = document.getElementById('status');
-    const sortBySelect = document.getElementById('sort_by');
-    const searchLoading = document.getElementById('searchLoading');
-    
-    let searchTimeout;
-
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchLoading.style.display = 'block';
-        
-        searchTimeout = setTimeout(() => {
-            filterForm.submit();
-        }, 500);
-    });
-
-    statusSelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
-    sortBySelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
-    filterForm.addEventListener('submit', function() {
-        searchLoading.style.display = 'none';
-    });
+    // Handle form submission success
+    if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+        // Check if we have a success/error message in session
+        @if(session('success'))
+            showToast("{{ session('success') }}", 'success');
+        @endif
+        @if(session('error'))
+            showToast("{{ session('error') }}", 'error');
+        @endif
+    }
 });
 </script>
 @endsection
