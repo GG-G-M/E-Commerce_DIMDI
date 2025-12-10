@@ -85,7 +85,7 @@
         box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
     }
 
-    /* User Info */
+  
     .user-name {
         font-weight: 700;
         color: var(--gray-800);

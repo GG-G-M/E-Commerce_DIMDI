@@ -1359,7 +1359,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Add green border to focused elements
     document.querySelectorAll('input, select, textarea').forEach(el => {
         el.addEventListener('focus', function() {
             this.parentElement.classList.add('border-success', 'border-opacity-50');

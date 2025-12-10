@@ -386,7 +386,7 @@
         margin-bottom: 1.5rem;
     }
 
-    /* Make table more compact on mobile */
+
     @media (max-width: 768px) {
         .header-buttons {
             flex-direction: column;
