@@ -419,6 +419,7 @@
         background: white;
         border: none;
         border-radius: 12px;
+        padding: 1.5em;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-bottom: 1.5rem;
     }
@@ -471,18 +472,7 @@
     }
 </style>
 
-<!-- Dashboard Header -->
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Users Management</h1>
-            <p class="mb-0 text-muted">Manage all system users including admins, staff, and customers</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted fw-bold">Total Users: {{ $totalUsers }}</small>
-        </div>
-    </div>
-</div>
+
 
 <!-- Filter Card -->
 <div class="filter-card">
@@ -549,7 +539,7 @@
         <h5 class="mb-0">All System Users</h5>
         <div class="header-buttons">
             <a href="{{ route('superadmin.users.create') }}" class="btn btn-success-custom">
-                <i class="fas fa-user-plus"></i> New User
+          New User
             </a>
         </div>
     </div>

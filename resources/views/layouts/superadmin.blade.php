@@ -387,12 +387,12 @@
                         </li>
 
                         <!-- Settings -->
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}"
                                 href="{{ route('superadmin.settings') }}">
                                 <i class="fas fa-sliders-h me-2"></i>System Settings
                             </a>
-                        </li>
+                        </li> --}}
 
                         <!-- Audit Log -->
                         <li class="nav-item">
@@ -413,11 +413,11 @@
                                 <i class="fas fa-user-shield me-2"></i>Admin Panel
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('delivery.dashboard') }}">
                                 <i class="fas fa-truck me-2"></i>Delivery Panel
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <i class="fas fa-store me-2"></i>View Store
