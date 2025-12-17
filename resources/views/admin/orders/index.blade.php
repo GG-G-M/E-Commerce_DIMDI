@@ -573,7 +573,7 @@
                             <td class="action-col">
                                 <div class="action-buttons">
                                     <a href="{{ route('admin.orders.show', $order) }}" class="action-btn btn-view" title="View Order Details">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-search ms-1"></i>
                                     </a>
                                     @if($order->order_status == 'cancelled' && !$order->refund_processed)
                                     <a href="{{ route('admin.orders.refund.show', $order) }}" class="action-btn btn-refund" title="Process Refund">

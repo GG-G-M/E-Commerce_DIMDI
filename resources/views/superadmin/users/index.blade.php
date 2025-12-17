@@ -626,7 +626,7 @@
                                 <div class="action-buttons">
                                     <a href="{{ route('superadmin.users.show', $user) }}" 
                                        class="action-btn btn-view" title="View Details">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-search ms-1"></i>
                                     </a>
                                     
                                     <a href="{{ route('superadmin.users.edit', $user) }}" 

@@ -177,7 +177,7 @@
                                         <input type="password" class="form-control ps-0 @error('password') is-invalid @enderror" 
                                                id="password" name="password" required>
                                         <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-search ms-1"></i>
                                         </button>
                                     </div>
                                     <div class="password-strength mt-3">

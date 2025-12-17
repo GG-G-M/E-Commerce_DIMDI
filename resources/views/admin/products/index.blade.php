@@ -59,18 +59,22 @@
 
     /* CSV Import Button - Matching Add Product Button */
     .btn-import-csv {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
-        height: 46px;
+        background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     
     .btn-import-csv:hover {
@@ -86,18 +90,22 @@
 
     /* Add Product Button */
     .btn-add-product {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        color: white;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
-        height: 46px;
+        background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     
     .btn-add-product:hover {
@@ -267,6 +275,7 @@
     
     .status-featured {
         color: #2C8F0C;
+        font-weight: 600;
     }
     
     @keyframes pulse {
@@ -310,18 +319,9 @@
         transform: translateY(-50%);
         display: none;
     }
-    
-    .action-btn {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        border: 2px solid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+    .position-relative {
+        position: relative;
     }
 
     /* Table styling for no scroll bars */
@@ -1393,201 +1393,6 @@
             width: 100%;
         }
     }
-
-    /* Product Image */
-    .product-image {
-        width: 60px;
-        height: 60px;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid #e9ecef;
-    }
-
-    /* Product Info */
-    .product-name {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.85rem;
-        line-height: 1.2;
-    }
-    
-    .product-sku {
-        color: #6c757d;
-        font-size: 0.75rem;
-    }
-
-    /* Price Styling */
-    .price-current {
-        font-weight: 700;
-        color: #2C8F0C;
-        font-size: 0.9rem;
-    }
-    
-    .price-original {
-        font-size: 0.75rem;
-        color: #6c757d;
-        text-decoration: line-through;
-    }
-    
-    .discount-badge {
-        font-size: 0.7rem;
-        font-weight: 600;
-        color: #C62828;
-        background-color: #FFEBEE;
-        padding: 0.1rem 0.3rem;
-        border-radius: 3px;
-        margin-left: 0.25rem;
-    }
-
-    /* Filter Card */
-    .filter-card {
-        background: white;
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-    }
-
-    /* Header Stats */
-    .header-stats {
-        font-size: 0.9rem;
-        font-weight: 600;
-        opacity: 0.9;
-    }
-
-    /* Category Text */
-    .category-text {
-        color: #495057;
-        font-size: 0.85rem;
-    }
-    
-    .category-warning {
-        color: #FBC02D;
-        font-size: 0.7rem;
-    }
-
-    /* Brand Text */
-    .brand-text {
-        color: #495057;
-        font-size: 0.85rem;
-    }
-
-    /* Variants Info */
-    .variants-info {
-        color: #495057;
-        font-size: 0.85rem;
-    }
-
-    /* Pagination styling - Consistent */
-    .pagination .page-item .page-link {
-        color: #2C8F0C;
-        border: 1px solid #dee2e6;
-        margin: 0 1px;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-        padding: 0.4rem 0.7rem;
-        font-size: 0.85rem;
-    }
-    
-    .pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border-color: #2C8F0C;
-        color: white;
-    }
-    
-    .pagination .page-item:not(.disabled) .page-link:hover {
-        background-color: #E8FDF8;
-        border-color: #2C8F0C;
-        color: #2C8F0C;
-    }
-    
-    .pagination .page-item.disabled .page-link {
-        color: #6c757d;
-        background-color: #f8f9fa;
-    }
-
-    /* Header button group */
-    .header-buttons {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-    
-    .header-buttons .btn {
-        margin: 0;
-        font-size: 0.9rem;
-    }
-
-    /* Modal Styling */
-    .modal-header {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1rem;
-    }
-
-    .modal-title {
-        font-weight: 700;
-        font-size: 1.1rem;
-    }
-
-    .modal-content {
-        border-radius: 12px;
-        border: none;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-
-    /* Template Download Section */
-    .template-download {
-        background: #E8F5E6;
-        border: 1px dashed #2C8F0C;
-        padding: 1rem;
-        text-align: center;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-
-    /* Instructions */
-    .csv-instructions {
-        background: #f8f9fa;
-        border-left: 4px solid #2C8F0C;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-        font-size: 0.9rem;
-    }
-
-    /* Make table more compact on mobile */
-    @media (max-width: 768px) {
-        .header-buttons {
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .table th,
-        .table td {
-            padding: 0.5rem 0.25rem;
-        }
-        
-        .product-image {
-            width: 50px;
-            height: 50px;
-        }
-        
-        .action-btn {
-            width: 28px;
-            height: 28px;
-            font-size: 0.8rem;
-        }
-        
-        .btn-outline-success-custom,
-        .btn-success-custom,
-        .btn-info-custom {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.8rem;
-        }
-    }
 </style>
 
 <!-- Summary Cards -->
@@ -1698,27 +1503,27 @@
                 <h5 class="modal-title">
                     <i class="fas fa-file-csv me-2"></i>Upload Products via CSV
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.products.import.csv') }}" method="POST" enctype="multipart/form-data" id="csvUploadForm">
                 @csrf
                 <div class="modal-body">
                     
                     <!-- Template Download Section -->
-                    <div class="template-download">
+                    <div class="template-download" style="background: #e8f5e9; border: 1px dashed #2C8F0C; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
                         <h6 class="text-success mb-3">
                             <i class="fas fa-download me-2"></i>Download CSV Template
                         </h6>
                         <p class="text-muted mb-3">
                             Use our template to ensure your CSV file has the correct format.
                         </p>
-                        <a href="{{ route('admin.products.csv.template') }}" class="btn btn-success-custom btn-sm">
+                        <a href="{{ route('admin.products.csv.template') }}" class="btn btn-success">
                             <i class="fas fa-file-download me-2"></i>Download Template
                         </a>
                     </div>
 
                     <!-- Instructions -->
-                    <div class="csv-instructions">
+                    <div class="csv-instructions" style="background: #f8f9fa; border-left: 4px solid #2C8F0C; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
                         <h6><i class="fas fa-info-circle me-2"></i>CSV Format Instructions</h6>
                         <ul class="small mb-0">
                             <li>File must be in CSV format (Comma Separated Values)</li>
@@ -1733,7 +1538,7 @@
                     <!-- File Upload -->
                     <div class="mb-3">
                         <label for="csv_file" class="form-label fw-bold">Select CSV File</label>
-                        <input type="file" class="form-control search-box" id="csv_file" name="csv_file" accept=".csv" required>
+                        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
                         <div class="form-text">
                             Only .csv files are allowed. Maximum file size: 10MB
                         </div>
@@ -1744,7 +1549,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Duplicate Handling</label>
-                                <select class="form-select search-box" name="duplicate_handling">
+                                <select class="form-select" name="duplicate_handling">
                                     <option value="skip">Skip duplicates (keep existing)</option>
                                     <option value="update">Update existing products</option>
                                     <option value="overwrite">Overwrite existing products</option>
@@ -1754,7 +1559,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Default Status</label>
-                                <select class="form-select search-box" name="default_status">
+                                <select class="form-select" name="default_status">
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
@@ -2038,7 +1843,7 @@
                                         data-bs-target="#viewProductModal" 
                                         data-product='{{ json_encode(array_merge($product->toArray(), ['image_url' => $product->image_url, 'variants' => $product->variants->map(function($variant) { return array_merge($variant->toArray(), ['image_url' => $variant->image_url]); })->toArray()])) }}'
                                         data-title="View Product" title="View Product">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-search ms-1"></i>
                                     </button>
                                     <a href="{{ route('admin.products.edit', $product) }}" 
                                        class="action-btn btn-edit" 
@@ -2120,12 +1925,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const categorySelect = document.getElementById('category_id');
     const statusSelect = document.getElementById('status');
     const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
     
     let searchTimeout;
 
     // Auto-submit search with delay
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
         searchTimeout = setTimeout(() => {
             filterForm.submit();
         }, 800);
@@ -2149,6 +1957,11 @@ document.addEventListener('DOMContentLoaded', function() {
         filterForm.submit();
     });
 
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
+
     // CSV Upload functionality
     const csvUploadForm = document.getElementById('csvUploadForm');
     const uploadProgress = document.getElementById('uploadProgress');
@@ -2169,7 +1982,7 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadCsvBtn.disabled = true;
             uploadCsvBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
             
-            // Simulate progress
+            // Simulate progress (in real implementation, you'd use AJAX with progress events)
             let progress = 0;
             const progressInterval = setInterval(() => {
                 progress += 5;
@@ -2196,6 +2009,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (data.success) {
                     showUploadStatus('success', data.message);
+                    // Refresh the page after 2 seconds to show new products
                     setTimeout(() => {
                         window.location.reload();
                     }, 2000);

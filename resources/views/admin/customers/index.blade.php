@@ -48,18 +48,22 @@
 
         /* Improved Add Customer Button */
         .btn-add-customer {
-            background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
-            height: 46px;
+            background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .btn-add-customer:hover {
@@ -636,20 +640,6 @@
         </div>
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
-
-</div>
-<button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            {{-- <i class="fas fa-user-plus"></i>  --}}
-            Add Customer
-        </button>
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h5 class="mb-0">Customer List</h5>
-        
-    </div>
-    <div class="card-body p-0">
-        <table class="table table-hover align-middle mb-0">
-
                 <thead>
                     <tr>
                         <th class="id-col">ID</th>
@@ -663,62 +653,6 @@
                 </thead>
                 <tbody>
                     @foreach ($customers as $customer)
-
-                    <tr data-id="{{ $customer->id }}">
-                        <td class="id-col">
-                            <span class="text-muted">#{{ $customer->id }}</span>
-                        </td>
-                        <td class="name-col">
-                            <div class="customer-info-cell">
-                                <div class="customer-icon">
-                                    {{ substr($customer->first_name, 0, 1) }}{{ substr($customer->last_name, 0, 1) }}
-                                </div>
-                                <div>
-                                    <div class="customer-name">{{ $customer->first_name }} {{ $customer->last_name }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="email-col">
-                            <a href="mailto:{{ $customer->email }}" class="customer-email" title="{{ $customer->email }}">
-                                {{ $customer->email }}
-                            </a>
-                        </td>
-                        <td class="phone-col">
-                            @if($customer->phone)
-                                <div class="customer-phone">{{ $customer->phone }}</div>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td class="address-col">
-                            @if($customer->address)
-                                <div class="customer-address" title="{{ $customer->address }}">
-                                    {{ Str::limit($customer->address, 40) }}
-                                </div>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td class="status-col">
-                            @if ($customer->is_archived)
-                                <span class="status-badge-archived">Archived</span>
-                            @else
-                                <span class="status-text status-text-active">Active</span>
-                            @endif
-                        </td>
-                        <td class="action-col">
-                            <div class="action-buttons">
-                                <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' data-title="Edit Customer">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                @if ($customer->is_archived)
-                                    <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $customer->id }}" data-title="Unarchive Customer">
-                                       <i class="fas fa-box-open"></i>
-                                    </button>
-                                @else
-                                    <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}" data-title="Archive Customer">
-                                        <i class="fas fa-archive"></i>
-                                    </button>
                         <tr data-id="{{ $customer->id }}">
                             <td class="id-col">
                                 <span class="text-muted">#{{ $customer->id }}</span>
@@ -816,8 +750,6 @@
                 </tbody>
             </table>
 
-        
-
             @if ($customers->hasPages())
                 <div class="d-flex justify-content-center p-4">
                     {{ $customers->links('pagination::bootstrap-5') }}
@@ -826,7 +758,6 @@
 
         </div>
     </div>
-
 
     <!-- Add Customer Modal -->
     <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
