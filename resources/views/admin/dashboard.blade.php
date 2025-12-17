@@ -1,279 +1,6 @@
 @extends('layouts.admin')
 
 @section('content')
-<style>
-    .stats-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-        min-height: 140px;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
-    
-    .card-primary {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-    }
-    
-    .card-success {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        color: white;
-    }
-    
-    .card-info {
-        background: linear-gradient(135deg, #4CAF50, #66BB6A);
-        color: white;
-    }
-    
-    .card-warning {
-        background: linear-gradient(135deg, #FFA000, #FFB300);
-        color: white;
-    }
-    
-    .stats-icon {
-        font-size: 2rem;
-        opacity: 0.8;
-    }
-    
-    .stats-number {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.2rem;
-    }
-    
-    .stats-label {
-        font-size: 0.85rem;
-        opacity: 0.9;
-        font-weight: 500;
-    }
-    
-    .dashboard-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-    
-    .section-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-    }
-    
-    .section-card .card-header {
-        background: white;
-        border-bottom: 2px solid #E8F5E6;
-        font-weight: 600;
-        color: #2C8F0C;
-        padding: 1rem 1.5rem;
-    }
-    
-    .table th {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        font-weight: 600;
-        border-bottom: 2px solid #2C8F0C;
-    }
-    
-    .badge-success {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-    }
-    
-    .badge-warning {
-        background-color: #FFF3CD;
-        color: #856404;
-    }
-    
-    .badge-danger {
-        background-color: #F8D7DA;
-        color: #721C24;
-    }
-    
-    .product-image {
-        width: 40px;
-        height: 40px;
-        border-radius: 6px;
-        object-fit: cover;
-    }
-    
-    .performance-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .filter-active {
-        background-color: #2C8F0C !important;
-        color: white !important;
-        border-color: #2C8F0C !important;
-    }
-    
-    .custom-date-inputs {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-        border: 1px solid #E8F5E6;
-    }
-    
-    .clickable-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .clickable-card:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.2) !important;
-    }
-
-    /* Make sure the link covers the entire card */
-    .text-decoration-none {
-        display: block;
-    }
-
-    /* Improved Filter Dropdown */
-    .filter-dropdown-container {
-        background: white;
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .filter-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid #E8F5E6;
-    }
-
-    .filter-title {
-        font-weight: 600;
-        color: #2C8F0C;
-        margin: 0;
-    }
-
-    .filter-dropdown {
-        position: relative;
-        width: 100%;
-    }
-
-    .filter-dropdown-btn {
-        width: 100%;
-        background: white;
-        border: 2px solid #E8F5E6;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        text-align: left;
-        font-weight: 500;
-        color: #2C8F0C;
-        transition: all 0.2s ease;
-    }
-
-    .filter-dropdown-btn:hover {
-        border-color: #2C8F0C;
-        background: #F8FFF8;
-    }
-
-    .filter-dropdown-btn:after {
-        content: '▼';
-        float: right;
-        font-size: 0.8rem;
-        margin-top: 2px;
-        transition: transform 0.2s ease;
-    }
-
-    .filter-dropdown-btn.active:after {
-        transform: rotate(180deg);
-    }
-
-    .filter-dropdown-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 2px solid #E8F5E6;
-        border-radius: 8px;
-        margin-top: 0.25rem;
-        padding: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        z-index: 1000;
-        display: none;
-    }
-
-    .filter-dropdown-menu.show {
-        display: block;
-    }
-
-    .filter-option {
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        margin-bottom: 0.25rem;
-    }
-
-    .filter-option:hover {
-        background: #E8F5E6;
-        color: #2C8F0C;
-    }
-
-    .filter-option.active {
-        background: #2C8F0C;
-        color: white;
-    }
-
-    .filter-option i {
-        margin-right: 0.5rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    /* Date range display */
-    .date-range-display {
-        background: linear-gradient(135deg, #E8F5E6, #D4EDDA);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        margin-top: 1rem;
-        border-left: 4px solid #2C8F0C;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .date-range-text {
-        font-size: 0.9rem;
-        color: #2C8F0C;
-        font-weight: 500;
-    }
-
-    .clear-filter-btn {
-        background: rgba(255,255,255,0.9);
-        border: 1px solid #2C8F0C;
-        color: #2C8F0C;
-        padding: 0.25rem 0.75rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        transition: all 0.2s ease;
-    }
-
-    .clear-filter-btn:hover {
-        background: #2C8F0C;
-        color: white;
-    }
-</style>
 
 <!-- Clean Header -->
 <div class="dashboard-header">
@@ -392,28 +119,32 @@
     @endif
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats Cards - Improved Alignment -->
 <div class="row">
     <!-- Total Products Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.products.index') }}" class="text-decoration-none">
             <div class="card stats-card card-primary h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <i class="fas fa-box stats-icon me-2"></i>
-                            <div class="stats-label">TOTAL PRODUCTS</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Added in selected period
-                                @else
-                                    Active in catalog
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Products</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Added in selected period
+                                    @else
+                                        Active in catalog
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <div class="stats-number">{{ $stats['total_products'] }}</div>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_products'] }}</div>
                     </div>
                 </div>
             </div>
@@ -424,22 +155,26 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.orders.index') }}" class="text-decoration-none">
             <div class="card stats-card card-success h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <i class="fas fa-shopping-cart stats-icon me-2"></i>
-                            <div class="stats-label">TOTAL ORDERS</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Orders in selected period
-                                @else
-                                    All time orders
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Orders</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Orders in selected period
+                                    @else
+                                        All time orders
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <div class="stats-number">{{ $stats['total_orders'] }}</div>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_orders'] }}</div>
                     </div>
                 </div>
             </div>
@@ -450,22 +185,26 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.customers.index') }}" class="text-decoration-none">
             <div class="card stats-card card-info h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <i class="fas fa-users stats-icon me-2"></i>
-                            <div class="stats-label">TOTAL CUSTOMERS</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Registered in selected period
-                                @else
-                                    Registered users
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Customers</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Registered in selected period
+                                    @else
+                                        Registered users
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <div class="stats-number">{{ $stats['total_customers'] }}</div>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_customers'] }}</div>
                     </div>
                 </div>
             </div>
@@ -475,22 +214,26 @@
     <!-- Total Revenue Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stats-card card-warning h-100">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <i class="fas fa-dollar-sign stats-icon me-2"></i>
-                        <div class="stats-label">TOTAL REVENUE</div>
-                        <small>
-                            @if($filter != 'all')
-                                Revenue in selected period
-                            @else
-                                Lifetime sales
-                            @endif
-                        </small>
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-icon-circle me-3">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <div class="stats-label text-uppercase small">Total Revenue</div>
+                            <small class="text-white opacity-75">
+                                @if($filter != 'all')
+                                    Revenue in selected period
+                                @else
+                                    Lifetime sales
+                                @endif
+                            </small>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <div class="stats-number">₱{{ number_format($stats['revenue'], 2) }}</div>
-                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="stats-number display-6 fw-bold">₱{{ number_format($stats['revenue'], 2) }}</div>
                 </div>
             </div>
         </div>

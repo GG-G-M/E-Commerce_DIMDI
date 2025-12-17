@@ -5,443 +5,375 @@
 
 @section('content')
 <style>
-    /* === Modern Design System === */
-    :root {
-        --primary-green: #2C8F0C;
-        --secondary-green: #4CAF50;
-        --light-green: #E8F5E9;
-        --dark-green: #1B5E20;
-        --gradient-green: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        --gradient-dark: linear-gradient(135deg, #1B5E20, #2C8F0C);
-        --gray-50: #F9FAFB;
-        --gray-100: #F3F4F6;
-        --gray-200: #E5E7EB;
-        --gray-300: #D1D5DB;
-        --gray-600: #4B5563;
-        --gray-700: #374151;
-        --gray-800: #1F2937;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --radius-lg: 16px;
-        --radius-md: 12px;
-        --radius-sm: 8px;
-    }
+/* ===========================================
+   SALES REPORT SPECIFIC STYLES
+   =========================================== */
 
-    /* Unified Dashboard Header Card */
-    .dashboard-header-card {
-        background: white;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        margin-bottom: 2rem;
-        border: 1px solid var(--gray-200);
-        transition: all 0.3s ease;
-    }
+/* CSS Variables (keep these if not in main CSS) */
+:root {
+    --primary-green: #2C8F0C;
+    --secondary-green: #4CAF50;
+    --light-green: #E8F5E9;
+    --dark-green: #1B5E20;
+    --gradient-green: linear-gradient(135deg, #2C8F0C, #4CAF50);
+    --gradient-dark: linear-gradient(135deg, #1B5E20, #2C8F0C);
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+}
 
-    .dashboard-header-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
-    }
+/* Action Buttons (UNIQUE to sales report - put back inline) */
+.action-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap; /* Add this to prevent text breaking */
+    min-width: fit-content
+}
 
-    .dashboard-header {
-        background: var(--gradient-green);
-        color: white;
-        padding: 1.5rem 2rem;
-        position: relative;
-        overflow: hidden;
-    }
+.action-btn.btn-primary {
+    background: white;
+    color: var(--primary-green);
+    border: 2px solid rgba(255,255,255,0.3);
+}
 
-    .dashboard-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
+.action-btn.btn-primary:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
 
-    .dashboard-header h1 {
-        font-weight: 700;
-        font-size: 1.75rem;
-        margin-bottom: 0.25rem;
-        position: relative;
-        z-index: 2;
-    }
+.action-btn.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
 
-    .dashboard-header .subtitle {
-        opacity: 0.9;
-        font-size: 0.95rem;
-        position: relative;
-        z-index: 2;
-    }
+.action-btn.btn-outline:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
 
-    .header-actions {
-        position: relative;
-        z-index: 2;
-        margin-top: 1rem;
-    }
+/* Unified Dashboard Header Card */
+.dashboard-header-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
 
-    /* Stats Grid - Integrated into dashboard card */
+.dashboard-header-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.dashboard-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.dashboard-header h1 {
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+    position: relative;
+    z-index: 2;
+}
+
+.dashboard-header .subtitle {
+    opacity: 0.9;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 2;
+}
+
+.header-actions {
+    position: relative;
+    z-index: 2;
+    margin-top: 1rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--gray-200);
+    margin-top: 1px;
+}
+
+.stat-item {
+    background: white;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: var(--gray-50);
+    transform: translateY(-2px);
+}
+
+.stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: var(--gray-200);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--light-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--primary-green);
+    font-size: 1.25rem;
+}
+
+/* Filter Card */
+.filter-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.filter-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+}
+
+.filter-header {
+    background: var(--gray-50);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-body {
+    padding: 1.5rem;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.chart-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+.chart-body {
+    padding: 1.5rem;
+    position: relative;
+}
+
+/* Enhanced Chart Styles */
+.chart-container-enhanced {
+    position: relative;
+    height: 280px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.chart-stats {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    border-left: 3px solid var(--primary-green);
+}
+
+/* Payment Method Legend */
+.payment-legend {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.payment-item {
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.payment-item:hover {
+    border-color: var(--primary-green);
+    transform: translateX(3px);
+}
+
+.color-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+/* Orders Table */
+.orders-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-top: 2rem;
+}
+
+.orders-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+/* Custom Date Range */
+#customDateRange {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid var(--gray-200);
+}
+
+/* Responsive Design for Sales Report */
+@media (max-width: 768px) {
     .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1px;
-        background: var(--gray-200);
-        margin-top: 1px;
-    }
-
-    .stat-item {
-        background: white;
-        padding: 1.5rem;
-        text-align: center;
-        position: relative;
-        transition: all 0.3s ease;
-    }
-
-    .stat-item:hover {
-        background: var(--gray-50);
-        transform: translateY(-2px);
+        grid-template-columns: 1fr;
     }
 
     .stat-item:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        right: 0;
-        top: 20%;
-        height: 60%;
-        width: 1px;
-        background: var(--gray-200);
+        display: none;
     }
 
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-green);
-        margin-bottom: 0.25rem;
-        line-height: 1.2;
-    }
-
-    .stat-label {
-        color: var(--gray-600);
-        font-size: 0.875rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--light-green);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        color: var(--primary-green);
-        font-size: 1.25rem;
-    }
-
-    /* Action Buttons */
-    .action-btn {
-        padding: 0.5rem 1.25rem;
-        border-radius: var(--radius-sm);
-        font-weight: 600;
-        font-size: 0.875rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s ease;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background: white;
-        color: var(--primary-green);
-        border: 2px solid rgba(255,255,255,0.3);
-    }
-
-    .btn-primary:hover {
-        background: rgba(255,255,255,0.2);
-        border-color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow);
-        text-decoration: none;
-    }
-
-    .btn-outline {
-        background: transparent;
-        color: white;
-        border: 2px solid rgba(255,255,255,0.3);
-    }
-
-    .btn-outline:hover {
-        background: rgba(255,255,255,0.1);
-        border-color: white;
-        transform: translateY(-1px);
-        box-shadow: var(--shadow);
-        text-decoration: none;
-    }
-
-    /* Filter Card */
-    .filter-card {
-        background: white;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-200);
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-    }
-
-    .filter-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-1px);
-    }
-
-    .filter-header {
-        background: var(--gray-50);
-        padding: 1rem 1.5rem;
+    .stat-item:not(:last-child) {
         border-bottom: 1px solid var(--gray-200);
-        font-weight: 600;
-        color: var(--gray-700);
-        display: flex;
-        align-items: center;
+    }
+
+    .chart-container-enhanced {
+        height: 250px;
+    }
+
+    .dashboard-header {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .header-actions {
+        flex-direction: column;
         gap: 0.5rem;
+        align-items: flex-start;
     }
 
-    .filter-body {
-        padding: 1.5rem;
-    }
-
-    /* Chart Cards */
-    .chart-card {
-        background: white;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-200);
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .chart-card:hover {
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
+    .action-btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .chart-header {
-        background: var(--gradient-green);
-        color: white;
-        padding: 1rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 600;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
     }
-
-    .chart-body {
-        padding: 1.5rem;
-        position: relative;
-    }
-
-    /* Enhanced Chart Styles */
-    .chart-container-enhanced {
-        position: relative;
-        height: 280px;
-        width: 100%;
-        margin-bottom: 1rem;
-    }
-
-    .chart-stats {
-        background: var(--gray-50);
-        border-radius: var(--radius-sm);
-        padding: 1rem;
-        border-left: 3px solid var(--primary-green);
-    }
-
-    /* Payment Method Legend */
-    .payment-legend {
-        background: var(--gray-50);
-        border-radius: var(--radius-sm);
-        padding: 1rem;
-        margin-top: 1rem;
-    }
-
-    .payment-item {
-        background: white;
-        border: 1px solid var(--gray-200);
-        border-radius: var(--radius-sm);
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-        transition: all 0.2s ease;
-    }
-
-    .payment-item:hover {
-        border-color: var(--primary-green);
-        transform: translateX(3px);
-    }
-
-    .color-indicator {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 0.5rem;
-    }
-
-    /* Orders Table */
-    .orders-card {
-        background: white;
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-200);
-        overflow: hidden;
-        margin-top: 2rem;
-    }
-
-    .orders-header {
-        background: var(--gradient-green);
-        color: white;
-        padding: 1rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 600;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table th {
-        background: var(--gray-50);
-        color: var(--gray-700);
-        font-weight: 600;
-        padding: 1rem;
-        border-bottom: 2px solid var(--gray-300);
-    }
-
-    .table td {
-        padding: 1rem;
-        vertical-align: middle;
-        border-color: var(--gray-200);
-    }
-
-    .table tbody tr:hover {
-        background: var(--gray-50);
-    }
-
-    .badge-success {
-        background: var(--gradient-green);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-weight: 600;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-    }
-
-    /* Pagination */
-    .pagination {
-        margin-bottom: 0;
-    }
-
-    .pagination .page-link {
-        color: var(--primary-green);
-        border-color: var(--gray-300);
-    }
-
-    .pagination .page-item.active .page-link {
-        background: var(--primary-green);
-        border-color: var(--primary-green);
-        color: white;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .stat-item:not(:last-child)::after {
-            display: none;
-        }
-
-        .stat-item:not(:last-child) {
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .chart-container-enhanced {
-            height: 250px;
-        }
-
-        .dashboard-header {
-            padding: 1.25rem 1.5rem;
-        }
-
-        .dashboard-header h1 {
-            font-size: 1.5rem;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .header-actions {
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: flex-start;
-        }
-
-        .action-btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .chart-header {
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: flex-start;
-        }
-    }
-
-    /* Custom Date Range */
-    #customDateRange {
-        background: var(--gray-50);
-        border-radius: var(--radius-sm);
-        padding: 1rem;
-        margin-top: 1rem;
-        border: 1px solid var(--gray-200);
-    }
-
-    /* Form Controls */
-    .form-select, .form-control {
-        border: 2px solid var(--gray-300);
-        border-radius: var(--radius-sm);
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-    }
-
-    .form-select:focus, .form-control:focus {
-        border-color: var(--primary-green);
-        box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
-        outline: none;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: var(--gray-700);
-        margin-bottom: 0.5rem;
-        display: block;
-    }
+}
 </style>
 
 <!-- Unified Dashboard Header Card with Stats -->
@@ -674,7 +606,7 @@
                     </td>
                     <td class="text-center">
                         <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-success">
-                            <i class="fas fa-eye"></i> View
+                            <i class="fas fa-search ms-1"></i>
                         </a>
                     </td>
                 </tr>
