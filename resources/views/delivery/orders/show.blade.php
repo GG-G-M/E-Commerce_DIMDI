@@ -610,12 +610,22 @@
                             <h6>Delivery Photo</h6>
                         </div>
                         <div class="text-center">
-                            <img src="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
-                                 alt="Delivery Proof" 
-                                 class="proof-image mb-2"
-                                 onerror="this.src='{{ asset('images/noproduct.png') }}'; this.onerror=null;">
-                            @if($order->delivered_at)
+                            <a href="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                               target="_blank" 
+                               title="Click to view full size">
+                                <img src="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                                     alt="Delivery Proof" 
+                                     class="proof-image mb-2"
+                                     style="cursor: pointer; transition: transform 0.2s ease;"
+                                     onmouseover="this.style.transform='scale(1.05)'"
+                                     onmouseout="this.style.transform='scale(1)'"
+                                     onerror="this.src='{{ asset('images/noproduct.png') }}'; this.onerror=null;">
+                            </a>
                             <div class="text-muted small">
+                                <i class="fas fa-search-plus me-1"></i>Click image to view full size
+                            </div>
+                            @if($order->delivered_at)
+                            <div class="text-muted small mt-1">
                                 <i class="fas fa-calendar me-1"></i>
                                 {{ $order->delivered_at->format('M j, Y h:i A') }}
                             </div>

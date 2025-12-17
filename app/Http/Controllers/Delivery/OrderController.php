@@ -415,8 +415,14 @@ class OrderController extends Controller
             // Update the order
             $order->update($updateData);
 
+            // Get delivery staff name for status notes
+            $deliveryStaffName = 'Delivery Personnel';
+            if (Auth::check()) {
+                $deliveryStaffName = Auth::user()->name ?? 'Delivery Personnel';
+            }
+
             // Update status with notes
-            $statusNotes = 'Order delivered by delivery personnel';
+            $statusNotes = "Order delivered by {$deliveryStaffName}";
             if (!empty($updateData['delivery_notes'])) {
                 $statusNotes .= ' | Notes: ' . $updateData['delivery_notes'];
             }
