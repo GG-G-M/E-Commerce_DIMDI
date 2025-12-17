@@ -439,14 +439,14 @@
         </form>
     </div>
 </div>
-
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h5 class="mb-0">Customer List</h5>
-        <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+<button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
             {{-- <i class="fas fa-user-plus"></i>  --}}
             Add Customer
         </button>
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Customer List</h5>
+        
     </div>
     <div class="card-body p-0">
         <table class="table table-hover align-middle mb-0">
