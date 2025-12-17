@@ -135,7 +135,6 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-<<<<<<< HEAD
     /* Role Text Styles */
     .role-text {
         font-weight: 600;
@@ -160,70 +159,6 @@
     
     .role-customer {
         color: #6c757d;
-=======
-    /* Badges - Compact */
-    .badge-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 100px;
-    }
-    
-    .badge-super-admin {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-    
-    .badge-admin {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-delivery {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-    
-    .badge-checker {
-        background-color: #E8F5E9;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-customer {
-        background-color: #F8F9FA;
-        color: #495057;
-        border: 1px solid #E9ECEF;
-    }
-
-    /* Status Badges - Compact */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 70px;
-    }
-    
-    .status-active {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-inactive {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     }
 
     /* Action Buttons */
@@ -417,14 +352,6 @@
         background-color: #f8f9fa;
     }
 
-<<<<<<< HEAD
-=======
-    /* Card body padding fix */
-    .card-body {
-        padding: 0 !important;
-    }
-
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     /* Header button group */
     .header-buttons {
         display: flex;
@@ -444,25 +371,16 @@
         font-size: 0.9rem;
     }
 
-<<<<<<< HEAD
     /* Filter Card - FIXED PADDING */
-=======
-    /* Filter Card */
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     .filter-card {
         background: white;
         border: none;
         border-radius: 12px;
-<<<<<<< HEAD
         padding: 1.5rem !important; /* Added important to override any other styles */
-=======
-        padding: 1.5em;
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-bottom: 1.5rem;
     }
 
-<<<<<<< HEAD
     /* Filter Form Row Spacing */
     .filter-form-row {
         margin-bottom: -0.5rem; /* Adjust spacing between rows */
@@ -491,8 +409,6 @@
         font-size: 0.8rem;
         font-weight: 600;
     }
-=======
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
     @media (max-width: 768px) {
         .header-buttons {
@@ -505,31 +421,12 @@
             padding: 0.5rem 0.25rem;
         }
         
-<<<<<<< HEAD
         .action-btn {
             width: 28px;
             height: 28px;
             font-size: 0.8rem;
         }
         
-=======
-        .badge-text {
-            min-width: 80px;
-            font-size: 0.7rem;
-        }
-        
-        .status-text {
-            min-width: 60px;
-            font-size: 0.7rem;
-        }
-        
-        .action-btn {
-            width: 28px;
-            height: 28px;
-            font-size: 0.8rem;
-        }
-        
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         .user-name {
             font-size: 0.8rem;
         }
@@ -546,7 +443,6 @@
         
         .stats-number {
             font-size: 1.5rem;
-<<<<<<< HEAD
         }
         
         /* Mobile filter adjustments */
@@ -593,20 +489,6 @@
         <form method="GET" action="{{ route('superadmin.users.index') }}" class="row g-2 filter-form-row" id="filterForm">
             <div class="col-md-3">
                 <div class="mb-0">
-=======
-        }
-    }
-</style>
-
-
-
-<!-- Filter Card -->
-<div class="filter-card">
-    <div class="card-body">
-        <form method="GET" class="row g-2" id="filterForm">
-            <div class="col-md-3">
-                <div class="mb-2">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <label class="form-label fw-bold">Search Users</label>
                     <input type="text" name="search" class="form-control search-box" 
                            placeholder="Search by name or email..." 
@@ -614,11 +496,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-<<<<<<< HEAD
                 <div class="mb-0">
-=======
-                <div class="mb-2">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <label class="form-label fw-bold">Filter by Role</label>
                     <select name="role" class="form-select search-box" id="roleSelect">
                         <option value="">All Roles</option>
@@ -631,11 +509,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-<<<<<<< HEAD
                 <div class="mb-0">
-=======
-                <div class="mb-2">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <label class="form-label fw-bold">Status</label>
                     <select name="status" class="form-select search-box" id="statusSelect">
                         <option value="">All Status</option>
@@ -645,11 +519,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-<<<<<<< HEAD
                 <div class="mb-0">
-=======
-                <div class="mb-2">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <label class="form-label fw-bold">Sort By</label>
                     <select name="sort" class="form-select search-box" id="sortSelect">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -660,7 +530,6 @@
                 </div>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-<<<<<<< HEAD
                 <div class="mb-0 w-100">
                     <!-- Submit button is now hidden but functional -->
                     <button type="submit" class="btn btn-success-custom w-100 d-none" id="submitBtn">
@@ -668,9 +537,6 @@
                     </button>
                     
                     <!-- Only show Clear button when filters are applied -->
-=======
-                <div class="mb-2 w-100">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     @if(request()->hasAny(['search', 'role', 'status', 'sort']))
                         <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom w-100">
                             <i class="fas fa-times me-1"></i> Clear
@@ -681,10 +547,6 @@
         </form>
     </div>
 </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
 <!-- Users Table -->
 <div class="card card-custom">
@@ -692,11 +554,7 @@
         <h5 class="mb-0">All System Users</h5>
         <div class="header-buttons">
             <a href="{{ route('superadmin.users.create') }}" class="btn btn-success-custom">
-<<<<<<< HEAD
             New User
-=======
-          New User
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             </a>
         </div>
     </div>
@@ -736,7 +594,6 @@
                             </td>
                             <td class="role-col">
                                 @if($user->role == 'super_admin')
-<<<<<<< HEAD
                                     <span class="role-text role-super-admin">Super Admin</span>
                                 @elseif($user->role == 'admin')
                                     <span class="role-text role-admin">Admin</span>
@@ -746,17 +603,6 @@
                                     <span class="role-text role-checker">Checker</span>
                                 @else
                                     <span class="role-text role-customer">Customer</span>
-=======
-                                    <span class="badge-text badge-super-admin">Super Admin</span>
-                                @elseif($user->role == 'admin')
-                                    <span class="badge-text badge-admin">Admin</span>
-                                @elseif($user->role == 'delivery')
-                                    <span class="badge-text badge-delivery">Delivery</span>
-                                @elseif($user->role == 'stock_checker' || $user->role == 'checker')
-                                    <span class="badge-text badge-checker">Checker</span>
-                                @else
-                                    <span class="badge-text badge-customer">Customer</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 @endif
                             </td>
                             <td class="phone-col">
@@ -768,15 +614,9 @@
                             </td>
                             <td class="status-col">
                                 @if($user->is_active)
-<<<<<<< HEAD
                                     <span class="badge-active">Active</span>
                                 @else
                                     <span class="badge-inactive">Inactive</span>
-=======
-                                    <span class="status-text status-active">Active</span>
-                                @else
-                                    <span class="status-text status-inactive">Inactive</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 @endif
                             </td>
                             <td class="date-col">
@@ -823,11 +663,7 @@
                     </small>
                 </div>
                 <div>
-<<<<<<< HEAD
                     {{ $users->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
-=======
-                    {{ $users->links('pagination::bootstrap-5') }}
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 </div>
             </div>
             @endif
@@ -837,17 +673,11 @@
                 <h5 class="text-muted">No Users Found</h5>
                 <p class="text-muted mb-4">No users match your search criteria</p>
                 <div class="d-flex gap-3 justify-content-center">
-<<<<<<< HEAD
                     @if(request()->hasAny(['search', 'role', 'status', 'sort']))
                     <a href="{{ route('superadmin.users.index') }}" class="btn btn-success-custom">
                         <i class="fas fa-times me-1"></i> Clear Filters
                     </a>
                     @endif
-=======
-                    <a href="{{ route('superadmin.users.index') }}" class="btn btn-success-custom">
-                        <i class="fas fa-times me-1"></i> Clear Filters
-                    </a>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <a href="{{ route('superadmin.users.create') }}" class="btn btn-outline-success-custom">
                         <i class="fas fa-user-plus me-1"></i> Create User
                     </a>
@@ -857,37 +687,6 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-
-=======
-<!-- Statistics -->
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $totalUsers }}</div>
-            <div class="stats-label">Total Users</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $adminCount }}</div>
-            <div class="stats-label">Admins</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $deliveryCount }}</div>
-            <div class="stats-label">Delivery Staff</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $activeCount }}</div>
-            <div class="stats-label">Active Users</div>
-        </div>
-    </div>
-</div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -896,7 +695,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('roleSelect');
     const statusSelect = document.getElementById('statusSelect');
     const sortSelect = document.getElementById('sortSelect');
-<<<<<<< HEAD
     const submitBtn = document.getElementById('submitBtn');
 
     let searchTimeout;
@@ -924,22 +722,10 @@ document.addEventListener('DOMContentLoaded', function() {
         searchTimeout = setTimeout(() => {
             submitFilterForm();
         }, 800); // 800ms delay for better UX
-=======
-
-    let searchTimeout;
-
-    // Auto-submit on search input with delay
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            filterForm.submit();
-        }, 500);
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     });
 
     // Auto-submit on select changes
     roleSelect.addEventListener('change', function() {
-<<<<<<< HEAD
         submitFilterForm();
     });
 
@@ -983,18 +769,6 @@ document.addEventListener('DOMContentLoaded', function() {
     roleSelect.addEventListener('change', updateUrlWithFilters);
     statusSelect.addEventListener('change', updateUrlWithFilters);
     sortSelect.addEventListener('change', updateUrlWithFilters);
-=======
-        filterForm.submit();
-    });
-
-    statusSelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
-
-    sortSelect.addEventListener('change', function() {
-        filterForm.submit();
-    });
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 });
 </script>
 

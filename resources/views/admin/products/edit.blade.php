@@ -330,22 +330,10 @@
 </style>
 
 <!-- Header -->
-<<<<<<< HEAD
-<div class="page-header">
-    <div class="d-flex justify-content-between align-items-start">
-        <div>
-            <h1>Edit Product</h1>
-            <p>Update product information and manage variants</p>
-        </div>
-        <a href="{{ route('admin.products.index') }}" class="btn-secondary">
-            Back to Products
-        </a>
-=======
 {{-- <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Edit Product</h1>
         <p class="text-muted mb-0">Update product details and manage variants.</p>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     </div>
 </div> --}}
 
@@ -487,68 +475,6 @@
                             Enable Product Variants
                         </label>
                     </div>
-<<<<<<< HEAD
-                    <small class="text-muted">Create different models/versions of this product</small>
-                </div>
-            </div>
-            
-            <!-- Variants Section -->
-            <div id="variantsSection" style="display: {{ $product->has_variants ? 'block' : 'none' }};">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <label class="form-label mb-0">Product Variants</label>
-                    <button type="button" id="addVariant" class="btn-add-variant">
-                        + Add Variant
-                    </button>
-                </div>
-                
-                <div class="variants-container">
-                    <div id="variantsContainer">
-                        @if($product->has_variants && $variants->count() > 0)
-                            @foreach($variants as $index => $variant)
-                            <div class="variant-item" data-index="{{ $index }}">
-                                <div class="variant-header">
-                                    <div class="variant-title">Variant #{{ $index + 1 }}</div>
-                                    <button type="button" class="btn-remove-variant" onclick="removeVariant(this)">
-                                        Remove
-                                    </button>
-                                </div>
-                                
-                                <input type="hidden" name="variants[{{ $index }}][id]" value="{{ $variant->id }}">
-                                
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Variant Name *</label>
-                                        <input type="text" class="form-control" 
-                                               name="variants[{{ $index }}][variant_name]" 
-                                               value="{{ old('variants.'.$index.'.variant_name', $variant->variant_name) }}" 
-                                               placeholder="e.g., Pro Model, Standard Edition" required>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label class="form-label">Stock Quantity *</label>
-                                        <input type="number" class="form-control stock-input" 
-                                               name="variants[{{ $index }}][stock]" 
-                                               value="{{ old('variants.'.$index.'.stock', $variant->stock_quantity) }}" 
-                                               min="0" required>
-                                    </div>
-                                    
-                                    <div class="col-12">
-                                        <label class="form-label">Variant Description</label>
-                                        <textarea class="form-control" 
-                                                  name="variants[{{ $index }}][variant_description]" 
-                                                  rows="2" 
-                                                  placeholder="Optional description for this variant">{{ old('variants.'.$index.'.variant_description', $variant->variant_description) }}</textarea>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <label class="form-label">Price *</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₱</span>
-                                            <input type="number" step="0.01" class="form-control" 
-                                                   name="variants[{{ $index }}][price]" 
-                                                   value="{{ old('variants.'.$index.'.price', $variant->price) }}" 
-                                                   min="0" required>
-=======
 
                     <div class="row">
                         <div class="col-md-6">
@@ -617,7 +543,6 @@
                                                        value="{{ old('variants.'.$index.'.stock', $variant->stock_quantity) }}" 
                                                        min="0" readonly>
                                             </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                         </div>
                                     </div>
                                     
@@ -653,8 +578,6 @@
                                         @endif
                                     </div>
                                 </div>
-<<<<<<< HEAD
-=======
                                 @endforeach
                             @else
                                 <div class="no-variants-message" id="noVariantsMessage">
@@ -676,7 +599,6 @@
                                     <strong>Total Stock:</strong> 
                                     <span id="totalStock">{{ $product->total_stock }} units</span>
                                 </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             </div>
                             @endforeach
                         @else
@@ -758,20 +680,6 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-        </div>
-        
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <a href="{{ route('admin.products.index') }}" class="btn-secondary">
-                Cancel
-            </a>
-            <button type="submit" class="btn-primary">
-                Update Product
-            </button>
-        </div>
-    </form>
-=======
 
             <div class="d-flex justify-content-end mt-4">
                 <a href="{{ route('admin.products.index') }}" class="btn-custom-green-secondary me-2">
@@ -785,7 +693,6 @@
             </div>
         </form>
     </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 </div>
 
 @endsection
@@ -838,19 +745,12 @@
                     </div>
                     
                     <div class="col-md-6">
-<<<<<<< HEAD
-                        <label class="form-label">Stock Quantity *</label>
-                        <input type="number" class="form-control stock-input" 
-                               name="variants[${variantCount}][stock]" 
-                               value="0" min="0" required>
-=======
                         <div class="mb-3">
                             <label class="form-label">Stock Quantity *</label>
                             <input type="number" class="form-control stock-input" 
                                    name="variants[${variantCount}][stock]" 
                                    value="0" min="0" readonly>
                         </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     </div>
                     
                     <div class="col-12">
@@ -964,12 +864,6 @@
         }
     });
 
-<<<<<<< HEAD
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        updateSummary();
-    });
-=======
     // Initial summary update
     updateSummary();
 
@@ -1024,6 +918,5 @@
             }
         }, 3000);
     }
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 </script>
 @endpush

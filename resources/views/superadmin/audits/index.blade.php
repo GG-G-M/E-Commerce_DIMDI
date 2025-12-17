@@ -352,6 +352,11 @@
                     <select name="action" class="form-select">
                         <option value="">All Actions</option>
                         <option value="login" {{ request('action') == 'login' ? 'selected' : '' }}>Login</option>
+                        <option value="created" {{ request('action') == 'created' ? 'selected' : '' }}>Created</option>
+                        <option value="edited" {{ request('action') == 'edited' ? 'selected' : '' }}>Edited</option>
+                        <option value="deleted" {{ request('action') == 'deleted' ? 'selected' : '' }}>Deleted</option>
+                        <option value="archived" {{ request('action') == 'archived' ? 'selected' : '' }}>Archived</option>
+                        <option value="unarchived" {{ request('action') == 'unarchived' ? 'selected' : '' }}>Unarchived</option>
                         <option value="POST" {{ request('action') == 'POST' ? 'selected' : '' }}>Create (POST)</option>
                         <option value="PUT" {{ request('action') == 'PUT' ? 'selected' : '' }}>Update (PUT/PATCH)</option>
                         <option value="DELETE" {{ request('action') == 'DELETE' ? 'selected' : '' }}>Delete</option>
@@ -425,6 +430,11 @@
                             @php
                                 $actionClasses = [
                                     'login' => 'action-login',
+                                    'created' => 'action-post',
+                                    'edited' => 'action-put',
+                                    'deleted' => 'action-delete',
+                                    'archived' => 'action-delete', // Using delete color for archived
+                                    'unarchived' => 'action-post', // Using post color for unarchived
                                     'POST' => 'action-post',
                                     'PUT' => 'action-put',
                                     'DELETE' => 'action-delete',

@@ -2,34 +2,11 @@
 
 @section('content')
 <div class="container-fluid px-4">
-<<<<<<< HEAD
     <!-- Back Button -->
     <div class="mb-4">
         <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
             <i class="fas fa-arrow-left me-2"></i>Back to Users
         </a>
-=======
-    <!-- Header -->
-    <div class="dashboard-header mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="{{ route('superadmin.dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('superadmin.users.index') }}">Users</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Create New</li>
-            </ol>
-        </nav>
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h1 class="h3 fw-bold mb-1">
-                    <i class="fas fa-user-plus text-success me-2"></i>Create New User
-                </h1>
-                <p class="text-muted mb-0">Add a new user to the system with appropriate role and permissions</p>
-            </div>
-            <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
-                <i class="fas fa-arrow-left me-2"></i>Back to Users
-            </a>
-        </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     </div>
 
     <div class="row justify-content-center">
@@ -67,7 +44,6 @@
                 </div>
             </div>
 
-<<<<<<< HEAD
             <!-- Main Form -->
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -75,28 +51,12 @@
                         <i class="fas fa-user-circle me-2"></i>User Information
                     </h5>
                     <span class="badge bg-white text-success border border-success border-opacity-25">Required fields marked <span class="text-required">*</span></span>
-=======
-            <!-- Main Form Card -->
-            <div class="card card-custom mb-4">
-                <div class="card-header-custom">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-user-circle me-2"></i>User Information
-                        </h5>
-                        <span class="badge bg-white text-success border border-success border-opacity-25">Required fields marked <span class="text-required">*</span></span>
-                    </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 </div>
 
                 <form method="POST" action="{{ route('superadmin.users.store') }}" id="createUserForm">
                     @csrf
-<<<<<<< HEAD
 
                     <div class="p-4 p-md-5">
-=======
-                    
-                    <div class="card-body p-4 p-md-5">
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                         <!-- Name Section -->
                         <div class="form-section mb-5">
                             <div class="d-flex align-items-center mb-4">
@@ -306,7 +266,6 @@
                                                     </p>
                                                     <div class="mt-3">
                                                         @if($key == 'superadmin')
-<<<<<<< HEAD
                                                             <span >Full Access</span>
                                                         @elseif($key == 'admin')
                                                             <span >Management</span>
@@ -314,15 +273,6 @@
                                                             <span>Delivery</span>
                                                         @else
                                                             <span>Basic</span>
-=======
-                                                            <span class="badge-text badge-superadmin">Full Access</span>
-                                                        @elseif($key == 'admin')
-                                                            <span class="badge-text badge-admin">Management</span>
-                                                        @elseif($key == 'delivery')
-                                                            <span class="badge-text badge-delivery">Delivery</span>
-                                                        @else
-                                                            <span class="badge-text badge-customer">Basic</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                                         @endif
                                                     </div>
                                                 </div>
@@ -380,11 +330,7 @@
                                 <div class="section-icon">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </div>
-<<<<<<< HEAD
                                 <h6 class="mb-0 text-dark fw-bold fs-5">Address Information</h6>
-=======
-                                <h6 class="mb-0 text-dark fw-bold fs-5">Address Information (Optional)</h6>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             </div>
                             
                             <div class="row g-3">
@@ -493,119 +439,21 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <div>
                                 <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom btn-lg">
-<<<<<<< HEAD
                                     </i>Cancel
-=======
-                                    <i class="fas fa-times me-2"></i>Cancel
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 </a>
                             </div>
                             <div class="d-flex gap-3">
                                 <button type="reset" class="btn btn-outline-success-custom btn-lg">
-<<<<<<< HEAD
                                     Reset Form
                                 </button>
                                 <button type="submit" class="btn btn-success-custom btn-lg px-5">
                                    Create User
-=======
-                                    <i class="fas fa-redo me-2"></i>Reset Form
-                                </button>
-                                <button type="submit" class="btn btn-success-custom btn-lg px-5">
-                                    <i class="fas fa-user-plus me-2"></i>Create User
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 </button>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-<<<<<<< HEAD
-=======
-            
-            <!-- Quick Stats -->
-            <div class="row g-3">
-                <div class="col-xl-3 col-lg-6">
-                    <div class="card card-custom stats-card">
-                        <div class="card-body p-3 p-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-success-custom p-3 rounded-circle me-3">
-                                    <i class="fas fa-users text-success fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h3 class="stats-number mb-0" id="totalUsersCount">1,247</h3>
-                                    <small class="stats-label">Total Users</small>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-success">
-                                    <i class="fas fa-arrow-up me-1"></i>12% increase
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-6">
-                    <div class="card card-custom stats-card">
-                        <div class="card-body p-3 p-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-warning-custom p-3 rounded-circle me-3">
-                                    <i class="fas fa-truck text-warning fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h3 class="stats-number mb-0" id="deliveryUsersCount">43</h3>
-                                    <small class="stats-label">Delivery Staff</small>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-success">
-                                    <i class="fas fa-arrow-up me-1"></i>5% increase
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-6">
-                    <div class="card card-custom stats-card">
-                        <div class="card-body p-3 p-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary-custom p-3 rounded-circle me-3">
-                                    <i class="fas fa-user-shield text-primary fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h3 class="stats-number mb-0" id="adminUsersCount">12</h3>
-                                    <small class="stats-label">Admin Users</small>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-success">
-                                    <i class="fas fa-arrow-up me-1"></i>8% increase
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-6">
-                    <div class="card card-custom stats-card">
-                        <div class="card-body p-3 p-md-4">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-info-custom p-3 rounded-circle me-3">
-                                    <i class="fas fa-user-clock text-info fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h3 class="stats-number mb-0" id="activeUsersCount">1,024</h3>
-                                    <small class="stats-label">Active Users</small>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-success">
-                                    <i class="fas fa-arrow-up me-1"></i>15% increase
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         </div>
     </div>
 </div>

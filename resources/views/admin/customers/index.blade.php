@@ -625,9 +625,6 @@
             </form>
         </div>
     </div>
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 
     <div class="card card-custom">
         <div class="card-header card-header-custom">
@@ -639,8 +636,7 @@
         </div>
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
-=======
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
+
 </div>
 <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
             {{-- <i class="fas fa-user-plus"></i>  --}}
@@ -653,10 +649,7 @@
     </div>
     <div class="card-body p-0">
         <table class="table table-hover align-middle mb-0">
-<<<<<<< HEAD
-=======
->>>>>>> 2fc7c66 (Rgister Stepper)
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
+
                 <thead>
                     <tr>
                         <th class="id-col">ID</th>
@@ -670,7 +663,7 @@
                 </thead>
                 <tbody>
                     @foreach ($customers as $customer)
-<<<<<<< HEAD
+
                     <tr data-id="{{ $customer->id }}">
                         <td class="id-col">
                             <span class="text-muted">#{{ $customer->id }}</span>
@@ -726,7 +719,6 @@
                                     <button class="action-btn btn-archive archiveBtn" data-id="{{ $customer->id }}" data-title="Archive Customer">
                                         <i class="fas fa-archive"></i>
                                     </button>
-=======
                         <tr data-id="{{ $customer->id }}">
                             <td class="id-col">
                                 <span class="text-muted">#{{ $customer->id }}</span>
@@ -753,7 +745,6 @@
                                     <div class="customer-phone">{{ $customer->phone }}</div>
                                 @else
                                     <span class="text-muted">-</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 @endif
                             </td>
                             <td class="address-col">
@@ -823,10 +814,9 @@
                         </tr>
                     @endforeach
                 </tbody>
-<<<<<<< HEAD
-        </table>
-=======
             </table>
+
+        
 
             @if ($customers->hasPages())
                 <div class="d-flex justify-content-center p-4">
@@ -836,7 +826,7 @@
 
         </div>
     </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
+
 
     <!-- Add Customer Modal -->
     <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
@@ -1350,60 +1340,6 @@
                     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     button.style.opacity = '0.6';
 
-<<<<<<< HEAD
-        fetch(form.action, {
-            method: 'POST',
-            headers: { 
-                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
-                'X-HTTP-Method-Override': 'PUT' 
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                // Close modal and reload
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
-                modal.hide();
-                location.reload();
-            } else {
-                alert('Error updating customer: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Network error. Please try again.');
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        });
-    });
-
-    /* === Archive Customer === */
-    document.querySelectorAll('.archiveBtn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to archive this customer? This will make them inactive but preserve their data.')) return;
-            
-            const id = this.dataset.id;
-            const button = this;
-
-            // Disable button during processing
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            fetch(`/admin/customers/${id}/archive`, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Failed to archive customer: ' + (data.message || 'Unknown error'));
-                    location.reload();
-=======
                     // Make the actual request
                     fetch(`/admin/customers/${id}/unarchive`, {
                         method: 'POST',
@@ -1429,7 +1365,6 @@
                         button.style.opacity = '1';
                         showNotification('Failed to unarchive customer: ' + error.message, 'error');
                     });
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 }
 
                 // Ensure table fits container on all screen sizes
@@ -1444,62 +1379,6 @@
                     }
                 });
             });
-<<<<<<< HEAD
-        });
-    });
-
-    /* === Unarchive Customer === */
-    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to unarchive this customer? They will become active again.')) return;
-            
-            const id = this.dataset.id;
-            const button = this;
-
-            // Disable button during processing
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-            fetch(`/admin/customers/${id}/unarchive`, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Failed to unarchive customer: ' + (data.message || 'Unknown error'));
-                    location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Network error. Please try again.');
-                location.reload();
-            });
-        });
-    });
-    
-    // Ensure table fits container on all screen sizes
-    window.addEventListener('resize', function() {
-        const tableContainer = document.querySelector('.table-container');
-        const table = document.querySelector('.table');
-        if (table) {
-            // Always keep fixed layout for consistent appearance
-            table.style.tableLayout = 'fixed';
-            // Ensure table doesn't overflow
-            table.style.width = '100%';
-            table.style.maxWidth = '100%';
-        }
-    });
-});
-</script>
-@endpush
-
-@endsection
-=======
         </script>
     @endpush
 @endsection
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527

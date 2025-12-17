@@ -201,7 +201,6 @@
     /* Alternating row colors */
     .table tbody tr:nth-child(even) {
         background-color: #f8f9fa;
-<<<<<<< HEAD
     }
 
     .table tbody tr:nth-child(even):hover {
@@ -255,125 +254,6 @@
         background-color: #2C8F0C;
         color: white;
     }
-=======
-    }
-
-    .table tbody tr:nth-child(even):hover {
-        background-color: #F8FDF8;
-    }
-
-    /* Badges - Compact */
-    .badge-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 80px;
-    }
-    
-    .badge-super-admin {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-    
-    .badge-admin {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-delivery {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-    
-    .badge-checker {
-        background-color: #E8F5E9;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-customer {
-        background-color: #F8F9FA;
-        color: #495057;
-        border: 1px solid #E9ECEF;
-    }
-
-    /* Status Badges - Compact */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 60px;
-    }
-    
-    .status-active {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-inactive {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 6px;
-        flex-wrap: nowrap;
-        justify-content: center;
-    }
-    
-    .action-btn-small {
-        width: 32px;
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        border: 2px solid;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    
-    .action-btn-small:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-    }
-    
-    .btn-view-small {
-        background-color: white;
-        border-color: #2C8F0C;
-        color: #2C8F0C;
-    }
-    
-    .btn-view-small:hover {
-        background-color: #2C8F0C;
-        color: white;
-    }
-    
-    .btn-edit-small {
-        background-color: white;
-        border-color: #2C8F0C;
-        color: #2C8F0C;
-    }
-    
-    .btn-edit-small:hover {
-        background-color: #2C8F0C;
-        color: white;
-    }
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
     /* View All Button */
     .view-all-btn {
@@ -479,23 +359,13 @@
         border-bottom: none;
     }
 
-<<<<<<< HEAD
     /* Status Text Styles */
     .status-text {
-=======
-    .badge-count {
-        background: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-        border-radius: 12px;
-        padding: 0.25rem 0.5rem;
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         font-weight: 600;
         font-size: 0.85rem;
     }
  
 
-<<<<<<< HEAD
     /* Role Text Styles */
     .role-text {
         font-weight: 600;
@@ -522,8 +392,6 @@
         color: #6c757d;
     }
 
-=======
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     /* Pagination styling - Consistent */
     .pagination .page-item .page-link {
         color: #2C8F0C;
@@ -611,15 +479,6 @@
             width: 28px;
             height: 28px;
             font-size: 0.8rem;
-<<<<<<< HEAD
-=======
-        }
-        
-        .badge-text,
-        .status-text {
-            min-width: 70px;
-            font-size: 0.7rem;
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         }
     }
 </style>
@@ -748,7 +607,6 @@
                         </td>
                         <td class="role-col">
                             @if($user->role == 'super_admin')
-<<<<<<< HEAD
                                 <span class="role-text role-super-admin">Super Admin</span>
                             @elseif($user->role == 'admin')
                                 <span class="role-text role-admin">Admin</span>
@@ -758,30 +616,13 @@
                                 <span class="role-text role-checker">Checker</span>
                             @else
                                 <span class="role-text role-customer">Customer</span>
-=======
-                                <span class="badge-text badge-super-admin">Super Admin</span>
-                            @elseif($user->role == 'admin')
-                                <span class="badge-text badge-admin">Admin</span>
-                            @elseif($user->role == 'delivery')
-                                <span class="badge-text badge-delivery">Delivery</span>
-                            @elseif($user->role == 'stock_checker' || $user->role == 'checker')
-                                <span class="badge-text badge-checker">Checker</span>
-                            @else
-                                <span class="badge-text badge-customer">Customer</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             @endif
                         </td>
                         <td class="status-col">
                             @if($user->is_active)
-<<<<<<< HEAD
                                 <span >Active</span>
                             @else
                                 <span >Inactive</span>
-=======
-                                <span class="status-text status-active">Active</span>
-                            @else
-                                <span class="status-text status-inactive">Inactive</span>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             @endif
                         </td>
                         <td class="date-col">

@@ -329,24 +329,10 @@
 </style>
 
 <!-- Header -->
-<<<<<<< HEAD
-<div class="page-header">
-    <div class="d-flex justify-content-between align-items-start">
-        <div>
-            <h1>Add New Product</h1>
-            <p>Fill out the form to add a new product to your store</p>
-        </div>
-        <a href="{{ route('admin.products.index') }}" class="btn-secondary">
-            Back to Products
-        </a>
-    </div>
-</div>
-=======
 {{-- <div class="page-header">
     <h1 class="h3 mb-1">Add New Product</h1>
     <p class="text-muted mb-0">Fill out the form to add a new product to your store.</p>
 </div> --}}
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
 <!-- Product Form -->
 <div class="form-container">
@@ -472,65 +458,6 @@
                             Enable Product Variants
                         </label>
                     </div>
-<<<<<<< HEAD
-                </div>
-            </div>
-            
-            <!-- Variants Section -->
-            <div id="variantsSection" style="display: {{ old('has_variants') ? 'block' : 'none' }};">
-                <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
-                    <label class="form-label mb-0">Product Variants</label>
-                    <button type="button" id="addVariant" class="btn-add-variant">
-                        + Add Variant
-                    </button>
-                </div>
-                
-                <div class="variants-container">
-                    <div id="variantsContainer">
-                        @if(old('variants'))
-                            @foreach(old('variants') as $index => $variant)
-                            <div class="variant-item" data-index="{{ $index }}">
-                                <div class="variant-header">
-                                    <div class="variant-title">Variant #{{ $index + 1 }}</div>
-                                    <button type="button" class="btn-remove-variant" onclick="removeVariant(this)">
-                                        Remove
-                                    </button>
-                                </div>
-                                
-                                <div class="row g-2">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Variant Name *</label>
-                                        <input type="text" class="form-control" 
-                                               name="variants[{{ $index }}][variant_name]" 
-                                               value="{{ $variant['variant_name'] ?? '' }}" 
-                                               placeholder="e.g., Pro Model, Standard Edition" required>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <label class="form-label">Stock Quantity *</label>
-                                        <input type="number" class="form-control stock-input" 
-                                               name="variants[{{ $index }}][stock]" 
-                                               value="{{ $variant['stock'] ?? 0 }}" 
-                                               min="0" required>
-                                    </div>
-                                    
-                                    <div class="col-12">
-                                        <label class="form-label">Variant Description</label>
-                                        <textarea class="form-control" 
-                                                  name="variants[{{ $index }}][variant_description]" 
-                                                  rows="2" 
-                                                  placeholder="Optional description for this variant">{{ $variant['variant_description'] ?? '' }}</textarea>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <label class="form-label">Price *</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">₱</span>
-                                            <input type="number" step="0.01" class="form-control" 
-                                                   name="variants[{{ $index }}][price]" 
-                                                   value="{{ $variant['price'] ?? '' }}" 
-                                                   min="0" required>
-=======
 
                     <div class="row">
                         <div class="col-md-6">
@@ -639,7 +566,6 @@
                                                        value="{{ $variant['stock'] ?? 0 }}" 
                                                        min="0" readonly>
                                             </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                         </div>
                                     </div>
                                     
@@ -661,8 +587,6 @@
                                                accept="image/*">
                                     </div>
                                 </div>
-<<<<<<< HEAD
-=======
                                 @endforeach
                             @else
                                 <div class="no-variants-message" id="noVariantsMessage">
@@ -684,7 +608,6 @@
                                     <strong>Total Stock:</strong> 
                                     <span id="totalStock">0 units</span>
                                 </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             </div>
                             @endforeach
                         @else
@@ -731,40 +654,6 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-        </div>
-        
-        <!-- Product Status -->
-        <div class="form-section">
-            <div class="section-title">Product Status</div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="status-section">
-                        <div class="status-item">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       id="is_featured" name="is_featured" value="1" 
-                                       {{ old('is_featured') ? 'checked' : '' }}>
-                                <label class="form-check-label" for="is_featured">
-                                    Featured Product
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="status-item">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" 
-                                       id="is_active" name="is_active" value="1" 
-                                       {{ old('is_active', true) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="is_active">
-                                    Active
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-=======
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
                 <a href="{{ route('admin.products.index') }}" class="btn-custom-green-secondary me-md-2">
@@ -775,7 +664,6 @@
                     {{-- <i class="fas fa-plus"></i> --}}
                     Create Product
                 </button>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             </div>
         </div>
         
@@ -803,13 +691,6 @@
         const stockQuantityInput = document.getElementById('stock_quantity');
         
         variantsSection.style.display = this.checked ? 'block' : 'none';
-<<<<<<< HEAD
-        stockQuantityInput.disabled = this.checked;
-        stockQuantityInput.required = !this.checked;
-        
-        if (this.checked) {
-            stockQuantityInput.value = 0;
-=======
         
         // Enable/disable stock quantity field based on variants
         if (this.checked) {
@@ -819,7 +700,6 @@
         } else {
             stockQuantityInput.readOnly = false;
             stockQuantityInput.setAttribute('required', 'required');
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         }
         
         updateSummary();
@@ -852,19 +732,12 @@
                     </div>
                     
                     <div class="col-md-6">
-<<<<<<< HEAD
-                        <label class="form-label">Stock Quantity *</label>
-                        <input type="number" class="form-control stock-input" 
-                               name="variants[${variantCount}][stock]" 
-                               value="0" min="0" required>
-=======
                         <div class="mb-3">
                             <label class="form-label">Stock Quantity *</label>
                             <input type="number" class="form-control stock-input" 
                                    name="variants[${variantCount}][stock]" 
                                    value="0" min="0" readonly>
                         </div>
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     </div>
                     
                     <div class="col-12">
@@ -1013,12 +886,6 @@
         }
     });
 
-<<<<<<< HEAD
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        updateSummary();
-    });
-=======
     // Initial summary update
     updateSummary();
 
@@ -1073,6 +940,5 @@
             }
         }, 3000);
     }
->>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 </script>
 @endpush
