@@ -402,13 +402,6 @@
                             </a>
                         </li>
 
-                        <!-- Audit Log -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('superadmin.audits.*') ? 'active' : '' }}"
-                                href="{{ route('superadmin.audits.index') }}">
-                                <i class="fas fa-clipboard-list me-2"></i>Audit Log
-                            </a>
-                        </li>
 
                         <!-- Quick Links -->
                         <li class="nav-item mt-4">

@@ -50,6 +50,14 @@ class AuditController extends Controller
 
         $admins = User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN])->orderBy('first_name')->get();
 
-        return view('superadmin.audits.index', compact('audits', 'admins'));
+        // Calculate statistics
+        $stats = [
+            'total_audits' => Audit::count(),
+            'created_count' => Audit::whereIn('action', ['created', 'POST'])->count(),
+            'updated_count' => Audit::whereIn('action', ['edited', 'PUT', 'PATCH'])->count(),
+            'deleted_count' => Audit::whereIn('action', ['deleted', 'DELETE', 'archived'])->count(),
+        ];
+
+        return view('superadmin.audits.index', compact('audits', 'admins', 'stats'));
     }
 }

@@ -67,11 +67,11 @@
         opacity: 0.2;
     }
 
-    /* Stats Cards - Compact */
+    /* Stats Cards - Fixed Alignment */
     .stats-card {
         border: none;
         border-radius: 10px;
-        padding: 1rem;
+        padding: 1.25rem;
         color: white;
         transition: all 0.3s ease;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -79,6 +79,9 @@
         position: relative;
         overflow: hidden;
         min-height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .stats-card:hover {
@@ -104,11 +107,23 @@
 
     .stats-icon {
         position: absolute;
-        right: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
+        right: 1.25rem;
+        top: 1.25rem;
         font-size: 2rem;
         opacity: 0.3;
+    }
+
+    .stats-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-grow: 1;
+    }
+
+    .stats-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
     }
 
     .stats-content h6 {
@@ -118,13 +133,26 @@
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        text-align: left;
+        line-height: 1.2;
     }
 
     .stats-content h2 {
         font-weight: 700;
-        font-size: 1.75rem;
+        font-size: 2rem;
         margin: 0;
         line-height: 1;
+        text-align: right;
+        letter-spacing: -0.5px;
+    }
+
+    /* Text Alignment Helper */
+    .text-left {
+        text-align: left !important;
+    }
+    
+    .text-right {
+        text-align: right !important;
     }
 
     /* Quick Actions */
@@ -364,7 +392,6 @@
         font-weight: 600;
         font-size: 0.85rem;
     }
- 
 
     /* Role Text Styles */
     .role-text {
@@ -454,11 +481,13 @@
         }
         
         .stats-content h2 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
         }
         
         .stats-icon {
             font-size: 1.5rem;
+            right: 1rem;
+            top: 1rem;
         }
         
         .stats-grid {
@@ -480,6 +509,11 @@
             height: 28px;
             font-size: 0.8rem;
         }
+        
+        .stats-card {
+            padding: 1rem;
+            min-height: 110px;
+        }
     }
 </style>
 
@@ -497,76 +531,54 @@
     </div>
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats Cards - Fixed Alignment -->
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="stats-card bg-super-green">
-            <div class="stats-content">
-                <h6>Total Users</h6>
-                <h2>{{ App\Models\User::count() }}</h2>
-            </div>
             <i class="fas fa-users stats-icon"></i>
+            <div class="stats-content">
+                <div class="stats-text">
+                    <h6 class="text-left">Total Users</h6>
+                </div>
+                <h2 class="text-right">{{ App\Models\User::count() }}</h2>
+            </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stats-card bg-success-green">
-            <div class="stats-content">
-                <h6>Super Admins</h6>
-                <h2>{{ App\Models\User::where('role', 'super_admin')->count() }}</h2>
-            </div>
             <i class="fas fa-crown stats-icon"></i>
+            <div class="stats-content">
+                <div class="stats-text">
+                    <h6 class="text-left">Super Admins</h6>
+                </div>
+                <h2 class="text-right">{{ App\Models\User::where('role', 'super_admin')->count() }}</h2>
+            </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stats-card bg-primary-green">
-            <div class="stats-content">
-                <h6>Administrators</h6>
-                <h2>{{ App\Models\User::where('role', 'admin')->count() }}</h2>
-            </div>
             <i class="fas fa-user-shield stats-icon"></i>
+            <div class="stats-content">
+                <div class="stats-text">
+                    <h6 class="text-left">Administrators</h6>
+                </div>
+                <h2 class="text-right">{{ App\Models\User::where('role', 'admin')->count() }}</h2>
+            </div>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stats-card bg-info-green">
-            <div class="stats-content">
-                <h6>Active Users</h6>
-                <h2>{{ App\Models\User::where('is_active', true)->count() }}</h2>
-            </div>
             <i class="fas fa-user-check stats-icon"></i>
+            <div class="stats-content">
+                <div class="stats-text">
+                    <h6 class="text-left">Active Users</h6>
+                </div>
+                <h2 class="text-right">{{ App\Models\User::where('is_active', true)->count() }}</h2>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="actions-card">
-    <div class="card-body p-3">
-        <div class="row g-2">
-            <div class="col-md-3">
-                <a href="{{ route('superadmin.users.create') }}" class="action-btn btn-create">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Create Admin</span>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('superadmin.users.index') }}" class="action-btn btn-view">
-                    <i class="fas fa-users"></i>
-                    <span>View All Users</span>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('admin.dashboard') }}" class="action-btn btn-admin">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Admin Panel</span>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ route('home') }}" class="action-btn btn-store">
-                    <i class="fas fa-store"></i>
-                    <span>Visit Store</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Recent Users -->
 <div class="card card-custom mb-4">
@@ -620,9 +632,9 @@
                         </td>
                         <td class="status-col">
                             @if($user->is_active)
-                                <span >Active</span>
+                                <span class="status-text status-active">Active</span>
                             @else
-                                <span >Inactive</span>
+                                <span class="status-text status-inactive">Inactive</span>
                             @endif
                         </td>
                         <td class="date-col">
@@ -632,7 +644,7 @@
                             <div class="action-buttons">
                                 <a href="{{ route('superadmin.users.show', $user) }}" 
                                    class="action-btn-small btn-view-small" title="View Details">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-search ms-1"></i>
                                 </a>
                                 
                                 <a href="{{ route('superadmin.users.edit', $user) }}" 
