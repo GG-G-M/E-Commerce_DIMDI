@@ -219,7 +219,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
     Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
-    Route::get('/products/{product}/view', [AdminProductController::class, 'view'])->name('products.view');
+
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
@@ -252,10 +252,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/stock-outs', [StockOutController::class, 'store'])->name('stock_out.store');
     Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
     Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
+    Route::post('/stock-out/check-stock', [StockOutController::class, 'checkStock'])->name('stock_out.check-stock');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
     // REFUND ROUTES
@@ -278,9 +279,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/{category}/archive', [AdminCategoryController::class, 'archive'])->name('categories.archive');
+    Route::post('/categories/{category}/unarchive', [AdminCategoryController::class, 'unarchive'])->name('categories.unarchive');
 
     // Brand Routes
     Route::resource('brands', BrandController::class);
+    Route::post('/brands/{brand}/archive', [BrandController::class, 'archive'])->name('brands.archive');
+    Route::post('/brands/{brand}/unarchive', [BrandController::class, 'unarchive'])->name('brands.unarchive');
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
 
     // INVENTORY REPORTS
@@ -297,7 +302,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('/export-pdf', [SalesReportController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/comparison', [SalesReportController::class, 'comparison'])->name('comparison');
         Route::get('/comparison/export-pdf', [SalesReportController::class, 'exportComparisonPdf'])->name('comparison.export-pdf');
-        
     });
 
     // BANNER ROUTES

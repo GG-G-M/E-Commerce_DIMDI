@@ -244,11 +244,11 @@
             <div class="summary-title">📊 Comparison Summary</div>
             <div class="summary-grid">
                 <div class="summary-item">
-                    <span class="summary-value">₱{{ number_format(array_sum($year1Sales), 2) }}</span>
+                    <span class="summary-value">{{ pdf_currency(array_sum($year1Sales)) }}</span>
                     <span class="summary-label">{{ $year1 }} Total Sales</span>
                 </div>
                 <div class="summary-item orange">
-                    <span class="summary-value">₱{{ number_format(array_sum($year2Sales), 2) }}</span>
+                    <span class="summary-value">{{ pdf_currency(array_sum($year2Sales)) }}</span>
                     <span class="summary-label">{{ $year2 }} Total Sales</span>
                 </div>
                 <div class="summary-item">
@@ -267,16 +267,16 @@
                 <tbody>
                     <tr>
                         <td style="width: 40%; font-weight: bold;">{{ $year1 }} Total Revenue:</td>
-                        <td class="text-right">₱{{ number_format(array_sum($year1Sales), 2) }}</td>
+                        <td class="text-right">{{ pdf_currency(array_sum($year1Sales)) }}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">{{ $year2 }} Total Revenue:</td>
-                        <td class="text-right">₱{{ number_format(array_sum($year2Sales), 2) }}</td>
+                        <td class="text-right">{{ pdf_currency(array_sum($year2Sales)) }}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Revenue Difference:</td>
                         <td class="text-right {{ (array_sum($year1Sales) - array_sum($year2Sales)) >= 0 ? 'positive' : 'negative' }}">
-                            ₱{{ number_format(array_sum($year1Sales) - array_sum($year2Sales), 2) }}
+                            {{ pdf_currency(array_sum($year1Sales) - array_sum($year2Sales)) }}
                         </td>
                     </tr>
                     <tr class="total-row">
@@ -316,29 +316,29 @@
                     @endphp
                     <tr>
                         <td class="month-label">{{ $month }}</td>
-                        <td class="text-right">₱{{ number_format($sales1, 2) }}</td>
-                        <td class="text-right">₱{{ number_format($sales2, 2) }}</td>
+                        <td class="text-right">{{ pdf_currency($sales1) }}</td>
+                        <td class="text-right">{{ pdf_currency($sales2) }}</td>
                         <td class="text-right">
                             <span class="growth-badge {{ $growth >= 0 ? 'growth-positive' : 'growth-negative' }}">
                                 {{ number_format($growth, 1) }}%
                             </span>
                         </td>
                         <td class="text-right {{ $difference >= 0 ? 'positive' : 'negative' }}">
-                            ₱{{ number_format($difference, 2) }}
+                            {{ pdf_currency($difference) }}
                         </td>
                     </tr>
                     @endforeach
                     <tr class="total-row">
                         <td class="month-label">TOTAL</td>
-                        <td class="text-right">₱{{ number_format(array_sum($year1Sales), 2) }}</td>
-                        <td class="text-right">₱{{ number_format(array_sum($year2Sales), 2) }}</td>
+                        <td class="text-right">{{ pdf_currency(array_sum($year1Sales)) }}</td>
+                        <td class="text-right">{{ pdf_currency(array_sum($year2Sales)) }}</td>
                         <td class="text-right">
                             <span class="growth-badge {{ $totalGrowth >= 0 ? 'growth-positive' : 'growth-negative' }}">
                                 {{ number_format($totalGrowth, 1) }}%
                             </span>
                         </td>
                         <td class="text-right {{ (array_sum($year1Sales) - array_sum($year2Sales)) >= 0 ? 'positive' : 'negative' }}">
-                            ₱{{ number_format(array_sum($year1Sales) - array_sum($year2Sales), 2) }}
+                            {{ pdf_currency(array_sum($year1Sales) - array_sum($year2Sales)) }}
                         </td>
                     </tr>
                 </tbody>
@@ -359,27 +359,27 @@
                     @endphp
                     <tr>
                         <td style="width: 40%; font-weight: bold;">Best Performing Month ({{ $year1 }}):</td>
-                        <td>{{ $months[$bestMonth1] }} - ₱{{ number_format($year1Sales[$bestMonth1], 2) }}</td>
+                        <td>{{ $months[$bestMonth1] }} - {{ pdf_currency($year1Sales[$bestMonth1]) }}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Worst Performing Month ({{ $year1 }}):</td>
-                        <td>{{ $months[$worstMonth1] }} - ₱{{ number_format($year1Sales[$worstMonth1], 2) }}</td>
+                        <td>{{ $months[$worstMonth1] }} - {{ pdf_currency($year1Sales[$worstMonth1]) }}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Best Performing Month ({{ $year2 }}):</td>
-                        <td>{{ $months[$bestMonth2] }} - ₱{{ number_format($year2Sales[$bestMonth2], 2) }}</td>
+                        <td>{{ $months[$bestMonth2] }} - {{ pdf_currency($year2Sales[$bestMonth2]) }}</td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Worst Performing Month ({{ $year2 }}):</td>
-                        <td>{{ $months[$worstMonth2] }} - ₱{{ number_format($year2Sales[$worstMonth2], 2) }}</td>
+                        <td>{{ $months[$worstMonth2] }} - {{ pdf_currency($year2Sales[$worstMonth2]) }}</td>
                     </tr>
                     <tr class="total-row">
                         <td style="font-weight: bold;">Average Monthly Sales ({{ $year1 }}):</td>
-                        <td>₱{{ number_format(array_sum($year1Sales) / 12, 2) }}</td>
+                        <td>{{ pdf_currency(array_sum($year1Sales) / 12) }}</td>
                     </tr>
                     <tr class="total-row">
                         <td style="font-weight: bold;">Average Monthly Sales ({{ $year2 }}):</td>
-                        <td>₱{{ number_format(array_sum($year2Sales) / 12, 2) }}</td>
+                        <td>{{ pdf_currency(array_sum($year2Sales) / 12) }}</td>
                     </tr>
                 </tbody>
             </table>

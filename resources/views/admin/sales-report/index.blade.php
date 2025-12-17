@@ -525,11 +525,11 @@
                 <div class="row g-3 mt-2">
                     <div class="col-md-6">
                         <label class="form-label">Start Date</label>
-                        <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request('start_date') }}" onchange="handleCustomDateChange()">
+                        <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request('start_date') }}" max="{{ date('Y-m-d') }}" onchange="handleCustomDateChange()">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">End Date</label>
-                        <input type="date" name="end_date" class="form-control" id="endDate" value="{{ request('end_date') }}" onchange="handleCustomDateChange()">
+                        <input type="date" name="end_date" class="form-control" id="endDate" value="{{ request('end_date') }}" max="{{ date('Y-m-d') }}" onchange="handleCustomDateChange()">
                     </div>
                 </div>
             </div>

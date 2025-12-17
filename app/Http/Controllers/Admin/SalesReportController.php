@@ -8,7 +8,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class SalesReportController extends Controller
 {
     public function index(Request $request)
@@ -386,24 +386,124 @@ class SalesReportController extends Controller
         return $monthlySales;
     }
 
-    public function exportPdf(Request $request)
+    // In your SalesReportController.php
+
+public function exportPdf(Request $request)
     {
         $query = Order::where('order_status', 'delivered');
         
         // Apply filters
         $query = $this->applyFilters($query, $request);
         
-        // Get sales data for charts
+        // Get sales data
         $salesData = $this->getSalesData($request);
-        $orders = $query->with('user', 'items')->orderBy('delivered_at', 'desc')->get();
+        $orders = $query->with('items')->orderBy('delivered_at', 'desc')->get();
         
-        // Generate PDF
-        $pdf = \PDF::loadView('admin.sales-report.pdf', compact('orders', 'salesData'));
+        // Calculate additional statistics for PDF
+        $orderStatistics = $this->calculateOrderStatistics($orders);
+        
+        // Generate PDF with proper encoding
+        $pdf = Pdf::loadView('admin.sales-report.pdf', [
+            'orders' => $orders,
+            'salesData' => $salesData,
+            'orderStatistics' => $orderStatistics,
+            'request' => $request
+        ]);
+        
+        // Set paper size
+        $pdf->setPaper('A4', 'portrait');
+        
+        // IMPORTANT: Set encoding options for Peso sign and better font support
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+            'defaultFont' => 'Noto Sans',  // Use Noto Sans which has extensive Unicode support including peso
+            'fontHeightRatio' => 0.9,
+            'enable_unicode' => true,
+            'charset' => 'UTF-8',
+            'dpi' => 300,
+            'defaultPaperSize' => 'A4',
+            'isFontSubsettingEnabled' => false,  // Include full font to ensure peso symbol is available
+            'pdfVersion' => '1.7',
+        ]);
+        
+        // Set paper size
+        $pdf->setPaper('A4', 'portrait');
         
         $fileName = 'sales-report-' . date('Y-m-d-H-i-s') . '.pdf';
         
+        // Force download
         return $pdf->download($fileName);
     }
+    
+    // Helper method to format currency properly for PDF
+    private function formatCurrency($amount)
+    {
+        // Return HTML entity for peso symbol to avoid encoding issues
+        return '&#8369;' . number_format($amount, 2);
+    }
+    
+    private function calculateOrderStatistics($orders)
+    {
+        if ($orders->count() === 0) {
+            return [
+                'min_amount' => 0,
+                'max_amount' => 0,
+                'median_amount' => 0,
+                'std_deviation' => 0,
+                'average_amount' => 0,
+                'total_amount' => 0,
+                'order_count' => 0,
+                'first_order_date' => null,
+                'last_order_date' => null,
+                'period_days' => 0,
+            ];
+        }
+        
+        $amounts = $orders->pluck('total_amount')->toArray();
+        
+        // Calculate standard deviation manually
+        $average = $orders->avg('total_amount');
+        $variance = 0.0;
+        foreach ($amounts as $amount) {
+            $variance += pow($amount - $average, 2);
+        }
+        $stdDeviation = sqrt($variance / count($amounts));
+        
+        // Calculate median
+        sort($amounts);
+        $count = count($amounts);
+        $middle = floor(($count - 1) / 2);
+        $median = 0;
+        
+        if ($count % 2 == 0) {
+            // Even number of items
+            $median = ($amounts[$middle] + $amounts[$middle + 1]) / 2;
+        } else {
+            // Odd number of items
+            $median = $amounts[$middle];
+        }
+        
+        // Get first and last order dates
+        $sortedOrders = $orders->sortBy('created_at');
+        $firstOrder = $sortedOrders->first();
+        $lastOrder = $sortedOrders->last();
+        
+        return [
+            'min_amount' => $orders->min('total_amount'),
+            'max_amount' => $orders->max('total_amount'),
+            'median_amount' => $median,
+            'std_deviation' => $stdDeviation,
+            'average_amount' => $average,
+            'total_amount' => $orders->sum('total_amount'),
+            'order_count' => $orders->count(),
+            'first_order_date' => $firstOrder->created_at ?? null,
+            'last_order_date' => $lastOrder->created_at ?? null,
+            'period_days' => $firstOrder && $lastOrder ? 
+                $firstOrder->created_at->diffInDays($lastOrder->created_at) + 1 : 0,
+        ];
+    }
+// Alternative method using DomPDF directly
 
     public function exportComparisonPdf(Request $request)
     {
