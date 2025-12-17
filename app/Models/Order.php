@@ -313,6 +313,20 @@ class Order extends Model
      */
     public function reduceStock(): self
     {
+        // Load items with product and variants relationships if not already loaded
+        if (!$this->relationLoaded('items')) {
+            $this->load('items.product.variants');
+        } else {
+            // If items are loaded but product/variants aren't, load them
+            foreach ($this->items as $item) {
+                if (!$item->relationLoaded('product')) {
+                    $item->load('product.variants');
+                } elseif ($item->product && !$item->product->relationLoaded('variants')) {
+                    $item->product->load('variants');
+                }
+            }
+        }
+
         foreach ($this->items as $item) {
             if ($item->product) {
                 // If a variant was selected, deduct from variant stock

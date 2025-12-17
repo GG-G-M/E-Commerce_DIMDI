@@ -95,7 +95,6 @@ class OrderController extends Controller
         }
 
         $subtotal = $cartItems->sum('total_price');
-
         // For now, use default shipping until customer enters address
         // Shipping will be recalculated in store() with actual GPS coordinates
         $shipping = 0; // Will be calculated based on address
@@ -164,7 +163,6 @@ class OrderController extends Controller
 
         // Calculate totals
         $subtotal = $cartItems->sum('total_price');
-
         // Ensure we have the current user available for fallback address construction
         $user = Auth::user();
 
@@ -199,7 +197,6 @@ class OrderController extends Controller
             100 // Default fallback fee of 100 PHP if no zone matches
         );
         $shipping = $shippingResult['fee'];
-
         $total = $subtotal + $shipping;
 
         $user = Auth::user();
@@ -264,6 +261,7 @@ class OrderController extends Controller
                 return $this->initiateRedirectPayment($order, $request->payment_method, $total);
             } else {
                 // For card/bank transfer, update status and reduce stock immediately
+                // Note: updateStatus('confirmed') already calls reduceStock() internally
                 $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($request->payment_method));
 
                 // Send status update + receipt notification (safe)

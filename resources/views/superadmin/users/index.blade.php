@@ -135,68 +135,30 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
-    /* Badges - Compact */
-    .badge-text {
+    /* Role Text Styles */
+    .role-text {
         font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 100px;
+        font-size: 0.85rem;
     }
     
-    .badge-super-admin {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
+    .role-super-admin {
+        color: #9C27B0;
     }
     
-    .badge-admin {
-        background-color: #E8F5E6;
+    .role-admin {
         color: #2C8F0C;
-        border: 1px solid #C8E6C9;
     }
     
-    .badge-delivery {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+    .role-delivery {
+        color: #FBC02D;
     }
     
-    .badge-checker {
-        background-color: #E8F5E9;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
+    .role-checker {
+        color: #1A5D1A;
     }
     
-    .badge-customer {
-        background-color: #F8F9FA;
-        color: #495057;
-        border: 1px solid #E9ECEF;
-    }
-
-    /* Status Badges - Compact */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 70px;
-    }
-    
-    .status-active {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-inactive {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
+    .role-customer {
+        color: #6c757d;
     }
 
     /* Action Buttons */
@@ -390,11 +352,6 @@
         background-color: #f8f9fa;
     }
 
-    /* Card body padding fix */
-    .card-body {
-        padding: 0 !important;
-    }
-
     /* Header button group */
     .header-buttons {
         display: flex;
@@ -414,16 +371,44 @@
         font-size: 0.9rem;
     }
 
-    /* Filter Card */
+    /* Filter Card - FIXED PADDING */
     .filter-card {
         background: white;
         border: none;
         border-radius: 12px;
-        padding: 1.5em;
+        padding: 1.5rem !important; /* Added important to override any other styles */
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-bottom: 1.5rem;
     }
 
+    /* Filter Form Row Spacing */
+    .filter-form-row {
+        margin-bottom: -0.5rem; /* Adjust spacing between rows */
+    }
+
+    .filter-form-row > .col-md-3,
+    .filter-form-row > .col-md-2 {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Status badge styles */
+    .badge-active {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .badge-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
 
     @media (max-width: 768px) {
         .header-buttons {
@@ -434,16 +419,6 @@
         .table th,
         .table td {
             padding: 0.5rem 0.25rem;
-        }
-        
-        .badge-text {
-            min-width: 80px;
-            font-size: 0.7rem;
-        }
-        
-        .status-text {
-            min-width: 60px;
-            font-size: 0.7rem;
         }
         
         .action-btn {
@@ -469,17 +444,51 @@
         .stats-number {
             font-size: 1.5rem;
         }
+        
+        /* Mobile filter adjustments */
+        .filter-card {
+            padding: 1rem !important;
+        }
+        
+        .filter-form-row > .col-md-3,
+        .filter-form-row > .col-md-2 {
+            margin-bottom: 0.75rem;
+        }
     }
 </style>
-
-
-
-<!-- Filter Card -->
+<!-- Statistics -->
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-number">{{ $totalUsers }}</div>
+            <div class="stats-label">Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-number">{{ $adminCount }}</div>
+            <div class="stats-label">Admins</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-number">{{ $deliveryCount }}</div>
+            <div class="stats-label">Delivery Staff</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-number">{{ $activeCount }}</div>
+            <div class="stats-label">Active Users</div>
+        </div>
+    </div>
+</div>
+<!-- Filter Card - Automatic Filters -->
 <div class="filter-card">
-    <div class="card-body">
-        <form method="GET" class="row g-2" id="filterForm">
+    <div class="card-body p-0">
+        <form method="GET" action="{{ route('superadmin.users.index') }}" class="row g-2 filter-form-row" id="filterForm">
             <div class="col-md-3">
-                <div class="mb-2">
+                <div class="mb-0">
                     <label class="form-label fw-bold">Search Users</label>
                     <input type="text" name="search" class="form-control search-box" 
                            placeholder="Search by name or email..." 
@@ -487,7 +496,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="mb-2">
+                <div class="mb-0">
                     <label class="form-label fw-bold">Filter by Role</label>
                     <select name="role" class="form-select search-box" id="roleSelect">
                         <option value="">All Roles</option>
@@ -500,7 +509,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <div class="mb-2">
+                <div class="mb-0">
                     <label class="form-label fw-bold">Status</label>
                     <select name="status" class="form-select search-box" id="statusSelect">
                         <option value="">All Status</option>
@@ -510,7 +519,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <div class="mb-2">
+                <div class="mb-0">
                     <label class="form-label fw-bold">Sort By</label>
                     <select name="sort" class="form-select search-box" id="sortSelect">
                         <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
@@ -521,7 +530,13 @@
                 </div>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <div class="mb-2 w-100">
+                <div class="mb-0 w-100">
+                    <!-- Submit button is now hidden but functional -->
+                    <button type="submit" class="btn btn-success-custom w-100 d-none" id="submitBtn">
+                        <i class="fas fa-filter me-1"></i> Apply
+                    </button>
+                    
+                    <!-- Only show Clear button when filters are applied -->
                     @if(request()->hasAny(['search', 'role', 'status', 'sort']))
                         <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom w-100">
                             <i class="fas fa-times me-1"></i> Clear
@@ -539,7 +554,7 @@
         <h5 class="mb-0">All System Users</h5>
         <div class="header-buttons">
             <a href="{{ route('superadmin.users.create') }}" class="btn btn-success-custom">
-          New User
+            New User
             </a>
         </div>
     </div>
@@ -579,15 +594,15 @@
                             </td>
                             <td class="role-col">
                                 @if($user->role == 'super_admin')
-                                    <span class="badge-text badge-super-admin">Super Admin</span>
+                                    <span class="role-text role-super-admin">Super Admin</span>
                                 @elseif($user->role == 'admin')
-                                    <span class="badge-text badge-admin">Admin</span>
+                                    <span class="role-text role-admin">Admin</span>
                                 @elseif($user->role == 'delivery')
-                                    <span class="badge-text badge-delivery">Delivery</span>
+                                    <span class="role-text role-delivery">Delivery</span>
                                 @elseif($user->role == 'stock_checker' || $user->role == 'checker')
-                                    <span class="badge-text badge-checker">Checker</span>
+                                    <span class="role-text role-checker">Checker</span>
                                 @else
-                                    <span class="badge-text badge-customer">Customer</span>
+                                    <span class="role-text role-customer">Customer</span>
                                 @endif
                             </td>
                             <td class="phone-col">
@@ -599,9 +614,9 @@
                             </td>
                             <td class="status-col">
                                 @if($user->is_active)
-                                    <span class="status-text status-active">Active</span>
+                                    <span class="badge-active">Active</span>
                                 @else
-                                    <span class="status-text status-inactive">Inactive</span>
+                                    <span class="badge-inactive">Inactive</span>
                                 @endif
                             </td>
                             <td class="date-col">
@@ -648,7 +663,7 @@
                     </small>
                 </div>
                 <div>
-                    {{ $users->links('pagination::bootstrap-5') }}
+                    {{ $users->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
                 </div>
             </div>
             @endif
@@ -658,9 +673,11 @@
                 <h5 class="text-muted">No Users Found</h5>
                 <p class="text-muted mb-4">No users match your search criteria</p>
                 <div class="d-flex gap-3 justify-content-center">
+                    @if(request()->hasAny(['search', 'role', 'status', 'sort']))
                     <a href="{{ route('superadmin.users.index') }}" class="btn btn-success-custom">
                         <i class="fas fa-times me-1"></i> Clear Filters
                     </a>
+                    @endif
                     <a href="{{ route('superadmin.users.create') }}" class="btn btn-outline-success-custom">
                         <i class="fas fa-user-plus me-1"></i> Create User
                     </a>
@@ -670,33 +687,6 @@
     </div>
 </div>
 
-<!-- Statistics -->
-<div class="row mt-4">
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $totalUsers }}</div>
-            <div class="stats-label">Total Users</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $adminCount }}</div>
-            <div class="stats-label">Admins</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $deliveryCount }}</div>
-            <div class="stats-label">Delivery Staff</div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card">
-            <div class="stats-number">{{ $activeCount }}</div>
-            <div class="stats-label">Active Users</div>
-        </div>
-    </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -705,30 +695,82 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('roleSelect');
     const statusSelect = document.getElementById('statusSelect');
     const sortSelect = document.getElementById('sortSelect');
+    const submitBtn = document.getElementById('submitBtn');
 
     let searchTimeout;
 
-    // Auto-submit on search input with delay
+    // Function to submit the form
+    function submitFilterForm() {
+        // Show loading state
+        const originalHtml = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Filtering...';
+        submitBtn.disabled = true;
+        
+        // Submit the form
+        filterForm.submit();
+        
+        // Reset button after a delay (in case submission fails)
+        setTimeout(() => {
+            submitBtn.innerHTML = originalHtml;
+            submitBtn.disabled = false;
+        }, 2000);
+    }
+
+    // Auto-submit on search input with delay (debounce)
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            filterForm.submit();
-        }, 500);
+            submitFilterForm();
+        }, 800); // 800ms delay for better UX
     });
 
     // Auto-submit on select changes
     roleSelect.addEventListener('change', function() {
-        filterForm.submit();
+        submitFilterForm();
     });
 
     statusSelect.addEventListener('change', function() {
-        filterForm.submit();
+        submitFilterForm();
     });
 
     sortSelect.addEventListener('change', function() {
-        filterForm.submit();
+        submitFilterForm();
     });
+
+    // Add enter key support for search (immediate submit)
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchTimeout);
+            submitFilterForm();
+        }
+    });
+
+    // Optional: Show loading indicator on form submission
+    filterForm.addEventListener('submit', function() {
+        // The loading state is already handled in submitFilterForm()
+    });
+
+    // Optional: Save filter state to URL without page reload (using History API)
+    function updateUrlWithFilters() {
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams();
+        
+        for (let [key, value] of formData.entries()) {
+            if (value) params.append(key, value);
+        }
+        
+        const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+        window.history.replaceState(null, '', newUrl);
+    }
+
+    // Update URL when filters change (optional enhancement)
+    searchInput.addEventListener('input', updateUrlWithFilters);
+    roleSelect.addEventListener('change', updateUrlWithFilters);
+    statusSelect.addEventListener('change', updateUrlWithFilters);
+    sortSelect.addEventListener('change', updateUrlWithFilters);
 });
 </script>
+
 
 @endsection

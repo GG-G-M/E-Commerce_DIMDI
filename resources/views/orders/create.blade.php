@@ -675,7 +675,6 @@
                                         $discountPercent = $product->discount_percentage;
                                         $variantName = 'Standard';
                                     }
-
                                     $itemTotalPrice = $unitPrice * $item->quantity;
                                     $itemOriginalTotalPrice = $originalUnitPrice * $item->quantity;
                                     $itemSavings = $itemOriginalTotalPrice - $itemTotalPrice;
@@ -981,14 +980,12 @@
         function showToast(message, type = 'success') {
             // Remove existing toasts
             document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
-
             const bgColors = {
                 'success': '#2C8F0C',
                 'error': '#dc3545',
                 'warning': '#ffc107',
                 'info': '#17a2b8'
             };
-
             const icons = {
                 'success': 'fa-check-circle',
                 'error': 'fa-exclamation-triangle',

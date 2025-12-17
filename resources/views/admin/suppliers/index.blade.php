@@ -295,7 +295,6 @@
         overflow: hidden;
     }
 
-
     /* Responsive table - always fixed layout for better fit */
     .table {
         table-layout: fixed;
@@ -536,7 +535,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
 
             @if($suppliers->hasPages())
             <div class="d-flex justify-content-center p-4">

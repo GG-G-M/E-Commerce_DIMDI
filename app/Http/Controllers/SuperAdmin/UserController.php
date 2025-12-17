@@ -15,29 +15,76 @@ class UserController extends Controller
     /**
      * Display a listing of all users.
      */
-    public function index()
-    {
-        // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
-        
-        $users = User::orderBy('created_at', 'desc')->paginate(20);
-        $roles = [
-            User::ROLE_SUPER_ADMIN => 'Super Admin',
-            User::ROLE_ADMIN => 'Admin',
-            User::ROLE_DELIVERY => 'Delivery Staff',
-            User::ROLE_CUSTOMER => 'Customer',
-        ];
-        
-        // Add statistics
-        $totalUsers = User::count();
-        $adminCount = User::where('role', User::ROLE_ADMIN)->count();
-        $deliveryCount = User::where('role', User::ROLE_DELIVERY)->count();
-        $activeCount = User::where('is_active', true)->count();
-        
-        return view('superadmin.users.index', compact('users', 'roles', 'totalUsers', 'adminCount', 'deliveryCount', 'activeCount'));
+   public function index(Request $request)
+{
+    // Check if user is super admin
+    if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
+        return redirect('/')->with('error', 'Unauthorized access.');
     }
+    
+    // Start query
+    $query = User::query();
+    
+    // Apply search filter
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('first_name', 'LIKE', "%{$search}%")
+              ->orWhere('last_name', 'LIKE', "%{$search}%")
+              ->orWhere('email', 'LIKE', "%{$search}%")
+              ->orWhere('phone', 'LIKE', "%{$search}%");
+        });
+    }
+    
+    // Apply role filter
+    if ($request->has('role') && !empty($request->role)) {
+        $query->where('role', $request->role);
+    }
+    
+    // Apply status filter
+    if ($request->has('status') && !empty($request->status)) {
+        $query->where('is_active', $request->status === 'active');
+    }
+    
+    // Apply sorting
+    switch ($request->get('sort', 'newest')) {
+        case 'oldest':
+            $query->orderBy('created_at', 'asc');
+            break;
+        case 'name_asc':
+            $query->orderBy('first_name', 'asc')->orderBy('last_name', 'asc');
+            break;
+        case 'name_desc':
+            $query->orderBy('first_name', 'desc')->orderBy('last_name', 'desc');
+            break;
+        case 'newest':
+        default:
+            $query->orderBy('created_at', 'desc');
+            break;
+    }
+    
+    // Paginate results
+    $users = $query->paginate(20);
+    
+    // Pass the query parameters to the pagination links
+    $users->appends($request->except('page'));
+    
+    // Available roles for the filter dropdown
+    $roles = [
+        User::ROLE_SUPER_ADMIN => 'Super Admin',
+        User::ROLE_ADMIN => 'Admin',
+        User::ROLE_DELIVERY => 'Delivery Staff',
+        User::ROLE_CUSTOMER => 'Customer',
+    ];
+    
+    // Add statistics
+    $totalUsers = User::count();
+    $adminCount = User::where('role', User::ROLE_ADMIN)->count();
+    $deliveryCount = User::where('role', User::ROLE_DELIVERY)->count();
+    $activeCount = User::where('is_active', true)->count();
+    
+    return view('superadmin.users.index', compact('users', 'roles', 'totalUsers', 'adminCount', 'deliveryCount', 'activeCount', 'request'));
+}
 
     /**
      * Show the form for creating a new user.

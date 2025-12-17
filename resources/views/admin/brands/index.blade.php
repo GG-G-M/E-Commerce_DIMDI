@@ -1006,7 +1006,6 @@ document.addEventListener('DOMContentLoaded', function() {
         editSlugInput.value = slug;
     });
 
-
     // Fix table layout on window resize
     window.addEventListener('resize', function() {
         const tableContainer = document.querySelector('.table-container');

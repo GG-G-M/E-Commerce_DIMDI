@@ -207,70 +207,6 @@
         background-color: #F8FDF8;
     }
 
-    /* Badges - Compact */
-    .badge-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 80px;
-    }
-    
-    .badge-super-admin {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-    
-    .badge-admin {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-delivery {
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
-    }
-    
-    .badge-checker {
-        background-color: #E8F5E9;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .badge-customer {
-        background-color: #F8F9FA;
-        color: #495057;
-        border: 1px solid #E9ECEF;
-    }
-
-    /* Status Badges - Compact */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 12px;
-        display: inline-block;
-        text-align: center;
-        min-width: 60px;
-    }
-    
-    .status-active {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-    }
-    
-    .status-inactive {
-        background-color: #FFEBEE;
-        color: #C62828;
-        border: 1px solid #FFCDD2;
-    }
-
     /* Action Buttons */
     .action-buttons {
         display: flex;
@@ -423,14 +359,37 @@
         border-bottom: none;
     }
 
-    .badge-count {
-        background: #E8F5E6;
-        color: #2C8F0C;
-        border: 1px solid #C8E6C9;
-        border-radius: 12px;
-        padding: 0.25rem 0.5rem;
+    /* Status Text Styles */
+    .status-text {
         font-weight: 600;
         font-size: 0.85rem;
+    }
+ 
+
+    /* Role Text Styles */
+    .role-text {
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .role-super-admin {
+        color: #9C27B0;
+    }
+    
+    .role-admin {
+        color: #2C8F0C;
+    }
+    
+    .role-delivery {
+        color: #FBC02D;
+    }
+    
+    .role-checker {
+        color: #1A5D1A;
+    }
+    
+    .role-customer {
+        color: #6c757d;
     }
 
     /* Pagination styling - Consistent */
@@ -520,12 +479,6 @@
             width: 28px;
             height: 28px;
             font-size: 0.8rem;
-        }
-        
-        .badge-text,
-        .status-text {
-            min-width: 70px;
-            font-size: 0.7rem;
         }
     }
 </style>
@@ -654,22 +607,22 @@
                         </td>
                         <td class="role-col">
                             @if($user->role == 'super_admin')
-                                <span class="badge-text badge-super-admin">Super Admin</span>
+                                <span class="role-text role-super-admin">Super Admin</span>
                             @elseif($user->role == 'admin')
-                                <span class="badge-text badge-admin">Admin</span>
+                                <span class="role-text role-admin">Admin</span>
                             @elseif($user->role == 'delivery')
-                                <span class="badge-text badge-delivery">Delivery</span>
+                                <span class="role-text role-delivery">Delivery</span>
                             @elseif($user->role == 'stock_checker' || $user->role == 'checker')
-                                <span class="badge-text badge-checker">Checker</span>
+                                <span class="role-text role-checker">Checker</span>
                             @else
-                                <span class="badge-text badge-customer">Customer</span>
+                                <span class="role-text role-customer">Customer</span>
                             @endif
                         </td>
                         <td class="status-col">
                             @if($user->is_active)
-                                <span class="status-text status-active">Active</span>
+                                <span >Active</span>
                             @else
-                                <span class="status-text status-inactive">Inactive</span>
+                                <span >Inactive</span>
                             @endif
                         </td>
                         <td class="date-col">
@@ -710,7 +663,7 @@
                             <i class="fas fa-users me-3" style="color: #28a745;"></i>
                             <span>Total Customers</span>
                         </span>
-                        <span class="badge-count">
+                        <span class="role-text role-customer">
                             {{ App\Models\User::where('role', 'customer')->count() }}
                         </span>
                     </div>
@@ -719,7 +672,7 @@
                             <i class="fas fa-truck me-3" style="color: #FBC02D;"></i>
                             <span>Delivery Staff</span>
                         </span>
-                        <span class="badge-count">
+                        <span class="role-text role-delivery">
                             {{ App\Models\User::where('role', 'delivery')->count() }}
                         </span>
                     </div>
@@ -728,7 +681,7 @@
                             <i class="fas fa-clipboard-check me-3" style="color: #1A5D1A;"></i>
                             <span>Stock Checkers</span>
                         </span>
-                        <span class="badge-count">
+                        <span class="role-text role-checker">
                             {{ App\Models\User::where('role', 'stock_checker')->orWhere('role', 'checker')->count() }}
                         </span>
                     </div>
@@ -737,7 +690,7 @@
                             <i class="fas fa-box me-3" style="color: #17a2b8;"></i>
                             <span>Total Products</span>
                         </span>
-                        <span class="badge-count">
+                        <span class="role-text role-customer">
                             {{ App\Models\Product::count() }}
                         </span>
                     </div>

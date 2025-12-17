@@ -44,6 +44,34 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Improved Add Button */
+    .btn-add-category {
+         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
+    }
+    
+    
+    .btn-add-category:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-category:active {
+        transform: translateY(0);
     }
 
     /* Improved Add Button */
@@ -456,7 +484,6 @@
     .badge-inactive {
         display: none;
     }
-
 
 
 </style>

@@ -821,12 +821,30 @@
                             <i class="fas fa-exclamation-triangle"></i>
                             <span id="errorText"></span>
                         </div>
+                        <input type="hidden" name="product_id" id="stockOutProductId">
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Reason</label>
                         <input type="text" class="form-control" name="reason" id="reasonInput" placeholder="e.g., Sold, Damaged, Returned">
                     </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" id="quantityInput" min="1" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Reason</label>
+                        <input type="text" class="form-control" name="reason" id="reasonInput" placeholder="e.g., Sold, Damaged, Returned">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-add-stock-out" id="saveBtn">
+                        <i class="fas fa-save me-1"></i> Save
+                    </button>
                 </div>
 
                 <div class="modal-footer">
