@@ -212,6 +212,7 @@
     .badge-shipped { background: #CCE5FF; color: #004085; }
     .badge-delivered { background: #D4EDDA; color: #155724; }
     .badge-cancelled { background: #F8D7DA; color: #721C24; }
+    .badge-out-for-delivery { background: #FFE5CC; color: #CC6600; }
     .summary-item {
         display: flex;
         justify-content: space-between;
@@ -284,6 +285,51 @@
     .timeline-marker.bg-shipped { background-color: #007bff !important; }
     .timeline-marker.bg-delivered { background-color: #28a745 !important; }
     .timeline-marker.bg-cancelled { background-color: #dc3545 !important; }
+    .timeline-marker.bg-out-for-delivery { background-color: #fd7e14 !important; }
+    
+    /* Delivery Proof Section */
+    .delivery-proof-card {
+        background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
+        border: 1px solid var(--light-green);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .proof-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .proof-header i {
+        color: var(--primary-green);
+        font-size: 1.25rem;
+        margin-right: 0.5rem;
+    }
+    
+    .proof-header h6 {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .proof-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border: 2px solid var(--light-green);
+    }
+    
+    .proof-notes {
+        background: white;
+        border: 1px solid var(--light-green);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
     .btn-primary-rounded {
         background: linear-gradient(135deg, var(--primary-green), var(--accent-green));
         color: white;
@@ -364,17 +410,30 @@
             <div>
                 @php
                     $statusClass = [
-                        'pending' => '1badge-pending',
-                        'confirmed' => '1badge-confirmed',
-                        'processing' => '1badge-processing',
-                        'shipped' => '1badge-shipped',
-                        'delivered' => '1badge-delivered',
-                        'cancelled' => '1badge-cancelled'
-                    ][$order->order_status] ?? '1badge-pending';
+                        'pending' => 'badge-pending',
+                        'confirmed' => 'badge-confirmed',
+                        'processing' => 'badge-processing',
+                        'shipped' => 'badge-shipped',
+                        'out_for_delivery' => 'badge-out-for-delivery',
+                        'delivered' => 'badge-delivered',
+                        'cancelled' => 'badge-cancelled'
+                    ][$order->order_status] ?? 'badge-pending';
                 @endphp
                 <span class="status-badge {{ $statusClass }}">
-                    <i class="fas fa-{{ $order->order_status == 'pending' ? 'clock' : ($order->order_status == 'confirmed' ? 'check' : ($order->order_status == 'processing' ? 'cog' : ($order->order_status == 'shipped' ? 'shipping-fast' : ($order->order_status == 'delivered' ? 'check-circle' : 'times')))) }}"></i>
-                    {{ ucfirst($order->order_status) }}
+                    @php
+                        $statusIcon = match($order->order_status) {
+                            'pending' => 'clock',
+                            'confirmed' => 'check',
+                            'processing' => 'cog',
+                            'shipped' => 'shipping-fast',
+                            'out_for_delivery' => 'truck',
+                            'delivered' => 'check-circle',
+                            'cancelled' => 'times',
+                            default => 'clock'
+                        };
+                    @endphp
+                    <i class="fas fa-{{ $statusIcon }}"></i>
+                    {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
                 </span>
             </div>
         </div>
@@ -502,7 +561,7 @@
                             $isCurrentStatus = $history->status === $order->order_status;
                         @endphp
                         <div class="timeline-item {{ $isCurrentStatus ? 'current' : '' }}">
-                            <div class="timeline-marker {{ $history->status === 'cancelled' ? 'bg-danger' : ($history->status === 'delivered' ? 'bg-success' : ($history->status === 'shipped' ? 'bg-primary' : ($history->status === 'confirmed' ? 'bg-info' : ($history->status === 'processing' ? 'bg-success' : 'bg-warning')))) }}">
+                            <div class="timeline-marker {{ $history->status === 'cancelled' ? 'bg-cancelled' : ($history->status === 'delivered' ? 'bg-delivered' : ($history->status === 'shipped' ? 'bg-shipped' : ($history->status === 'confirmed' ? 'bg-confirmed' : ($history->status === 'processing' ? 'bg-processing' : 'bg-pending')))) }}">
                             </div>
                             <div class="timeline-content">
                                 <h6 class="mb-1 text-{{ $history->status === 'cancelled' ? 'danger' : ($history->status === 'delivered' ? 'success' : ($history->status === 'shipped' ? 'primary' : ($history->status === 'confirmed' ? 'info' : ($history->status === 'processing' ? 'success' : 'warning')))) }}">
@@ -532,6 +591,70 @@
         </div>
 
         <div class="col-lg-4">
+            <!-- Delivery Proof -->
+            <div class="info-section">
+                <div class="info-header">
+                    <i class="fas fa-camera"></i>
+                    <h5>Delivery Proof</h5>
+                </div>
+                <div class="info-content">
+                    @if($order->delivery_proof_photo || $order->delivery_notes)
+                        @if($order->delivery_proof_photo)
+                        <div class="delivery-proof-card">
+                            <div class="proof-header">
+                                <i class="fas fa-camera"></i>
+                                <h6>Delivery Photo</h6>
+                            </div>
+                            <div class="text-center">
+                                <a href="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                                   target="_blank" 
+                                   title="Click to view full size">
+                                    <img src="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                                         alt="Delivery Proof" 
+                                         class="proof-image mb-2"
+                                         style="cursor: pointer; transition: transform 0.2s ease;"
+                                         onmouseover="this.style.transform='scale(1.05)'"
+                                         onmouseout="this.style.transform='scale(1)'"
+                                         onerror="this.src='{{ asset('images/noproduct.png') }}'; this.onerror=null;">
+                                </a>
+                                <div class="text-muted small">
+                                    <i class="fas fa-search-plus me-1"></i>Click image to view full size
+                                </div>
+                                @if($order->delivered_at)
+                                <div class="text-muted small mt-1">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ $order->delivered_at->format('M j, Y h:i A') }}
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                        @else
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-camera fa-2x mb-2"></i>
+                            <p>No delivery photo available</p>
+                        </div>
+                        @endif
+                        
+                        @if($order->delivery_notes)
+                        <div class="delivery-proof-card">
+                            <div class="proof-header">
+                                <i class="fas fa-comment"></i>
+                                <h6>Delivery Notes</h6>
+                            </div>
+                            <div class="proof-notes">
+                                {{ $order->delivery_notes }}
+                            </div>
+                        </div>
+                        @endif
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle fa-2x mb-2"></i>
+                            <p>No delivery proof or notes available for this order.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="info-section">
                 <div class="info-header">
                     <i class="fas fa-calculator"></i>

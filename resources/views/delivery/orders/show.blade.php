@@ -316,7 +316,7 @@
         color: var(--primary-green);
     }
     
-    /* Timeline */
+    /* Enhanced Timeline */
     .timeline {
         position: relative;
         padding-left: 30px;
@@ -325,6 +325,13 @@
     .timeline-item {
         position: relative;
         margin-bottom: 25px;
+    }
+    
+    .timeline-item.current .timeline-marker {
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 3px var(--primary-green);
+        transform: scale(1.3);
+        animation: pulse 2s infinite;
     }
     
     .timeline-marker {
@@ -364,11 +371,19 @@
         margin-left: -5px;
     }
     
-    .timeline-marker.bg-delivered { background-color: #28a745 !important; }
-    .timeline-marker.bg-shipped { background-color: #007bff !important; }
-    .timeline-marker.bg-out-for-delivery { background-color: #fd7e14 !important; }
-    .timeline-marker.bg-confirmed { background-color: #17a2b8 !important; }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
+    }
+    
     .timeline-marker.bg-pending { background-color: #ffc107 !important; }
+    .timeline-marker.bg-confirmed { background-color: #17a2b8 !important; }
+    .timeline-marker.bg-processing { background-color: var(--primary-green) !important; }
+    .timeline-marker.bg-shipped { background-color: #007bff !important; }
+    .timeline-marker.bg-delivered { background-color: #28a745 !important; }
+    .timeline-marker.bg-out-for-delivery { background-color: #fd7e14 !important; }
+    .timeline-marker.bg-cancelled { background-color: #dc3545 !important; }
     
     /* Back Button */
     .btn-back {
@@ -412,7 +427,19 @@
                 ][$order->order_status] ?? 'badge-pending';
             @endphp
             <span class="status-badge {{ $statusClass }}">
-                <i class="fas fa-{{ $order->order_status == 'pending' ? 'clock' : ($order->order_status == 'confirmed' ? 'check' : ($order->order_status == 'processing' ? 'cog' : ($order->order_status == 'shipped' ? 'shipping-fast' : ($order->order_status == 'out_for_delivery' ? 'truck' : ($order->order_status == 'delivered' ? 'check-circle' : 'times'))))) }}"></i>
+                @php
+                    $statusIcon = match($order->order_status) {
+                        'pending' => 'clock',
+                        'confirmed' => 'check',
+                        'processing' => 'cog',
+                        'shipped' => 'shipping-fast',
+                        'out_for_delivery' => 'truck',
+                        'delivered' => 'check-circle',
+                        'cancelled' => 'times',
+                        default => 'clock'
+                    };
+                @endphp
+                <i class="fas fa-{{ $statusIcon }}"></i>
                 {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
             </span>
         </div>
