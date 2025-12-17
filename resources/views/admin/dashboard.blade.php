@@ -8,6 +8,7 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow: hidden;
+        min-height: 140px;
     }
     
     .stats-card:hover {
@@ -400,8 +401,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
+                            <i class="fas fa-box stats-icon me-2"></i>
                             <div class="stats-label">TOTAL PRODUCTS</div>
-                            <div class="stats-number">{{ $stats['total_products'] }}</div>
                             <small>
                                 @if($filter != 'all')
                                     Added in selected period
@@ -411,7 +412,7 @@
                             </small>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-box stats-icon"></i>
+                            <div class="stats-number">{{ $stats['total_products'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -426,8 +427,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
+                            <i class="fas fa-shopping-cart stats-icon me-2"></i>
                             <div class="stats-label">TOTAL ORDERS</div>
-                            <div class="stats-number">{{ $stats['total_orders'] }}</div>
                             <small>
                                 @if($filter != 'all')
                                     Orders in selected period
@@ -437,7 +438,7 @@
                             </small>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-shopping-cart stats-icon"></i>
+                            <div class="stats-number">{{ $stats['total_orders'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -452,8 +453,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
+                            <i class="fas fa-users stats-icon me-2"></i>
                             <div class="stats-label">TOTAL CUSTOMERS</div>
-                            <div class="stats-number">{{ $stats['total_customers'] }}</div>
                             <small>
                                 @if($filter != 'all')
                                     Registered in selected period
@@ -463,7 +464,7 @@
                             </small>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-users stats-icon"></i>
+                            <div class="stats-number">{{ $stats['total_customers'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -477,8 +478,8 @@
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
+                        <i class="fas fa-dollar-sign stats-icon me-2"></i>
                         <div class="stats-label">TOTAL REVENUE</div>
-                        <div class="stats-number">₱{{ number_format($stats['revenue'], 2) }}</div>
                         <small>
                             @if($filter != 'all')
                                 Revenue in selected period
@@ -488,7 +489,7 @@
                         </small>
                     </div>
                     <div class="col-auto">
-                        <i class="fas fa-dollar-sign stats-icon"></i>
+                        <div class="stats-number">₱{{ number_format($stats['revenue'], 2) }}</div>
                     </div>
                 </div>
             </div>
