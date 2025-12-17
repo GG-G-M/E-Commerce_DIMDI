@@ -485,13 +485,15 @@
     </div>
 
     <!-- Shipping Address -->
-    <div class="shipping-card">
-        <div class="shipping-header">
+    <div class="info-section">
+        <div class="info-header">
             <i class="fas fa-map-marker-alt"></i>
-            <h6>Shipping Address</h6>
+            <h5>Shipping Address</h5>
         </div>
-        <div class="address-content">
-            {!! nl2br(e($order->shipping_address)) !!}
+        <div class="info-content">
+            <div class="address-content">
+                {!! nl2br(e($order->shipping_address)) !!}
+            </div>
         </div>
     </div>
 </div>

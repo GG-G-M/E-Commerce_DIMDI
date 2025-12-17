@@ -12,9 +12,22 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
+        $status = $request->get('status');
         
         $categories = Category::when($search, function($query) use ($search) {
                 return $query->search($search);
+            })
+            ->when($status === 'archived', function($query) {
+                return $query->where('is_archived', true);
+            })
+            ->when($status === 'active', function($query) {
+                return $query->where('is_active', true)->where('is_archived', false);
+            })
+            ->when($status === 'inactive', function($query) {
+                return $query->where('is_active', false)->where('is_archived', false);
+            })
+            ->when(!$status, function($query) {
+                return $query->where('is_archived', false);
             })
             ->latest()
             ->paginate(10)
@@ -40,6 +53,7 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'is_active' => $request->has('is_active'),
+            'is_archived' => false,
         ]);
 
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully!');
@@ -69,13 +83,26 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        // Check if category has products
-        if ($category->products()->count() > 0) {
-            return redirect()->back()->with('error', 'Cannot delete category with associated products.');
-        }
+        // Actually archive instead of delete
+        $category->is_archived = true;
+        $category->save();
 
-        $category->delete();
+        return redirect()->route('admin.categories.index')->with('success', 'Category archived successfully!');
+    }
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully!');
+    public function archive(Category $category)
+    {
+        $category->is_archived = true;
+        $category->save();
+
+        return response()->json(['success' => true, 'message' => 'Category archived successfully']);
+    }
+
+    public function unarchive(Category $category)
+    {
+        $category->is_archived = false;
+        $category->save();
+
+        return response()->json(['success' => true, 'message' => 'Category unarchived successfully']);
     }
 }

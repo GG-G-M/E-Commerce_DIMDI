@@ -48,28 +48,28 @@ class ShippingZoneSeeder extends Seeder
             [
                 'zone_name' => 'Local',
                 'min_distance' => 0,
-                'max_distance' => 100,
+                'max_distance' => 250,
                 'shipping_fee' => 100,
                 'description' => 'Local delivery within 15km'
             ],
             [
                 'zone_name' => 'Metro',
-                'min_distance' => 100.01,
-                'max_distance' => 200,
+                'min_distance' => 250.01,
+                'max_distance' => 500,
                 'shipping_fee' => 150,
                 'description' => 'Metro area (15-50km)'
             ],
             [
                 'zone_name' => 'Provincial',
-                'min_distance' => 200.01,
-                'max_distance' => 300,
+                'min_distance' => 500.01,
+                'max_distance' => 750,
                 'shipping_fee' => 200,
                 'description' => 'Provincial delivery (50-150km)'
             ],
             [
                 'zone_name' => 'Far Provincial',
-                'min_distance' => 300.01,
-                'max_distance' => 500,
+                'min_distance' => 750.01,
+                'max_distance' => 1000,
                 'shipping_fee' => 350,
                 'description' => 'Far provincial (150-500km)'
             ]

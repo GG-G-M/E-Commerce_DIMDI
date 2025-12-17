@@ -195,6 +195,75 @@
         flex-wrap: nowrap;
     }
 
+    /* Enhanced Action Buttons - Consistent with suppliers */
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-edit {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-edit:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+    
+    .btn-delete {
+        background-color: white;
+        border-color: #C62828;
+        color: #C62828;
+    }
+    
+    .btn-delete:hover {
+        background-color: #C62828;
+        color: white;
+    }
+
+    /* Tooltip styling for buttons */
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
     .status-active {
         color: #2C8F0C;
         font-weight: 600;
@@ -203,6 +272,49 @@
     .status-inactive {
         color: #6c757d;
         font-weight: 600;
+    }
+
+    /* Status styling - Consistent with suppliers */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
+        color: #2C8F0C;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-text-inactive {
+        color: #6c757d;
+    }
+
+    .status-text-inactive::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.8;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
     .table th {
@@ -261,7 +373,7 @@
     <div class="card-body">
         <form method="GET" action="{{ route('admin.banners.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Banners</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -273,7 +385,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
@@ -283,7 +395,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="sort_by" class="form-label fw-bold">Sort By</label>
                         <select class="form-select" id="sort_by" name="sort_by">
@@ -377,18 +489,18 @@
                             </td>
                             <td>
                                 @if($banner->is_active)
-                                    <span class="status-active">
-                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    <span class="status-text status-text-active">
+                                        Active
                                     </span>
                                 @else
-                                    <span class="status-inactive">
-                                        <i class="fas fa-times-circle me-1"></i>Inactive
+                                    <span class="status-text status-text-inactive">
+                                        Inactive
                                     </span>
                                 @endif
                             </td>
                             <td class="text-center">
                                 <div class="action-buttons justify-content-center">
-                                    <button type="button" class="btn btn-sm btn-outline-warning edit-banner-btn"
+                                    <button type="button" class="action-btn btn-edit edit-banner-btn"
                                             data-bs-toggle="modal" data-bs-target="#editBannerModal"
                                             data-id="{{ $banner->id }}"
                                             data-title="{{ $banner->title }}"
@@ -397,15 +509,16 @@
                                             data-target_url="{{ $banner->target_url }}"
                                             data-order="{{ $banner->order }}"
                                             data-is_active="{{ $banner->is_active }}"
-                                            data-image="{{ $banner->image_path ? asset($banner->image_path) : '' }}">
+                                            data-image="{{ $banner->image_path ? asset($banner->image_path) : '' }}"
+                                            data-title="Edit Banner">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     <form action="{{ route('admin.banners.destroy', $banner) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        <button type="submit" class="action-btn btn-delete"
                                                 onclick="return confirm('Are you sure you want to delete this banner?')"
-                                                title="Delete Banner">
+                                                data-title="Delete Banner">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>

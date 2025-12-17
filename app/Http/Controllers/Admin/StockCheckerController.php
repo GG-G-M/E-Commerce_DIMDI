@@ -100,9 +100,15 @@ class StockCheckerController extends Controller
     public function archive($id)
     {
         $checker = StockChecker::findOrFail($id);
-        $checker->update(['is_archived' => true]);
-
-        return response()->json(['success' => true]);
+        
+        if ($checker->archive()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to archive stock checker.'
+        ], 500);
     }
 
     /**
@@ -111,9 +117,15 @@ class StockCheckerController extends Controller
     public function unarchive($id)
     {
         $checker = StockChecker::findOrFail($id);
-        $checker->update(['is_archived' => false]);
-
-        return response()->json(['success' => true]);
+        
+        if ($checker->unarchive()) {
+            return response()->json(['success' => true]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to unarchive stock checker.'
+        ], 500);
     }
 
     /**

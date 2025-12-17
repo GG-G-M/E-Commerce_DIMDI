@@ -2,11 +2,40 @@
 
 @section('content')
 <div class="container-fluid px-4">
+<<<<<<< HEAD
     <!-- Back Button -->
     <div class="mb-4">
         <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
             <i class="fas fa-arrow-left me-2"></i>Back to Users
         </a>
+=======
+    <!-- Header -->
+    <div class="dashboard-header mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="{{ route('superadmin.dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('superadmin.users.index') }}">Users</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('superadmin.users.show', $user) }}">{{ $user->name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h3 fw-bold mb-1">
+                    <i class="fas fa-user-edit text-success me-2"></i>Edit User: {{ $user->name }}
+                </h1>
+                <p class="text-muted mb-0">Update user information, role, and permissions</p>
+            </div>
+            <div class="header-buttons">
+                <a href="{{ route('superadmin.users.show', $user) }}" class="btn btn-outline-success-custom">
+                    <i class="fas fa-eye me-2"></i>View
+                </a>
+                <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Users
+                </a>
+            </div>
+        </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     </div>
 
     @if($user->isSuperAdmin() && $user->id !== auth()->id())
@@ -40,6 +69,7 @@
     @endif
 
     <div class="row justify-content-center">
+<<<<<<< HEAD
         <!-- Main Content - Wider Column -->
         <div class="col-12">
             <!-- Main Form -->
@@ -51,13 +81,92 @@
                     <span class="badge bg-white text-success border border-success border-opacity-25">
                         Required fields marked <span class="text-required">*</span>
                     </span>
+=======
+        <!-- Main Content -->
+        <div class="col-xl-10 col-lg-12">
+            <!-- User Summary Card -->
+            <div class="card card-custom mb-4">
+                <div class="card-body p-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    @if($user->isSuperAdmin())
+                                        <div class="bg-danger bg-opacity-10 p-2 rounded-circle">
+                                            <i class="fas fa-crown text-danger"></i>
+                                        </div>
+                                    @elseif($user->isAdmin())
+                                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+                                            <i class="fas fa-user-shield text-primary"></i>
+                                        </div>
+                                    @elseif($user->isDelivery())
+                                        <div class="bg-warning bg-opacity-10 p-2 rounded-circle">
+                                            <i class="fas fa-truck text-warning"></i>
+                                        </div>
+                                    @else
+                                        <div class="bg-secondary bg-opacity-10 p-2 rounded-circle">
+                                            <i class="fas fa-user text-secondary"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div>
+                                    <h4 class="mb-1 fw-bold">{{ $user->name }}</h4>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @if($user->isSuperAdmin())
+                                            <span class="badge-text badge-superadmin">Super Admin</span>
+                                        @elseif($user->isAdmin())
+                                            <span class="badge-text badge-admin">Admin</span>
+                                        @elseif($user->isDelivery())
+                                            <span class="badge-text badge-delivery">Delivery</span>
+                                        @else
+                                            <span class="badge-text badge-customer">Customer</span>
+                                        @endif
+                                        <span class="status-text {{ $user->is_active ? 'status-active' : 'status-inactive' }}">
+                                            {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                        </span>
+                                        <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                            <i class="fas fa-calendar me-1"></i>{{ $user->created_at->format('M d, Y') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="d-flex flex-column">
+                                <span class="text-muted small">Last Updated</span>
+                                <span class="fw-bold text-success">{{ $user->updated_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 </div>
 
+<<<<<<< HEAD
                 <form method="POST" action="{{ route('superadmin.users.update', $user) }}" id="editUserForm">
                     @csrf
                     @method('PUT')
 
                     <div class="p-4 p-md-5">
+=======
+            <!-- Main Form Card -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-edit me-2"></i>Edit User Information
+                        </h5>
+                        <span class="badge bg-white text-success border border-success border-opacity-25">
+                            Required fields marked <span class="text-required">*</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <form method="POST" action="{{ route('superadmin.users.update', $user) }}" id="editUserForm">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="card-body p-4 p-md-5">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                         <!-- Name Section -->
                         <div class="form-section mb-4">
                             <div class="d-flex align-items-center mb-3">
@@ -443,7 +552,66 @@
             </div>
             @endif
 
+<<<<<<< HEAD
 
+=======
+            <!-- User Activity Stats -->
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>User Activity
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                <div class="bg-success-custom p-2 rounded-circle me-3">
+                                    <i class="fas fa-calendar-check text-success"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-number mb-0">{{ $user->created_at->format('M d, Y') }}</h4>
+                                    <small class="stats-label">Account Created</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                <div class="bg-primary-custom p-2 rounded-circle me-3">
+                                    <i class="fas fa-clock text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-number mb-0">{{ $user->updated_at->diffForHumans() }}</h4>
+                                    <small class="stats-label">Last Updated</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                <div class="bg-warning-custom p-2 rounded-circle me-3">
+                                    <i class="fas fa-sign-in-alt text-warning"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-number mb-0" id="lastLogin">--</h4>
+                                    <small class="stats-label">Last Login</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="d-flex align-items-center p-3 border rounded bg-light">
+                                <div class="bg-info-custom p-2 rounded-circle me-3">
+                                    <i class="fas fa-user-clock text-info"></i>
+                                </div>
+                                <div>
+                                    <h4 class="stats-number mb-0" id="accountAge">--</h4>
+                                    <small class="stats-label">Account Age</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         </div>
     </div>
 </div>
@@ -519,11 +687,14 @@
         --warning: #856404;
     }
 
+<<<<<<< HEAD
     /* Wider layout */
     .container-fluid {
         max-width: 1800px;
     }
 
+=======
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     /* Dashboard Header */
     .dashboard-header {
         background: white;

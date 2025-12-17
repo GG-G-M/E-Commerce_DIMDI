@@ -257,12 +257,12 @@
                                         </a>
                                     </li>
 
-                                    <li class="nav-item">
+                                    {{-- <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.deliveries.*') ? 'active' : '' }}"
                                             href="{{ route('admin.deliveries.index') }}">
                                             <i class="fas fa-truck me-2"></i>Delivery
                                         </a>
-                                    </li>
+                                    </li> --}}
 
                                     <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
@@ -349,12 +349,12 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.inventory-reports.*') ? 'active' : '' }}"
                                 href="{{ route('admin.inventory-reports.index') }}">
                                 <i class="fas fa-boxes me-2"></i>Inventory Reports
                             </a>
-                        </li>
+                        </li> --}}
 
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales-report.*') ? 'active' : '' }}"
@@ -370,7 +370,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="logoutWithConfirm(event);">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -411,20 +411,6 @@
 
                 <!-- Page content -->
                 <div class="container-fluid py-4">
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
                     @yield('content')
                 </div>
             </main>
@@ -433,6 +419,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @include('components.ui-elements')
     @stack('scripts')
 </body>
 

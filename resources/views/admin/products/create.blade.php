@@ -272,9 +272,64 @@
             text-align: center;
         }
     }
+
+    /* === Green Gradient Buttons (matching Add Product button from index) === */
+    .btn-custom-green {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+
+    .btn-custom-green:active {
+        transform: translateY(0);
+    }
+
+    /* Secondary green button for cancel */
+    .btn-custom-green-secondary {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green-secondary:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #495057;
+    }
 </style>
 
 <!-- Header -->
+<<<<<<< HEAD
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-start">
         <div>
@@ -286,6 +341,12 @@
         </a>
     </div>
 </div>
+=======
+{{-- <div class="page-header">
+    <h1 class="h3 mb-1">Add New Product</h1>
+    <p class="text-muted mb-0">Fill out the form to add a new product to your store.</p>
+</div> --}}
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
 <!-- Product Form -->
 <div class="form-container">
@@ -411,6 +472,7 @@
                             Enable Product Variants
                         </label>
                     </div>
+<<<<<<< HEAD
                 </div>
             </div>
             
@@ -468,6 +530,116 @@
                                                    name="variants[{{ $index }}][price]" 
                                                    value="{{ $variant['price'] ?? '' }}" 
                                                    min="0" required>
+=======
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
+                                <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror" 
+                                       id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', 0) }}" 
+                                       min="0" {{ old('has_variants') ? '' : 'required' }} readonly>
+                                @error('stock_quantity')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Used when variants are disabled</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category_id" class="form-label">Category *</label>
+                                <select class="form-select @error('category_id') is-invalid @enderror" 
+                                        id="category_id" name="category_id" required>
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('category_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Dropdown -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="brand_id" class="form-label">Brand</label>
+                                <select class="form-select @error('brand_id') is-invalid @enderror" 
+                                        id="brand_id" name="brand_id">
+                                    <option value="">Select Brand</option>
+                                    @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('brand_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Select the product brand (optional)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- You can add more fields here if needed -->
+                        </div>
+                    </div>
+
+                    <!-- Variants Toggle -->
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_variants" name="has_variants" value="1" {{ old('has_variants') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="has_variants">
+                                <strong>Enable Product Variants</strong>
+                            </label>
+                            <small class="form-text text-muted d-block">
+                                Enable this to create different models/versions of this product
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Variants Section -->
+                    <div id="variantsSection" style="display: {{ old('has_variants') ? 'block' : 'none' }};">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label mb-0">Product Variants</label>
+                            <button type="button" id="addVariant" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus me-1"></i> Add Variant
+                            </button>
+                        </div>
+
+                        <div id="variantsContainer">
+                            @if(old('variants'))
+                                @foreach(old('variants') as $index => $variant)
+                                <div class="variant-card" data-index="{{ $index }}">
+                                    <div class="variant-header">
+                                        <span class="variant-number">Variant #{{ $index + 1 }}</span>
+                                        <button type="button" class="remove-variant" onclick="removeVariant(this)">
+                                            <i class="fas fa-times me-1"></i> Remove
+                                        </button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Variant Name *</label>
+                                                <input type="text" class="form-control" 
+                                                       name="variants[{{ $index }}][variant_name]" 
+                                                       value="{{ $variant['variant_name'] ?? '' }}" 
+                                                       placeholder="e.g., Pro Model, Standard Edition" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Stock Quantity *</label>
+                                                <input type="number" class="form-control stock-input" 
+                                                       name="variants[{{ $index }}][stock]" 
+                                                       value="{{ $variant['stock'] ?? 0 }}" 
+                                                       min="0" readonly>
+                                            </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                         </div>
                                     </div>
                                     
@@ -489,6 +661,30 @@
                                                accept="image/*">
                                     </div>
                                 </div>
+<<<<<<< HEAD
+=======
+                                @endforeach
+                            @else
+                                <div class="no-variants-message" id="noVariantsMessage">
+                                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                                    <h5>No Variants Added</h5>
+                                    <p class="mb-0">Click "Add Variant" to create different models of this product.</p>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Total Stock Summary -->
+                        <div class="total-stock-summary">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Total Variants:</strong> 
+                                    <span id="totalVariants">0</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Total Stock:</strong> 
+                                    <span id="totalStock">0 units</span>
+                                </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                             </div>
                             @endforeach
                         @else
@@ -535,6 +731,7 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
         </div>
         
         <!-- Product Status -->
@@ -567,6 +764,18 @@
                         </div>
                     </div>
                 </div>
+=======
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                <a href="{{ route('admin.products.index') }}" class="btn-custom-green-secondary me-md-2">
+                    {{-- <i class="fas fa-times"></i> --}}
+                    Cancel
+                </a>
+                <button type="submit" class="btn-custom-green">
+                    {{-- <i class="fas fa-plus"></i> --}}
+                    Create Product
+                </button>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             </div>
         </div>
         
@@ -594,11 +803,23 @@
         const stockQuantityInput = document.getElementById('stock_quantity');
         
         variantsSection.style.display = this.checked ? 'block' : 'none';
+<<<<<<< HEAD
         stockQuantityInput.disabled = this.checked;
         stockQuantityInput.required = !this.checked;
         
         if (this.checked) {
             stockQuantityInput.value = 0;
+=======
+        
+        // Enable/disable stock quantity field based on variants
+        if (this.checked) {
+            stockQuantityInput.readOnly = true;
+            stockQuantityInput.removeAttribute('required');
+            stockQuantityInput.value = '0';
+        } else {
+            stockQuantityInput.readOnly = false;
+            stockQuantityInput.setAttribute('required', 'required');
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         }
         
         updateSummary();
@@ -631,10 +852,19 @@
                     </div>
                     
                     <div class="col-md-6">
+<<<<<<< HEAD
                         <label class="form-label">Stock Quantity *</label>
                         <input type="number" class="form-control stock-input" 
                                name="variants[${variantCount}][stock]" 
                                value="0" min="0" required>
+=======
+                        <div class="mb-3">
+                            <label class="form-label">Stock Quantity *</label>
+                            <input type="number" class="form-control stock-input" 
+                                   name="variants[${variantCount}][stock]" 
+                                   value="0" min="0" readonly>
+                        </div>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     </div>
                     
                     <div class="col-12">
@@ -759,6 +989,17 @@
                 alert('Please add at least one variant when variants are enabled.');
                 return false;
             }
+            
+            // Clear stock_quantity when variants are enabled
+            document.getElementById('stock_quantity').value = '0';
+        } else {
+            // Ensure stock_quantity has a value when variants are disabled
+            const stockQuantity = document.getElementById('stock_quantity').value;
+            if (!stockQuantity || stockQuantity < 0) {
+                e.preventDefault();
+                alert('Please enter a valid stock quantity when variants are disabled.');
+                return false;
+            }
         }
         
         // Validate prices
@@ -772,9 +1013,66 @@
         }
     });
 
+<<<<<<< HEAD
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         updateSummary();
     });
+=======
+    // Initial summary update
+    updateSummary();
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 </script>
 @endpush

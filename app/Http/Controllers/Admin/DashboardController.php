@@ -161,7 +161,7 @@ class DashboardController extends Controller
 
     private function getRevenue($dateRange)
     {
-        $query = Order::where('order_status', '!=', 'cancelled');
+        $query = Order::where('order_status', 'delivered');
         
         if ($dateRange) {
             $query->whereBetween(
@@ -195,7 +195,7 @@ class DashboardController extends Controller
                 DB::raw('SUM(total_price) as total_revenue')
             )
             ->whereHas('order', function($query) {
-                $query->where('order_status', '!=', 'cancelled');
+                $query->where('order_status', 'delivered');
             })
             ->with(['product' => function($query) {
                 $query->with('category');
@@ -227,7 +227,7 @@ class DashboardController extends Controller
         // Get products that have sales in the period
         $soldProductsQuery = OrderItem::select('product_id')
             ->whereHas('order', function($query) {
-                $query->where('order_status', '!=', 'cancelled');
+                $query->where('order_status', 'delivered');
             })
             ->whereIn('product_id', $allActiveProducts)
             ->groupBy('product_id');
@@ -268,7 +268,7 @@ class DashboardController extends Controller
                     DB::raw('SUM(total_price) as total_revenue')
                 )
                 ->whereHas('order', function($query) {
-                    $query->where('order_status', '!=', 'cancelled');
+                    $query->where('order_status', 'delivered');
                 })
                 ->whereIn('product_id', $allActiveProducts)
                 ->with(['product' => function($query) {
@@ -288,7 +288,7 @@ class DashboardController extends Controller
 
     private function getSalesData($dateRange, $filter)
     {
-        $query = Order::where('order_status', '!=', 'cancelled');
+        $query = Order::where('order_status', 'delivered');
 
         if ($dateRange) {
             $query->whereBetween(

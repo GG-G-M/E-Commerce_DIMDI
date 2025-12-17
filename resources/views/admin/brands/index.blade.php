@@ -74,7 +74,6 @@
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
     }
     
     .action-btn {
@@ -106,6 +105,28 @@
         color: white;
     }
     
+    .btn-archive {
+        background-color: white;
+        border-color: #FBC02D;
+        color: #FBC02D;
+    }
+    
+    .btn-archive:hover {
+        background-color: #FBC02D;
+        color: white;
+    }
+    
+    .btn-unarchive {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-unarchive:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+    
     .btn-delete {
         background-color: white;
         border-color: #C62828;
@@ -132,6 +153,9 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
@@ -145,7 +169,7 @@
         transition: background-color 0.2s ease;
     }
 
-    /* Alternating row colors */
+    /* Alternating row colors for better readability */
     .table tbody tr:nth-child(even) {
         background-color: #f8f9fa;
     }
@@ -183,17 +207,32 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-inactive {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-inactive {
+        color: #dc3545;
+    }
+
+    .status-text-inactive::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        opacity: 0.8;
+    }
+
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Modal Styling - Consistent */
@@ -255,62 +294,9 @@
         align-items: center;
         justify-content: center;
         color: white;
-    }
-
-    /* Tips Box */
-    .tips-box {
-        background-color: #F8FDF8;
-        border-left: 4px solid #2C8F0C;
-        border-radius: 8px;
-        padding: 1rem;
+        font-weight: bold;
         font-size: 0.9rem;
-        color: #2C8F0C;
     }
-
-    .tips-box i {
-        color: #2C8F0C;
-        margin-right: 5px;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        color: #C8E6C9;
-        margin-bottom: 1rem;
-    }
-
-    /* Table Container for consistency */
-    .table-container {
-        overflow-x: auto;
-        border-radius: 8px;
-        border: 1px solid #e9ecef;
-    }
-    
-    /* Responsive adjustments */
-    @media (min-width: 1200px) {
-        .table-container {
-            overflow-x: visible;
-        }
-        
-        .table {
-            table-layout: fixed;
-        }
-    }
-
-    /* Column widths for consistency */
-    .name-col { min-width: 200px; width: 250px; }
-    .id-col { min-width: 80px; width: 100px; }
-    .slug-col { min-width: 150px; width: 180px; }
-    .description-col { min-width: 200px; max-width: 250px; width: 250px; }
-    .products-col { min-width: 100px; width: 120px; }
-    .status-col { min-width: 100px; width: 120px; }
-    .sort-col { min-width: 100px; width: 120px; }
-    .action-col { min-width: 120px; width: 140px; }
 
     /* Brand Info Cell */
     .brand-info-cell {
@@ -338,6 +324,34 @@
         word-break: break-word;
     }
 
+    /* Tooltip styling for buttons */
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+
     /* Products Count */
     .products-count {
         font-weight: 600;
@@ -346,6 +360,66 @@
         display: flex;
         align-items: center;
         gap: 5px;
+    }
+
+    /* Table styling for no scroll bars */
+    .table {
+        width: 100%;
+        max-width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    /* Prevent any scroll bars in the table card */
+    .card-custom .card-body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    .card-custom {
+        overflow: hidden;
+    }
+
+    /* Responsive table - always fixed layout for better fit */
+    .table {
+        table-layout: fixed;
+    }
+
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .slug-col { min-width: 90px; width: 90px; }
+    .description-col { min-width: 120px; width: 120px; }
+    .products-col { min-width: 70px; width: 70px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .sort-col { min-width: 70px; width: 70px; }
+    .action-col { min-width: 80px; width: 80px; }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #C8E6C9;
+        margin-bottom: 1rem;
+    }
+
+    /* Tips Box */
+    .tips-box {
+        background-color: #F8FDF8;
+        border-left: 4px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: #2C8F0C;
+    }
+
+    .tips-box i {
+        color: #2C8F0C;
+        margin-right: 5px;
     }
 
     /* Pagination styling - Consistent */
@@ -410,7 +484,7 @@
         <form method="GET" action="{{ route('admin.brands.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Description -->
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Brands</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -431,12 +505,13 @@
                             <option value="">All Status</option>
                             <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
@@ -467,8 +542,8 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="name-col">Brand</th>
                             <th class="id-col">ID</th>
+                            <th class="name-col">Brand</th>
                             <th class="slug-col">Slug</th>
                             <th class="description-col">Description</th>
                             <th class="products-col">Products</th>
@@ -480,6 +555,9 @@
                     <tbody>
                         @foreach($brands as $brand)
                         <tr data-id="{{ $brand->id }}">
+                            <td class="id-col">
+                                <span class="text-muted">#{{ $brand->id }}</span>
+                            </td>
                             <td class="name-col">
                                 <div class="brand-info-cell">
                                     <div class="brand-icon">
@@ -487,12 +565,8 @@
                                     </div>
                                     <div>
                                         <div class="brand-name">{{ $brand->name }}</div>
-                                        <div class="brand-slug">{{ $brand->slug }}</div>
                                     </div>
                                 </div>
-                            </td>
-                            <td class="id-col">
-                                <span class="brand-id">#{{ $brand->id }}</span>
                             </td>
                             <td class="slug-col">
                                 <code class="brand-slug">{{ $brand->slug }}</code>
@@ -508,15 +582,17 @@
                             </td>
                             <td class="products-col">
                                 <span class="products-count">
-                                    <i class="fas fa-box"></i>
+                                    {{-- <i class="fas fa-box"></i> --}}
                                     {{ $brand->products->count() }}
                                 </span>
                             </td>
                             <td class="status-col">
-                                @if($brand->is_active)
+                                @if($brand->is_archived)
+                                    <span class="status-text status-text-archived">Archived</span>
+                                @elseif($brand->is_active)
                                     <span class="status-text status-text-active">Active</span>
                                 @else
-                                    <span class="status-badge-inactive">Inactive</span>
+                                    <span class="status-text status-text-inactive">Inactive</span>
                                 @endif
                             </td>
                             <td class="sort-col">
@@ -527,18 +603,24 @@
                                     <button class="action-btn btn-edit editBtn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editBrandModal"
-                                            data-brand='@json($brand)'>
+                                            data-brand='@json($brand)'
+                                            data-title="Edit Brand">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     
-                                    <form action="{{ route('admin.brands.destroy', $brand) }}" 
-                                          method="POST" class="d-inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button" class="action-btn btn-delete deleteBtn">
-                                            <i class="fas fa-trash"></i>
+                                    @if($brand->is_archived)
+                                        <button type="button" class="action-btn btn-unarchive unarchiveBtn"
+                                                data-id="{{ $brand->id }}"
+                                                data-title="Unarchive Brand">
+                                            <i class="fas fa-box-open"></i>
                                         </button>
-                                    </form>
+                                    @else
+                                        <button type="button" class="action-btn btn-archive archiveBtn"
+                                                data-id="{{ $brand->id }}"
+                                                data-title="Archive Brand">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -557,9 +639,9 @@
                 <i class="fas fa-tag"></i>
                 <h5 class="text-muted">No Brands Found</h5>
                 <p class="text-muted mb-4">Add your first brand to get started</p>
-                <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
+                {{-- <button class="btn btn-add-brand" data-bs-toggle="modal" data-bs-target="#addBrandModal">
                     <i class="fas fa-user-plus"></i> Add First Brand
-                </button>
+                </button> --}}
             </div>
         @endif
     </div>
@@ -757,17 +839,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('addBrandModal'));
                 modal.hide();
                 location.reload();
+            } else if (data.redirect) {
+                location.href = data.redirect;
             } else {
-                alert('Error adding brand: ' + (data.message || 'Unknown error'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                 // Fallback if controller returns HTML (it does redirect)
+                 window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Network error. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+             // Fallback if controller returns HTML (it does redirect)
+             window.location.reload();
         });
     });
 
@@ -816,53 +898,82 @@ document.addEventListener('DOMContentLoaded', function() {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editBrandModal'));
                 modal.hide();
                 location.reload();
+            } else if (data.redirect) {
+                location.href = data.redirect;
             } else {
-                alert('Error updating brand: ' + (data.message || 'Unknown error'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                 // Fallback if controller returns HTML (it does redirect)
+                 window.location.reload();
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Network error. Please try again.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
+             // Fallback if controller returns HTML (it does redirect)
+             window.location.reload();
         });
     });
 
-    /* === Delete Brand === */
-    document.querySelectorAll('.deleteBtn').forEach(btn => {
+    /* === Archive Brand === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Are you sure you want to delete this brand? This action cannot be undone.')) return;
+            if (!confirm('Are you sure you want to archive this brand?')) return;
             
-            const form = this.closest('.delete-form');
-            
-            // Show loading state
-            this.disabled = true;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const id = this.dataset.id;
+            const button = this;
 
-            fetch(form.action, {
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/brands/${id}/archive`, {
                 method: 'POST',
-                headers: { 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-HTTP-Method-Override': 'DELETE'
-                }
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     location.reload();
                 } else {
-                    alert('Failed to delete brand: ' + (data.message || 'Unknown error'));
-                    this.disabled = false;
-                    this.innerHTML = '<i class="fas fa-trash"></i>';
+                    alert('Failed to archive brand: ' + (data.message || 'Unknown error'));
+                    location.reload();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
-                this.disabled = false;
-                this.innerHTML = '<i class="fas fa-trash"></i>';
+                location.reload();
+            });
+        });
+    });
+
+    /* === Unarchive Brand === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to unarchive this brand?')) return;
+            
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/brands/${id}/unarchive`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to unarchive brand: ' + (data.message || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                location.reload();
             });
         });
     });
@@ -909,6 +1020,8 @@ document.addEventListener('DOMContentLoaded', function() {
             table.style.tableLayout = 'fixed';
         }
     });
+
+
 });
 </script>
 @endpush

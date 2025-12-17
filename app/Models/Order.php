@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Http\Controllers\Admin\StockOutController;
 
 class Order extends Model
 {
@@ -213,10 +214,8 @@ class Order extends Model
             $this->restoreStock();
         }
 
-
         // NOTE: physical stock deduction is performed when order is marked 'shipped'.
         // Do not perform stock reduction on 'confirmed' to ensure FIFO is applied only once at 'shipped'.
-
 
         return $this;
     }
@@ -363,43 +362,40 @@ class Order extends Model
      */
     public function restoreStock(): self
     {
-        // Load items with product and variants relationships if not already loaded
-        if (!$this->relationLoaded('items')) {
-            $this->load('items.product.variants');
-        } else {
-            // If items are loaded but product/variants aren't, load them
-            foreach ($this->items as $item) {
-                if (!$item->relationLoaded('product')) {
-                    $item->load('product.variants');
-                } elseif ($item->product && !$item->product->relationLoaded('variants')) {
-                    $item->product->load('variants');
-                }
-            }
+        // Only restore stock if there are StockOut records associated with this order.
+        $stockOuts = \App\Models\StockOut::where('reason', 'like', '%Order #' . $this->id . '%')->get();
+
+        if ($stockOuts->isEmpty()) {
+            // Nothing to restore (no physical stock-out performed yet)
+            return $this;
         }
 
-        foreach ($this->items as $item) {
-            if ($item->product) {
-                // If a variant was selected, restore to variant stock
-                if ($item->selected_size) {
-                    $variant = $item->product->variants()
-                        ->where('variant_name', $item->selected_size)
-                        ->first();
+        foreach ($stockOuts as $stockOut) {
+            // Restore remaining_quantity on batches
+            foreach ($stockOut->stockInBatches as $batch) {
+                $batch->increment('remaining_quantity', $batch->pivot->deducted_quantity);
+            }
 
-                    if ($variant) {
-                        // Restore to variant stock
-                        $variant->increment('stock_quantity', $item->quantity);
-
-                        // Update main product stock as sum of all variants
-                        if ($item->product->has_variants) {
-                            $totalVariantStock = $item->product->variants()->sum('stock_quantity');
-                            $item->product->update(['stock_quantity' => $totalVariantStock]);
-                        }
+            // Restore product/variant totals
+            if ($stockOut->product_variant_id) {
+                $variant = \App\Models\ProductVariant::find($stockOut->product_variant_id);
+                if ($variant) {
+                    $variant->increment('stock_quantity', $stockOut->quantity);
+                    // Sync parent product total
+                    if (method_exists($variant->product, 'updateTotalStock')) {
+                        $variant->product->updateTotalStock();
                     }
-                } else {
-                    // No variant selected, restore to main product stock
-                    $item->product->increment('stock_quantity', $item->quantity);
+                }
+            } else {
+                $product = \App\Models\Product::find($stockOut->product_id);
+                if ($product) {
+                    $product->increment('stock_quantity', $stockOut->quantity);
                 }
             }
+
+            // Detach pivot records and delete the StockOut log
+            $stockOut->stockInBatches()->detach();
+            $stockOut->delete();
         }
 
         return $this;

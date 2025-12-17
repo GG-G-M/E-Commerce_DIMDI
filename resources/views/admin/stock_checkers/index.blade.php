@@ -2,7 +2,27 @@
 
 @section('content')
 <style>
+<<<<<<< HEAD
     /* === Consistent Green Theme === */
+=======
+    /* === Green Theme and Card Styling === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
+
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     .card-custom {
         border: none;
         border-radius: 12px;
@@ -60,6 +80,33 @@
         transform: translateY(0);
     }
 
+    /* Improved Add Button */
+    .btn-add-checker {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+    }
+    
+    .btn-add-checker:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-checker:active {
+        transform: translateY(0);
+    }
+
     .btn-primary {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
@@ -69,12 +116,46 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
+<<<<<<< HEAD
     /* Enhanced Action Buttons - Consistent with other pages */
+=======
+    /* Enhanced Action Buttons */
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     .action-buttons {
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
+<<<<<<< HEAD
         justify-content: center;
+=======
+    }
+    
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     }
     
     .action-btn {
@@ -143,6 +224,12 @@
         border-bottom: 2px solid #2C8F0C;
         padding: 1rem 0.75rem;
         white-space: nowrap;
+<<<<<<< HEAD
+=======
+        position: sticky;
+        top: 0;
+        z-index: 10;
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     }
 
     .table td {
@@ -194,6 +281,7 @@
         100% { opacity: 1; }
     }
 
+<<<<<<< HEAD
     .status-badge-archived {
         padding: 0.35rem 0.75rem;
         border-radius: 20px;
@@ -207,13 +295,26 @@
         border: 1px solid #FFEAA7;
     }
 
+=======
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
     /* Modal Styling - Consistent */
     .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1.25rem;
     }
 
     .modal-title {
@@ -315,6 +416,7 @@
         }
     }
 
+<<<<<<< HEAD
     /* Column widths for consistency */
     .id-col { min-width: 80px; width: 80px; }
     .name-col { min-width: 250px; width: 300px; }
@@ -322,6 +424,15 @@
     .address-col { min-width: 200px; max-width: 250px; width: 250px; }
     .status-col { min-width: 100px; width: 120px; }
     .action-col { min-width: 120px; width: 140px; }
+=======
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .contact-col { min-width: 90px; width: 90px; }
+    .address-col { min-width: 120px; max-width: 120px; width: 120px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
 
     /* Name Cell */
     .checker-info-cell {
@@ -388,7 +499,11 @@
         <form method="GET" action="{{ route('admin.stock_checkers.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Contact -->
+<<<<<<< HEAD
                 <div class="col-md-5">
+=======
+                <div class="col-md-7">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Stock Checkers</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -413,7 +528,11 @@
                 </div>
 
                 <!-- Items per page selection -->
+<<<<<<< HEAD
                 <div class="col-md-4">
+=======
+                <div class="col-md-2">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
@@ -435,7 +554,12 @@
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock Checker Management</h5>
         <button class="btn btn-add-checker" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
+<<<<<<< HEAD
             <i class="fas fa-user-plus"></i> Add Stock Checker
+=======
+            {{-- <i class="fas fa-user-plus"></i>  --}}
+            Add Stock Checker
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
         </button>
     </div>
     <div class="card-body p-0">
@@ -488,7 +612,11 @@
                             </td>
                             <td class="status-col">
                                 @if ($checker->is_archived)
+<<<<<<< HEAD
                                     <span class="status-badge-archived">Archived</span>
+=======
+                                    <span class="status-text status-text-archived">Archived</span>
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                 @else
                                     <span class="status-text status-text-active">Active</span>
                                 @endif
@@ -498,20 +626,33 @@
                                     <button class="action-btn btn-edit editBtn"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editStockCheckerModal"
+<<<<<<< HEAD
                                             data-checker='@json($checker)'>
+=======
+                                            data-checker='@json($checker)'
+                                            data-title="Edit Stock Checker">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                         <i class="fas fa-edit"></i>
                                     </button>
 
                                     @if (!$checker->is_archived)
                                         <button class="action-btn btn-archive archiveBtn" 
                                                 data-id="{{ $checker->id }}" 
+<<<<<<< HEAD
                                                 title="Archive Stock Checker">
+=======
+                                                data-title="Archive Stock Checker">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @else
                                         <button class="action-btn btn-unarchive unarchiveBtn" 
                                                 data-id="{{ $checker->id }}" 
+<<<<<<< HEAD
                                                 title="Unarchive Stock Checker">
+=======
+                                                data-title="Unarchive Stock Checker">
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @endif
@@ -752,7 +893,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('editStockCheckerForm');
             
             // Set form action
+<<<<<<< HEAD
             form.action = `/admin/stock_checkers/${checker.id}`;
+=======
+            form.action = `/admin/stock-checkers/${checker.id}`;
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             
             // Fill form fields
             document.getElementById('edit_firstname').value = checker.firstname || '';
@@ -816,7 +961,11 @@ document.addEventListener('DOMContentLoaded', function() {
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
+<<<<<<< HEAD
             fetch(`/admin/stock_checkers/${id}/archive`, {
+=======
+            fetch(`/admin/stock-checkers/${id}/archive`, {
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
@@ -826,15 +975,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to archive stock checker: ' + (data.message || 'Unknown error'));
+<<<<<<< HEAD
                     button.disabled = false;
                     button.innerHTML = '<i class="fas fa-archive"></i>';
+=======
+                    location.reload();
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
+<<<<<<< HEAD
                 button.disabled = false;
                 button.innerHTML = '<i class="fas fa-archive"></i>';
+=======
+                location.reload();
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             });
         });
     });
@@ -851,7 +1008,11 @@ document.addEventListener('DOMContentLoaded', function() {
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
+<<<<<<< HEAD
             fetch(`/admin/stock_checkers/${id}/unarchive`, {
+=======
+            fetch(`/admin/stock-checkers/${id}/unarchive`, {
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 method: 'POST',
                 headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
             })
@@ -861,15 +1022,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     location.reload();
                 } else {
                     alert('Failed to unarchive stock checker: ' + (data.message || 'Unknown error'));
+<<<<<<< HEAD
                     button.disabled = false;
                     button.innerHTML = '<i class="fas fa-box-open"></i>';
+=======
+                    location.reload();
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Network error. Please try again.');
+<<<<<<< HEAD
                 button.disabled = false;
                 button.innerHTML = '<i class="fas fa-box-open"></i>';
+=======
+                location.reload();
+>>>>>>> e21b2ced8e67d9b402d56afb9e279460b25cb527
             });
         });
     });

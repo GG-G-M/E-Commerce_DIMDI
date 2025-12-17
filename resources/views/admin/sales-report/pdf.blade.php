@@ -2,10 +2,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Sales Report - {{ config('app.name', 'DIMDI STORE') }}</title>
+    <title>Sales Report</title>
     <style>
-        /* ==================== PDF REPORT STYLES ==================== */
         * {
             margin: 0;
             padding: 0;

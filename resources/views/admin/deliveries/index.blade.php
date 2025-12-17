@@ -206,8 +206,9 @@
         font-weight: 600;
         display: inline-block;
         text-align: center;
-        color: #000000ff;
-
+        background-color: #E3F2FD;
+        color: #1565C0;
+        border: 1px solid #BBDEFB;
     }
 
     /* Modal Styling - Consistent */
@@ -379,6 +380,14 @@
     .pagination .page-item.disabled .page-link {
         color: #6c757d;
         background-color: #f8f9fa;
+    }
+
+    /* Remove old badge styles */
+    .badge-success,
+    .badge-danger,
+    .badge-info,
+    .badge-warning {
+        display: none;
     }
 
 

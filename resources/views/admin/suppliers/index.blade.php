@@ -203,17 +203,18 @@
         100% { opacity: 1; }
     }
 
-    .status-badge-archived {
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
         display: inline-block;
-        text-align: center;
-        min-width: 80px;
-        background-color: #FFF3CD;
-        color: #856404;
-        border: 1px solid #FFEAA7;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
     }
 
     /* Enhanced Action Buttons */
@@ -281,13 +282,15 @@
         table-layout: fixed;
         border-collapse: collapse;
     }
-    
+
+
     /* Prevent any scroll bars in the table card */
     .card-custom .card-body {
         overflow-x: hidden;
         overflow-y: hidden;
     }
-    
+
+
     .card-custom {
         overflow: hidden;
     }
@@ -299,7 +302,7 @@
 
     /* Column width control - compact for no scroll */
     .id-col { min-width: 40px; width: 40px; }
-    .name-col { min-width: 120px; width: 120px; }
+    .name-col { min-width: 120px; width: 150px; }
     .contact-col { min-width: 90px; width: 90px; }
     .person-col { min-width: 90px; width: 90px; }
     .address-col { min-width: 120px; max-width: 120px; width: 120px; }
@@ -400,7 +403,7 @@
         <form method="GET" action="{{ route('admin.suppliers.index') }}" id="filterForm">
             <div class="row">
                 <!-- Search by Name or Contact -->
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Suppliers</label>
                         <input type="text" class="form-control" id="search" name="search"
@@ -426,7 +429,7 @@
                 </div>
 
                 <!-- Items per page selection -->
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
@@ -453,6 +456,7 @@
     </div>
     <div class="card-body p-0">
         @if($suppliers->count())
+            <div class="table-container">
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
@@ -506,7 +510,7 @@
                             </td>
                             <td class="status-col">
                                 @if ($supplier->is_archived)
-                                    <span class="status-badge-archived">Archived</span>
+                                    <span class="status-text status-text-archived">Archived</span>
                                 @else
                                     <span class="status-text status-text-active">Active</span>
                                 @endif
@@ -849,15 +853,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Ensure table fits container on all screen sizes
+    // Fix table layout on window resize
     window.addEventListener('resize', function() {
+        const tableContainer = document.querySelector('.table-container');
         const table = document.querySelector('.table');
-        if (table) {
-            // Always keep fixed layout for consistent appearance
+        
+        // Only apply horizontal scroll on mobile
+        if (window.innerWidth < 1200) {
+            tableContainer.style.overflowX = 'auto';
+            table.style.tableLayout = 'auto';
+        } else {
+            tableContainer.style.overflowX = 'visible';
             table.style.tableLayout = 'fixed';
-            // Ensure table doesn't overflow
-            table.style.width = '100%';
-            table.style.maxWidth = '100%';
         }
     });
 });

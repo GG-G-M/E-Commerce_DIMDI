@@ -8,6 +8,8 @@ use App\Notifications\PaymentReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 
 class PaymentController extends Controller
@@ -121,6 +123,21 @@ class PaymentController extends Controller
             // Use the Order model's updateStatus method to properly update status and timeline
             // Note: updateStatus('confirmed') already calls reduceStock() internally
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
+            
+            // Notify customer with receipt links
+            if ($order->user) {
+                try {
+                    $order->user->notify(new PaymentReceived($order));
+                } catch (\Throwable $e) {
+                    // fallback: resolve user model and send via Notification facade
+                    $u = User::find($order->user_id);
+                    if ($u) {
+                        Notification::send($u, new PaymentReceived($order));
+                    }
+                }
+            }
+            
+            // Stock reduction is handled by Order::updateStatus('confirmed')
             
             // Clear selected items from cart if multi-select was used
             $selectedItemIds = session()->get('selected_cart_items');
