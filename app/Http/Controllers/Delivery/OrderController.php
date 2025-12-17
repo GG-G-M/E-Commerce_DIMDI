@@ -26,6 +26,23 @@ class OrderController extends Controller
         return $deliveryEntry ? $deliveryEntry->id : null;
     }
 
+    /**
+     * Get the current delivery staff name for status notes
+     */
+    private function getDeliveryStaffName()
+    {
+        if (Auth::check() && Auth::user()) {
+            $name = Auth::user()->name;
+            if (!empty($name)) {
+                Log::info('Using delivery staff name: ' . $name);
+                return $name;
+            }
+        }
+        
+        Log::warning('No delivery staff name found, using default');
+        return 'Delivery Personnel';
+    }
+
     public function index()
     {
         $deliveriesTableId = $this->getDeliveriesTableId();
@@ -142,6 +159,9 @@ class OrderController extends Controller
                 // Load order items before processing
                 $order->load('items.product.variants');
                 
+                // Get delivery staff name for status notes
+                $deliveryStaffName = $this->getDeliveryStaffName();
+                
                 // Use deliveries table ID
                 $order->update([
                     'delivery_id' => $deliveriesTableId, // This is from deliveries table
@@ -149,7 +169,7 @@ class OrderController extends Controller
                     'assigned_at' => now(),
                 ]);
                 
-                $order->updateStatus('shipped', 'Order picked up by delivery personnel');
+                $order->updateStatus('shipped', "Order picked up by {$deliveryStaffName}");
                 
                 // AUTO STOCK-OUT WHEN ORDER BECOMES SHIPPED (Same logic as admin)
                 // If FIFO stock-out already occurred at confirmation, skip to avoid double deduction
@@ -245,6 +265,9 @@ class OrderController extends Controller
                     // Load order items before processing
                     $order->load('items.product.variants');
                     
+                    // Get delivery staff name for status notes
+                    $deliveryStaffName = $this->getDeliveryStaffName();
+                    
                     // Use deliveries table ID
                     $order->update([
                         'delivery_id' => $deliveriesTableId,
@@ -252,7 +275,7 @@ class OrderController extends Controller
                         'assigned_at' => now(),
                     ]);
                     
-                    $statusNote = 'Order picked up by delivery personnel';
+                    $statusNote = "Order picked up by {$deliveryStaffName}";
                     if ($pickupNotes) {
                         $statusNote .= ' | Notes: ' . $pickupNotes;
                     }
@@ -416,10 +439,7 @@ class OrderController extends Controller
             $order->update($updateData);
 
             // Get delivery staff name for status notes
-            $deliveryStaffName = 'Delivery Personnel';
-            if (Auth::check()) {
-                $deliveryStaffName = Auth::user()->name ?? 'Delivery Personnel';
-            }
+            $deliveryStaffName = $this->getDeliveryStaffName();
 
             // Update status with notes
             $statusNotes = "Order delivered by {$deliveryStaffName}";
@@ -488,7 +508,10 @@ class OrderController extends Controller
         }
 
         try {
-            $order->updateStatus('out_for_delivery', 'Order is out for delivery');
+            // Get delivery staff name for status notes
+            $deliveryStaffName = $this->getDeliveryStaffName();
+            
+            $order->updateStatus('out_for_delivery', "Order is out for delivery by {$deliveryStaffName}");
 
             return redirect()->back()->with('success', 'Order marked as out for delivery successfully!');
 
