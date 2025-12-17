@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -114,7 +115,7 @@ class OrderController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $order->load(['user', 'orderItems.product', 'orderItems.product.images', 'statusHistory']);
+        $order->load(['user', 'orderItems.product', 'statusHistory']);
 
         return view('delivery.orders.show', compact('order'));
     }
@@ -124,7 +125,7 @@ class OrderController extends Controller
         $deliveriesTableId = $this->getDeliveriesTableId();
         
         if (!$deliveriesTableId) {
-            \Log::error('Delivery staff not found in deliveries table', [
+            Log::error('Delivery staff not found in deliveries table', [
                 'user_id' => Auth::id(),
                 'email' => Auth::user()->email
             ]);
@@ -188,7 +189,7 @@ class OrderController extends Controller
                 ->with('success', 'Order #' . $order->order_number . ' has been assigned to you and marked as shipped!');
 
         } catch (\Exception $e) {
-            \Log::error('Failed to mark order as picked up', [
+            Log::error('Failed to mark order as picked up', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -325,33 +326,142 @@ class OrderController extends Controller
         }
     }
     
+    public function testDeliverRoute(Order $order)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'Test route working',
+            'order_id' => $order->id,
+            'order_number' => $order->order_number
+        ]);
+    }
+
     public function markAsDelivered(Order $order, Request $request)
     {
         $deliveriesTableId = $this->getDeliveriesTableId();
         
         if (!$deliveriesTableId) {
-            return redirect()->back()->with('error', 'You are not registered in the deliveries system.');
+            return response()->json([
+                'success' => false, 
+                'message' => 'You are not registered in the deliveries system.'
+            ], 403);
         }
         
         // Verify the order belongs to the current delivery driver
         if ($order->delivery_id !== $deliveriesTableId) {
-            return redirect()->back()->with('error', 'Unauthorized action. This order is not assigned to you.');
+            return response()->json([
+                'success' => false, 
+                'message' => 'Unauthorized action. This order is not assigned to you.'
+            ], 403);
         }
 
         // Check if order can be marked as delivered using model method
         if (!$order->canBeMarkedAsDelivered()) {
-            return redirect()->back()->with('error', 'This order cannot be marked as delivered. Current status: ' . $order->order_status);
+            return response()->json([
+                'success' => false, 
+                'message' => 'This order cannot be marked as delivered. Current status: ' . $order->order_status
+            ], 400);
         }
 
         try {
-            // Use updateStatus LIKE ADMIN DOES - This creates proper timeline entries!
-            $order->updateStatus('delivered', 'Order delivered by delivery personnel');
+            // Validate request
+            $request->validate([
+                'delivery_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+                'delivery_notes' => 'nullable|string|max:500'
+            ]);
 
-            return redirect()->route('delivery.orders.index')
-                ->with('success', 'Order #' . $order->order_number . ' has been marked as delivered successfully!');
+            $updateData = [
+                'delivered_at' => now(),
+            ];
 
+            // Handle file upload
+            if ($request->hasFile('delivery_photo')) {
+                $photo = $request->file('delivery_photo');
+                
+                // Validate image
+                if (!$photo->isValid()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid image file uploaded.'
+                    ], 400);
+                }
+
+                // Generate unique filename
+                $filename = 'delivery_proof_' . $order->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
+                
+                // Store the file
+                $path = $photo->storeAs('delivery_proofs', $filename, 'public');
+                
+                if ($path) {
+                    $updateData['delivery_proof_photo'] = $path;
+                } else {
+                    Log::error('Failed to store delivery proof photo', [
+                        'order_id' => $order->id,
+                        'filename' => $filename
+                    ]);
+                    
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to save delivery proof photo.'
+                    ], 500);
+                }
+            }
+
+            // Add delivery notes if provided
+            if ($request->filled('delivery_notes')) {
+                $updateData['delivery_notes'] = $request->delivery_notes;
+            }
+
+            // Update the order
+            $order->update($updateData);
+
+            // Update status with notes
+            $statusNotes = 'Order delivered by delivery personnel';
+            if (!empty($updateData['delivery_notes'])) {
+                $statusNotes .= ' | Notes: ' . $updateData['delivery_notes'];
+            }
+            if (!empty($updateData['delivery_proof_photo'])) {
+                $statusNotes .= ' | Proof photo uploaded';
+            }
+
+            $order->updateStatus('delivered', $statusNotes);
+
+            Log::info('Order marked as delivered successfully', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'delivery_id' => $deliveriesTableId,
+                'has_photo' => !empty($updateData['delivery_proof_photo']),
+                'has_notes' => !empty($updateData['delivery_notes'])
+            ]);
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Order #' . $order->order_number . ' has been marked as delivered successfully!',
+                'order_id' => $order->id
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed for order delivery', [
+                'order_id' => $order->id,
+                'errors' => $e->errors()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed: ' . implode(', ', array_values($e->errors())[0] ?? ['Unknown error'])
+            ], 422);
+            
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to mark order as delivered: ' . $e->getMessage());
+            Log::error('Failed to mark order as delivered', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false, 
+                'message' => 'Failed to mark order as delivered: ' . $e->getMessage()
+            ], 500);
         }
     }
 

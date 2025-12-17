@@ -636,8 +636,6 @@
         </div>
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
-<<<<<<< HEAD
-=======
 
 </div>
 <button class="btn btn-add-customer" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
@@ -652,7 +650,6 @@
     <div class="card-body p-0">
         <table class="table table-hover align-middle mb-0">
 
->>>>>>> c791fd3b061b27f1e8f069b890b414e50af371bd
                 <thead>
                     <tr>
                         <th class="id-col">ID</th>

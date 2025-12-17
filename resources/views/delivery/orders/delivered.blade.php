@@ -188,7 +188,7 @@
     .amount-col { width: 100px; min-width: 100px; }
     .items-col { width: 80px; min-width: 80px; }
     .delivered-col { width: 120px; min-width: 120px; }
-    .time-col { width: 100px; min-width: 100px; }
+    .delivery-proof-col { width: 100px; min-width: 100px; }
     .action-col { width: 70px; min-width: 70px; }
 
     /* Customer Info */
@@ -432,14 +432,13 @@
                             <th class="amount-col">Amount</th>
                             <th class="items-col">Items</th>
                             <th class="delivered-col">Delivered On</th>
-                            <th class="time-col">Delivery Time</th>
+                            <th class="delivery-proof-col">Proof</th>
                             <th class="action-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($orders as $order)
                         @php
-                            $deliveryTime = $order->delivered_at ? $order->delivered_at->diffInHours($order->picked_up_at ?? $order->assigned_at) : null;
                             $isRecentDelivery = $order->delivered_at && $order->delivered_at->gt(now()->subDays(1));
                         @endphp
                         <tr>
@@ -483,11 +482,24 @@
                                     <div class="text-muted">N/A</div>
                                 @endif
                             </td>
-                            <td class="time-col">
-                                @if($deliveryTime !== null)
-                                    <div class="delivery-hours">{{ $deliveryTime }} hours</div>
+                            <td class="delivery-proof-col">
+                                @if($order->delivery_proof_photo)
+                                    <button type="button" class="btn btn-sm btn-outline-success" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#proofModal{{ $order->id }}"
+                                            title="View Delivery Proof">
+                                        <i class="fas fa-camera"></i> View
+                                    </button>
                                 @else
-                                    <div class="text-muted">N/A</div>
+                                    <span class="text-muted">No Photo</span>
+                                @endif
+                                
+                                @if($order->delivery_notes)
+                                    <div class="mt-1">
+                                        <small class="text-muted">
+                                            <i class="fas fa-comment me-1"></i>Notes
+                                        </small>
+                                    </div>
                                 @endif
                             </td>
                             <td class="action-col">
@@ -570,4 +582,103 @@
     </div>
 </div>
 @endif
+
+<!-- Delivery Proof Modals -->
+@foreach($orders as $order)
+    @if($order->delivery_proof_photo || $order->delivery_notes)
+    <div class="modal fade" id="proofModal{{ $order->id }}" tabindex="-1" aria-labelledby="proofModalLabel{{ $order->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(135deg, #2C8F0C, #4CAF50); color: white;">
+                    <h5 class="modal-title" id="proofModalLabel{{ $order->id }}">
+                        <i class="fas fa-camera me-2"></i>Delivery Proof - Order #{{ $order->order_number }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">
+                                <i class="fas fa-info-circle me-1"></i>Order Information
+                            </h6>
+                            <div class="alert alert-info" style="background-color: #E8F5E6; border-color: #C8E6C9; color: #2C8F0C;">
+                                <strong>{{ $order->customer_name }}</strong><br>
+                                <small>
+                                    <i class="fas fa-phone me-1"></i>{{ $order->customer_phone }}<br>
+                                    <i class="fas fa-envelope me-1"></i>{{ $order->customer_email }}
+                                </small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Delivery Address:</strong><br>
+                                <small class="text-muted">{{ $order->shipping_address }}</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Delivered On:</strong><br>
+                                <small class="text-muted">
+                                    @if($order->delivered_at)
+                                        {{ $order->delivered_at->format('M j, Y \a\t h:i A') }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            @if($order->delivery_proof_photo)
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-camera me-1"></i>Delivery Photo
+                                </h6>
+                                <div class="text-center">
+                                    <img src="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                                         alt="Delivery Proof" 
+                                         class="img-fluid rounded border"
+                                         style="max-height: 300px; width: 100%; object-fit: contain;">
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ $order->delivered_at ? $order->delivered_at->format('M j, Y h:i A') : 'N/A' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            @if($order->delivery_notes)
+                                <div class="mt-3">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="fas fa-comment me-1"></i>Delivery Notes
+                                    </h6>
+                                    <div class="card" style="background-color: #F8FDF8; border-color: #C8E6C9;">
+                                        <div class="card-body py-2">
+                                            <small class="text-dark">{{ $order->delivery_notes }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            @if(!$order->delivery_proof_photo && !$order->delivery_notes)
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-info-circle fa-2x mb-2"></i>
+                                    <p>No delivery proof or notes available for this order.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Close
+                    </button>
+                    <a href="{{ route('delivery.orders.show', $order) }}" class="btn" style="background: linear-gradient(135deg, #2C8F0C, #4CAF50); color: white;">
+                        <i class="fas fa-eye me-1"></i>View Full Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+@endforeach
+
 @endsection

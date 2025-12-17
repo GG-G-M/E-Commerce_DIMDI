@@ -40,6 +40,8 @@ class Order extends Model
         'refund_method',
         'refund_notes',
         'refund_processed_at',
+        'delivery_proof_photo',
+        'delivery_notes',
         'created_at',
         'updated_at',
     ];
