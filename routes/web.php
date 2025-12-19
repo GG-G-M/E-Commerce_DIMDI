@@ -113,6 +113,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');
         Route::get('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
 
+        // Shipping calculation route
+        Route::post('/orders/calculate-shipping', [OrderController::class, 'calculateShipping'])->name('orders.calculate-shipping');
+
         // Ratings
         Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
         Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
