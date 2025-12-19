@@ -105,6 +105,30 @@
         min-width: 140px;
     }
 
+    .date-range-container {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .date-input {
+        flex: 1;
+        min-width: 0;
+        max-width: calc(50% - 0.25rem);
+    }
+
+    @media (max-width: 768px) {
+        .date-range-container {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .date-input {
+            max-width: 100%;
+        }
+    }
+
     /* Buttons */
     .btn {
         padding: 0.5rem 1rem;
@@ -242,13 +266,15 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
         white-space: nowrap;
+        background: transparent;
+        color: var(--gray-700);
     }
 
-    .action-login { background: #E8F5E9; color: #2C8F0C; }
-    .action-post { background: #E3F2FD; color: #1976D2; }
-    .action-put { background: #FFF3E0; color: #F57C00; }
-    .action-delete { background: #FFEBEE; color: #C62828; }
-    .action-default { background: var(--gray-100); color: var(--gray-600); }
+    .action-login { }
+    .action-post { }
+    .action-put { }
+    .action-delete { }
+    .action-default { }
 
     .audit-url {
         font-family: 'SF Mono', Monaco, monospace;
@@ -508,16 +534,16 @@
             <!-- Search -->
             <div class="col-md-3">
                 <label class="form-label">Search</label>
-                <input type="text" 
-                       name="q" 
-                       value="{{ request('q') }}" 
-                       placeholder="Search URL, IP, or data..." 
+                <input type="text"
+                       name="q"
+                       value="{{ request('q') }}"
+                       placeholder="Search URL, IP, or data..."
                        class="form-control"
                        id="searchInput">
             </div>
 
             <!-- Admin Filter -->
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label">Admin</label>
                 <select name="user_id" class="form-select" id="adminSelect">
                     <option value="">All Admins</option>
@@ -530,7 +556,7 @@
             </div>
 
             <!-- Action Filter -->
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="form-label">Action</label>
                 <select name="action" class="form-select" id="actionSelect">
                     <option value="">All Actions</option>
@@ -546,28 +572,21 @@
             <!-- Date Range -->
             <div class="col-md-3">
                 <label class="form-label">Date Range</label>
-                <div class="d-flex gap-2">
-                    <input type="date" 
-                           name="date_from" 
-                           value="{{ request('date_from') }}" 
-                           class="form-control" 
+                <div class="date-range-container">
+                    <input type="date"
+                           name="date_from"
+                           value="{{ request('date_from') }}"
+                           class="form-control date-input"
                            placeholder="From"
                            id="dateFrom">
-                    <input type="date" 
-                           name="date_to" 
-                           value="{{ request('date_to') }}" 
-                           class="form-control" 
+                    <input type="date"
+                           name="date_to"
+                           value="{{ request('date_to') }}"
+                           class="form-control date-input"
                            placeholder="To"
                            id="dateTo">
                 </div>
             </div>
-
-            <!-- Clear Button -->
-            <!-- <div class="col-md-2 d-flex align-items-end">
-                <a href="{{ route('superadmin.audits.index') }}" class="btn btn-outline-secondary w-100">
-                    <i class="fas fa-redo me-1"></i> Clear
-                </a>
-            </div> -->
         </div>
     </form>
 </div>
@@ -581,10 +600,7 @@
                         <th style="width: 60px">ID</th>
                         <th style="width: 120px">Time</th>
                         <th style="min-width: 150px">Admin</th>
-                        <th style="width: 80px">Action</th>
-                        <th style="min-width: 180px">URL</th>
-                        <th style="min-width: 200px">Data</th>
-                        <th style="width: 160px">IP / Agent</th>
+                        <th style="min-width: 300px">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -613,51 +629,46 @@
                                     'archived' => 'action-delete',
                                     'unarchived' => 'action-post',
                                 ];
+                                $productActions = ['created', 'edited', 'deleted', 'archived', 'unarchived'];
+                                $actionVerbs = [
+                                    'login' => 'logged in',
+                                    'logout' => 'logged out',
+                                    'created' => 'created',
+                                    'edited' => 'edited',
+                                    'deleted' => 'deleted',
+                                    'archived' => 'archived',
+                                    'unarchived' => 'unarchived',
+                                ];
+                                $actionVerb = $actionVerbs[$audit->action] ?? $audit->action;
+                                if ($audit->user) {
+                                    $adminName = $audit->user->first_name . ' ' . $audit->user->last_name;
+                                    if (in_array($audit->action, $productActions)) {
+                                        $oldData = $audit->old_values;
+                                        $productName = $oldData['name'] ?? 'Unknown Product';
+                                        $actionText = $adminName . ' ' . $actionVerb . ' the ' . $productName;
+                                    } else {
+                                        $actionText = $adminName . ' ' . $actionVerb;
+                                    }
+                                } else {
+                                    $actionText = $audit->action;
+                                }
                             @endphp
-                            <span class="audit-action {{ $actionClasses[$audit->action] ?? 'action-default' }}">
-                                {{ $audit->action }}
+                            <span class="audit-action">
+                                {{ $actionText }}
                             </span>
                         </td>
-                        <td>
-                            <code class="audit-url">{{ \Illuminate\Support\Str::limit($audit->url, 50) }}</code>
-                        </td>
-                        <td>
-                            <div class="compact-data">
-                                @if($audit->old_values || $audit->new_values)
-                                    @if($audit->old_values)
-                                        <div class="data-item">
-                                            <span class="data-key">Old:</span>
-                                            <span class="data-value">{{ \Illuminate\Support\Str::limit(json_encode($audit->old_values), 50) }}</span>
-                                        </div>
-                                    @endif
-                                    @if($audit->new_values)
-                                        <div class="data-item">
-                                            <span class="data-key">New:</span>
-                                            <span class="data-value">{{ \Illuminate\Support\Str::limit(json_encode($audit->new_values), 50) }}</span>
-                                        </div>
-                                    @endif
-                                @else
-                                    <span class="text-muted">—</span>
-                                @endif
-                            </div>
-                        </td>
-                        <td>
-                            <div class="ip-address">{{ $audit->ip_address ?? '—' }}</div>
-                            <div class="user-agent">{{ \Illuminate\Support\Str::limit($audit->user_agent, 60) }}</div>
-                        </td>
+
+
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-4">
+                        <td colspan="4" class="text-center py-4">
                             <div class="empty-state">
                                 <div class="empty-state-icon">
                                     <i class="fas fa-user-shield"></i>
                                 </div>
                                 <h4>No Audit Records</h4>
                                 <p>No audit records found matching your criteria.</p>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearFilters()">
-                                    <i class="fas fa-redo me-1"></i> Clear Filters
-                                </button>
                             </div>
                         </td>
                     </tr>

@@ -456,6 +456,13 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="superAdminNavbar">
+                            <ul class="navbar-nav me-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link btn btn-outline-success me-2" href="{{ route('superadmin.dashboard') }}">
+                                        <i class="fas fa-crown me-1"></i>Super Admin Dashboard
+                                    </a>
+                                </li>
+                            </ul>
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"

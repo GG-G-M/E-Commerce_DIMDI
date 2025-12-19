@@ -165,7 +165,7 @@ Route::prefix('delivery')->name('delivery.')->middleware(['auth','delivery'])->g
 });
 
 // Admin Routes (restricted to admin role)
-Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin','logAdminActions'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
