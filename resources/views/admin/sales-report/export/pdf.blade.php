@@ -4,7 +4,7 @@
 <head>
     <title>Sales Report - {{ date('Y-m-d') }}</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body { font-family: 'Arial', sans-serif; margin: 20px; font-size: 12px; }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
         .summary { margin-bottom: 20px; }
         .summary-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }

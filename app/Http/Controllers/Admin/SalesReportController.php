@@ -410,25 +410,12 @@ public function exportPdf(Request $request)
             'request' => $request
         ]);
         
-        // Set paper size
+        // Set paper size and basic options only
         $pdf->setPaper('A4', 'portrait');
-        
-        // IMPORTANT: Set encoding options for Peso sign and better font support
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
             'isRemoteEnabled' => false,
-            'defaultFont' => 'Noto Sans',  // Use Noto Sans which has extensive Unicode support including peso
-            'fontHeightRatio' => 0.9,
-            'enable_unicode' => true,
-            'charset' => 'UTF-8',
-            'dpi' => 300,
-            'defaultPaperSize' => 'A4',
-            'isFontSubsettingEnabled' => false,  // Include full font to ensure peso symbol is available
-            'pdfVersion' => '1.7',
         ]);
-        
-        // Set paper size
-        $pdf->setPaper('A4', 'portrait');
         
         $fileName = 'sales-report-' . date('Y-m-d-H-i-s') . '.pdf';
         
@@ -533,6 +520,12 @@ public function exportPdf(Request $request)
             'growthData',
             'totalGrowth'
         ));
+        
+        // Set basic options only
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+        ]);
         
         $fileName = 'sales-comparison-' . $year1 . '-vs-' . $year2 . '-' . date('Y-m-d-H-i-s') . '.pdf';
         

@@ -24,8 +24,8 @@
     <div class="summary">
         <h3>Yearly Summary</h3>
         <div class="summary-card">
-            <p><strong>{{ $year1 }} Total Sales:</strong> ₱{{ number_format(array_sum($year1Sales), 2) }}</p>
-            <p><strong>{{ $year2 }} Total Sales:</strong> ₱{{ number_format(array_sum($year2Sales), 2) }}</p>
+            <p><strong>{{ $year1 }} Total Sales:</strong> {{ pdf_currency(array_sum($year1Sales)) }}</p>
+            <p><strong>{{ $year2 }} Total Sales:</strong> {{ pdf_currency(array_sum($year2Sales)) }}</p>
             <p><strong>Growth Rate:</strong> <span class="{{ $totalGrowth >= 0 ? 'positive' : 'negative' }}">{{ number_format($totalGrowth, 2) }}%</span></p>
         </div>
     </div>
@@ -46,10 +46,10 @@
                 @foreach($year1Sales as $month => $sales1)
                 <tr>
                     <td>{{ date('F', mktime(0, 0, 0, $month, 1)) }}</td>
-                    <td>₱{{ number_format($year2Sales[$month], 2) }}</td>
-                    <td>₱{{ number_format($sales1, 2) }}</td>
+                    <td>{{ pdf_currency($year2Sales[$month]) }}</td>
+                    <td>{{ pdf_currency($sales1) }}</td>
                     <td class="{{ $growthData[$month] >= 0 ? 'positive' : 'negative' }}">
-                        ₱{{ number_format($sales1 - $year2Sales[$month], 2) }}
+                        {{ pdf_currency($sales1 - $year2Sales[$month]) }}
                     </td>
                     <td class="{{ $growthData[$month] >= 0 ? 'positive' : 'negative' }}">
                         {{ number_format($growthData[$month], 2) }}%

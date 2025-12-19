@@ -26,7 +26,7 @@ if (!function_exists('pdf_currency')) {
      */
     function pdf_currency($amount)
     {
-        // Use "Peso" word instead of symbol to avoid font encoding issues
-        return 'Peso ' . number_format($amount, 2);
+        // Use PHP prefix for better compatibility in PDF generation
+        return 'PHP ' . number_format($amount, 2);
     }
 }
