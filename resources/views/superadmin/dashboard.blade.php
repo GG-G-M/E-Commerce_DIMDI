@@ -391,6 +391,28 @@
     .status-text {
         font-weight: 600;
         font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .status-active {
+        color: #2C8F0C;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .status-inactive {
+        color: #6c757d;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    .status-active .fa-circle,
+    .status-inactive .fa-circle {
+        font-size: 0.6em;
+        margin-right: 0.25rem;
     }
 
     /* Role Text Styles */
@@ -632,9 +654,9 @@
                         </td>
                         <td class="status-col">
                             @if($user->is_active)
-                                <span class="status-text status-active">Active</span>
+                                <span class="status-text status-active"><i class="fas fa-circle"></i> Active</span>
                             @else
-                                <span class="status-text status-inactive">Inactive</span>
+                                <span class="status-text status-inactive"><i class="fas fa-circle"></i> Inactive</span>
                             @endif
                         </td>
                         <td class="date-col">

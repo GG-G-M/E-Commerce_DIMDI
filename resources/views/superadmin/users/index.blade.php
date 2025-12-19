@@ -84,21 +84,21 @@
     /* Button Styles - Consistent */
     .btn-success-custom {
         background: white;
-    color: #2C8F0C;
-    border: 2px solid rgba(44, 143, 12, 0.3);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
-    min-width: fit-content;
-    height: auto;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        color: #2C8F0C;
+        border: 2px solid rgba(44, 143, 12, 0.3);
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+        min-width: fit-content;
+        height: auto;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     
     .btn-success-custom:hover {
@@ -138,6 +138,39 @@
     .search-box:focus {
         border-color: #2C8F0C;
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    }
+
+    /* Status Text Styles - SIMPLE DESIGN (No Badges) */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .status-active {
+        color: #2C8F0C;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .status-inactive {
+        color: #6c757d;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .status-text i {
+        font-size: 0.6em;
     }
 
     /* Role Text Styles */
@@ -381,38 +414,19 @@
         background: white;
         border: none;
         border-radius: 12px;
-        padding: 1.5rem !important; /* Added important to override any other styles */
+        padding: 1.5rem !important;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         margin-bottom: 1.5rem;
     }
 
     /* Filter Form Row Spacing */
     .filter-form-row {
-        margin-bottom: -0.5rem; /* Adjust spacing between rows */
+        margin-bottom: -0.5rem;
     }
 
     .filter-form-row > .col-md-3,
     .filter-form-row > .col-md-2 {
         margin-bottom: 0.5rem;
-    }
-
-    /* Status badge styles */
-    .badge-active {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-    
-    .badge-inactive {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: 600;
     }
 
     @media (max-width: 768px) {
@@ -461,6 +475,7 @@
         }
     }
 </style>
+
 <!-- Statistics -->
 <div class="row mt-4">
     <div class="col-md-3">
@@ -488,15 +503,16 @@
         </div>
     </div>
 </div>
+
 <!-- Filter Card - Automatic Filters -->
 <div class="filter-card">
     <div class="card-body p-0">
         <form method="GET" action="{{ route('superadmin.users.index') }}" class="row g-2 filter-form-row" id="filterForm">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="mb-0">
                     <label class="form-label fw-bold">Search Users</label>
-                    <input type="text" name="search" class="form-control search-box" 
-                           placeholder="Search by name or email..." 
+                    <input type="text" name="search" class="form-control search-box"
+                           placeholder="Search by name or email..."
                            value="{{ request('search') }}" id="searchInput">
                 </div>
             </div>
@@ -513,7 +529,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <div class="mb-0">
                     <label class="form-label fw-bold">Status</label>
                     <select name="status" class="form-select search-box" id="statusSelect">
@@ -534,21 +550,6 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <div class="mb-0 w-100">
-                    <!-- Submit button is now hidden but functional -->
-                    <button type="submit" class="btn btn-success-custom w-100 d-none" id="submitBtn">
-                        <i class="fas fa-filter me-1"></i> Apply
-                    </button>
-                    
-                    <!-- Only show Clear button when filters are applied -->
-                    @if(request()->hasAny(['search', 'role', 'status', 'sort']))
-                        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom w-100">
-                            <i class="fas fa-times me-1"></i> Clear
-                        </a>
-                    @endif
-                </div>
-            </div>
         </form>
     </div>
 </div>
@@ -559,7 +560,7 @@
         <h5 class="mb-0">All System Users</h5>
         <div class="header-buttons">
             <a href="{{ route('superadmin.users.create') }}" class="btn btn-success-custom">
-            New User
+                New User
             </a>
         </div>
     </div>
@@ -619,9 +620,9 @@
                             </td>
                             <td class="status-col">
                                 @if($user->is_active)
-                                    <span class="badge-active">Active</span>
+                                    <span class="status-text status-active"><i class="fas fa-circle"></i> Active</span>
                                 @else
-                                    <span class="badge-inactive">Inactive</span>
+                                    <span class="status-text status-inactive"><i class="fas fa-circle"></i> Inactive</span>
                                 @endif
                             </td>
                             <td class="date-col">
@@ -692,7 +693,6 @@
     </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filterForm');
@@ -751,11 +751,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Optional: Show loading indicator on form submission
-    filterForm.addEventListener('submit', function() {
-        // The loading state is already handled in submitFilterForm()
-    });
-
     // Optional: Save filter state to URL without page reload (using History API)
     function updateUrlWithFilters() {
         const formData = new FormData(filterForm);
@@ -776,6 +771,5 @@ document.addEventListener('DOMContentLoaded', function() {
     sortSelect.addEventListener('change', updateUrlWithFilters);
 });
 </script>
-
 
 @endsection
