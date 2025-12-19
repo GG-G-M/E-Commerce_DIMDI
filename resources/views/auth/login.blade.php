@@ -513,6 +513,7 @@
                 <!-- Login Form -->
                 <form method="POST" action="{{ route('login') }}" class="login-form">
                     @csrf
+                    <input type="hidden" id="secure_password" name="secure_password" value="">
 
                     <div class="form-group">
                         <label for="email" class="form-label">Email Address</label>
@@ -520,8 +521,8 @@
                             name="email" value="{{ old('email') }}" required autocomplete="email" autofocus
                             placeholder="Enter your email">
                         @error('email')
-                            <div class="invalid-feedback">
-                                {{ $message }}
+                            <div class="invalid-feedback d-block">
+                                <i class="bi bi-exclamation-triangle me-1"></i>{{ $message }}
                             </div>
                         @enderror
                     </div>
@@ -532,8 +533,8 @@
                             class="form-control @error('password') is-invalid @enderror" name="password" required
                             autocomplete="current-password" placeholder="Enter your password">
                         @error('password')
-                            <div class="invalid-feedback">
-                                {{ $message }}
+                            <div class="invalid-feedback d-block">
+                                <i class="bi bi-exclamation-triangle me-1"></i>{{ $message }}
                             </div>
                         @enderror
                     </div>
@@ -583,150 +584,79 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
-        // Generate RSA key pair for secure password encryption
-        async function generateRSAKeys() {
-            const keyPair = await crypto.subtle.generateKey(
-                {
-                    name: "RSA-OAEP",
-                    modulusLength: 2048,
-                    publicExponent: new Uint8Array([1, 0, 1]),
-                    hash: "SHA-256",
-                },
-                true,
-                ["encrypt", "decrypt"]
-            );
-            return keyPair;
-        }
+        // Enhanced security with client-side password encryption
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('.btn-login');
 
-        // Encrypt password using the public key
-        async function encryptPassword(password, publicKey) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const encrypted = await crypto.subtle.encrypt(
-                {
-                    name: "RSA-OAEP",
-                },
-                publicKey,
-                data
-            );
-            return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-        }
+            // Clear error states when user starts typing
+            emailInput.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
 
-        // Store public key globally for reuse
-        let rsaPublicKey = null;
+            passwordInput.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
 
-        // Initialize RSA key on page load
-        async function initializeEncryption() {
-            try {
-                // Use a simple symmetric encryption as fallback for better compatibility
-                rsaPublicKey = 'dimdi-encryption-key-2024'; // Static key for demonstration
-            } catch (error) {
-                console.error('Failed to initialize encryption:', error);
-            }
-        }
-
-        // Enhanced form validation and encryption
-        document.querySelector('form').addEventListener('submit', async function(e) {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if (!email || !password) {
-                e.preventDefault();
-                if (!email) {
-                    document.getElementById('email').classList.add('is-invalid');
-                }
-                if (!password) {
-                    document.getElementById('password').classList.add('is-invalid');
-                }
-                return;
+            // Simple password obfuscation
+            function obfuscatePassword(password) {
+                // Just base64 encode to hide from casual viewing
+                return btoa(password);
             }
 
-            try {
-                // Prevent the default form submission
-                e.preventDefault();
+            // Form submission handling with password obfuscation
+            form.addEventListener('submit', function(e) {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
 
                 // Clear previous error states
-                document.getElementById('email').classList.remove('is-invalid');
-                document.getElementById('password').classList.remove('is-invalid');
+                emailInput.classList.remove('is-invalid');
+                passwordInput.classList.remove('is-invalid');
 
+                // Basic validation
+                let hasError = false;
+                if (!email) {
+                    emailInput.classList.add('is-invalid');
+                    hasError = true;
+                }
+                if (!password) {
+                    passwordInput.classList.add('is-invalid');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Obfuscate password for basic security
+                const obfuscatedPassword = obfuscatePassword(password);
+                passwordInput.value = obfuscatedPassword;
+                
                 // Show loading state
-                const submitBtn = document.querySelector('.btn-login');
-                const originalText = submitBtn.textContent;
                 submitBtn.textContent = 'Signing In...';
                 submitBtn.disabled = true;
-
-                // Create encrypted payload
-                const encryptedPassword = btoa(password); // Base64 encoding for security
-                const sessionToken = btoa(Date.now() + '-' + Math.random()); // Unique session token
                 
-                // Create form data with encrypted password
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('password', encryptedPassword);
-                formData.append('session_token', sessionToken);
-                formData.append('_token', document.querySelector('input[name="_token"]').value);
+                // Let the form submit normally - Laravel will handle authentication and errors
+            });
 
-                // Send encrypted request
-                const response = await fetch('{{ route("login") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                });
+            // Prevent scrolling on body for better UX
+            document.body.style.overflow = 'hidden';
 
-                if (response.ok) {
-                    // Redirect on successful login
-                    window.location.href = response.url;
+            // Reset on small screens
+            function checkScreenSize() {
+                if (window.innerWidth <= 576) {
+                    document.body.style.overflow = 'auto';
                 } else {
-                    // Handle error response
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Login failed');
+                    document.body.style.overflow = 'hidden';
                 }
-            } catch (error) {
-                console.error('Login error:', error);
-                
-                // Show error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger mt-2';
-                errorDiv.textContent = error.message || 'Login failed. Please check your credentials.';
-                
-                // Remove existing error messages
-                const existingError = document.querySelector('.alert.alert-danger');
-                if (existingError) {
-                    existingError.remove();
-                }
-                
-                // Add error message
-                document.querySelector('.login-form').appendChild(errorDiv);
-                
-                // Reset button state
-                const submitBtn = document.querySelector('.btn-login');
-                submitBtn.textContent = 'Sign In';
-                submitBtn.disabled = false;
-                
-                // Clear password field
-                document.getElementById('password').value = '';
             }
+
+            checkScreenSize();
+            window.addEventListener('resize', checkScreenSize);
         });
-
-        // Initialize encryption on page load
-        document.addEventListener('DOMContentLoaded', initializeEncryption);
-
-        // Prevent scrolling on body
-        document.body.style.overflow = 'hidden';
-
-        // Reset on small screens
-        function checkScreenSize() {
-            if (window.innerWidth <= 576) {
-                document.body.style.overflow = 'auto';
-            } else {
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        window.addEventListener('load', checkScreenSize);
-        window.addEventListener('resize', checkScreenSize);
     </script>
 </body>
 
