@@ -68,6 +68,17 @@
         opacity: 0.8;
     }
     
+    .stats-icon-circle {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
     .stats-number {
         font-size: 1.8rem;
         font-weight: 700;
@@ -342,16 +353,20 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.pickup') }}" class="text-decoration-none">
             <div class="card stats-card card-primary h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">AVAILABLE FOR PICKUP</div>
-                            <div class="stats-number">{{ $stats['availableOrdersCount'] }}</div>
-                            <small>Orders ready to be picked up</small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">AVAILABLE FOR PICKUP</div>
+                                <small class="text-white opacity-75">Orders ready to be picked up</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box-open stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['availableOrdersCount'] }}</div>
                     </div>
                 </div>
             </div>
@@ -362,16 +377,20 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.my-orders') }}" class="text-decoration-none">
             <div class="card stats-card card-success h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">MY ACTIVE ORDERS</div>
-                            <div class="stats-number">{{ $stats['myActiveOrdersCount'] }}</div>
-                            <small>Orders you're delivering</small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-truck-loading"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">MY ACTIVE ORDERS</div>
+                                <small class="text-white opacity-75">Orders you're delivering</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-truck-loading stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['myActiveOrdersCount'] }}</div>
                     </div>
                 </div>
             </div>
@@ -381,16 +400,20 @@
     <!-- Out for Delivery -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stats-card card-orange h-100">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="stats-label">OUT FOR DELIVERY</div>
-                        <div class="stats-number">{{ $stats['outForDeliveryCount'] }}</div>
-                        <small>Currently being delivered</small>
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-icon-circle me-3">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <div class="stats-label text-uppercase small">OUT FOR DELIVERY</div>
+                            <small class="text-white opacity-75">Currently being delivered</small>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-shipping-fast stats-icon"></i>
-                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="stats-number display-6 fw-bold">{{ $stats['outForDeliveryCount'] }}</div>
                 </div>
             </div>
         </div>
@@ -400,16 +423,20 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.delivered') }}" class="text-decoration-none">
             <div class="card stats-card card-info h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">DELIVERED TODAY</div>
-                            <div class="stats-number">{{ $stats['deliveredTodayCount'] }}</div>
-                            <small>Completed deliveries today</small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">DELIVERED TODAY</div>
+                                <small class="text-white opacity-75">Completed deliveries today</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['deliveredTodayCount'] }}</div>
                     </div>
                 </div>
             </div>

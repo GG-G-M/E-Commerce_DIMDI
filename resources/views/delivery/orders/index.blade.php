@@ -185,11 +185,20 @@
         color: #333;
         font-size: 0.85rem;
         line-height: 1.2;
+        text-align: left;
     }
     
     .customer-phone {
         color: #6c757d;
         font-size: 0.75rem;
+        text-align: left;
+    }
+
+    /* Status and Assignment Styling */
+    .status-col span,
+    .assignment-col span {
+        text-align: left;
+        display: block;
     }
 
     /* Amount Styling */
@@ -197,12 +206,28 @@
         font-weight: 700;
         color: #2C8F0C;
         font-size: 0.9rem;
+        text-align: right;
+        display: block;
+    }
+
+    /* Order Number Styling */
+    .order-number {
+        text-align: right;
+        display: block;
+        font-weight: 600;
     }
 
     /* Date Styling */
     .date-text {
         font-size: 0.85rem;
         color: #6c757d;
+        text-align: left;
+    }
+
+    .time-text {
+        font-size: 0.75rem;
+        color: #adb5bd;
+        text-align: left;
     }
 
     /* Pagination styling - Consistent */
@@ -244,6 +269,11 @@
     .header-buttons .btn {
         margin: 0;
         font-size: 0.9rem;
+    }
+
+    /* Ensure header buttons content aligns left */
+    .header-buttons .btn i {
+        margin-right: 6px;
     }
 
     /* Form Styling */
@@ -333,7 +363,7 @@
                         @foreach($orders as $order)
                         <tr>
                             <td class="order-col">
-                                <strong class="text-dark">#{{ $order->order_number }}</strong>
+                                <strong class="text-dark order-number">#{{ $order->order_number }}</strong>
                             </td>
                             <td class="customer-col">
                                 <div>
