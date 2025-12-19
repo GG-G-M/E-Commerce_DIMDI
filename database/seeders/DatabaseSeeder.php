@@ -14,7 +14,13 @@ class DatabaseSeeder extends Seeder
         $this->call(CommerceSeeder::class);
         $this->command->info('Datas created successfully!');
         $this->call(AdminUserSeeder::class);
-        $this->call(UserSeeder::class); 
+        $this->call(SuperAdminSeeder::class);
+        $this->call(UserSeeder::class);
+        $this->call(DeliverySeeder::class);
+        $this->call(StockSeeder::class);
+        // $this->call(OrderSeeder::class);
+        $this->call(RatingSeeder::class);
+        $this->call(ShippingZoneSeeder::class);
 
         $this->command->info('|||| Seeder Run Completed ||||');
 

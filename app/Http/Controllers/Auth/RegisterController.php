@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\AddressController;
 use App\Models\User;
 use App\Models\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class RegisterController extends Controller
 {
@@ -19,6 +20,7 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        // Validate input
         $request->validate([
             'first_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
@@ -26,32 +28,56 @@ class RegisterController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string|max:20',
-            'address' => 'required|string',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'zip_code' => 'required|string|max:20',
+            'street_address' => 'required|string|max:255',
+            'barangay' => 'required|string|max:100', // code from API
+            'city' => 'required|string|max:100',     // code from API
+            'province' => 'required|string|max:100', // code from API
+            'region' => 'nullable|string|max:100',   // optional if you compute it
             'country' => 'required|string|max:100',
         ]);
 
-        // Build full name from separated fields
+        // Handle encrypted password
+        $password = $request->input('password');
+        
+        // If password is base64 encoded, decode it
+        if (preg_match('/^[A-Za-z0-9+\/]*={0,2}$/', $password) && base64_decode($password, true) !== false) {
+            $decodedPassword = base64_decode($password);
+        } else {
+            // Fallback for non-encrypted passwords (backward compatibility)
+            $decodedPassword = $password;
+        }
+
+        // Build full name
         $fullName = $request->first_name;
         if ($request->middle_name) {
             $fullName .= ' ' . $request->middle_name;
         }
         $fullName .= ' ' . $request->last_name;
 
+        // Convert codes to readable names using AddressController helpers
+        $provinceName = AddressController::getProvinceName($request->province);
+        $cityName     = AddressController::getCityName($request->city);
+        $barangayName = AddressController::getBarangayName($request->barangay);
+
+        // Fetch region name from province code if not provided
+        $regionName = $request->region;
+        if (!$regionName) {
+            $regionName = AddressController::getRegionName($request->province);
+        }
+
+        // Create user
         $user = User::create([
-            'name' => $fullName, // Keep the old name field
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($decodedPassword),
             'phone' => $request->phone,
-            'address' => $request->address,
-            'city' => $request->city,
-            'state' => $request->state,
-            'zip_code' => $request->zip_code,
+            'street_address' => $request->street_address,
+            'barangay' => $barangayName,
+            'city' => $cityName,
+            'province' => $provinceName,
+            'region' => $regionName,
             'country' => $request->country,
             'role' => 'customer',
         ]);
@@ -61,22 +87,39 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->intended('/')->with('success', 'Registration successful! Welcome to DIMDI Store.');
+        return redirect()->intended(route('home'))->with('success', 'Registration successful! Welcome to DIMDI Store.');
     }
 
     private function transferGuestCartToUser(User $user)
     {
         $sessionId = session()->get('cart_session_id');
-        
+
         if ($sessionId) {
-            // Update cart items from session to user
             Cart::where('session_id', $sessionId)->update([
                 'session_id' => null,
                 'user_id' => $user->id
             ]);
-            
-            // Clear the session cart ID
+
             session()->forget('cart_session_id');
         }
+    }
+
+    /**
+     * Helper: Get region name from province code
+     */
+    private function getRegionFromProvince($provinceCode)
+    {
+        try {
+            $res = Http::timeout(10)->get("https://psgc.gitlab.io/api/provinces/$provinceCode");
+
+            if ($res->successful()) {
+                $data = $res->json();
+                return $data['region']['name'] ?? ''; // Correct field
+            }
+        } catch (\Exception $e) {
+            // optional: log
+        }
+
+        return '';
     }
 }

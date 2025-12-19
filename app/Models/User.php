@@ -19,11 +19,16 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
-        'address',
+        'street_address',
+        'barangay',
         'city',
-        'state',
-        'zip_code',
-        'country'
+        'province',
+        'region',
+        'country',
+        'vehicle_type',
+        'vehicle_number',
+        'license_number',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -31,28 +36,35 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_active' => 'boolean',
+    ];
+    // Role constants
+    const ROLE_SUPER_ADMIN = 'super_admin';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_DELIVERY = 'delivery';
+    const ROLE_CUSTOMER = 'customer';
 
     // Add accessor for full name
+
+    // Accessor for full name
+
     public function getNameAttribute()
     {
         $names = [$this->first_name];
-        
+
         if ($this->middle_name) {
             $names[] = $this->middle_name;
         }
-        
+
         $names[] = $this->last_name;
-        
+
         return implode(' ', $names);
     }
 
+    // Relationships
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
@@ -63,8 +75,53 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
-    public function isAdmin()
+    // Role checking methods
+    public function isSuperAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_SUPER_ADMIN;
+    }
+
+    // Role checks
+    public function isAdmin(): bool
+
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isDelivery(): bool
+    {
+        return $this->role === self::ROLE_DELIVERY;
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === self::ROLE_CUSTOMER || empty($this->role);
+    }
+
+    // Check if user can create accounts
+    public function canCreateRole($role)
+    {
+        if ($this->isSuperAdmin()) {
+            return in_array($role, [self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_DELIVERY, self::ROLE_CUSTOMER]);
+        }
+        
+        if ($this->isAdmin()) {
+            return in_array($role, [self::ROLE_DELIVERY, self::ROLE_CUSTOMER]);
+        }
+        
+        return false;
+    }
+
+    // Get role display name
+    public function getRoleNameAttribute()
+    {
+        $roles = [
+            self::ROLE_SUPER_ADMIN => 'Super Admin',
+            self::ROLE_ADMIN => 'Admin',
+            self::ROLE_DELIVERY => 'Delivery Staff',
+            self::ROLE_CUSTOMER => 'Customer',
+        ];
+        
+        return $roles[$this->role] ?? 'Customer';
     }
 }

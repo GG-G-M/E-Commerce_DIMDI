@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Cart;
+use App\Notifications\PaymentReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
 
 
 class PaymentController extends Controller
@@ -118,13 +121,36 @@ class PaymentController extends Controller
             ]);
             
             // Use the Order model's updateStatus method to properly update status and timeline
+            // Note: updateStatus('confirmed') already calls reduceStock() internally
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
             
-            // Reduce stock for confirmed orders
-            $order->reduceStock();
+            // Notify customer with receipt links
+            if ($order->user) {
+                try {
+                    $order->user->notify(new PaymentReceived($order));
+                } catch (\Throwable $e) {
+                    // fallback: resolve user model and send via Notification facade
+                    $u = User::find($order->user_id);
+                    if ($u) {
+                        Notification::send($u, new PaymentReceived($order));
+                    }
+                }
+            }
             
-            // Clear cart
-            Cart::where('user_id', $order->user_id)->delete();
+            // Stock reduction is handled by Order::updateStatus('confirmed')
+            
+            // Clear selected items from cart if multi-select was used
+            $selectedItemIds = session()->get('selected_cart_items');
+            if ($selectedItemIds && is_array($selectedItemIds) && count($selectedItemIds) > 0) {
+                Cart::where('user_id', $order->user_id)
+                    ->whereIn('id', $selectedItemIds)
+                    ->delete();
+                session()->forget('selected_cart_items');
+            } else {
+                // Otherwise clear entire cart (backward compatibility)
+                Cart::where('user_id', $order->user_id)->delete();
+            }
+            
             session()->forget('last_order_id');
 
             return redirect()->route('orders.show', $order)
