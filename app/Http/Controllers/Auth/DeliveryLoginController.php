@@ -11,6 +11,11 @@ class DeliveryLoginController extends Controller
 {
     public function showLoginForm()
     {
+        // Redirect authenticated delivery users to their dashboard
+        if (Auth::guard('delivery')->check()) {
+            return redirect()->intended(route('delivery.dashboard'));
+        }
+        
         return view('auth.delivery-login');
     }
 
