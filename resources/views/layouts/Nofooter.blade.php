@@ -1004,7 +1004,8 @@ input#searchInput:-webkit-autofill:active {
                         const data = await response.json();
                         if (data.new_count > 0) {
                             this.updateNotificationCounts();
-                            this.showPushNotification(data.latest);
+                            // REMOVED: Automatic pop-up notifications
+                            // Users will see notifications only when they click the notification icon
                         }
                     }
                 } catch (error) {
