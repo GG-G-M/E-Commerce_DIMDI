@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-@extends('layouts.appwithoutfooter')
-=======
 @extends('layouts.cart')
->>>>>>> 9efbcd6fd91248c5ff165f32fe47fafaee8608f4
 
 @section('content')
     <style>

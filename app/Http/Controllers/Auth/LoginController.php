@@ -16,6 +16,23 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        // Redirect authenticated users to their appropriate dashboard
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Redirect based on role
+            if ($user->role === 'super_admin') {
+                return redirect()->route('superadmin.dashboard');
+            } elseif ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'delivery') {
+                return redirect()->route('delivery.dashboard');
+            }
+            
+            // Default redirect for customers
+            return redirect('/');
+        }
+        
         return view('auth.login');
     }
 

@@ -139,33 +139,40 @@ class NotificationController extends Controller
     
     public function checkNew()
     {
-        // Check if user is authenticated
+        // Always return JSON for this endpoint to prevent HTML responses
         if (!Auth::check()) {
-            // For unauthenticated users, redirect to login
-            return redirect()->route('login')
-                ->with('info', 'Please log in to view your notifications.');
+            return response()->json([
+                'error' => 'Not authenticated',
+                'new_count' => 0,
+                'latest' => null
+            ], 401);
         }
         
         $count = Auth::user()->unreadNotifications()->count();
+        $latest = null;
         
-        // Check if this is an AJAX request
-        if (request()->ajax() || request()->wantsJson()) {
-            return response()->json([
-                'has_new' => $count > 0,
-                'count' => $count
-            ]);
-        }
-        
-        // For direct browser visits, redirect to notifications index
-        // If there are new notifications, redirect with a flash message
+        // Get the latest notification if there are unread ones
         if ($count > 0) {
-            return redirect()->route('notifications.index')
-                ->with('info', "You have {$count} new notification(s)");
+            $latestNotification = Auth::user()->unreadNotifications()
+                ->latest()
+                ->first();
+                
+            $latest = [
+                'message' => $latestNotification->data['message'] ?? 'New notification',
+                'order_number' => $latestNotification->data['order_number'] ?? null,
+                'status_display' => $latestNotification->data['status_display'] ?? null,
+                'icon' => $latestNotification->data['icon'] ?? 'fas fa-bell',
+                'color' => $latestNotification->data['color'] ?? 'primary',
+                'url' => $latestNotification->data['url'] ?? '#',
+                'created_at' => $latestNotification->created_at->diffForHumans()
+            ];
         }
         
-        // If no new notifications, redirect to notifications index
-        return redirect()->route('notifications.index')
-            ->with('info', 'No new notifications at the moment');
+        return response()->json([
+            'new_count' => $count,
+            'has_new' => $count > 0,
+            'latest' => $latest
+        ]);
     }
     
     public function getUnreadCount()

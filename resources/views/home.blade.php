@@ -287,54 +287,6 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
-        <!-- Contact Section -->
-        <section class="contact-section">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 mb-5 mb-lg-0">
-                        <h2 class="section-title">Visit Our Store</h2>
-                        <p class="about-text mb-4">Come experience our products in person at our flagship showroom. Our design consultants are ready to help you create the home of your dreams.</p>
-                        
-                        <div class="contact-info">
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <div>
-                                    <h5>Our Location</h5>
-                                    <p class="text-muted">San Pedro Street, Davao City, Philippines</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div>
-                                    <h5>Call Us</h5>
-                                    <p class="text-muted">0928 503 6033</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div>
-                                    <h5>Email Us</h5>
-                                    <p class="text-muted">dimdisales@gmail.com</p>
-                                </div>
-                            </div>
-                            
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div>
-                                    <h5>Store Hours</h5>
-                                    <p class="text-muted">Mon-Sat: 9AM-6PM/p>
-=======
                         <div class="row g-4">
                             <div class="col-md-4">
                                 <div class="testimonial-card">
@@ -385,7 +337,6 @@
                                             <p>Home Stager</p>
                                         </div>
                                     </div>
->>>>>>> 9efbcd6fd91248c5ff165f32fe47fafaee8608f4
                                 </div>
                             </div>
                         </div>
