@@ -666,8 +666,12 @@
                         </a>
                     </li>
 
-                    @auth
-                        @if (Auth::user()->isAdmin())
+                        @auth
+                        @if (Auth::user()->isSuperAdmin())
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('superadmin.dashboard') }}">Super Admin</a>
+                            </li>
+                        @elseif (Auth::user()->isAdmin())
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a>
                             </li>
