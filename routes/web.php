@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SessionController;
+use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Delivery\DashboardController as DeliveryDashboardController;
 use App\Http\Controllers\Delivery\OrderController as DeliveryOrderController;
 use App\Http\Controllers\Delivery\ProfileController as DeliveryProfileController;
@@ -234,6 +235,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
+    Route::get('/stock-ins/products', [StockInController::class, 'getProducts'])->name('stock_in.products');
+    Route::get('/stock-ins/variants', [StockInController::class, 'getVariants'])->name('stock_in.variants');
 
     // CSV
     Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');
@@ -280,6 +283,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::resource('brands', BrandController::class);
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
 
+    // About Routes
+    Route::resource('abouts', AboutController::class);
+
     // INVENTORY REPORTS
     Route::prefix('inventory-reports')->name('inventory-reports.')->group(function () {
         Route::get('/', [InventoryReportController::class, 'index'])->name('index');
@@ -290,13 +296,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::prefix('sales-report')->name('sales-report.')->group(function () {
         Route::get('/', [SalesReportController::class, 'index'])->name('index');
         Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
-        Route::get('/export', [SalesReportController::class, 'export'])->name('export');
         Route::get('/comparison', [SalesReportController::class, 'comparison'])->name('comparison');
+        Route::get('/export', [SalesReportController::class, 'export'])->name('export');
+        Route::get('/export-pdf', [SalesReportController::class, 'exportPdf'])->name('export-pdf');
+        Route::get('/comparison/export-pdf', [SalesReportController::class, 'exportComparisonPdf'])->name('comparison.export-pdf');
     });
 
     // BANNER ROUTES
     Route::resource('banners', BannerController::class);
     Route::post('/banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
+    Route::post('/banners/clear', [BannerController::class, 'clear'])->name('banners.clear');
 
     // Developer: Authentication Sessions
     Route::get('/sessions', [SessionController::class, 'index'])->name('sessions.index');
@@ -308,10 +317,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
 Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', function () {
-        // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
         return view('superadmin.dashboard');
     })->name('dashboard');
 
@@ -335,17 +340,11 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
     
     // System Settings
     Route::get('/settings', function () {
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
         return view('superadmin.settings');
     })->name('settings');
     
     // Super Admin Profile
     Route::get('/profile', function () {
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
         return view('superadmin.profile');
     })->name('profile');
     

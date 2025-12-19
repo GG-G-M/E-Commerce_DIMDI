@@ -187,4 +187,26 @@ class BannerController extends Controller
             return redirect()->back()->with('error', 'Error updating banner status: ' . $e->getMessage());
         }
     }
+
+    public function clear()
+    {
+        try {
+            Banner::truncate();
+            
+            // Delete all banner images from public directory
+            $directory = public_path('images/banners');
+            if (file_exists($directory)) {
+                $files = glob($directory . '/*');
+                foreach($files as $file) {
+                    if(is_file($file)) {
+                        unlink($file);
+                    }
+                }
+            }
+
+            return redirect()->back()->with('success', 'All banners cleared successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error clearing banners: ' . $e->getMessage());
+        }
+    }
 }
