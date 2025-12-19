@@ -159,6 +159,9 @@ Route::prefix('delivery')->name('delivery.')->middleware(['auth','delivery'])->g
     // ✅ REMOVE DUPLICATES - Keep only these:
     Route::post('/orders/{order}/claim', [DeliveryOrderController::class, 'claimOrder'])->name('orders.claim');
 
+    // Bulk pickup route
+    Route::post('/orders/bulk-pickup', [DeliveryOrderController::class, 'bulkPickup'])->name('orders.bulkPickup');
+
     // Profile Routes
     Route::get('/profile', [DeliveryProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [DeliveryProfileController::class, 'update'])->name('profile.update');

@@ -194,6 +194,7 @@ class UserSeeder extends Seeder
             ['email' => 'enrique.molina@gmail.com', 'first_name' => 'Enrique', 'last_name' => 'Molina', 'phone' => '09531234567'],
             ['email' => 'laura.acosta@gmail.com', 'first_name' => 'Laura', 'last_name' => 'Acosta', 'phone' => '09541234567'],
             ['email' => 'rocky@gmail.com', 'first_name' => 'Rocky', 'last_name' => 'Adaya', 'phone' => '09551234567'],
+            ['email' => 'gilgregenemantilla@gmail.com', 'first_name' => 'Gil Gregor', 'last_name' => 'Nemantilla', 'phone' => '09561234567'],
         ];
 
         foreach ($customers as $index => $customer) {
@@ -298,7 +299,7 @@ class UserSeeder extends Seeder
         $this->command->info('✅ Users created successfully!');
         $this->command->info('👑 Admin: admin@gmail.com / 12345678');
         $this->command->info('🚚 Delivery Personnel: delivery1@example.com / 12345678');
-        $this->command->info('👥 Customers: 40 customers created');
+        $this->command->info('👥 Customers: 41 customers created (including gilgregenemantilla@gmail.com)');
         $this->command->info('📦 Warehouse Staff: 4 staff created');
         $this->command->info('🔍 Stock Checkers: 2 checkers created');
     }

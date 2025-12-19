@@ -32,13 +32,13 @@ class OrderSeeder extends Seeder
         $baseDate = Carbon::now()->subMonths(5);
         $orderNumber = 1000;
 
-        // Create orders spanning 5 months (300+ orders for high volume business)
-        for ($i = 0; $i < 320; $i++) {
+        // Create orders spanning 5 months (500+ orders for high volume business)
+        for ($i = 0; $i < 550; $i++) {
             $orderDate = $baseDate->copy()->addDays(rand(0, 150));
             $customer = $customers->random();
             
-            // Random number of items per order (1-4)
-            $itemCount = rand(1, 4);
+            // Random number of items per order (1-5)
+            $itemCount = rand(1, 5);
             $selectedProducts = $products->random($itemCount);
             
             $subtotal = 0;
@@ -70,18 +70,26 @@ class OrderSeeder extends Seeder
             $orderStatus = $this->getRandomOrderStatus();
             $isDelivered = in_array($orderStatus, ['delivered', 'cancelled']);
             
-            $deliveryId = in_array($orderStatus, ['shipped', 'delivered']) ? rand(1, 6) : null;
+            // For recent orders (last 30 days), ensure some remain for drivers
+            $daysSinceOrder = Carbon::now()->diffInDays($orderDate);
+            if ($daysSinceOrder <= 30) {
+                // Recent orders - more likely to be pending/confirmed for driver selection
+                $orderStatus = $this->getRecentOrderStatus();
+                $isDelivered = in_array($orderStatus, ['delivered', 'cancelled']);
+            }
+            
+            $deliveryId = in_array($orderStatus, ['shipped', 'delivered', 'out_for_delivery']) ? rand(1, 6) : null;
             
             $order = Order::create([
                 'order_number' => 'ORD-' . str_pad($orderNumber++, 6, '0', STR_PAD_LEFT),
                 'user_id' => $customer->id,
                 'delivery_id' => $deliveryId,
-                'assigned_at' => in_array($orderStatus, ['shipped', 'delivered']) ? $orderDate->copy()->addHours(rand(1, 24)) : null,
+                'assigned_at' => in_array($orderStatus, ['shipped', 'delivered', 'out_for_delivery']) ? $orderDate->copy()->addHours(rand(1, 24)) : null,
                 'customer_email' => $customer->email,
                 'customer_name' => $customer->first_name . ' ' . $customer->last_name,
                 'customer_phone' => $customer->phone,
-                'shipping_address' => $customer->address . ', ' . $customer->city . ', ' . $customer->state,
-                'billing_address' => $customer->address . ', ' . $customer->city . ', ' . $customer->state,
+                'shipping_address' => $customer->street_address . ', ' . $customer->barangay . ', ' . $customer->city . ', ' . $customer->province,
+                'billing_address' => $customer->street_address . ', ' . $customer->barangay . ', ' . $customer->city . ', ' . $customer->province,
                 'subtotal' => $subtotal,
                 'shipping_cost' => $shippingCost,
                 'tax_amount' => $taxAmount,
@@ -105,13 +113,34 @@ class OrderSeeder extends Seeder
             $this->createOrderStatusHistory($order, $orderDate);
         }
         
-        $this->command->info('Orders created successfully! 320 orders spanning 5 months with 65% delivery rate!');
+        $this->command->info('Orders created successfully! 550 orders spanning 5 months with realistic distribution!');
+        $this->command->info('Recent orders (30 days) have higher chance of being pending/confirmed for driver selection');
+        $this->command->info('Total customers with purchase history: ' . $customers->count());
     }
 
     private function getRandomOrderStatus()
     {
-        $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
-        $weights = [0.08, 0.12, 0.15, 0.65, 0.03]; // Increased delivered to 65% for more ratings
+        $statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled', 'out_for_delivery'];
+        $weights = [0.08, 0.12, 0.15, 0.55, 0.03, 0.07]; // Increased delivered to 55% for more ratings, added out_for_delivery
+        
+        $rand = rand(0, 100) / 100;
+        $cumulative = 0;
+        
+        foreach ($statuses as $index => $status) {
+            $cumulative += $weights[$index];
+            if ($rand <= $cumulative) {
+                return $status;
+            }
+        }
+        
+        return 'pending';
+    }
+
+    private function getRecentOrderStatus()
+    {
+        // For recent orders (last 30 days), more likely to be pending/confirmed for drivers
+        $statuses = ['pending', 'confirmed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled'];
+        $weights = [0.25, 0.30, 0.20, 0.15, 0.08, 0.02]; // Higher chance of pending/confirmed for recent orders
         
         $rand = rand(0, 100) / 100;
         $cumulative = 0;
