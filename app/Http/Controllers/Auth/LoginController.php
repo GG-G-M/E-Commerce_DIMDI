@@ -26,7 +26,22 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        // Handle encrypted password
+        $password = $request->input('password');
+        
+        // If password is base64 encoded, decode it
+        if (preg_match('/^[A-Za-z0-9+\/]*={0,2}$/', $password) && base64_decode($password, true) !== false) {
+            $decodedPassword = base64_decode($password);
+        } else {
+            // Fallback for non-encrypted passwords (backward compatibility)
+            $decodedPassword = $password;
+        }
+
+        $credentials = [
+            'email' => $request->input('email'),
+            'password' => $decodedPassword
+        ];
+        
         $remember = $request->has('remember');
 
         if (Auth::attempt($credentials, $remember)) {

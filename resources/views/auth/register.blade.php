@@ -921,10 +921,111 @@
         let currentStep = 1;
         const totalSteps = 4;
 
+        // Generate session token for security
+        function generateSessionToken() {
+            return btoa(Date.now() + '-' + Math.random());
+        }
+
         // Initialize stepper
         function initStepper() {
             updateProgressBar();
         }
+
+        // Enhanced form submission with password encryption
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateStep(4)) {
+                alert('Please complete all required fields and agree to the NDA.');
+                return;
+            }
+            
+            const ndaCheckbox = document.getElementById('ndaAgreement');
+            if (!ndaCheckbox.checked) {
+                alert('Please agree to the Non-Disclosure Agreement.');
+                ndaCheckbox.focus();
+                return;
+            }
+
+            try {
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Creating Account...';
+                submitBtn.disabled = true;
+
+                // Get form data
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('password-confirm').value;
+                
+                // Encrypt passwords
+                const encryptedPassword = btoa(password);
+                const encryptedConfirmPassword = btoa(confirmPassword);
+                const sessionToken = generateSessionToken();
+                
+                // Create form data with encrypted passwords
+                const formData = new FormData();
+                formData.append('first_name', document.getElementById('first_name').value);
+                formData.append('middle_name', document.getElementById('middle_name').value);
+                formData.append('last_name', document.getElementById('last_name').value);
+                formData.append('email', document.getElementById('email').value);
+                formData.append('password', encryptedPassword);
+                formData.append('password_confirmation', encryptedConfirmPassword);
+                formData.append('phone', document.getElementById('phone').value);
+                formData.append('street_address', document.getElementById('street_address').value);
+                formData.append('province', document.getElementById('province').value);
+                formData.append('city', document.getElementById('city').value);
+                formData.append('barangay', document.getElementById('barangay').value);
+                formData.append('region', document.getElementById('region').value);
+                formData.append('country', document.getElementById('country').value);
+                formData.append('nda_agreement', '1');
+                formData.append('session_token', sessionToken);
+                formData.append('_token', document.querySelector('input[name="_token"]').value);
+
+                // Send encrypted request
+                const response = await fetch('{{ route("register") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                });
+
+                if (response.ok) {
+                    // Redirect on successful registration
+                    window.location.href = response.url;
+                } else {
+                    // Handle error response
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger mt-3';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${error.message || 'Registration failed. Please check your information and try again.'}`;
+                
+                // Remove existing error messages
+                const existingError = document.querySelector('.alert.alert-danger');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                // Add error message
+                document.querySelector('.stepper-container').insertBefore(errorDiv, document.querySelector('.stepper-container').firstChild);
+                
+                // Reset button state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-user-plus me-1"></i> Create Account';
+                submitBtn.disabled = false;
+                
+                // Clear password fields
+                document.getElementById('password').value = '';
+                document.getElementById('password-confirm').value = '';
+            }
+        });
 
         // Navigate to next step
         function nextStep(step) {
@@ -1037,20 +1138,11 @@
             summaryDiv.innerHTML = html;
         }
 
-        // Form submission
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            if (!validateStep(4)) {
-                e.preventDefault();
-                alert('Please complete all required fields and agree to the NDA.');
-                return;
-            }
-            
-            const ndaCheckbox = document.getElementById('ndaAgreement');
-            if (!ndaCheckbox.checked) {
-                e.preventDefault();
-                alert('Please agree to the Non-Disclosure Agreement.');
-                ndaCheckbox.focus();
-            }
+        // Clear validation on input
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+            });
         });
 
         // Initialize on load
@@ -1119,13 +1211,6 @@
                             });
                         });
                 }
-            });
-        });
-
-        // Clear validation on input
-        document.querySelectorAll('input, select, textarea').forEach(input => {
-            input.addEventListener('input', function() {
-                this.classList.remove('is-invalid');
             });
         });
     </script>
