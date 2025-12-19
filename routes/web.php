@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\WarehouseController as AdminWarehouseController;
 use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\StockCheckerController as AdminStockCheckerController;
 use App\Http\Controllers\Admin\LowStockController;
 use App\Http\Controllers\Admin\StockInController;
@@ -25,8 +24,6 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\AddressController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\BrandController;
@@ -38,15 +35,16 @@ use App\Http\Controllers\Delivery\ProfileController as DeliveryProfileController
 // ADD THIS: Notification Controller
 use App\Http\Controllers\NotificationController;
 
-// Public Routes
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+// Public Routes (block delivery accounts from storefront pages)
+Route::middleware('noDeliveryStore')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
-// Products
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
-
+    // Products
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+});
 
 // Authentication Routes (SINGLE LOGIN FOR ALL)
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -56,20 +54,24 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Social login (Google, Facebook) - redirects and callbacks
-Route::get('/login/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
-Route::get('/login/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('login.google.callback');
-Route::get('/login/facebook', [LoginController::class, 'redirectToFacebook'])->name('login.facebook');
-Route::get('/login/facebook/callback', [LoginController::class, 'handleFacebookCallback'])->name('login.facebook.callback');
+// GOOGLE LOGIN
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
 
-// Cart Routes
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-Route::post('/cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout-selected');
-Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+// FACEBOOK LOGIN
+Route::get('/auth/facebook', [LoginController::class, 'redirectToFacebook'])->name('login.facebook');
+Route::get('/auth/facebook/callback', [LoginController::class, 'handleFacebookCallback']);
+
+// Cart Routes (also blocked for delivery accounts)
+Route::middleware('noDeliveryStore')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::put('/cart/{cart}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::post('/cart/checkout-selected', [CartController::class, 'checkoutSelected'])->name('cart.checkout-selected');
+    Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+});
 
 // Payment Routes - UPDATED SECTION
 Route::get('/payment/{order}/pay', [PaymentController::class, 'showPaymentForm'])->name('payment.form');
@@ -78,14 +80,11 @@ Route::post('/payment/create-source', [PaymentController::class, 'createSource']
 Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
 Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
 
-// Order receipt routes (preview and download) - public but controller will authorize access
-Route::get('/orders/{order}/receipt/preview', [OrderController::class, 'previewReceipt'])->name('orders.receipt.preview');
-Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloadReceipt'])->name('orders.receipt.download');
-
 // Address Routes
 Route::get('/address/provinces', [AddressController::class, 'provinces']);
 Route::get('/address/cities/{provinceCode}', [AddressController::class, 'cities']);
 Route::get('/address/barangays/{cityCode}', [AddressController::class, 'barangays']);
+
 
 // Authenticated User Routes (All logged-in users)
 Route::middleware('auth')->group(function () {
@@ -94,42 +93,49 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Customer Routes - UPDATED SECTION
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-    Route::post('/orders/calculate-shipping', [OrderController::class, 'calculateShipping'])->name('orders.calculate-shipping');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    // Customer Routes - restricted to customer role
+    Route::middleware('customer')->group(function () {
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+        Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    // NEW PAYMENT ROUTES FOR ORDERS
-    Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');
-    Route::get('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
+        // Receipts
+        Route::get('/orders/{order}/receipt/download', [OrderController::class, 'downloadReceipt'])->name('orders.receipt.download');
+        Route::get('/orders/{order}/receipt/preview', [OrderController::class, 'previewReceipt'])->name('orders.receipt.preview');
 
-    // Rating
-     Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
-    Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
-    Route::delete('/ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
+        // Aliases for compatibility
+        Route::get('/orders/{order}/download-receipt', [OrderController::class, 'downloadReceipt'])->name('orders.download-receipt');
+        Route::get('/orders/{order}/preview-receipt', [OrderController::class, 'previewReceipt'])->name('orders.preview-receipt');
 
-    // ADD THIS: Notification Routes
-    Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
-        Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markAsRead');
-        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
-        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
-        Route::delete('/', [NotificationController::class, 'clearAll'])->name('clearAll');
-        Route::get('/list', [NotificationController::class, 'list'])->name('list');
-        Route::get('/check-new', [NotificationController::class, 'checkNew'])->name('checkNew');
-        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
-        // Receipt viewing/download/preview via notification
-        Route::get('/{id}/receipt', [NotificationController::class, 'viewReceipt'])->name('receipt.view');
-        Route::get('/{id}/receipt/download', [NotificationController::class, 'downloadReceipt'])->name('receipt.download');
-        Route::get('/{id}/receipt/preview', [NotificationController::class, 'previewReceipt'])->name('receipt.preview');
+        // Payment routes for orders
+        Route::get('/orders/{order}/payment', [OrderController::class, 'showPayment'])->name('orders.payment');
+        Route::get('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
+
+        // Ratings
+        Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+        Route::put('/ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+
+        // Notifications
+        Route::prefix('notifications')->name('notifications.')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])->name('index');
+            Route::post('/mark-as-read/{id}', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+            Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+            Route::get('/{notification}/receipt', [NotificationController::class, 'viewReceipt'])->name('receipt.view');
+            Route::get('/{notification}/receipt/download', [NotificationController::class, 'downloadReceipt'])->name('receipt.download');
+            Route::get('/{notification}/receipt/preview', [NotificationController::class, 'previewReceipt'])->name('receipt.preview');
+            Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+            Route::delete('/', [NotificationController::class, 'clearAll'])->name('clearAll');
+            Route::get('/list', [NotificationController::class, 'list'])->name('list');
+            Route::get('/check-new', [NotificationController::class, 'checkNew'])->name('checkNew');
+            Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('unreadCount');
+        });
     });
 });
 
 // DELIVERY ROUTES (First come, first served system)
-Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function () {
+Route::prefix('delivery')->name('delivery.')->middleware(['auth','delivery'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DeliveryDashboardController::class, 'index'])->name('dashboard');
 
@@ -138,7 +144,6 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::get('/orders/pickup', [DeliveryOrderController::class, 'pickup'])->name('orders.pickup');
     Route::get('/orders/delivered', [DeliveryOrderController::class, 'delivered'])->name('orders.delivered');
     Route::get('/orders/my-orders', [DeliveryOrderController::class, 'myOrders'])->name('orders.my-orders');
-    Route::post('/orders/bulk-pickup', [DeliveryOrderController::class, 'bulkPickup'])->name('orders.bulkPickup');
 
     // PARAMETERIZED ROUTES LAST - CLEANED UP AND CORRECTED
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
@@ -159,8 +164,8 @@ Route::prefix('delivery')->name('delivery.')->middleware('auth')->group(function
     Route::post('/orders/{order}/deliver-order', [DeliveryOrderController::class, 'markAsDelivered'])->name('orders.deliver-order');
 });
 
-// Admin Routes (Role checking in controllers)
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+// Admin Routes (restricted to admin role)
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
@@ -181,14 +186,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/deliveries/{delivery}', [DeliveryController::class, 'update'])->name('deliveries.update');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
     Route::post('/deliveries/{delivery}/toggle-status', [DeliveryController::class, 'toggleStatus'])->name('deliveries.toggle-status');
-
-    // Abouts
-    Route::get('/abouts', [AboutController::class, 'index'])->name('abouts.index');
-    Route::post('/abouts', [AboutController::class, 'store'])->name('abouts.store');
-    Route::put('/abouts/{id}', [AboutController::class, 'update'])->name('abouts.update');
-    Route::post('/abouts/{id}/archive', [AboutController::class, 'archive'])->name('abouts.archive');
-    Route::post('/abouts/{id}/unarchive', [AboutController::class, 'unarchive'])->name('abouts.unarchive');
-    Route::delete('/abouts/{id}', [AboutController::class, 'destroy'])->name('abouts.destroy');
 
     // Warehouses
     Route::get('/warehouses', [AdminWarehouseController::class, 'index'])->name('warehouses.index');
@@ -219,7 +216,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/products/create', [AdminProductController::class, 'create'])->name('products.create');
     Route::post('/products', [AdminProductController::class, 'store'])->name('products.store');
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
-
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
     Route::post('/products/{product}/archive', [AdminProductController::class, 'archive'])->name('products.archive');
@@ -229,18 +225,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/products/import/csv', [AdminProductController::class, 'importCSV'])->name('products.import.csv');
     Route::get('/products/csv/template', [AdminProductController::class, 'downloadCSVTemplate'])->name('products.csv.template');
 
+
     // Stock-Ins
     Route::get('/stock-ins', [StockInController::class, 'index'])->name('stock_in.index');
     Route::post('/stock-ins', [StockInController::class, 'store'])->name('stock_in.store');
     Route::put('/stock-ins/{stockIn}', [StockInController::class, 'update'])->name('stock_in.update');
     Route::delete('/stock-ins/{stockIn}', [StockInController::class, 'destroy'])->name('stock_in.destroy');
-    Route::get('/admin/stock-in/products/modal', [StockInController::class, 'productModal'])->name('stock_in.products.modal');
 
     // CSV
     Route::get('/stock-ins/csv-template', [StockInController::class, 'downloadCsvTemplate'])->name('stock_in.csv.template');
     Route::post('/stock-ins/import-csv', [StockInController::class, 'importCsv'])->name('stock_in.import.csv');
-    Route::get('/stock-ins/products', [StockInController::class, 'getProducts'])->name('stock_in.products');
-    Route::get('/stock-ins/variants', [StockInController::class, 'getVariants'])->name('stock_in.variants');
 
     // Low Stocks
     Route::get('low-stock', [LowStockController::class, 'index'])->name('low_stock.index');
@@ -252,7 +246,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/stock-outs', [StockOutController::class, 'store'])->name('stock_out.store');
     Route::put('/stock-outs/{stockOut}', [StockOutController::class, 'update'])->name('stock_out.update');
     Route::delete('/stock-outs/{stockOut}', [StockOutController::class, 'destroy'])->name('stock_out.destroy');
-    Route::post('/stock-out/check-stock', [StockOutController::class, 'checkStock'])->name('stock_out.check-stock');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
@@ -279,13 +272,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
-    Route::post('/categories/{category}/archive', [AdminCategoryController::class, 'archive'])->name('categories.archive');
-    Route::post('/categories/{category}/unarchive', [AdminCategoryController::class, 'unarchive'])->name('categories.unarchive');
 
     // Brand Routes
     Route::resource('brands', BrandController::class);
-    Route::post('/brands/{brand}/archive', [BrandController::class, 'archive'])->name('brands.archive');
-    Route::post('/brands/{brand}/unarchive', [BrandController::class, 'unarchive'])->name('brands.unarchive');
     Route::post('brands/quick-store', [BrandController::class, 'quickStore'])->name('brands.quick-store');
 
     // INVENTORY REPORTS
@@ -299,10 +288,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('/', [SalesReportController::class, 'index'])->name('index');
         Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
         Route::get('/export', [SalesReportController::class, 'export'])->name('export');
-        Route::get('/export-pdf', [SalesReportController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/comparison', [SalesReportController::class, 'comparison'])->name('comparison');
-        Route::get('/comparison/export-pdf', [SalesReportController::class, 'exportComparisonPdf'])->name('comparison.export-pdf');
-        
     });
 
     // BANNER ROUTES
@@ -320,9 +306,7 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
     // Dashboard
     Route::get('/dashboard', function () {
         // Check if user is super admin
-        /** @var \App\Models\User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isSuperAdmin()) {
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.dashboard');
@@ -336,38 +320,31 @@ Route::prefix('super-admin')->name('superadmin.')->middleware('auth')->group(fun
     Route::get('/users/{user}/edit', [App\Http\Controllers\SuperAdmin\UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [App\Http\Controllers\SuperAdmin\UserController::class, 'destroy'])->name('users.destroy');
-
+    
     // User actions
     Route::post('/users/{user}/reset-password', [App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::post('/users/{user}/toggle-status', [App\Http\Controllers\SuperAdmin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
-
+    
     // Bulk actions
     Route::post('/users/bulk-activate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkActivate'])->name('users.bulk-activate');
     Route::post('/users/bulk-deactivate', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDeactivate'])->name('users.bulk-deactivate');
     Route::post('/users/bulk-delete', [App\Http\Controllers\SuperAdmin\UserController::class, 'bulkDelete'])->name('users.bulk-delete');
-
+    
     // System Settings
     Route::get('/settings', function () {
-        /** @var \App\Models\User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isSuperAdmin()) {
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.settings');
     })->name('settings');
-
+    
     // Super Admin Profile
     Route::get('/profile', function () {
-        /** @var \App\Models\User|null $user */
-        $user = Auth::user();
-        if (!$user || !$user->isSuperAdmin()) {
+        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
             return redirect('/')->with('error', 'Unauthorized access.');
         }
         return view('superadmin.profile');
     })->name('profile');
-
-    // Audits (who logged in and actions)
-    Route::get('/audits', [App\Http\Controllers\SuperAdmin\AuditController::class, 'index'])->name('audits.index');
 });
 
 // =============================================
