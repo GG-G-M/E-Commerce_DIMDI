@@ -8,7 +8,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use Barryvdh\DomPDF\Facade\Pdf;
 class SalesReportController extends Controller
 {
     public function index(Request $request)
@@ -403,7 +403,7 @@ public function exportPdf(Request $request)
         $orderStatistics = $this->calculateOrderStatistics($orders);
         
         // Generate PDF with proper encoding
-        $pdf = Pdf::loadView('admin.sales-report.pdf', [
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.sales-report.export.pdf', [
             'orders' => $orders,
             'salesData' => $salesData,
             'orderStatistics' => $orderStatistics,
@@ -525,7 +525,7 @@ public function exportPdf(Request $request)
         }
         
         // Generate PDF
-        $pdf = \PDF::loadView('admin.sales-report.comparison-pdf', compact(
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.sales-report.comparison-pdf', compact(
             'year1', 
             'year2', 
             'year1Sales', 
