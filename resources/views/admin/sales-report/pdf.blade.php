@@ -13,62 +13,62 @@
         body {
             font-family: 'Helvetica', 'Arial', sans-serif;
             color: #333;
-            line-height: 1.4;
+            line-height: 1.2;
             background: white;
-            font-size: 12px;
+            font-size: 50px;
         }
         
         .container {
             max-width: 100%;
-            padding: 20px 25px;
+            padding: 10px 15px;
         }
         
         /* Header Section */
         .header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 3px solid #2C8F0C;
             position: relative;
         }
-        
+
         .header h1 {
             color: #2C8F0C;
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 70px;
+            margin-bottom: 10px;
             font-weight: bold;
         }
-        
+
         .company-name {
             color: #666;
-            font-size: 16px;
+            font-size: 45px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
         }
-        
+
         .report-info {
             color: #777;
-            font-size: 11px;
+            font-size: 30px;
             background: #f8f9fa;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 15px 30px;
+            border-radius: 8px;
             display: inline-block;
-            margin-top: 5px;
+            margin-top: 10px;
         }
         
         /* Summary Statistics */
         .summary-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        
+
         .section-title {
             background: #2C8F0C;
             color: white;
-            padding: 8px 15px;
+            padding: 15px 30px;
             font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 15px;
-            border-radius: 4px;
+            font-size: 35px;
+            margin-bottom: 25px;
+            border-radius: 8px;
         }
         
         .stats-grid {
@@ -80,8 +80,8 @@
         
         .stat-box {
             display: table-cell;
-            padding: 15px;
-            border: 1px solid #ddd;
+            padding: 30px;
+            border: 2px solid #ddd;
             text-align: center;
             width: 25%;
             vertical-align: middle;
@@ -92,47 +92,47 @@
         }
         
         .stat-value {
-            font-size: 18px;
+            font-size: 60px;
             font-weight: bold;
             color: #2C8F0C;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
-        
+
         .stat-label {
-            font-size: 11px;
+            font-size: 30px;
             color: #666;
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
         
         /* Data Tables */
         .data-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             page-break-inside: avoid;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 11px;
+            margin-bottom: 25px;
+            font-size: 30px;
         }
-        
+
         table th {
             background: #f5f5f5;
-            padding: 8px 10px;
+            padding: 10px 15px;
             text-align: left;
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
             font-weight: bold;
             color: #333;
-            font-size: 11px;
+            font-size: 32px;
         }
-        
+
         table td {
-            padding: 8px 10px;
-            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
             vertical-align: top;
         }
         
@@ -173,14 +173,14 @@
         /* Badges for status */
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            font-size: 10px;
+            padding: 5px 15px;
+            font-size: 27px;
             font-weight: 600;
             line-height: 1;
             text-align: center;
             white-space: nowrap;
             vertical-align: baseline;
-            border-radius: 10px;
+            border-radius: 25px;
         }
         
         .badge-success {
@@ -195,11 +195,11 @@
         
         /* Footer */
         .footer {
-            margin-top: 30px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
             text-align: center;
-            font-size: 10px;
+            font-size: 27px;
             color: #888;
         }
         
@@ -210,24 +210,24 @@
         /* Print specific styles */
         @media print {
             .container {
-                padding: 15px 20px;
+                padding: 20px 30px;
             }
-            
+
             .header {
-                margin-bottom: 20px;
+                margin-bottom: 25px;
             }
-            
+
             .stat-value {
-                font-size: 16px;
+                font-size: 55px;
             }
-            
+
             table {
-                font-size: 10px;
+                font-size: 32px;
             }
-            
+
             table th,
             table td {
-                padding: 6px 8px;
+                padding: 10px 15px;
             }
         }
         
@@ -285,11 +285,11 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="15%">Date</th>
-                        <th class="text-right" width="25%">Sales Amount</th>
-                        <th class="text-center" width="15%"># of Orders</th>
-                        <th class="text-right" width="25%">Average per Order</th>
-                        <th class="text-center" width="20%">Day Performance</th>
+                        <th width="10%">Date</th>
+                        <th class="text-right" width="20%">Sales Amount</th>
+                        <th class="text-center" width="10%"># of Orders</th>
+                        <th class="text-right" width="20%">Average per Order</th>
+                        <th class="text-center" width="16%">Day Performance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -316,11 +316,11 @@
                         <td class="text-right currency">{{ pdf_currency($dailyAverage) }}</td>
                         <td class="text-center">
                             @if($isPeak)
-                                <span class="badge badge-success small">Peak</span>
+                                <span class="badge badge-success" style="font-size: 25px; padding: 8px 20px;">Peak</span>
                             @elseif($isAboveAverage)
-                                <span class="badge badge-info small">Above Avg</span>
+                                <span class="badge badge-info" style="font-size: 25px; padding: 8px 20px;">Above Avg</span>
                             @else
-                                <span class="text-muted small">Normal</span>
+                                <span class="text-muted" style="font-size: 28px; font-weight: 600;">Normal</span>
                             @endif
                         </td>
                     </tr>
@@ -361,11 +361,11 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="20%">Payment Method</th>
-                        <th class="text-right" width="20%">Total Revenue</th>
-                        <th class="text-center" width="15%">Orders</th>
-                        <th class="text-center" width="15%">Market Share</th>
-                        <th class="text-right" width="20%">Average per Order</th>
+                        <th width="16%">Payment Method</th>
+                        <th class="text-right" width="16%">Total Revenue</th>
+                        <th class="text-center" width="11%">Orders</th>
+                        <th class="text-center" width="11%">Market Share</th>
+                        <th class="text-right" width="16%">Average per Order</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -417,38 +417,38 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="12%">Order #</th>
-                        <th width="20%">Customer</th>
-                        <th width="12%">Payment</th>
-                        <th class="text-right" width="15%">Amount</th>
-                        <th class="text-center" width="10%">Items</th>
-                        <th width="16%">Order Date</th>
-                        <th width="15%">Delivery Date</th>
+                        <th width="8%">Order #</th>
+                        <th width="16%">Customer</th>
+                        <th width="8%">Payment</th>
+                        <th class="text-right" width="11%">Amount</th>
+                        <th class="text-center" width="6%">Items</th>
+                        <th width="12%">Order Date</th>
+                        <th width="11%">Delivery Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
                     <tr>
                         <td>
-                            <strong style="font-size: 10px;">{{ $order->order_number }}</strong>
+                            <strong style="font-size: 25px;">{{ $order->order_number }}</strong>
                         </td>
                         <td>
-                            <div style="font-weight: 600;">{{ $order->customer_name }}</div>
-                            <div style="font-size: 9px; color: #666;">{{ $order->customer_email }}</div>
+                            <div style="font-weight: 600; font-size: 30px;">{{ $order->customer_name }}</div>
+                            <div style="font-size: 22px; color: #666;">{{ $order->customer_email }}</div>
                         </td>
                         <td>
-                            <span class="badge badge-info small">{{ strtoupper($order->payment_method) }}</span>
+                            <span class="badge badge-info" style="font-size: 25px; padding: 8px 20px;">{{ strtoupper($order->payment_method) }}</span>
                         </td>
                         <td class="text-right currency">
-                            <strong>{{ pdf_currency($order->total_amount) }}</strong>
+                            <strong style="font-size: 32px;">{{ pdf_currency($order->total_amount) }}</strong>
                         </td>
-                        <td class="text-center">{{ $order->items->count() }}</td>
-                        <td>{{ $order->created_at->format('M j, Y') }}</td>
-                        <td>
+                        <td class="text-center" style="font-size: 30px;">{{ $order->items->count() }}</td>
+                        <td style="font-size: 28px;">{{ $order->created_at->format('M j, Y') }}</td>
+                        <td style="font-size: 28px;">
                             @if($order->delivered_at)
                                 {{ $order->delivered_at->format('M j, Y') }}
                             @else
-                                <em style="color: #999;">Pending</em>
+                                <em style="color: #999; font-size: 26px;">Pending</em>
                             @endif
                         </td>
                     </tr>

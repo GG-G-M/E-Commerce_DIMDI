@@ -291,6 +291,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin','logAdminActi
         Route::get('/', [SalesReportController::class, 'index'])->name('index');
         Route::get('/charts', [SalesReportController::class, 'charts'])->name('charts');
         Route::get('/export', [SalesReportController::class, 'export'])->name('export');
+        Route::get('/export-pdf', [SalesReportController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/comparison', [SalesReportController::class, 'comparison'])->name('comparison');
     });
 
