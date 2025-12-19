@@ -44,26 +44,27 @@
     .card-header-custom h5 {
         margin: 0;
         font-weight: 700;
+        font-size: 1.25rem;
     }
 
-    /* Improved Add Supplier Button */
+    /* Improved Add Button */
     .btn-add-supplier {
-       background: white;
-    color: #2C8F0C;
-    border: 2px solid rgba(44, 143, 12, 0.3);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
-    min-width: fit-content;
-    height: auto;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        background: white;
+        color: #2C8F0C;
+        border: 2px solid rgba(44, 143, 12, 0.3);
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+        min-width: fit-content;
+        height: auto;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     }
     
     .btn-add-supplier:hover {
@@ -86,146 +87,38 @@
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
     }
 
-    .btn-warning {
-        background: #FBC02D;
-        border: none;
-        color: #fff;
-    }
-
-    .btn-danger {
-        background: #C62828;
-        border: none;
-    }
-
-    .table {
-        margin-bottom: 0;
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        font-weight: 600;
-        border-bottom: 2px solid #2C8F0C;
-        padding: 1rem 0.75rem;
-        white-space: nowrap;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-
-    .table td {
-        padding: 1rem 0.75rem;
-        vertical-align: middle;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .table tbody tr:hover {
-        background-color: #F8FDF8;
-        transition: background-color 0.2s ease;
-    }
-
-    /* Alternating row colors for better readability */
-    .table tbody tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    .table tbody tr:nth-child(even):hover {
-        background-color: #F8FDF8;
-    }
-
-    .modal-header {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: #2C8F0C;
-    }
-
-    /* Loading indicator for search */
-    .search-loading {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: none;
-    }
-
-    .position-relative {
-        position: relative;
-    }
-
-    /* Improved table cell styling */
-    .supplier-name {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .supplier-contact {
-        color: #495057;
-        font-size: 0.9rem;
-    }
-
-    .supplier-address {
-        color: #6c757d;
-        font-size: 0.85rem;
-        max-width: 200px;
-        word-break: break-word;
-    }
-
-    /* Status styling - no badge for active */
-    .status-text {
-        font-weight: 600;
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .status-text-active {
-        color: #2C8F0C;
-    }
-    
-    .status-text-active::before {
-        content: "";
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background-color: #2C8F0C;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.6; }
-        100% { opacity: 1; }
-    }
-
-    .status-text-archived {
-        color: #6c757d;
-    }
-
-    .status-text-archived::before {
-        content: "";
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        background-color: #6c757d;
-        border-radius: 50%;
-        opacity: 0.6;
-    }
-
     /* Enhanced Action Buttons */
     .action-buttons {
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
+    }
+    
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
     }
     
     .action-btn {
@@ -279,29 +172,192 @@
         color: white;
     }
 
-    /* Table styling for no scroll bars */
+    /* Table Styling - Consistent */
     .table {
+        margin-bottom: 0;
         width: 100%;
-        max-width: 100%;
-        table-layout: fixed;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
-
-    /* Prevent any scroll bars in the table card */
-    .card-custom .card-body {
-        overflow-x: hidden;
-        overflow-y: hidden;
+    .table th {
+        background-color: #E8F5E6;
+        color: #2C8F0C;
+        font-weight: 600;
+        border-bottom: 2px solid #2C8F0C;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-
-    .card-custom {
-        overflow: hidden;
+    .table td {
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
-    /* Responsive table - always fixed layout for better fit */
-    .table {
-        table-layout: fixed;
+    .table tbody tr:hover {
+        background-color: #F8FDF8;
+        transition: background-color 0.2s ease;
+    }
+
+    /* Alternating row colors */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Status styling - Consistent with customer/supplier pages */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
+        color: #2C8F0C;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+
+    .status-text-archived {
+        color: #6c757d;
+    }
+
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+    /* Modal Styling - Consistent */
+    .modal-header {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+    }
+
+    .modal-title {
+        font-weight: 700;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 600;
+        color: #2C8F0C;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #C8E6C9;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    }
+
+    /* Filter Section - Consistent */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    /* Supplier Icon */
+    .supplier-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Tips Box */
+    .tips-box {
+        background-color: #F8FDF8;
+        border-left: 4px solid #2C8F0C;
+        border-radius: 8px;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: #2C8F0C;
+    }
+
+    .tips-box i {
+        color: #2C8F0C;
+        margin-right: 5px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #C8E6C9;
+        margin-bottom: 1rem;
+    }
+
+    /* Table Container for consistency */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 1200px) {
+        .table-container {
+            overflow-x: visible;
+        }
+        
+        .table {
+            table-layout: fixed;
+        }
     }
 
     /* Column width control - compact for no scroll */
@@ -313,7 +369,26 @@
     .status-col { min-width: 80px; width: 80px; }
     .action-col { min-width: 80px; width: 80px; }
 
-    /* Pagination styling */
+    /* Supplier Info Cell */
+    .supplier-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .supplier-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .supplier-contact {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+
+    /* Pagination styling - Consistent */
     .pagination .page-item .page-link {
         color: #2C8F0C;
         border: 1px solid #dee2e6;
@@ -329,7 +404,7 @@
     }
     
     .pagination .page-item:not(.disabled) .page-link:hover {
-        background-color: #E8F5E6;
+        background-color: #E8FDF8;
         border-color: #2C8F0C;
         color: #2C8F0C;
     }
@@ -339,69 +414,14 @@
         background-color: #f8f9fa;
     }
 
-    /* Tooltip styling for buttons */
-    .action-btn {
-        position: relative;
-    }
-    
-    .action-btn::after {
-        content: attr(data-title);
-        position: absolute;
-        bottom: -30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: #333;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.2s ease;
-        z-index: 1000;
-    }
-    
-    .action-btn:hover::after {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    /* Supplier Icon - Retained */
-    .supplier-icon {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-
-    /* Supplier Info Cell */
-    .supplier-info-cell {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        color: #C8E6C9;
-        margin-bottom: 1rem;
+    /* Remove old badge styles */
+    .badge-active,
+    .badge-archived {
+        display: none;
     }
 </style>
 
-<!-- Filters and Search -->
+<!-- Filters and Search - Consistent -->
 <div class="card card-custom mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.suppliers.index') }}" id="filterForm">
@@ -411,8 +431,7 @@
                     <div class="mb-3 position-relative">
                         <label for="search" class="form-label fw-bold">Search Suppliers</label>
                         <input type="text" class="form-control" id="search" name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Search by name, contact, or address...">
+                            value="{{ request('search') }}" placeholder="Search by name, contact, or address...">
                         <div class="search-loading" id="searchLoading">
                             <div class="spinner-border spinner-border-sm text-success" role="status">
                                 <span class="visually-hidden">Loading...</span>
@@ -421,7 +440,7 @@
                     </div>
                 </div>
 
-                <!-- Filter by Status (Active / Archived) -->
+                <!-- Filter by Status -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
@@ -450,11 +469,11 @@
     </div>
 </div>
 
+<!-- Supplier Table -->
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Supplier Management</h5>
         <button class="btn btn-add-supplier" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-            {{-- <i class="fas fa-user-plus"></i>  --}}
             Add Supplier
         </button>
     </div>
@@ -482,10 +501,13 @@
                             <td class="name-col">
                                 <div class="supplier-info-cell">
                                     <div class="supplier-icon">
-                                        {{ substr($supplier->name, 0, 2) }}
+                                        <i class="fas fa-truck-loading"></i>
                                     </div>
                                     <div>
                                         <div class="supplier-name">{{ $supplier->name }}</div>
+                                        @if($supplier->contact)
+                                            <div class="supplier-contact">{{ $supplier->contact }}</div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -505,7 +527,7 @@
                             </td>
                             <td class="address-col">
                                 @if($supplier->address)
-                                    <div class="supplier-address" title="{{ $supplier->address }}">
+                                    <div class="supplier-contact" title="{{ $supplier->address }}">
                                         {{ Str::limit($supplier->address, 40) }}
                                     </div>
                                 @else
@@ -521,16 +543,25 @@
                             </td>
                             <td class="action-col">
                                 <div class="action-buttons">
-                                    <button class="action-btn btn-edit edit-supplier-btn" data-bs-toggle="modal" data-bs-target="#editSupplierModal" data-supplier='@json($supplier)' data-title="Edit Supplier">
+                                    <button class="action-btn btn-edit edit-supplier-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editSupplierModal"
+                                            data-supplier='@json($supplier)'
+                                            data-title="Edit Supplier">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    @if ($supplier->is_archived)
-                                        <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $supplier->id }}" data-title="Unarchive Supplier">
-                                           <i class="fas fa-box-open"></i>
+
+                                    @if (!$supplier->is_archived)
+                                        <button class="action-btn btn-archive archiveBtn" 
+                                                data-id="{{ $supplier->id }}" 
+                                                data-title="Archive Supplier">
+                                            <i class="fas fa-archive"></i>
                                         </button>
                                     @else
-                                        <button class="action-btn btn-archive archiveBtn" data-id="{{ $supplier->id }}" data-title="Archive Supplier">
-                                            <i class="fas fa-archive"></i>
+                                        <button class="action-btn btn-unarchive unarchiveBtn" 
+                                                data-id="{{ $supplier->id }}" 
+                                                data-title="Unarchive Supplier">
+                                            <i class="fas fa-box-open"></i>
                                         </button>
                                     @endif
                                 </div>
@@ -539,6 +570,7 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
 
             @if($suppliers->hasPages())
             <div class="d-flex justify-content-center p-4">
@@ -551,8 +583,7 @@
                 <h5 class="text-muted">No Suppliers Found</h5>
                 <p class="text-muted mb-4">Add your first supplier to get started</p>
                 <button class="btn btn-add-supplier" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                    {{-- <i class="fas fa-user-plus"></i>  --}}
-                    Add First Supplier
+                    <i class="fas fa-user-plus"></i> Add First Supplier
                 </button>
             </div>
         @endif
@@ -585,6 +616,7 @@
                                    placeholder="Enter contact number">
                         </div>
                     </div>
+                    
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="add_contact_person" class="form-label">Contact Person</label>
@@ -600,6 +632,13 @@
                                       placeholder="Enter complete address"></textarea>
                         </div>
                     </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tips:</strong> Suppliers help manage your product sources. Give each supplier clear contact information for easy communication.
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -613,7 +652,7 @@
 <!-- Edit Supplier Modal -->
 <div class="modal fade" id="editSupplierModal" tabindex="-1" aria-labelledby="editSupplierModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <form id="editSupplierForm">
+        <form id="editSupplierForm" method="POST">
             @csrf
             @method('PUT')
             <div class="modal-content">
@@ -635,6 +674,7 @@
                             <input type="text" id="edit_contact" name="contact" class="form-control">
                         </div>
                     </div>
+                    
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="edit_contact_person" class="form-label">Contact Person</label>
@@ -646,6 +686,13 @@
                         <div class="mb-3">
                             <label for="edit_address" class="form-label">Address</label>
                             <textarea id="edit_address" name="address" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Note:</strong> Archiving a supplier will hide them from selection but won't delete their historical records.
                         </div>
                     </div>
                 </div>
@@ -676,7 +723,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         searchTimeout = setTimeout(() => {
             filterForm.submit();
-        }, 800); // 800ms delay after typing stops
+        }, 800);
     });
 
     // Auto-submit status filter immediately
@@ -707,7 +754,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
 
-        fetch('{{ route("admin.suppliers.store") }}', {
+        fetch(form.action, {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             body: formData
@@ -721,13 +768,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             } else {
                 alert('Error adding supplier: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Network error. Please try again.');
-        })
-        .finally(() => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
         });
@@ -779,13 +826,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             } else {
                 alert('Error updating supplier: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Network error. Please try again.');
-        })
-        .finally(() => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
         });
@@ -856,7 +903,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-    
+
     // Fix table layout on window resize
     window.addEventListener('resize', function() {
         const tableContainer = document.querySelector('.table-container');
@@ -874,5 +921,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
-
 @endsection
