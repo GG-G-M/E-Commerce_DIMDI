@@ -23,14 +23,14 @@ class CustomerController extends Controller
             });
         }
 
-        // Status filter
-        if ($request->status === 'archived') {
+        // Status filter - default to active if not specified
+        $status = $request->get('status', 'active'); // Default to 'active'
+        if ($status === 'archived') {
             $query->where('is_archived', true);
-        } elseif ($request->status === 'active') {
-            // Default or 'active'
+        } elseif ($status === 'active') {
             $query->where('is_archived', false);
         }
-        // If status is 'all' or not specified, don't apply status filter (show all)
+        // If status is 'all', don't apply status filter (show all)
 
 
         $perPage = $request->get('per_page', 10);

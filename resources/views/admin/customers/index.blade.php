@@ -939,9 +939,45 @@
         </div>
     </div>
 
-    <!-- Working JavaScript for Archive/Unarchive -->
+    <!-- Working JavaScript for Archive/Unarchive and Filters -->
     <script>
         console.log('JavaScript is starting...');
+        
+        // Handle filter form auto-submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.getElementById('filterForm');
+            const statusSelect = document.getElementById('status');
+            const perPageSelect = document.getElementById('per_page');
+            const searchInput = document.getElementById('search');
+            
+            // Auto-submit when status changes
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function() {
+                    console.log('Status filter changed to:', this.value);
+                    filterForm.submit();
+                });
+            }
+            
+            // Auto-submit when per_page changes
+            if (perPageSelect) {
+                perPageSelect.addEventListener('change', function() {
+                    console.log('Per page changed to:', this.value);
+                    filterForm.submit();
+                });
+            }
+            
+            // Auto-submit search with delay
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        console.log('Search changed to:', this.value);
+                        filterForm.submit();
+                    }, 500); // 500ms delay
+                });
+            }
+        });
         
         // Define global functions that can be called from onclick attributes
         window.archiveCustomer = function(id, button) {
