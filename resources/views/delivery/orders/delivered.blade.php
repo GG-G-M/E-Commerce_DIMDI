@@ -300,6 +300,7 @@
         transition: all 0.2s ease;
         border: 2px solid;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        text-decoration: none;
     }
     
     .action-btn:hover {
@@ -404,7 +405,34 @@
 </style>
 
 
+<!-- Delivery Statistics -->
+@if($orders->count() > 0)
+<div class="row mt-4 mb-4">
+    <div class="col-md-4">
+        <div class="stats-card">
+            <i class="fas fa-shipping-fast stats-icon"></i>
+            <div class="stats-number">{{ $orders->total() }}</div>
+            <div class="stats-label">Total Delivered</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <i class="fas fa-calendar-day stats-icon"></i>
+            <div class="stats-number">{{ $orders->where('delivered_at', '>=', now()->startOfDay())->count() }}</div>
+            <div class="stats-label">Delivered Today</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <i class="fas fa-money-bill-wave stats-icon"></i>
+            <div class="stats-number">₱{{ number_format($orders->sum('total_amount'), 2) }}</div>
+            <div class="stats-label">Total Value Delivered</div>
+        </div>
+    </div>
+</div>
+@endif
 
+<div class="mt-4"></div>
 
 <!-- Orders Table -->
 <div class="card card-custom">
@@ -509,7 +537,7 @@
                             <td class="action-col">
                                 <div class="action-buttons">
                                     <a href="{{ route('delivery.orders.show', $order) }}" class="action-btn btn-view" title="View Delivery Details">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-search"></i>
                                     </a>
                                 </div>
                             </td>
@@ -560,32 +588,7 @@
     </div>
 </div>
 
-<!-- Delivery Statistics -->
-@if($orders->count() > 0)
-<div class="row mt-4">
-    <div class="col-md-4">
-        <div class="stats-card">
-            <i class="fas fa-shipping-fast stats-icon"></i>
-            <div class="stats-number">{{ $orders->total() }}</div>
-            <div class="stats-label">Total Delivered</div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card">
-            <i class="fas fa-calendar-day stats-icon"></i>
-            <div class="stats-number">{{ $orders->where('delivered_at', '>=', now()->startOfDay())->count() }}</div>
-            <div class="stats-label">Delivered Today</div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card">
-            <i class="fas fa-money-bill-wave stats-icon"></i>
-            <div class="stats-number">₱{{ number_format($orders->sum('total_amount'), 2) }}</div>
-            <div class="stats-label">Total Value Delivered</div>
-        </div>
-    </div>
-</div>
-@endif
+
 
 <!-- Delivery Proof Modals -->
 @foreach($orders as $order)

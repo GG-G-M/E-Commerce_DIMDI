@@ -540,11 +540,7 @@
 
         <div class="card-body p-0">
             @if ($orders->count() > 0)
-                <div class="alert alert-info-custom m-3 mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    You have {{ $orders->count() }} active order(s) assigned to you. Deliver them to customers and mark as
-                    delivered when completed.
-                </div>
+
 
                 <div class="table-container">
                     <table class="table table-hover align-middle mb-0">
