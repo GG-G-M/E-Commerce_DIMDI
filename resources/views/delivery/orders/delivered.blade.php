@@ -193,7 +193,7 @@
     .items-col { width: 80px; min-width: 80px; }
     .delivered-col { width: 120px; min-width: 120px; }
     .delivery-proof-col { width: 100px; min-width: 100px; }
-    .action-col { width: 70px; min-width: 70px; }
+    .action-col { width: 70px; min-width: 70px; vertical-align: middle; }
 
     /* Customer Info */
     .customer-name {
@@ -255,11 +255,7 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
     }
-    
-    .stats-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+
     
     .stats-icon {
         font-size: 2rem;
@@ -286,7 +282,9 @@
         display: flex;
         gap: 6px;
         flex-wrap: nowrap;
-        justify-content: center;
+        justify-content: flex-start;
+        align-items: center;
+        height: 100%;
     }
     
     .action-btn {

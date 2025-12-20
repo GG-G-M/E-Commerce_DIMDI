@@ -139,7 +139,12 @@ class NotificationController extends Controller
     
     public function checkNew()
     {
-        // Always return JSON for this endpoint to prevent HTML responses
+        // If this is not an AJAX request, redirect to the notifications index page
+        if (!request()->ajax()) {
+            return redirect()->route('notifications.index');
+        }
+        
+        // Only return JSON for AJAX requests
         if (!Auth::check()) {
             return response()->json([
                 'error' => 'Not authenticated',
