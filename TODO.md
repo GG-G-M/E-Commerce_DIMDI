@@ -1,20 +1,25 @@
-- [x] Increase base font size from 12px to 14px in the PDF template
-- [x] Adjust table column widths to make them narrower (reduce percentage widths)
-- [x] Reduce padding in table cells and containers
-- [x] Update print media styles for consistency
-- [x] Increase base font size to 16px for bigger fonts
-- [x] Further reduce padding and margins to fit A4 size
-- [x] Narrow table columns more to ensure content fits
-- [x] Adjust print styles for A4 compatibility
-- [x] Increase base font size to 18px for even bigger fonts
-- [x] Compress layout further by reducing margins and padding
-- [x] Make table columns even narrower
-- [x] Optimize for A4 paper size
-- [x] Increase base font size to 24px for even bigger fonts
-- [x] Adjust other font sizes proportionally
-- [x] Further compress layout to accommodate larger fonts
-- [x] Increase base font size to 50px for even bigger fonts
-- [x] Adjust other font sizes proportionally to 50px base
-- [x] Further compress layout to accommodate 50px fonts
-- [x] Increase font sizes in order details section for better readability
-- [x] Increase font sizes in day performance badges for better visibility
+# Task: Fix Route [delivery.orders.bulkPickup] not defined
+
+## Status: Completed ✅
+
+### Problem
+- Route [delivery.orders.bulkPickup] not defined error was occurring
+- The view file `resources/views/delivery/orders/pickup.blade.php` was referencing this route in a form action
+- The controller `app/Http/Controllers/Delivery/OrderController.php` had the `bulkPickup` method implemented
+- But the route was missing from `routes/web.php`
+
+### Solution
+- Added the missing route definition in `routes/web.php`:
+  ```php
+  // Bulk Pickup Route
+  Route::post('/orders/bulkPickup', [DeliveryOrderController::class, 'bulkPickup'])->name('orders.bulkPickup');
+  ```
+
+### Verification
+- Ran `php artisan route:list --name=delivery.orders.bulkPickup` to confirm the route is registered
+- Output confirmed: `POST delivery/orders/bulkPickup .... delivery.orders.bulkPickup › Delivery\OrderController@bulkPickup`
+
+### Files Modified
+- `routes/web.php`: Added the bulkPickup route definition
+
+The route is now properly defined and should resolve the "Route [delivery.orders.bulkPickup] not defined" error.
