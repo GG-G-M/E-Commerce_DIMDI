@@ -1055,7 +1055,12 @@ input#searchInput:-webkit-autofill:active {
 
             async checkForNewNotifications() {
                 try {
-                    const response = await fetch('/notifications/check-new');
+                    const response = await fetch('/notifications/check-new', {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    });
                     if (response.ok) {
                         const data = await response.json();
                         if (data.new_count > 0) {
