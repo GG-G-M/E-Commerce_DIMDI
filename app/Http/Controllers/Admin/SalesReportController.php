@@ -32,6 +32,9 @@ class SalesReportController extends Controller
 
     private function applyFilters($query, Request $request)
     {
+        // Trim all request inputs to remove any leading/trailing spaces
+        $request->merge(array_map('trim', $request->all()));
+
         // Date filters
         if ($request->has('date_range')) {
             switch ($request->date_range) {
@@ -60,7 +63,7 @@ class SalesReportController extends Controller
                     ]);
                     break;
                 case 'custom':
-                    if ($request->start_date && $request->end_date) {
+                    if ($request->filled('start_date') && $request->filled('end_date')) {
                         $query->whereBetween('delivered_at', [
                             $request->start_date,
                             $request->end_date
@@ -71,7 +74,7 @@ class SalesReportController extends Controller
         }
 
         // Payment method filter
-        if ($request->payment_method && $request->payment_method !== 'all') {
+        if ($request->filled('payment_method') && $request->payment_method !== 'all') {
             $query->where('payment_method', $request->payment_method);
         }
 

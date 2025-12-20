@@ -423,13 +423,13 @@
 
 <!-- Filters Card -->
 <div class="filter-card">
-    <div class="filter-header">
+    <!-- <div class="filter-header">
         <i class="fas fa-filter"></i> Filter Reports
-    </div>
+    </div> -->
     <div class="filter-body">
         <form action="{{ route('admin.sales-report.index') }}" method="GET" id="filterForm">
             <div class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label">Date Range</label>
                     <select name="date_range" class="form-select" id="dateRangeSelect" onchange="handleDateRangeChange()">
                         <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
@@ -440,8 +440,8 @@
                         <option value="custom" {{ request('date_range') == 'custom' ? 'selected' : '' }}>Custom Range</option>
                     </select>
                 </div>
-                
-                <div class="col-md-4">
+
+                <div class="col-md-6">
                     <label class="form-label">Payment Method</label>
                     <select name="payment_method" class="form-select" onchange="submitForm()">
                         <option value="all">All Payments</option>

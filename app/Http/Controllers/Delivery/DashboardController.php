@@ -28,7 +28,14 @@ class DashboardController extends Controller
         $deliveriesTableId = $this->getDeliveriesTableId();
         
         if (!$deliveriesTableId) {
-            return view('delivery.dashboard')
+            $stats = [
+                'availableOrdersCount' => 0,
+                'myActiveOrdersCount' => 0,
+                'outForDeliveryCount' => 0,
+                'deliveredTodayCount' => 0,
+                'totalDeliveredCount' => 0,
+            ];
+            return view('delivery.dashboard', compact('stats'))
                 ->with('error', 'You are not registered in the deliveries system.');
         }
         
