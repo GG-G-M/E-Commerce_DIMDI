@@ -4,7 +4,7 @@
 <div class="container-fluid px-4">
     <!-- Back Button -->
     <div class="mb-4">
-        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
+        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom btn-sm">
             <i class="fas fa-arrow-left me-2"></i>Back to Users
         </a>
     </div>
@@ -42,28 +42,26 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <!-- Wizard Steps -->
-            <div class="card card-custom mb-4">
-                <div class="card-body p-4">
-                    <div class="wizard-steps">
-                        <div class="step active" data-step="1">
-                            <div class="step-circle">1</div>
-                            <div class="step-label">Basic Info</div>
-                        </div>
-                        <div class="step-line active"></div>
-                        <div class="step" data-step="2">
-                            <div class="step-circle">2</div>
-                            <div class="step-label">Contact & Role</div>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step" data-step="3">
-                            <div class="step-circle">3</div>
-                            <div class="step-label">Address & Status</div>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step" data-step="4">
-                            <div class="step-circle">4</div>
-                            <div class="step-label">Review & Save</div>
-                        </div>
+            <div class="wizard-steps-container mb-4">
+                <div class="wizard-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="step-line active"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Contact & Role</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Address & Status</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Review & Save</div>
                     </div>
                 </div>
             </div>
@@ -88,7 +86,7 @@
                             </span>
                         </div>
                         
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-3 p-md-4">
                             <div class="form-section mb-4">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
@@ -143,9 +141,9 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-3 px-md-4">
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-success-custom btn-lg px-5 next-step" data-next="2">
+                                <button type="button" class="btn btn-success-custom btn-sm px-4 next-step" data-next="2">
                                     Next <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -168,14 +166,14 @@
                             </span>
                         </div>
                         
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-3 p-md-4">
                             <!-- Contact Section -->
                             <div class="form-section mb-4">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-envelope"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold">Contact Information</h6>
+                                    <h6 class="mb-0 text-dark fw-bold fs-5">Contact Information</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -332,12 +330,12 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-3 px-md-4">
                             <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-success-custom btn-lg prev-step" data-prev="1">
+                                <button type="button" class="btn btn-outline-success-custom btn-sm prev-step" data-prev="1">
                                     <i class="fas fa-arrow-left me-2"></i>Back
                                 </button>
-                                <button type="button" class="btn btn-success-custom btn-lg px-5 next-step" data-next="3">
+                                <button type="button" class="btn btn-success-custom btn-sm px-4 next-step" data-next="3">
                                     Next <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -360,14 +358,14 @@
                             </span>
                         </div>
                         
-                        <div class="card-body p-4 p-md-5">
+                        <div class="card-body p-3 p-md-4">
                             <!-- Address Information -->
                             <div class="form-section mb-4">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-map-marker-alt"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold">Address Information</h6>
+                                    <h6 class="mb-0 text-dark fw-bold fs-5">Address Information</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -466,12 +464,12 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-3 px-md-4">
                             <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-success-custom btn-lg prev-step" data-prev="2">
+                                <button type="button" class="btn btn-outline-success-custom btn-sm prev-step" data-prev="2">
                                     <i class="fas fa-arrow-left me-2"></i>Back
                                 </button>
-                                <button type="button" class="btn btn-success-custom btn-lg px-5 next-step" data-next="4">
+                                <button type="button" class="btn btn-success-custom btn-sm px-4 next-step" data-next="4">
                                     Next <i class="fas fa-arrow-right ms-2"></i>
                                 </button>
                             </div>
@@ -494,8 +492,8 @@
                             </span>
                         </div>
                         
-                        <div class="card-body p-4 p-md-5">
-                            <div class="alert alert-success-custom border border-success border-opacity-25 mb-5">
+                        <div class="card-body p-3 p-md-4">
+                            <div class="alert alert-success-custom border border-success border-opacity-25 mb-4">
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-check-circle text-success fs-4 me-3"></i>
                                     <div>
@@ -508,54 +506,54 @@
                             <!-- Review Summary -->
                             <div class="review-summary">
                                 <h6 class="mb-4 fw-bold text-dark">Updated Information Summary</h6>
-                                
+
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-user me-2"></i>Personal Details
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Full Name:</span>
                                                 <span class="fw-bold" id="reviewFullName">-</span>
                                             </div>
                                         </div>
-                                        
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-envelope me-2"></i>Contact Information
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Email:</span>
                                                 <span class="fw-bold" id="reviewEmail">-</span>
                                             </div>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Phone:</span>
                                                 <span class="fw-bold" id="reviewPhone">-</span>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-6">
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-user-tag me-2"></i>Role & Access
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Assigned Role:</span>
                                                 <span class="fw-bold" id="reviewRole">-</span>
                                             </div>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Account Status:</span>
                                                 <span class="fw-bold" id="reviewStatus">-</span>
                                             </div>
                                         </div>
-                                        
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-map-marker-alt me-2"></i>Address
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Address:</span>
                                                 <span class="fw-bold" id="reviewAddress">-</span>
                                             </div>
@@ -598,49 +596,6 @@
                     </div>
                 </div>
             </form>
-            
-            <!-- Danger Zone Card -->
-            @if(!$user->isSuperAdmin() && $user->id !== auth()->id())
-            <div class="card border-danger border-2 shadow-sm mb-4">
-                <div class="card-header bg-danger bg-gradient text-white py-3 px-4">
-                    <h5 class="mb-0 fw-semibold">
-                        <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
-                    </h5>
-                </div>
-                <div class="card-body p-4 p-md-5">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <div class="d-flex align-items-start">
-                                <div class="me-3">
-                                    <div class="bg-danger bg-opacity-10 p-2 rounded-circle">
-                                        <i class="fas fa-trash-alt text-danger"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold text-danger mb-2">Delete This User</h5>
-                                    <p class="text-muted small mb-2">Once you delete a user account, there is no going back. This action cannot be undone.</p>
-                                    <div class="alert alert-danger border-danger border-1 mt-3">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                            <span class="small"><strong>Warning:</strong> All user data, including their order history and profile information, will be permanently deleted.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <form action="{{ route('superadmin.users.destroy', $user) }}" method="POST" id="deleteUserForm">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn btn-danger btn-lg px-4" id="deleteUserBtn">
-                                    <i class="fas fa-trash-alt me-2"></i>Delete User
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
 
         </div>
     </div>
@@ -717,13 +672,26 @@
         --warning: #856404;
     }
 
+    /* Wizard Steps Container */
+    .wizard-steps-container {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        width: 100%;
+    }
+
     /* Wizard Steps */
     .wizard-steps {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .step {
@@ -741,19 +709,19 @@
     }
 
     .step-circle {
-        width: 50px;
-        height: 50px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         background: #e9ecef;
-        border: 3px solid #dee2e6;
+        border: 2px solid #dee2e6;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         color: var(--gray-medium);
         transition: all 0.3s ease;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     .step.active .step-circle {

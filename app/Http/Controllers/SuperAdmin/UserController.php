@@ -91,10 +91,6 @@ class UserController extends Controller
      */
     public function create()
     {
-        // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
         
         $roles = [
             User::ROLE_SUPER_ADMIN => 'Super Admin',
@@ -233,10 +229,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        // Check if user is super admin
-        if (!auth()->check() || !auth()->user()->isSuperAdmin()) {
-            return redirect('/')->with('error', 'Unauthorized access.');
-        }
         
         return view('superadmin.users.show', compact('user'));
     }

@@ -231,7 +231,6 @@
                 <div class="position-sticky pt-2">
                     <h4 class="text-center mb-4">
                         <i class="fas fa-crown me-2"></i>DIMDI Super Admin
-                        <div class="super-admin-badge mt-2">SUPER ADMIN</div>
                     </h4>
                     <ul class="nav flex-column">
 
@@ -444,32 +443,24 @@
                 <!-- Top navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
                     <div class="container-fluid">
-                        <div class="navbar-brand">
+                        <!-- <div class="navbar-brand">
                             <h5 class="mb-0">
                                 <i class="fas fa-crown text-green me-2"></i>
                                 Super Admin Dashboard
                                 <small class="text-muted ms-2">{{ auth()->user()->email }}</small>
                             </h5>
-                        </div>
+                        </div> -->
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#superAdminNavbar">
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="superAdminNavbar">
-                            <ul class="navbar-nav me-auto">
-                                <li class="nav-item">
-                                    <a class="nav-link btn btn-outline-success me-2" href="{{ route('superadmin.dashboard') }}">
-                                        <i class="fas fa-crown me-1"></i>Super Admin Dashboard
-                                    </a>
-                                </li>
-                            </ul>
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
                                         role="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-crown text-green me-1"></i>
+                                        <i class="fas fa-user me-1"></i>
                                         {{ Auth::user()->name }}
-                                        <span class="super-admin-badge">SUPER ADMIN</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="{{ route('superadmin.profile') }}">

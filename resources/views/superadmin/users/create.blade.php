@@ -4,7 +4,7 @@
 <div class="container-fluid px-4">
     <!-- Back Button -->
     <div class="mb-4">
-        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom">
+        <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-success-custom btn-sm">
             <i class="fas fa-arrow-left me-2"></i>Back to Users
         </a>
     </div>
@@ -12,28 +12,26 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <!-- Wizard Steps -->
-            <div class="card card-custom mb-4">
-                <div class="card-body p-4">
-                    <div class="wizard-steps">
-                        <div class="step active" data-step="1">
-                            <div class="step-circle">1</div>
-                            <div class="step-label">Basic Info</div>
-                        </div>
-                        <div class="step-line active"></div>
-                        <div class="step" data-step="2">
-                            <div class="step-circle">2</div>
-                            <div class="step-label">Contact & Security</div>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step" data-step="3">
-                            <div class="step-circle">3</div>
-                            <div class="step-label">Role & Address</div>
-                        </div>
-                        <div class="step-line"></div>
-                        <div class="step" data-step="4">
-                            <div class="step-circle">4</div>
-                            <div class="step-label">Review & Create</div>
-                        </div>
+            <div class="wizard-steps-container mb-4">
+                <div class="wizard-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Basic Info</div>
+                    </div>
+                    <div class="step-line active"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Contact & Security</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Role & Address</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Review & Create</div>
                     </div>
                 </div>
             </div>
@@ -56,14 +54,14 @@
                                 Required fields marked <span class="text-required">*</span>
                             </span>
                         </div>
-                        
-                        <div class="card-body p-4 p-md-5">
-                            <div class="form-section mb-5">
-                                <div class="d-flex align-items-center mb-4">
+
+                        <div class="card-body p-3 p-md-4">
+                            <div class="form-section mb-4">
+                                <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-id-card"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold fs-5">Personal Details</h6>
+                                    <h6 class="mb-0 text-dark fw-bold">Personal Details</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -77,7 +75,7 @@
                                             </span>
                                             <input type="text" class="form-control ps-0 @error('first_name') is-invalid @enderror" 
                                                    id="first_name" name="first_name" value="{{ old('first_name') }}" 
-                                                   placeholder="John" required>
+                                                   placeholder=" John" required>
                                         </div>
                                         @error('first_name')
                                             <div class="text-danger small mt-2">{{ $message }}</div>
@@ -109,10 +107,10 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-4 px-md-5">
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-success-custom btn-lg px-5 next-step" data-next="2">
-                                    Next <i class="fas fa-arrow-right ms-2"></i>
+                                <button type="button" class="btn btn-success-custom btn-sm px-4 next-step" data-next="2">
+                                    Next <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                             </div>
                         </div>
@@ -133,15 +131,15 @@
                                 Required fields marked <span class="text-required">*</span>
                             </span>
                         </div>
-                        
-                        <div class="card-body p-4 p-md-5">
+
+                        <div class="card-body p-3 p-md-4">
                             <!-- Contact Section -->
-                            <div class="form-section mb-5">
-                                <div class="d-flex align-items-center mb-4">
+                            <div class="form-section mb-4">
+                                <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-envelope"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold fs-5">Contact Information</h6>
+                                    <h6 class="mb-0 text-dark fw-bold">Contact Information</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -189,7 +187,7 @@
                                     <div class="section-icon">
                                         <i class="fas fa-lock"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold fs-5">Security & Access</h6>
+                                    <h6 class="mb-0 text-dark fw-bold">Security & Access</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -242,13 +240,13 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-4 px-md-5">
                             <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-success-custom btn-lg prev-step" data-prev="1">
-                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                <button type="button" class="btn btn-outline-success-custom btn-sm px-4 prev-step" data-prev="1">
+                                    <i class="fas fa-arrow-left me-1"></i>Back
                                 </button>
-                                <button type="button" class="btn btn-success-custom btn-lg px-5 next-step" data-next="3">
-                                    Next <i class="fas fa-arrow-right ms-2"></i>
+                                <button type="button" class="btn btn-success-custom btn-sm px-4 next-step" data-next="3">
+                                    Next <i class="fas fa-arrow-right ms-1"></i>
                                 </button>
                             </div>
                         </div>
@@ -269,15 +267,15 @@
                                 Required fields marked <span class="text-required">*</span>
                             </span>
                         </div>
-                        
-                        <div class="card-body p-4 p-md-5">
+
+                        <div class="card-body p-3 p-md-4">
                             <!-- Role Selection -->
-                            <div class="form-section mb-5">
-                                <div class="d-flex align-items-center mb-4">
+                            <div class="form-section mb-4">
+                                <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-user-tag"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold fs-5">Role Assignment</h6>
+                                    <h6 class="mb-0 text-dark fw-bold">Role Assignment</h6>
                                 </div>
                                 
                                 <label for="role" class="form-label">
@@ -309,7 +307,7 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        <h5 class="mb-2 fw-bold">{{ $label }}</h5>
+                                                        <h6 class="mb-2 fw-bold small">{{ $label }}</h6>
                                                         <p class="small text-muted mb-0">
                                                             @if($key == 'superadmin')
                                                                 Full system access
@@ -382,12 +380,12 @@
                             </div>
 
                             <!-- Address Information -->
-                            <div class="form-section mb-5">
-                                <div class="d-flex align-items-center mb-4">
+                            <div class="form-section mb-4">
+                                <div class="d-flex align-items-center mb-3">
                                     <div class="section-icon">
                                         <i class="fas fa-map-marker-alt"></i>
                                     </div>
-                                    <h6 class="mb-0 text-dark fw-bold fs-5">Address Information</h6>
+                                    <h6 class="mb-0 text-dark fw-bold">Address Information</h6>
                                 </div>
                                 
                                 <div class="row g-3">
@@ -506,51 +504,51 @@
                                 
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-user me-2"></i>Personal Details
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Full Name:</span>
                                                 <span class="fw-bold" id="reviewFullName">-</span>
                                             </div>
                                         </div>
-                                        
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-envelope me-2"></i>Contact Information
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Email:</span>
                                                 <span class="fw-bold" id="reviewEmail">-</span>
                                             </div>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Phone:</span>
                                                 <span class="fw-bold" id="reviewPhone">-</span>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-6">
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-user-tag me-2"></i>Role & Access
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Assigned Role:</span>
                                                 <span class="fw-bold" id="reviewRole">-</span>
                                             </div>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Account Status:</span>
                                                 <span class="fw-bold" id="reviewStatus">-</span>
                                             </div>
                                         </div>
-                                        
-                                        <div class="review-section mb-4">
-                                            <h6 class="text-success mb-3 fw-bold">
+
+                                        <div class="review-section mb-3">
+                                            <h6 class="text-success mb-2 fw-bold">
                                                 <i class="fas fa-map-marker-alt me-2"></i>Address
                                             </h6>
-                                            <div class="review-item mb-2">
+                                            <div class="review-item mb-1">
                                                 <span class="text-muted small">Address:</span>
                                                 <span class="fw-bold" id="reviewAddress">-</span>
                                             </div>
@@ -590,19 +588,19 @@
                             </div>
                         </div>
                         
-                        <div class="card-footer bg-light border-top py-4 px-4 px-md-5">
+                        <div class="card-footer bg-light border-top py-3 px-4 px-md-5">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                                 <div>
-                                    <button type="button" class="btn btn-outline-success-custom btn-lg prev-step" data-prev="3">
-                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                    <button type="button" class="btn btn-outline-success-custom btn-sm px-4 prev-step" data-prev="3">
+                                        <i class="fas fa-arrow-left me-1"></i>Back
                                     </button>
                                 </div>
                                 <div class="d-flex gap-3">
-                                    <button type="reset" class="btn btn-outline-success-custom btn-lg">
+                                    <button type="reset" class="btn btn-outline-success-custom btn-sm px-4">
                                         Reset Form
                                     </button>
-                                    <button type="submit" class="btn btn-success-custom btn-lg px-5">
-                                        <i class="fas fa-user-plus me-2"></i>Create User
+                                    <button type="submit" class="btn btn-success-custom btn-sm px-4">
+                                        <i class="fas fa-user-plus me-1"></i>Create User
                                     </button>
                                 </div>
                             </div>
@@ -666,20 +664,33 @@
         padding: 1rem 1.5rem;
     }
 
+    /* Wizard Steps Container */
+    .wizard-steps-container {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid #e9ecef;
+        width: 100%;
+    }
+
     /* Wizard Steps */
     .wizard-steps {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
     }
 
     .step {
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-width: 100px;
+        min-width: 70px;
         position: relative;
         opacity: 0.5;
         transition: all 0.3s ease;
@@ -690,48 +701,49 @@
     }
 
     .step-circle {
-        width: 50px;
-        height: 50px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         background: #e9ecef;
-        border: 3px solid #dee2e6;
+        border: 2px solid #dee2e6;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
-        font-size: 1.2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
         color: var(--gray-medium);
         transition: all 0.3s ease;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
     .step.active .step-circle {
         background: var(--green-light);
         border-color: var(--green-primary);
         color: var(--green-primary);
-        transform: scale(1.1);
-        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(44, 143, 12, 0.15);
     }
 
     .step-label {
-        font-size: 0.9rem;
+        font-size: 0.75rem;
         color: var(--gray-medium);
         font-weight: 500;
         white-space: nowrap;
         text-align: center;
+        line-height: 1.2;
     }
 
     .step.active .step-label {
         color: var(--green-primary);
-        font-weight: 700;
+        font-weight: 600;
     }
 
     .step-line {
         flex: 1;
-        height: 3px;
+        height: 2px;
         background: #e9ecef;
-        min-width: 40px;
-        max-width: 100px;
+        min-width: 20px;
+        max-width: 60px;
         transition: all 0.3s ease;
     }
 
