@@ -49,21 +49,21 @@
         /* Improved Add Customer Button */
         .btn-add-customer {
             background: white;
-    color: #2C8F0C;
-    border: 2px solid rgba(44, 143, 12, 0.3);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    white-space: nowrap;
-    min-width: fit-content;
-    height: auto;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            color: #2C8F0C;
+            border: 2px solid rgba(44, 143, 12, 0.3);
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            min-width: fit-content;
+            height: auto;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
 
         .btn-add-customer:hover {
@@ -732,12 +732,14 @@
                                 </button> --}}
                                     @if ($customer->is_archived)
                                         <button type="button" class="action-btn btn-unarchive unarchiveBtn" 
+                                            data-customer-id="{{ $customer->id }}"
                                             onclick="unarchiveCustomer({{ $customer->id }}, this)"
                                             data-title="Unarchive Customer">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
                                         <button type="button" class="action-btn btn-archive archiveBtn" 
+                                            data-customer-id="{{ $customer->id }}"
                                             onclick="archiveCustomer({{ $customer->id }}, this)"
                                             data-title="Archive Customer">
                                             <i class="fas fa-archive"></i>
@@ -937,379 +939,89 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const filterForm = document.getElementById('filterForm');
-                const searchInput = document.getElementById('search');
-                const statusSelect = document.getElementById('status');
-                const perPageSelect = document.getElementById('per_page');
-                const searchLoading = document.getElementById('searchLoading');
-
-                // Define route URLs for archive/unarchive operations
-                const archiveUrl = (id) => `/admin/customers/${id}/archive`;
-                const unarchiveUrl = (id) => `/admin/customers/${id}/unarchive`;
-
-                let searchTimeout;
-
-                // Auto-submit search with delay
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    searchLoading.style.display = 'block';
-
-                    searchTimeout = setTimeout(() => {
-                        filterForm.submit();
-                    }, 800); // 800ms delay after typing stops
-                });
-
-                // Auto-submit status filter immediately
-                statusSelect.addEventListener('change', function() {
-                    filterForm.submit();
-                });
-
-                // Auto-submit per page selection immediately
-                perPageSelect.addEventListener('change', function() {
-                    filterForm.submit();
-                });
-
-                // Clear loading indicator when form submits
-                filterForm.addEventListener('submit', function() {
-                    searchLoading.style.display = 'none';
-                });
-
-                // Utility function for showing notifications
-                function showNotification(message, type = 'info') {
-                    // Create notification element
-                    const notification = document.createElement('div');
-                    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
-                    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-                    notification.innerHTML = `
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    `;
-                    
-                    // Add to body
-                    document.body.appendChild(notification);
-                    
-                    // Auto remove after 5 seconds
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.remove();
-                        }
-                    }, 5000);
+    <!-- Working JavaScript for Archive/Unarchive -->
+    <script>
+        console.log('JavaScript is starting...');
+        
+        // Define global functions that can be called from onclick attributes
+        window.archiveCustomer = function(id, button) {
+            console.log('Archive function called for ID:', id);
+            
+            if (!confirm('Are you sure you want to archive this customer?')) {
+                return;
+            }
+            
+            // Visual feedback
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.style.opacity = '0.6';
+            
+            fetch(`/admin/customers/${id}/archive`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 }
-
-                /* === View Customer === */
-                document.querySelectorAll('.viewBtn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const customer = JSON.parse(this.dataset.customer);
-
-                        // Populate avatar and basic info
-                        const firstInitial = customer.first_name ? customer.first_name.charAt(0) : 'N';
-                        const lastInitial = customer.last_name ? customer.last_name.charAt(0) : 'A';
-
-                        document.getElementById('viewFirstName').textContent = firstInitial;
-                        document.getElementById('viewLastName').textContent = lastInitial;
-                        document.getElementById('viewFullName').textContent =
-                            `${customer.first_name || ''} ${customer.middle_name || ''} ${customer.last_name || ''}`
-                            .trim() || 'N/A';
-                        document.getElementById('viewCustomerId').textContent =
-                            `Customer ID: #${customer.id}`;
-
-                        // Populate status
-                        const statusElement = document.getElementById('viewStatus');
-                        if (customer.is_archived) {
-                            statusElement.className = 'status-text status-text-archived';
-                            statusElement.innerHTML = 'Archived';
-                        } else {
-                            statusElement.className = 'status-text status-text-active';
-                            statusElement.innerHTML = 'Active';
-                        }
-
-                        // Populate personal information
-                        document.getElementById('viewFirstNameField').textContent = customer
-                            .first_name || '-';
-                        document.getElementById('viewMiddleName').textContent = customer.middle_name ||
-                            '-';
-                        document.getElementById('viewLastNameField').textContent = customer.last_name ||
-                            '-';
-
-                        // Populate contact information
-                        const emailElement = document.getElementById('viewEmail');
-                        if (customer.email) {
-                            emailElement.innerHTML =
-                                `<a href="mailto:${customer.email}" style="color: #2C8F0C; text-decoration: none;">${customer.email}</a>`;
-                        } else {
-                            emailElement.textContent = '-';
-                        }
-                        document.getElementById('viewPhone').textContent = customer.phone || '-';
-
-                        // Populate address information
-                        document.getElementById('viewStreetAddress').textContent = customer
-                            .street_address || '-';
-                        document.getElementById('viewBarangay').textContent = customer.barangay ?
-                            `Barangay ${customer.barangay}` : '-';
-                        document.getElementById('viewCity').textContent = customer.city || '-';
-                        document.getElementById('viewProvince').textContent = customer.province || '-';
-                        document.getElementById('viewRegion').textContent = customer.region || '-';
-                        document.getElementById('viewCountry').textContent = customer.country ||
-                            'Philippines';
-
-                        // Populate account information
-                        const roleName = customer.role ? customer.role.charAt(0).toUpperCase() +
-                            customer.role.slice(1).replace('_', ' ') : 'Customer';
-                        document.getElementById('viewRole').textContent = roleName;
-                        document.getElementById('viewAccountStatus').textContent = customer
-                            .is_archived ? 'Archived' : 'Active';
-                        document.getElementById('viewCreatedAt').textContent = customer.created_at ?
-                            new Date(customer.created_at).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                            }) : '-';
-                        document.getElementById('viewEmailVerified').textContent = customer
-                            .email_verified_at ? 'Yes' : 'No';
-
-                        // Set edit button data for later use
-                        document.getElementById('editFromViewBtn').dataset.customer = this.dataset
-                            .customer;
-                    });
-                });
-
-                /* === Edit from View Modal === */
-                document.getElementById('editFromViewBtn').addEventListener('click', function() {
-                    const customer = JSON.parse(this.dataset.customer);
-
-                    // Close view modal
-                    const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCustomerModal'));
-                    viewModal.hide();
-
-                    // Open edit modal and populate it
-                    setTimeout(() => {
-                        const editModal = new bootstrap.Modal(document.getElementById(
-                            'editCustomerModal'));
-                        editModal.show();
-
-                        const form = document.getElementById('editCustomerForm');
-                        form.action = `/admin/customers/${customer.id}`;
-
-                        // Fill form fields
-                        for (const key in customer) {
-                            const input = form.querySelector(`[name="${key}"]`);
-                            if (input) {
-                                if (input.type === 'checkbox') {
-                                    input.checked = customer[key];
-                                } else {
-                                    input.value = customer[key];
-                                }
-                            }
-                        }
-                    }, 300);
-                });
-
-                /* === Add Customer === */
-                document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    const form = e.target;
-                    const formData = new FormData(form);
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.innerHTML;
-
-                    // Show loading state
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
-
-                    fetch('{{ route('admin.customers.store') }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Close modal and reload
-                                const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                    'addCustomerModal'));
-                                modal.hide();
-                                location.reload();
-                            } else {
-                                alert('Error adding customer: ' + (data.message || 'Unknown error'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Network error. Please try again.');
-                        })
-                        .finally(() => {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        });
-                });
-
-                /* === Edit Customer === */
-                document.querySelectorAll('.editBtn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const customer = JSON.parse(this.dataset.customer);
-                        const form = document.getElementById('editCustomerForm');
-
-                        // Set form action
-                        form.action = `/admin/customers/${customer.id}`;
-
-                        // Fill form fields
-                        for (const key in customer) {
-                            const input = form.querySelector(`[name="${key}"]`);
-                            if (input) {
-                                if (input.type === 'checkbox') {
-                                    input.checked = customer[key];
-                                } else {
-                                    input.value = customer[key];
-                                }
-                            }
-                        }
-                    });
-                });
-
-                document.getElementById('editCustomerForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    const form = e.target;
-                    const formData = new FormData(form);
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.innerHTML;
-
-                    // Show loading state
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
-
-                    fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-HTTP-Method-Override': 'PUT'
-                            },
-                            body: formData
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Close modal and reload
-                                const modal = bootstrap.Modal.getInstance(document.getElementById(
-                                    'editCustomerModal'));
-                                modal.hide();
-                                location.reload();
-                            } else {
-                                alert('Error updating customer: ' + (data.message || 'Unknown error'));
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Network error. Please try again.');
-                        })
-                        .finally(() => {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
-                        });
-                });
-
-                /* === Archive Customer === */
-                function archiveCustomer(id, button) {
-                    console.log('Archive function called for customer ID:', id);
-                    
-                    if (!confirm('Are you sure you want to archive this customer? This will make them inactive but preserve their data.')) {
-                        return;
-                    }
-
-                    const originalContent = button.innerHTML;
-                    
-                    // Visual feedback
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    button.style.opacity = '0.6';
-
-                    // Make the actual request
-                    fetch(`/admin/customers/${id}/archive`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showNotification('Customer archived successfully', 'success');
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            throw new Error(data.message || 'Archive failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Archive error:', error);
-                        button.disabled = false;
-                        button.innerHTML = originalContent;
-                        button.style.opacity = '1';
-                        showNotification('Failed to archive customer: ' + error.message, 'error');
-                    });
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Archive response:', data);
+                if (data.success) {
+                    alert('Customer archived successfully!');
+                    location.reload();
+                } else {
+                    throw new Error(data.message || 'Archive failed');
                 }
-
-                /* === Unarchive Customer === */
-                function unarchiveCustomer(id, button) {
-                    console.log('Unarchive function called for customer ID:', id);
-                    
-                    if (!confirm('Are you sure you want to unarchive this customer? They will become active again.')) {
-                        return;
-                    }
-
-                    const originalContent = button.innerHTML;
-                    
-                    // Visual feedback
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    button.style.opacity = '0.6';
-
-                    // Make the actual request
-                    fetch(`/admin/customers/${id}/unarchive`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showNotification('Customer unarchived successfully', 'success');
-                            setTimeout(() => location.reload(), 1000);
-                        } else {
-                            throw new Error(data.message || 'Unarchive failed');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Unarchive error:', error);
-                        button.disabled = false;
-                        button.innerHTML = originalContent;
-                        button.style.opacity = '1';
-                        showNotification('Failed to unarchive customer: ' + error.message, 'error');
-                    });
-                }
-
-                // Ensure table fits container on all screen sizes
-                window.addEventListener('resize', function() {
-                    const table = document.querySelector('.table');
-                    if (table) {
-                        // Always keep fixed layout for consistent appearance
-                        table.style.tableLayout = 'fixed';
-                        // Ensure table doesn't overflow
-                        table.style.width = '100%';
-                        table.style.maxWidth = '100%';
-                    }
-                });
+            })
+            .catch(error => {
+                console.error('Archive error:', error);
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                button.style.opacity = '1';
+                alert('Archive failed: ' + error.message);
             });
-        </script>
-    @endpush
+        };
+        
+        window.unarchiveCustomer = function(id, button) {
+            console.log('Unarchive function called for ID:', id);
+            
+            if (!confirm('Are you sure you want to unarchive this customer?')) {
+                return;
+            }
+            
+            // Visual feedback
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.style.opacity = '0.6';
+            
+            fetch(`/admin/customers/${id}/unarchive`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Unarchive response:', data);
+                if (data.success) {
+                    alert('Customer unarchived successfully!');
+                    location.reload();
+                } else {
+                    throw new Error(data.message || 'Unarchive failed');
+                }
+            })
+            .catch(error => {
+                console.error('Unarchive error:', error);
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                button.style.opacity = '1';
+                alert('Unarchive failed: ' + error.message);
+            });
+        };
+        
+        console.log('Global archive/unarchive functions defined');
+    </script>
 @endsection
