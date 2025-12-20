@@ -210,13 +210,13 @@
         font-weight: 700;
         color: #2C8F0C;
         font-size: 0.9rem;
-        text-align: right;
+        text-align: left;
         display: block;
     }
 
     /* Order Number Styling */
     .order-number {
-        text-align: right;
+        text-align: left;
         display: block;
         font-weight: 600;
     }
@@ -287,11 +287,7 @@
         font-size: 0.9rem;
     }
 
-    /* Quick Filter Buttons */
-    .btn-outline-success-custom {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
-    }
+
 
     /* Make table more compact on mobile */
     @media (max-width: 768px) {
@@ -319,13 +315,7 @@
 </style>
 
 
-@if(session('success'))
-    <div class="alert alert-success border-success" style="background-color: #E8F5E6; border-color: #C8E6C9;" role="alert">
-        <i class="fas fa-check-circle me-2" style="color: #2C8F0C;"></i> 
-        <strong style="color: #2C8F0C;">{{ session('success') }}</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
+
 
 @if(session('error'))
     <div class="alert alert-danger border-danger" style="background-color: #FFEBEE; border-color: #FFCDD2;" role="alert">
@@ -355,37 +345,37 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th class="order-col">Order #</th>
-                            <th class="customer-col">Customer</th>
-                            <th class="amount-col">Amount</th>
-                            <th class="status-col">Status</th>
-                            <th class="assignment-col">Assignment</th>
-                            <th class="date-col">Order Date</th>
+                            <th class="order-col text-start">Order #</th>
+                            <th class="customer-col text-start">Customer</th>
+                            <th class="amount-col text-start">Amount</th>
+                            <th class="status-col text-start">Status</th>
+                            <th class="assignment-col text-start">Assignment</th>
+                            <th class="date-col text-start">Order Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($orders as $order)
                         <tr>
-                            <td class="order-col">
+                            <td class="order-col text-start">
                                 <strong class="text-dark order-number">#{{ $order->order_number }}</strong>
                             </td>
-                            <td class="customer-col">
+                            <td class="customer-col text-start">
                                 <div>
                                     <div class="customer-name">{{ $order->customer_name }}</div>
                                     <div class="customer-phone">{{ $order->customer_phone }}</div>
                                 </div>
                             </td>
-                            <td class="amount-col">
+                            <td class="amount-col text-start">
                                 <div class="amount-text">₱{{ number_format($order->total_amount, 2) }}</div>
                             </td>
-                            <td class="status-col">
+                            <td class="status-col text-start">
                                 @php
                                     $statusClass = '' . str_replace('_', '-', $order->order_status);
                                     $statusText = ucfirst(str_replace('_', ' ', $order->order_status));
                                 @endphp
                                 <span class="{{ $statusClass }}">{{ $statusText }}</span>
                             </td>
-                            <td class="assignment-col">
+                            <td class="assignment-col text-start">
                                 @if(is_null($order->delivery_id))
                                     <span >Available</span>
                                 @elseif($order->delivery_id == Auth::id())
@@ -394,7 +384,7 @@
                                     <span>Assigned</span>
                                 @endif
                             </td>
-                            <td class="date-col">
+                            <td class="date-col text-start">
                                 <div class="date-text">{{ $order->created_at->format('M j, Y') }}</div>
                                 <div class="time-text" style="font-size: 0.75rem; color: #adb5bd;">
                                     {{ $order->created_at->format('h:i A') }}

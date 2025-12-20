@@ -442,7 +442,7 @@
     .confirmation-icon {
         width: 80px;
         height: 80px;
-        background: linear-gradient(135deg, #FBC02D, #FFB300);
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border-radius: 50%;
         display: flex;
         align-items: center;
