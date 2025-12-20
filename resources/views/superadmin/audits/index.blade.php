@@ -517,8 +517,19 @@
                                         $adminName = $audit->user->first_name . ' ' . $audit->user->last_name;
                                         if (in_array($audit->action, ['created', 'edited', 'deleted', 'archived', 'unarchived'])) {
                                             $oldData = $audit->old_values;
-                                            $productName = $oldData['name'] ?? 'Unknown Item';
-                                            $actionText = $adminName . ' ' . $actionVerb . ' the ' . $productName;
+                                            $newData = $audit->new_values;
+                                            
+                                            // Try to get the item name from various possible fields
+                                            $itemName = $newData['name'] ?? $oldData['name'] ?? 
+                                                       $newData['title'] ?? $oldData['title'] ??
+                                                       $newData['first_name'] ?? $oldData['first_name'] ??
+                                                       $newData['product_name'] ?? $oldData['product_name'] ??
+                                                       $newData['category_name'] ?? $oldData['category_name'] ??
+                                                       $newData['brand_name'] ?? $oldData['brand_name'] ??
+                                                       $newData['order_number'] ?? $oldData['order_number'] ??
+                                                       'Unknown Item';
+                                            
+                                            $actionText = $adminName . ' ' . $actionVerb . ' the ' . $itemName;
                                         } else {
                                             $actionText = $adminName . ' ' . $actionVerb;
                                         }
