@@ -519,17 +519,84 @@
                                             $oldData = $audit->old_values;
                                             $newData = $audit->new_values;
                                             
-                                            // Try to get the item name from various possible fields
-                                            $itemName = $newData['name'] ?? $oldData['name'] ?? 
-                                                       $newData['title'] ?? $oldData['title'] ??
-                                                       $newData['first_name'] ?? $oldData['first_name'] ??
-                                                       $newData['product_name'] ?? $oldData['product_name'] ??
-                                                       $newData['category_name'] ?? $oldData['category_name'] ??
-                                                       $newData['brand_name'] ?? $oldData['brand_name'] ??
-                                                       $newData['order_number'] ?? $oldData['order_number'] ??
-                                                       'Unknown Item';
+                                            // Try to get the item name from various possible fields, prioritizing new_data
+                                            $itemName = null;
                                             
-                                            $actionText = $adminName . ' ' . $actionVerb . ' the ' . $itemName;
+                                            // First try common name fields from new_data
+                                            if (isset($newData['name'])) {
+                                                $itemName = $newData['name'];
+                                            } elseif (isset($newData['title'])) {
+                                                $itemName = $newData['title'];
+                                            } elseif (isset($newData['variant_name'])) {
+                                                $itemName = $newData['variant_name'];
+                                            } elseif (isset($newData['order_number'])) {
+                                                $itemName = 'Order #' . $newData['order_number'];
+                                            } elseif (isset($newData['sku'])) {
+                                                $itemName = 'SKU: ' . $newData['sku'];
+                                            } elseif (isset($newData['email'])) {
+                                                $itemName = 'User: ' . $newData['email'];
+                                            } elseif (isset($newData['first_name']) && isset($newData['last_name'])) {
+                                                $itemName = $newData['first_name'] . ' ' . $newData['last_name'];
+                                            }
+                                            
+                                            // If not found in new_data, try old_data
+                                            if (!$itemName) {
+                                                if (isset($oldData['name'])) {
+                                                    $itemName = $oldData['name'];
+                                                } elseif (isset($oldData['title'])) {
+                                                    $itemName = $oldData['title'];
+                                                } elseif (isset($oldData['variant_name'])) {
+                                                    $itemName = $oldData['variant_name'];
+                                                } elseif (isset($oldData['order_number'])) {
+                                                    $itemName = 'Order #' . $oldData['order_number'];
+                                                } elseif (isset($oldData['sku'])) {
+                                                    $itemName = 'SKU: ' . $oldData['sku'];
+                                                } elseif (isset($oldData['email'])) {
+                                                    $itemName = 'User: ' . $oldData['email'];
+                                                } elseif (isset($oldData['first_name']) && isset($oldData['last_name'])) {
+                                                    $itemName = $oldData['first_name'] . ' ' . $oldData['last_name'];
+                                                }
+                                            }
+                                            
+                                            // If still no item name, try to determine from auditable_type
+                                            if (!$itemName && $audit->auditable_type) {
+                                                $entityType = class_basename($audit->auditable_type);
+                                                switch ($entityType) {
+                                                    case 'Product':
+                                                        $itemName = 'a product';
+                                                        break;
+                                                    case 'Category':
+                                                        $itemName = 'a category';
+                                                        break;
+                                                    case 'Brand':
+                                                        $itemName = 'a brand';
+                                                        break;
+                                                    case 'Order':
+                                                        $itemName = 'an order';
+                                                        break;
+                                                    case 'User':
+                                                        $itemName = 'a user';
+                                                        break;
+                                                    case 'Banner':
+                                                        $itemName = 'a banner';
+                                                        break;
+                                                    case 'Supplier':
+                                                        $itemName = 'a supplier';
+                                                        break;
+                                                    case 'ShippingZone':
+                                                        $itemName = 'a shipping zone';
+                                                        break;
+                                                    default:
+                                                        $itemName = 'an item';
+                                                }
+                                            }
+                                            
+                                            // Final fallback
+                                            if (!$itemName) {
+                                                $itemName = 'an item';
+                                            }
+                                            
+                                            $actionText = $adminName . ' ' . $actionVerb . ' ' . $itemName;
                                         } else {
                                             $actionText = $adminName . ' ' . $actionVerb;
                                         }
