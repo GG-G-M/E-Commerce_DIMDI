@@ -691,16 +691,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const textColor = type === 'warning' ? 'text-dark' : 'text-white';
         
         const toast = document.createElement('div');
-        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.className = 'upper-middle-toast';
         toast.style.cssText = `
-            top: 100px;
-            z-index: 9999;
-            min-width: 300px;
-            text-align: center;
+            pointer-events: none;
         `;
         
         toast.innerHTML = `
-            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px; max-width: 400px;">
                 <div class="d-flex justify-content-center align-items-center p-3">
                     <div class="toast-body ${textColor} d-flex align-items-center">
                         <i class="fas ${icon} me-2 fs-5"></i>

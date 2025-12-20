@@ -1318,11 +1318,15 @@ main {
 .upper-middle-toast {
     position: fixed;
     top: 100px;
-    start: 50%;
-    translate: -50%;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 9999;
     min-width: 300px;
     text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .toast {
