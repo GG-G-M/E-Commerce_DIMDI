@@ -168,6 +168,7 @@ Route::prefix('delivery')->name('delivery.')->middleware(['auth','delivery'])->g
     // Profile Routes
     Route::get('/profile', [DeliveryProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [DeliveryProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [DeliveryProfileController::class, 'updatePassword'])->name('profile.password');
 
     // ✅ ADD MISSING ROUTES FOR COMPATIBILITY
     Route::post('/orders/{order}/pickup-order', [DeliveryOrderController::class, 'markAsPickedUp'])->name('orders.pickup-order');

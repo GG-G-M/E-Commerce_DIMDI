@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
@@ -17,16 +18,36 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
+            'street_address' => 'nullable|string|max:500',
+            'province' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'barangay' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
         ]);
 
-        $user->update($request->only('name', 'email', 'phone', 'address'));
+        $user->update($request->only([
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+            'phone',
+            'street_address',
+            'province',
+            'city',
+            'barangay',
+            'region',
+            'country'
+        ]));
 
         return redirect()->route('delivery.profile.show')
             ->with('success', 'Profile updated successfully!');
@@ -39,6 +60,7 @@ class ProfileController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
