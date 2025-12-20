@@ -524,6 +524,34 @@
         transform: translateY(-1px);
     }
     
+    /* Tooltip styling for buttons - Consistent with other pages */
+    .action-btn {
+        position: relative;
+    }
+
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+    
     /* Ensure forms don't interfere with button layout */
     .action-buttons form {
         display: inline;
@@ -1842,22 +1870,22 @@
                                     <button class="action-btn btn-view viewBtn" data-bs-toggle="modal"
                                         data-bs-target="#viewProductModal" 
                                         data-product='{{ json_encode(array_merge($product->toArray(), ['image_url' => $product->image_url, 'variants' => $product->variants->map(function($variant) { return array_merge($variant->toArray(), ['image_url' => $variant->image_url]); })->toArray()])) }}'
-                                        data-title="View Product" title="View Product">
+                                        data-title="View Product">
                                         <i class="fas fa-search ms-1"></i>
                                     </button>
                                     <a href="{{ route('admin.products.edit', $product) }}" 
                                        class="action-btn btn-edit" 
-                                       title="Edit Product">
+                                       data-title="Edit Product">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     @if($product->is_archived)
                                         <button class="action-btn btn-unarchive unarchiveBtn" data-id="{{ $product->slug }}"
-                                            title="Unarchive Product">
+                                            data-title="Unarchive Product">
                                             <i class="fas fa-box-open"></i>
                                         </button>
                                     @else
                                         <button class="action-btn btn-archive archiveBtn" data-id="{{ $product->slug }}"
-                                            title="Archive Product">
+                                            data-title="Archive Product">
                                             <i class="fas fa-archive"></i>
                                         </button>
                                     @endif

@@ -268,7 +268,7 @@
         display: flex;
         gap: 8px;
         flex-wrap: nowrap;
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .action-btn {
@@ -309,6 +309,34 @@
     .btn-refund:hover {
         background-color: #28a745;
         color: white;
+    }
+
+    /* Tooltip styling for buttons - Consistent with customers page */
+    .action-btn {
+        position: relative;
+    }
+
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
     }
 
     /* Table Container */
@@ -572,11 +600,11 @@
                             </td>
                             <td class="action-col">
                                 <div class="action-buttons">
-                                    <a href="{{ route('admin.orders.show', $order) }}" class="action-btn btn-view" title="View Order Details">
+                                    <a href="{{ route('admin.orders.show', $order) }}" class="action-btn btn-view" data-title="View Order Details">
                                         <i class="fas fa-search ms-1"></i>
                                     </a>
                                     @if($order->order_status == 'cancelled' && !$order->refund_processed)
-                                    <a href="{{ route('admin.orders.refund.show', $order) }}" class="action-btn btn-refund" title="Process Refund">
+                                    <a href="{{ route('admin.orders.refund.show', $order) }}" class="action-btn btn-refund" data-title="Process Refund">
                                         <i class="fas fa-money-bill-wave"></i>
                                     </a>
                                     @endif
