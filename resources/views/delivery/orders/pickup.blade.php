@@ -302,7 +302,7 @@
         display: flex;
         gap: 6px;
         flex-wrap: nowrap;
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .action-btn {
@@ -577,7 +577,7 @@
                             <th class="amount-col">Amount</th>
                             <th class="items-col">Items</th>
                             <th class="date-col">Order Date</th>
-                            <th class="action-col text-center">Pickup</th>
+                            <th class="action-col">Pickup</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -638,8 +638,8 @@
                                     {{ $order->created_at->format('h:i A') }}
                                 </div>
                             </td>
-                            <td class="action-col text-center">
-                                <div class="action-buttons justify-content-center">
+                            <td class="action-col">
+                                <div class="action-buttons">
                                     <button type="button" class="action-btn btn-pickup pickup-confirm-btn" 
                                             data-order-id="{{ $order->id }}"
                                             data-order-number="{{ $order->order_number }}"
