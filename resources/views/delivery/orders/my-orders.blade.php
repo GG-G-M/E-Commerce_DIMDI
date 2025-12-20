@@ -879,12 +879,21 @@
                 
                 formData.append('delivery_notes', document.getElementById('deliveryNotes').value);
                 
-                // Submit via AJAX
+                // Submit via AJAX with proper CSRF token handling
+                const csrfToken = document.querySelector('input[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    alert('Security token not found. Please refresh the page and try again.');
+                    return;
+                }
+                
                 fetch(`/delivery/orders/${currentOrderId}/deliver-order`, {
                     method: 'POST',
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
                     },
                     body: formData
                 })

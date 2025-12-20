@@ -361,17 +361,36 @@ class OrderController extends Controller
 
     public function markAsDelivered(Order $order, Request $request)
     {
+        Log::info('markAsDelivered called', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'request_method' => $request->method(),
+            'request_uri' => $request->fullUrl(),
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()->email ?? 'not logged in'
+        ]);
+        
         $deliveriesTableId = $this->getDeliveriesTableId();
         
         if (!$deliveriesTableId) {
+            Log::error('Delivery staff not found in deliveries table', [
+                'user_id' => Auth::id(),
+                'email' => Auth::user()->email ?? 'not logged in'
+            ]);
             return response()->json([
                 'success' => false, 
                 'message' => 'You are not registered in the deliveries system.'
             ], 403);
         }
         
+        Log::info('Deliveries table ID found', ['deliveries_table_id' => $deliveriesTableId]);
+        
         // Verify the order belongs to the current delivery driver
         if ($order->delivery_id !== $deliveriesTableId) {
+            Log::warning('Order not assigned to current delivery driver', [
+                'order_delivery_id' => $order->delivery_id,
+                'current_delivery_id' => $deliveriesTableId
+            ]);
             return response()->json([
                 'success' => false, 
                 'message' => 'Unauthorized action. This order is not assigned to you.'
@@ -380,6 +399,10 @@ class OrderController extends Controller
 
         // Check if order can be marked as delivered using model method
         if (!$order->canBeMarkedAsDelivered()) {
+            Log::warning('Order cannot be marked as delivered', [
+                'order_id' => $order->id,
+                'current_status' => $order->order_status
+            ]);
             return response()->json([
                 'success' => false, 
                 'message' => 'This order cannot be marked as delivered. Current status: ' . $order->order_status
@@ -387,15 +410,29 @@ class OrderController extends Controller
         }
 
         try {
-            // Validate request
-            $request->validate([
-                'delivery_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            Log::info('Starting validation', ['all_request_data' => $request->all()]);
+            
+            // Validate request - Make photo truly optional and allow more formats
+            $validatedData = $request->validate([
+                'delivery_photo' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max, allow webp
                 'delivery_notes' => 'nullable|string|max:500'
             ]);
+            
+            Log::info('Validation passed', ['validated_data' => $validatedData]);
 
             $updateData = [
                 'delivered_at' => now(),
             ];
+            
+            Log::info('Starting file upload processing', [
+                'has_file' => $request->hasFile('delivery_photo'),
+                'file_data' => $request->hasFile('delivery_photo') ? [
+                    'original_name' => $request->file('delivery_photo')->getClientOriginalName(),
+                    'size' => $request->file('delivery_photo')->getSize(),
+                    'mime_type' => $request->file('delivery_photo')->getMimeType(),
+                    'is_valid' => $request->file('delivery_photo')->isValid()
+                ] : null
+            ]);
 
             // Handle file upload
             if ($request->hasFile('delivery_photo')) {
@@ -403,19 +440,31 @@ class OrderController extends Controller
                 
                 // Validate image
                 if (!$photo->isValid()) {
+                    Log::error('Invalid image file uploaded', [
+                        'errors' => $photo->getError(),
+                        'error_message' => $photo->getErrorMessage()
+                    ]);
                     return response()->json([
                         'success' => false,
-                        'message' => 'Invalid image file uploaded.'
+                        'message' => 'Invalid image file uploaded: ' . $photo->getErrorMessage()
                     ], 400);
                 }
 
                 // Generate unique filename
                 $filename = 'delivery_proof_' . $order->id . '_' . time() . '.' . $photo->getClientOriginalExtension();
                 
+                Log::info('Attempting to store delivery proof photo', [
+                    'filename' => $filename,
+                    'original_name' => $photo->getClientOriginalName(),
+                    'size' => $photo->getSize(),
+                    'mime_type' => $photo->getMimeType()
+                ]);
+                
                 // Store the file
                 $path = $photo->storeAs('delivery_proofs', $filename, 'public');
                 
                 if ($path) {
+                    Log::info('Delivery proof photo stored successfully', ['path' => $path]);
                     $updateData['delivery_proof_photo'] = $path;
                 } else {
                     Log::error('Failed to store delivery proof photo', [
@@ -428,15 +477,28 @@ class OrderController extends Controller
                         'message' => 'Failed to save delivery proof photo.'
                     ], 500);
                 }
+            } else {
+                Log::info('No delivery photo provided, skipping file upload');
             }
 
             // Add delivery notes if provided
             if ($request->filled('delivery_notes')) {
                 $updateData['delivery_notes'] = $request->delivery_notes;
+                Log::info('Adding delivery notes to update', [
+                    'notes_length' => strlen($request->delivery_notes),
+                    'notes_preview' => substr($request->delivery_notes, 0, 50)
+                ]);
             }
+            
+            Log::info('Preparing to update order with data', ['update_data' => $updateData]);
 
             // Update the order
             $order->update($updateData);
+            
+            Log::info('Order updated successfully', [
+                'order_id' => $order->id,
+                'update_data' => $updateData
+            ]);
 
             // Get delivery staff name for status notes
             $deliveryStaffName = $this->getDeliveryStaffName();
@@ -449,8 +511,15 @@ class OrderController extends Controller
             if (!empty($updateData['delivery_proof_photo'])) {
                 $statusNotes .= ' | Proof photo uploaded';
             }
+            
+            Log::info('Updating order status', [
+                'new_status' => 'delivered',
+                'status_notes' => $statusNotes
+            ]);
 
             $order->updateStatus('delivered', $statusNotes);
+            
+            Log::info('Order status updated successfully');
 
             Log::info('Order marked as delivered successfully', [
                 'order_id' => $order->id,
@@ -467,14 +536,46 @@ class OrderController extends Controller
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed for order delivery', [
+            Log::error('Validation failed for order delivery - DETAILED', [
                 'order_id' => $order->id,
-                'errors' => $e->errors()
+                'order_number' => $order->order_number,
+                'request_all_data' => $request->all(),
+                'request_files' => $request->file(),
+                'request_headers' => $request->headers->all(),
+                'validation_errors' => $e->errors(),
+                'validation_messages' => $e->getMessage(),
+                'validated_data' => $e->validator->validated(),
+                'csrf_token_present' => !empty($request->input('_token')),
+                'user_agent' => $request->header('User-Agent'),
+                'request_content_type' => $request->header('Content-Type')
             ]);
+            
+            // Build detailed error message for frontend
+            $errorMessages = [];
+            foreach ($e->errors() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $errorMessages[] = "Field '{$field}': {$message}";
+                }
+            }
+            
+            $detailedMessage = 'Validation failed: ' . implode('; ', $errorMessages);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Validation failed: ' . implode(', ', array_values($e->errors())[0] ?? ['Unknown error'])
+                'message' => $detailedMessage,
+                'validation_errors' => $e->errors(),
+                'debug_info' => [
+                    'has_photo' => $request->hasFile('delivery_photo'),
+                    'photo_details' => $request->file('delivery_photo') ? [
+                        'original_name' => $request->file('delivery_photo')->getClientOriginalName(),
+                        'size' => $request->file('delivery_photo')->getSize(),
+                        'mime_type' => $request->file('delivery_photo')->getMimeType(),
+                        'is_valid' => $request->file('delivery_photo')->isValid()
+                    ] : null,
+                    'has_notes' => $request->filled('delivery_notes'),
+                    'notes_length' => $request->filled('delivery_notes') ? strlen($request->input('delivery_notes')) : 0,
+                    'csrf_token_present' => $request->has('_token')
+                ]
             ], 422);
             
         } catch (\Exception $e) {
