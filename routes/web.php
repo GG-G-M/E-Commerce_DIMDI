@@ -149,6 +149,9 @@ Route::prefix('delivery')->name('delivery.')->middleware(['auth','delivery'])->g
     Route::get('/orders/delivered', [DeliveryOrderController::class, 'delivered'])->name('orders.delivered');
     Route::get('/orders/my-orders', [DeliveryOrderController::class, 'myOrders'])->name('orders.my-orders');
 
+    // Bulk Pickup Route
+    Route::post('/orders/bulkPickup', [DeliveryOrderController::class, 'bulkPickup'])->name('orders.bulkPickup');
+
     // PARAMETERIZED ROUTES LAST - CLEANED UP AND CORRECTED
     Route::get('/orders/{order}', [DeliveryOrderController::class, 'show'])->name('orders.show');
 

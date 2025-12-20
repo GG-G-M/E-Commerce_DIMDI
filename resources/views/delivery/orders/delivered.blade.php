@@ -85,18 +85,22 @@
 
     /* Update the button styles to match pick up button design */
 .btn-outline-success-custom {
-    background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-    border: none;
-    color: white;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
+    background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
     border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(44, 143, 12, 0.2);
+    gap: 0.5rem;
+    transition: all 0.2s ease;
     text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-outline-success-custom:hover {

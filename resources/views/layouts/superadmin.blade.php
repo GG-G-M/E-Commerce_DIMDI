@@ -266,7 +266,7 @@
                                             <i class="fas fa-user-plus me-2"></i>Create User
                                         </a>
                                     </li>
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.customers.index') ? 'active' : '' }}"
                                             href="{{ route('admin.customers.index') }}">
                                             <i class="fas fa-user-tag me-2"></i>Customers
@@ -283,12 +283,12 @@
                                             href="{{ route('admin.stock_checkers.index') }}">
                                             <i class="fas fa-user-check me-2"></i>Stock Checkers
                                         </a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- System Access -->
+                        <!-- System Access
                         <li class="nav-item">
                             <a class="nav-link collapsed" data-bs-toggle="collapse" href="#systemAccessMenu"
                                 role="button" aria-expanded="false" aria-controls="systemAccessMenu">
@@ -384,7 +384,7 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> -->
 
                         <!-- Settings -->
                         {{-- <li class="nav-item">

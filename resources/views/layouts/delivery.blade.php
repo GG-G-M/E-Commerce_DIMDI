@@ -345,7 +345,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-3 px-md-4" style="margin-left:270px;">
                 <!-- Top navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
                     <div class="container-fluid">
@@ -377,7 +377,7 @@
                 </nav>
 
                 <!-- Page content -->
-                <div class="container-fluid py-4">
+                <div class="container-fluid py-3 px-0">
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
