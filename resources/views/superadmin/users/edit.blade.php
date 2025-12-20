@@ -371,30 +371,52 @@
                                 </div>
                                 
                                 <div class="row g-3">
+                                    <!-- Street Address -->
                                     <div class="col-lg-8">
-                                        <label for="address" class="form-label">Street Address</label>
-                                        <input type="text" class="form-control form-control-lg" name="address" 
-                                               value="{{ old('address', $user->address) }}" placeholder="123 Main Street">
+                                        <label for="street_address" class="form-label">Street Address</label>
+                                        <input type="text" class="form-control form-control-lg" name="street_address" 
+                                               value="{{ old('street_address', $user->street_address) }}" placeholder="123 Main Street">
                                     </div>
+                                    
+                                    <!-- Province -->
                                     <div class="col-lg-4">
-                                        <label for="city" class="form-label">City</label>
-                                        <input type="text" class="form-control form-control-lg" name="city" 
-                                               value="{{ old('city', $user->city) }}" placeholder="New York">
+                                        <label for="province" class="form-label">Province <span class="text-required">*</span></label>
+                                        <select id="province" name="province" class="form-control form-control-lg" required>
+                                            <option value="">Select Province</option>
+                                        </select>
                                     </div>
+                                    
+                                    <!-- City -->
                                     <div class="col-lg-4">
-                                        <label for="state" class="form-label">State/Province</label>
-                                        <input type="text" class="form-control form-control-lg" name="state" 
-                                               value="{{ old('state', $user->state) }}" placeholder="NY">
+                                        <label for="city" class="form-label">City <span class="text-required">*</span></label>
+                                        <select id="city" name="city" class="form-control form-control-lg" required>
+                                            <option value="">Select City</option>
+                                        </select>
                                     </div>
+                                    
+                                    <!-- Barangay -->
+                                    <div class="col-lg-4">
+                                        <label for="barangay" class="form-label">Barangay <span class="text-required">*</span></label>
+                                        <select id="barangay" name="barangay" class="form-control form-control-lg" required>
+                                            <option value="">Select Barangay</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Hidden Region Field -->
+                                    <input type="hidden" name="region" id="region">
+                                    
+                                    <!-- Country -->
+                                    <div class="col-lg-4">
+                                        <label for="country" class="form-label">Country <span class="text-required">*</span></label>
+                                        <input type="text" class="form-control form-control-lg" name="country" 
+                                               value="{{ old('country', $user->country ?? 'Philippines') }}" required readonly>
+                                    </div>
+                                    
+                                    <!-- ZIP/Postal Code -->
                                     <div class="col-lg-4">
                                         <label for="zip_code" class="form-label">ZIP/Postal Code</label>
                                         <input type="text" class="form-control form-control-lg" name="zip_code" 
                                                value="{{ old('zip_code', $user->zip_code) }}" placeholder="10001">
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <label for="country" class="form-label">Country</label>
-                                        <input type="text" class="form-control form-control-lg" name="country" 
-                                               value="{{ old('country', $user->country) }}" placeholder="United States">
                                     </div>
                                 </div>
                             </div>
@@ -1183,7 +1205,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
                 
             case 3:
-                // Step 3 doesn't have required fields except status (which is always set)
+                // Validate address fields
+                const province = document.getElementById('province');
+                const city = document.getElementById('city');
+                const barangay = document.getElementById('barangay');
+                
+                if (province && !province.value) {
+                    isValid = false;
+                    showError(province, 'Province is required');
+                    if (!firstErrorField) firstErrorField = province;
+                }
+                
+                if (city && !city.value) {
+                    isValid = false;
+                    showError(city, 'City is required');
+                    if (!firstErrorField) firstErrorField = city;
+                }
+                
+                if (barangay && !barangay.value) {
+                    isValid = false;
+                    showError(barangay, 'Barangay is required');
+                    if (!firstErrorField) firstErrorField = barangay;
+                }
                 break;
         }
         
@@ -1305,8 +1348,33 @@ document.addEventListener('DOMContentLoaded', function() {
         // Build address string
         let addressParts = [];
         if (address) addressParts.push(address);
-        if (city) addressParts.push(city);
-        if (state) addressParts.push(state);
+        
+        // Get selected dropdown values for address
+        const barangaySelect = document.getElementById('barangay');
+        const citySelect = document.getElementById('city');
+        const provinceSelect = document.getElementById('province');
+        
+        if (barangaySelect && barangaySelect.options[barangaySelect.selectedIndex]) {
+            const barangayText = barangaySelect.options[barangaySelect.selectedIndex].text;
+            if (barangayText && barangayText !== 'Select Barangay') {
+                addressParts.push(barangayText);
+            }
+        }
+        
+        if (citySelect && citySelect.options[citySelect.selectedIndex]) {
+            const cityText = citySelect.options[citySelect.selectedIndex].text;
+            if (cityText && cityText !== 'Select City') {
+                addressParts.push(cityText);
+            }
+        }
+        
+        if (provinceSelect && provinceSelect.options[provinceSelect.selectedIndex]) {
+            const provinceText = provinceSelect.options[provinceSelect.selectedIndex].text;
+            if (provinceText && provinceText !== 'Select Province') {
+                addressParts.push(provinceText);
+            }
+        }
+        
         if (country) addressParts.push(country);
         
         document.getElementById('reviewAddress').textContent = 
@@ -1419,6 +1487,91 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Address API functionality
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+    const barangaySelect = document.getElementById('barangay');
+    const regionInput = document.getElementById('region');
+
+    // Fetch provinces
+    if (provinceSelect) {
+        fetch('/address/provinces')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.code;
+                    option.dataset.region = province.region || '';
+                    option.text = province.name;
+                    provinceSelect.appendChild(option);
+                });
+                
+                // If there's an existing province value, set it and trigger loading of cities
+                const existingProvince = '{{ old('province', $user->province ?? '') }}';
+                if (existingProvince) {
+                    provinceSelect.value = existingProvince;
+                    provinceSelect.dispatchEvent(new Event('change'));
+                }
+            });
+    }
+
+    // Fetch cities when province is selected
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceCode = this.value;
+            regionInput.value = this.options[this.selectedIndex].dataset.region || '';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            
+            if (provinceCode) {
+                fetch(`/address/cities/${provinceCode}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.code;
+                            option.text = city.name;
+                            citySelect.appendChild(option);
+                        });
+                        
+                        // If there's an existing city value, set it and trigger loading of barangays
+                        const existingCity = '{{ old('city', $user->city ?? '') }}';
+                        if (existingCity) {
+                            citySelect.value = existingCity;
+                            citySelect.dispatchEvent(new Event('change'));
+                        }
+                    });
+            }
+        });
+    }
+
+    // Fetch barangays when city is selected
+    if (citySelect) {
+        citySelect.addEventListener('change', function() {
+            const cityCode = this.value;
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            
+            if (cityCode) {
+                fetch(`/address/barangays/${cityCode}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(barangay => {
+                            const option = document.createElement('option');
+                            option.value = barangay.code;
+                            option.text = barangay.name;
+                            barangaySelect.appendChild(option);
+                        });
+                        
+                        // If there's an existing barangay value, set it
+                        const existingBarangay = '{{ old('barangay', $user->barangay ?? '') }}';
+                        if (existingBarangay) {
+                            barangaySelect.value = existingBarangay;
+                        }
+                    });
+            }
+        });
+    }
+
     // Initialize
     goToStep(1);
     

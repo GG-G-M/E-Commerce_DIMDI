@@ -401,51 +401,47 @@
                                         @enderror
                                     </div>
                                     
-                                    <!-- Barangay -->
+                                    <!-- Province -->
                                     <div class="col-lg-4">
-                                        <label for="barangay" class="form-label">Barangay</label>
-                                        <input type="text" class="form-control form-control-lg" name="barangay" 
-                                               value="{{ old('barangay') }}" placeholder="Barangay Name">
-                                        @error('barangay')
+                                        <label for="province" class="form-label">Province <span class="text-required">*</span></label>
+                                        <select id="province" name="province" class="form-control form-control-lg" required>
+                                            <option value="">Select Province</option>
+                                        </select>
+                                        @error('province')
                                             <div class="text-danger small mt-2">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     
                                     <!-- City -->
                                     <div class="col-lg-4">
-                                        <label for="city" class="form-label">City</label>
-                                        <input type="text" class="form-control form-control-lg" name="city" 
-                                               value="{{ old('city') }}" placeholder="City Name">
+                                        <label for="city" class="form-label">City <span class="text-required">*</span></label>
+                                        <select id="city" name="city" class="form-control form-control-lg" required>
+                                            <option value="">Select City</option>
+                                        </select>
                                         @error('city')
                                             <div class="text-danger small mt-2">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     
-                                    <!-- Province -->
+                                    <!-- Barangay -->
                                     <div class="col-lg-4">
-                                        <label for="province" class="form-label">Province</label>
-                                        <input type="text" class="form-control form-control-lg" name="province" 
-                                               value="{{ old('province') }}" placeholder="Province Name">
-                                        @error('province')
+                                        <label for="barangay" class="form-label">Barangay <span class="text-required">*</span></label>
+                                        <select id="barangay" name="barangay" class="form-control form-control-lg" required>
+                                            <option value="">Select Barangay</option>
+                                        </select>
+                                        @error('barangay')
                                             <div class="text-danger small mt-2">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     
-                                    <!-- Region -->
-                                    <div class="col-lg-4">
-                                        <label for="region" class="form-label">Region</label>
-                                        <input type="text" class="form-control form-control-lg" name="region" 
-                                               value="{{ old('region') }}" placeholder="Region Name">
-                                        @error('region')
-                                            <div class="text-danger small mt-2">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                                    <!-- Hidden Region Field -->
+                                    <input type="hidden" name="region" id="region">
                                     
                                     <!-- Country -->
                                     <div class="col-lg-4">
-                                        <label for="country" class="form-label">Country</label>
+                                        <label for="country" class="form-label">Country <span class="text-required">*</span></label>
                                         <input type="text" class="form-control form-control-lg" name="country" 
-                                               value="{{ old('country', 'Philippines') }}" placeholder="Country">
+                                               value="{{ old('country', 'Philippines') }}" required readonly>
                                         @error('country')
                                             <div class="text-danger small mt-2">{{ $message }}</div>
                                         @enderror
@@ -1292,6 +1288,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('Please select a role for the user');
                     return false;
                 }
+                
+                // Validate address fields
+                const province = document.getElementById('province');
+                const city = document.getElementById('city');
+                const barangay = document.getElementById('barangay');
+                
+                if (!province.value) {
+                    isValid = false;
+                    showError(province, 'Province is required');
+                    if (!firstErrorField) firstErrorField = province;
+                }
+                
+                if (!city.value) {
+                    isValid = false;
+                    showError(city, 'City is required');
+                    if (!firstErrorField) firstErrorField = city;
+                }
+                
+                if (!barangay.value) {
+                    isValid = false;
+                    showError(barangay, 'Barangay is required');
+                    if (!firstErrorField) firstErrorField = barangay;
+                }
                 break;
         }
         
@@ -1517,8 +1536,33 @@ document.addEventListener('DOMContentLoaded', function() {
         // Build address string
         let addressParts = [];
         if (streetAddress) addressParts.push(streetAddress);
-        if (city) addressParts.push(city);
-        if (province) addressParts.push(province);
+        
+        // Get selected dropdown values for address
+        const barangaySelect = document.getElementById('barangay');
+        const citySelect = document.getElementById('city');
+        const provinceSelect = document.getElementById('province');
+        
+        if (barangaySelect && barangaySelect.options[barangaySelect.selectedIndex]) {
+            const barangayText = barangaySelect.options[barangaySelect.selectedIndex].text;
+            if (barangayText && barangayText !== 'Select Barangay') {
+                addressParts.push(barangayText);
+            }
+        }
+        
+        if (citySelect && citySelect.options[citySelect.selectedIndex]) {
+            const cityText = citySelect.options[citySelect.selectedIndex].text;
+            if (cityText && cityText !== 'Select City') {
+                addressParts.push(cityText);
+            }
+        }
+        
+        if (provinceSelect && provinceSelect.options[provinceSelect.selectedIndex]) {
+            const provinceText = provinceSelect.options[provinceSelect.selectedIndex].text;
+            if (provinceText && provinceText !== 'Select Province') {
+                addressParts.push(provinceText);
+            }
+        }
+        
         if (country) addressParts.push(country);
         
         document.getElementById('reviewAddress').textContent = 
@@ -1574,6 +1618,71 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Address API functionality
+    const provinceSelect = document.getElementById('province');
+    const citySelect = document.getElementById('city');
+    const barangaySelect = document.getElementById('barangay');
+    const regionInput = document.getElementById('region');
+
+    // Fetch provinces
+    if (provinceSelect) {
+        fetch('/address/provinces')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.code;
+                    option.dataset.region = province.region || '';
+                    option.text = province.name;
+                    provinceSelect.appendChild(option);
+                });
+            });
+    }
+
+    // Fetch cities when province is selected
+    if (provinceSelect) {
+        provinceSelect.addEventListener('change', function() {
+            const provinceCode = this.value;
+            regionInput.value = this.options[this.selectedIndex].dataset.region || '';
+            citySelect.innerHTML = '<option value="">Select City</option>';
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            
+            if (provinceCode) {
+                fetch(`/address/cities/${provinceCode}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.code;
+                            option.text = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    }
+
+    // Fetch barangays when city is selected
+    if (citySelect) {
+        citySelect.addEventListener('change', function() {
+            const cityCode = this.value;
+            barangaySelect.innerHTML = '<option value="">Select Barangay</option>';
+            
+            if (cityCode) {
+                fetch(`/address/barangays/${cityCode}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.forEach(barangay => {
+                            const option = document.createElement('option');
+                            option.value = barangay.code;
+                            option.text = barangay.name;
+                            barangaySelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    }
+
     // Initialize
     goToStep(1);
 });
