@@ -325,12 +325,12 @@
     
     .btn-pickup {
         background-color: white;
-        border-color: #FBC02D;
-        color: #FBC02D;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
     }
     
     .btn-pickup:hover {
-        background-color: #FBC02D;
+        background-color: #2C8F0C;
         color: white;
     }
 
@@ -560,12 +560,9 @@
     
     <div class="card-body p-0">
         @if($orders->count() > 0)
-            <div class="alert alert-info-custom m-3 mb-0">
+            <div class="alert alert-info-custom m-3 mb-0" id="bulkModeInfo" style="display: none;">
                 <i class="fas fa-info-circle me-2"></i> 
-                You have {{ $orders->count() }} order(s) ready for pickup. Please pick them up from the warehouse.
-                <span id="bulkModeInfo" style="display: none;"> | 
-                    <strong>Bulk Mode Active:</strong> Select multiple orders for bulk pickup
-                </span>
+                <strong>Bulk Mode Active:</strong> Select multiple orders for bulk pickup
             </div>
 
             <div class="table-container">
@@ -580,7 +577,7 @@
                             <th class="amount-col">Amount</th>
                             <th class="items-col">Items</th>
                             <th class="date-col">Order Date</th>
-                            <th class="action-col">Pickup</th>
+                            <th class="action-col text-center">Pickup</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -641,8 +638,8 @@
                                     {{ $order->created_at->format('h:i A') }}
                                 </div>
                             </td>
-                            <td class="action-col">
-                                <div class="action-buttons">
+                            <td class="action-col text-center">
+                                <div class="action-buttons justify-content-center">
                                     <button type="button" class="action-btn btn-pickup pickup-confirm-btn" 
                                             data-order-id="{{ $order->id }}"
                                             data-order-number="{{ $order->order_number }}"
@@ -761,7 +758,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success-custom" id="confirmSinglePickupBtn">
+                <button type="button" class="btn btn-success fw-semibold" id="confirmSinglePickupBtn">
                     <i class="fas fa-box-check me-1"></i> Yes, Pick Up Order
                 </button>
             </div>
@@ -827,7 +824,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success-custom" id="confirmBulkPickupBtn">
+                <button type="button" class="btn btn-success fw-semibold" id="confirmBulkPickupBtn">
                     <i class="fas fa-box-check me-1"></i> Confirm Bulk Pickup
                 </button>
             </div>
