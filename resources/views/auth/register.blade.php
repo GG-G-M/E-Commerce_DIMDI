@@ -988,30 +988,55 @@
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
                     },
                 });
 
-                if (response.ok) {
-                    // Redirect on successful registration
-                    window.location.href = response.url;
+                // Check if response is JSON (Laravel returns JSON for AJAX requests)
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Success: Laravel returns JSON with redirect URL or success message
+                        if (data.redirect || data.url) {
+                            window.location.href = data.redirect || data.url;
+                        } else if (data.message) {
+                            // Show success message and redirect
+                            alert(data.message);
+                            window.location.href = data.redirect_url || '{{ route("home") }}';
+                        } else {
+                            // Default redirect
+                            window.location.href = '{{ route("home") }}';
+                        }
+                    } else {
+                        // Laravel validation errors or other errors
+                        throw new Error(data.message || 'Registration failed');
+                    }
                 } else {
-                    // Handle error response
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Registration failed');
+                    // Non-JSON response (likely HTML redirect or error page)
+                    if (response.ok) {
+                        // Successful redirect - let the browser handle it
+                        const redirectUrl = response.url || '{{ route("home") }}';
+                        window.location.href = redirectUrl;
+                    } else {
+                        throw new Error('Registration failed. Please try again.');
+                    }
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                
-                // Show error message
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger mt-3';
-                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${error.message || 'Registration failed. Please check your information and try again.'}`;
                 
                 // Remove existing error messages
                 const existingError = document.querySelector('.alert.alert-danger');
                 if (existingError) {
                     existingError.remove();
                 }
+                
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger mt-3';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${error.message || 'Registration failed. Please check your information and try again.'}`;
                 
                 // Add error message
                 document.querySelector('.stepper-container').insertBefore(errorDiv, document.querySelector('.stepper-container').firstChild);
@@ -1021,9 +1046,12 @@
                 submitBtn.innerHTML = '<i class="fas fa-user-plus me-1"></i> Create Account';
                 submitBtn.disabled = false;
                 
-                // Clear password fields
+                // Clear password fields for security
                 document.getElementById('password').value = '';
                 document.getElementById('password-confirm').value = '';
+                
+                // Scroll to top to show error
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
 
