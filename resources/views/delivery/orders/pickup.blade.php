@@ -702,7 +702,7 @@
 
 <!-- Single Pickup Confirmation Modal -->
 <div class="modal fade" id="pickupConfirmationModal" tabindex="-1" aria-labelledby="pickupConfirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="pickupConfirmationModalLabel">
@@ -768,7 +768,7 @@
 
 <!-- Bulk Pickup Modal -->
 <div class="modal fade" id="bulkPickupModal" tabindex="-1" aria-labelledby="bulkPickupModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="bulkPickupModalLabel">
