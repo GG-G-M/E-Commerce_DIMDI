@@ -618,7 +618,7 @@
                 </div>
             </div>
 
-            <div class="text-center text-lg-start mt-4">
+            <div class="text-center text-lg-end mt-4">
                 <button type="submit" class="btn btn-primary px-5">
                     <i class="fas fa-save me-2"></i>Update Profile
                 </button>
@@ -678,7 +678,7 @@
                 </div>
             </div>
 
-            <div class="text-center text-lg-start mt-4">
+            <div class="text-center text-lg-end mt-4">
                 <button type="submit" class="btn btn-primary px-5">
                     <i class="fas fa-key me-2"></i>Update Password
                 </button>
