@@ -8,7 +8,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-
+// use Barryvdh\DomPDF\Facade\Pdf;
 class SalesReportController extends Controller
 {
     public function index(Request $request)
@@ -384,5 +384,151 @@ class SalesReportController extends Controller
         }
         
         return $monthlySales;
+    }
+
+    // In your SalesReportController.php
+
+public function exportPdf(Request $request)
+    {
+        $query = Order::where('order_status', 'delivered');
+        
+        // Apply filters
+        $query = $this->applyFilters($query, $request);
+        
+        // Get sales data
+        $salesData = $this->getSalesData($request);
+        $orders = $query->with('items')->orderBy('delivered_at', 'desc')->get();
+        
+        // Calculate additional statistics for PDF
+        $orderStatistics = $this->calculateOrderStatistics($orders);
+        
+        // Generate PDF with proper encoding
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.sales-report.export.pdf', [
+            'orders' => $orders,
+            'salesData' => $salesData,
+            'orderStatistics' => $orderStatistics,
+            'request' => $request
+        ]);
+        
+        // Set paper size and basic options only
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+        ]);
+        
+        $fileName = 'sales-report-' . date('Y-m-d-H-i-s') . '.pdf';
+        
+        // Force download
+        return $pdf->download($fileName);
+    }
+    
+    // Helper method to format currency properly for PDF
+    private function formatCurrency($amount)
+    {
+        // Return HTML entity for peso symbol to avoid encoding issues
+        return '&#8369;' . number_format($amount, 2);
+    }
+    
+    private function calculateOrderStatistics($orders)
+    {
+        if ($orders->count() === 0) {
+            return [
+                'min_amount' => 0,
+                'max_amount' => 0,
+                'median_amount' => 0,
+                'std_deviation' => 0,
+                'average_amount' => 0,
+                'total_amount' => 0,
+                'order_count' => 0,
+                'first_order_date' => null,
+                'last_order_date' => null,
+                'period_days' => 0,
+            ];
+        }
+        
+        $amounts = $orders->pluck('total_amount')->toArray();
+        
+        // Calculate standard deviation manually
+        $average = $orders->avg('total_amount');
+        $variance = 0.0;
+        foreach ($amounts as $amount) {
+            $variance += pow($amount - $average, 2);
+        }
+        $stdDeviation = sqrt($variance / count($amounts));
+        
+        // Calculate median
+        sort($amounts);
+        $count = count($amounts);
+        $middle = floor(($count - 1) / 2);
+        $median = 0;
+        
+        if ($count % 2 == 0) {
+            // Even number of items
+            $median = ($amounts[$middle] + $amounts[$middle + 1]) / 2;
+        } else {
+            // Odd number of items
+            $median = $amounts[$middle];
+        }
+        
+        // Get first and last order dates
+        $sortedOrders = $orders->sortBy('created_at');
+        $firstOrder = $sortedOrders->first();
+        $lastOrder = $sortedOrders->last();
+        
+        return [
+            'min_amount' => $orders->min('total_amount'),
+            'max_amount' => $orders->max('total_amount'),
+            'median_amount' => $median,
+            'std_deviation' => $stdDeviation,
+            'average_amount' => $average,
+            'total_amount' => $orders->sum('total_amount'),
+            'order_count' => $orders->count(),
+            'first_order_date' => $firstOrder->created_at ?? null,
+            'last_order_date' => $lastOrder->created_at ?? null,
+            'period_days' => $firstOrder && $lastOrder ? 
+                $firstOrder->created_at->diffInDays($lastOrder->created_at) + 1 : 0,
+        ];
+    }
+// Alternative method using DomPDF directly
+
+    public function exportComparisonPdf(Request $request)
+    {
+        $year1 = $request->get('year1', date('Y'));
+        $year2 = $request->get('year2', date('Y') - 1);
+        
+        $year1Sales = $this->getMonthlySalesData($year1);
+        $year2Sales = $this->getMonthlySalesData($year2);
+        
+        $growthData = [];
+        $totalYear1 = array_sum($year1Sales);
+        $totalYear2 = array_sum($year2Sales);
+        $totalGrowth = $totalYear2 > 0 ? (($totalYear1 - $totalYear2) / $totalYear2) * 100 : ($totalYear1 > 0 ? 100 : 0);
+        
+        foreach ($year1Sales as $month => $sales1) {
+            $sales2 = $year2Sales[$month];
+            $growth = $sales2 > 0 ? (($sales1 - $sales2) / $sales2) * 100 : ($sales1 > 0 ? 100 : 0);
+            $growthData[$month] = round($growth, 2);
+        }
+        
+        // Generate PDF
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.sales-report.comparison-pdf', compact(
+            'year1', 
+            'year2', 
+            'year1Sales', 
+            'year2Sales',
+            'growthData',
+            'totalGrowth'
+        ));
+        
+        // Set basic options only
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false,
+        ]);
+        
+        $fileName = 'sales-comparison-' . $year1 . '-vs-' . $year2 . '-' . date('Y-m-d-H-i-s') . '.pdf';
+        
+        return $pdf->download($fileName);
     }
 }

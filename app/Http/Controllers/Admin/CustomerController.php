@@ -11,7 +11,7 @@ class CustomerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'customer');
+        $query = User::where('role', 'customer')->orderBy('created_at', 'desc');
 
         // Search filter
         if ($request->filled('search')) {
@@ -23,13 +23,14 @@ class CustomerController extends Controller
             });
         }
 
-        // Status filter
-        if ($request->status === 'archived') {
+        // Status filter - default to active if not specified
+        $status = $request->get('status', 'active'); // Default to 'active'
+        if ($status === 'archived') {
             $query->where('is_archived', true);
-        } else {
-            // Default or 'active'
+        } elseif ($status === 'active') {
             $query->where('is_archived', false);
         }
+        // If status is 'all', don't apply status filter (show all)
 
 
         $perPage = $request->get('per_page', 10);
@@ -56,10 +57,11 @@ class CustomerController extends Controller
             'email'       => $request->email,
             'password'    => Hash::make($request->password),
             'phone'       => $request->phone,
-            'address'     => $request->address,
+            'street_address' => $request->street_address,
+            'barangay'    => $request->barangay,
             'city'        => $request->city,
-            'state'       => $request->state,
-            'zip_code'    => $request->zip_code,
+            'province'    => $request->province,
+            'region'      => $request->region,
             'country'     => $request->country,
         ]);
 
@@ -79,10 +81,11 @@ class CustomerController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
+            'street_address' => 'nullable|string',
+            'barangay' => 'nullable|string',
             'city' => 'nullable|string',
-            'state' => 'nullable|string',
-            'zip_code' => 'nullable|string',
+            'province' => 'nullable|string',
+            'region' => 'nullable|string',
             'country' => 'nullable|string',
         ]);
 

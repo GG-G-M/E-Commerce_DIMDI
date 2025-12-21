@@ -121,6 +121,7 @@ class PaymentController extends Controller
             ]);
             
             // Use the Order model's updateStatus method to properly update status and timeline
+            // Note: updateStatus('confirmed') already calls reduceStock() internally
             $order->updateStatus('confirmed', 'Payment received via ' . ucfirst($order->payment_method));
             
             // Notify customer with receipt links

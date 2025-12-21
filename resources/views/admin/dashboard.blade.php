@@ -1,258 +1,150 @@
 @extends('layouts.admin')
 
 @section('content')
-<style>
-    .stats-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        overflow: hidden;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
-    
-    .card-primary {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-    }
-    
-    .card-success {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        color: white;
-    }
-    
-    .card-info {
-        background: linear-gradient(135deg, #4CAF50, #66BB6A);
-        color: white;
-    }
-    
-    .card-warning {
-        background: linear-gradient(135deg, #FFA000, #FFB300);
-        color: white;
-    }
-    
-    .stats-icon {
-        font-size: 2rem;
-        opacity: 0.8;
-    }
-    
-    .stats-number {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.2rem;
-    }
-    
-    .stats-label {
-        font-size: 0.85rem;
-        opacity: 0.9;
-        font-weight: 500;
-    }
-    
-    .dashboard-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-    
-    .section-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-    }
-    
-    .section-card .card-header {
-        background: white;
-        border-bottom: 2px solid #E8F5E6;
-        font-weight: 600;
-        color: #2C8F0C;
-        padding: 1rem 1.5rem;
-    }
-    
-    .table th {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        font-weight: 600;
-        border-bottom: 2px solid #2C8F0C;
-    }
-    
-    .badge-success {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-    }
-    
-    .badge-warning {
-        background-color: #FFF3CD;
-        color: #856404;
-    }
-    
-    .badge-danger {
-        background-color: #F8D7DA;
-        color: #721C24;
-    }
-    
-    .product-image {
-        width: 40px;
-        height: 40px;
-        border-radius: 6px;
-        object-fit: cover;
-    }
-    
-    .performance-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-    }
-    
-    .filter-active {
-        background-color: #2C8F0C !important;
-        color: white !important;
-        border-color: #2C8F0C !important;
-    }
-    
-    .custom-date-inputs {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
-        border: 1px solid #E8F5E6;
-    }
-    .clickable-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
-    }
 
-    .clickable-card:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.2) !important;
-    }
-
-    /* Make sure the link covers the entire card */
-    .text-decoration-none {
-        display: block;
-    }
-</style>
-
+<!-- Clean Header -->
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Dashboard Overview</h1>
-            <p class="mb-0 text-muted">Welcome back, {{ Auth::user()->name }}! Here's what's happening with your store.</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted">Last updated: {{ now()->format('M d, Y \\a\\t h:i A') }}</small>
+            <p class="mb-0 text-muted">Here's your store performance overview.</p>
         </div>
     </div>
 </div>
 
-<!-- Filter Section -->
-<div class="card section-card mb-4">
-    <div class="card-body">
-        <form id="dashboardFilter" method="GET" action="{{ route('admin.dashboard') }}">
-            <div class="row align-items-end">
-                <div class="col-md-8">
-                    <label class="form-label fw-bold text-muted mb-2">Filter by Date Range:</label>
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="filter" value="all" id="filter_all" 
-                               {{ $filter == 'all' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_all">All Time</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="today" id="filter_today" 
-                               {{ $filter == 'today' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_today">Today</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="week" id="filter_week" 
-                               {{ $filter == 'week' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_week">This Week</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="month" id="filter_month" 
-                               {{ $filter == 'month' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_month">This Month</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="year" id="filter_year" 
-                               {{ $filter == 'year' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_year">This Year</label>
-
-                        <input type="radio" class="btn-check" name="filter" value="custom" id="filter_custom" 
-                               {{ $filter == 'custom' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="filter_custom">Custom</label>
-                    </div>
-
-                    <!-- Custom Date Inputs -->
-                    <div id="customDateInputs" class="custom-date-inputs" 
-                         style="{{ $filter == 'custom' ? 'display: block;' : 'display: none;' }}">
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" 
-                                       value="{{ $startDate }}" max="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="col-md-5">
-                                <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" 
-                                       value="{{ $endDate }}" max="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-success w-100">Apply</button>
-                            </div>
-                        </div>
-                    </div>
+<!-- Filter Section with Dropdown -->
+<div class="filter-dropdown-container">
+    <div class="filter-header">
+        <h6 class="filter-title">
+            <i class="fas fa-filter me-2"></i>Filter Dashboard Data
+        </h6>
+        @if($filter != 'all')
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-success">
+            <i class="fas fa-times me-1"></i> Clear Filter
+        </a>
+        @endif
+    </div>
+    
+    <form id="dashboardFilter" method="GET" action="{{ route('admin.dashboard') }}">
+        <div class="filter-dropdown">
+            <div class="filter-dropdown-btn" id="filterDropdownBtn">
+                <span id="selectedFilterText">
+                    @php
+                        $filterTexts = [
+                            'all' => '<i class="fas fa-calendar-alt"></i> All Time',
+                            'today' => '<i class="fas fa-sun"></i> Today',
+                            'week' => '<i class="fas fa-calendar-week"></i> This Week',
+                            'month' => '<i class="fas fa-calendar"></i> This Month',
+                            'year' => '<i class="fas fa-calendar-day"></i> This Year',
+                            'custom' => '<i class="fas fa-calendar-check"></i> Custom Date Range'
+                        ];
+                        echo $filterTexts[$filter] ?? $filterTexts['all'];
+                    @endphp
+                </span>
+            </div>
+            
+            <div class="filter-dropdown-menu" id="filterDropdownMenu">
+                <div class="filter-option {{ $filter == 'all' ? 'active' : '' }}" 
+                     data-value="all" data-text="All Time">
+                    <i class="fas fa-calendar-alt"></i> All Time
                 </div>
-                <div class="col-md-4 text-end">
-                    @if($filter != 'all')
-                    <div class="d-flex align-items-center justify-content-end">
-                        <small class="text-muted me-2">
-                            @php
-                                $displayText = match($filter) {
-                                    'today' => 'Today: ' . now()->format('M d, Y'),
-                                    'week' => 'This Week: ' . now()->startOfWeek()->format('M d') . ' - ' . now()->endOfWeek()->format('M d, Y'),
-                                    'month' => 'This Month: ' . now()->format('F Y'),
-                                    'year' => 'This Year: ' . now()->format('Y'),
-                                    'custom' => 'Custom: ' . ($startDate ? Carbon\Carbon::parse($startDate)->format('M d, Y') : '') . ' - ' . ($endDate ? Carbon\Carbon::parse($endDate)->format('M d, Y') : ''),
-                                    default => ''
-                                };
-                            @endphp
-                            {{ $displayText }}
-                        </small>
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary ms-2">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </div>
-                    @endif
+                <div class="filter-option {{ $filter == 'today' ? 'active' : '' }}" 
+                     data-value="today" data-text="Today">
+                    <i class="fas fa-sun"></i> Today
+                </div>
+                <div class="filter-option {{ $filter == 'week' ? 'active' : '' }}" 
+                     data-value="week" data-text="This Week">
+                    <i class="fas fa-calendar-week"></i> This Week
+                </div>
+                <div class="filter-option {{ $filter == 'month' ? 'active' : '' }}" 
+                     data-value="month" data-text="This Month">
+                    <i class="fas fa-calendar"></i> This Month
+                </div>
+                <div class="filter-option {{ $filter == 'year' ? 'active' : '' }}" 
+                     data-value="year" data-text="This Year">
+                    <i class="fas fa-calendar-day"></i> This Year
+                </div>
+                <div class="filter-option {{ $filter == 'custom' ? 'active' : '' }}" 
+                     data-value="custom" data-text="Custom Date Range">
+                    <i class="fas fa-calendar-check"></i> Custom Date Range
                 </div>
             </div>
-        </form>
+            
+            <input type="hidden" name="filter" id="filterInput" value="{{ $filter }}">
+        </div>
+
+        <!-- Custom Date Inputs -->
+        <div id="customDateInputs" class="custom-date-inputs" 
+             style="{{ $filter == 'custom' ? 'display: block;' : 'display: none;' }}">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                           value="{{ $startDate }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" 
+                           value="{{ $endDate }}" max="{{ date('Y-m-d') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-check me-1"></i> Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Date Range Display -->
+    @if($filter != 'all')
+    <div class="date-range-display">
+        <div class="date-range-text">
+            @php
+                $displayText = match($filter) {
+                    'today' => '<i class="fas fa-sun me-1"></i>Today: ' . now()->format('M d, Y'),
+                    'week' => '<i class="fas fa-calendar-week me-1"></i>This Week: ' . now()->startOfWeek()->format('M d') . ' - ' . now()->endOfWeek()->format('M d, Y'),
+                    'month' => '<i class="fas fa-calendar me-1"></i>This Month: ' . now()->format('F Y'),
+                    'year' => '<i class="fas fa-calendar-day me-1"></i>This Year: ' . now()->format('Y'),
+                    'custom' => '<i class="fas fa-calendar-check me-1"></i>Custom Range: ' . ($startDate ? Carbon\Carbon::parse($startDate)->format('M d, Y') : '') . ' - ' . ($endDate ? Carbon\Carbon::parse($endDate)->format('M d, Y') : ''),
+                    default => ''
+                };
+            @endphp
+            {!! $displayText !!}
+        </div>
+        <a href="{{ route('admin.dashboard') }}" class="clear-filter-btn">
+            <i class="fas fa-times me-1"></i> Clear
+        </a>
     </div>
+    @endif
 </div>
 
-<!-- Stats Cards -->
+<!-- Stats Cards - Improved Alignment -->
 <div class="row">
     <!-- Total Products Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.products.index') }}" class="text-decoration-none">
             <div class="card stats-card card-primary h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">TOTAL PRODUCTS</div>
-                            <div class="stats-number">{{ $stats['total_products'] }}</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Added in selected period
-                                @else
-                                    Active in catalog
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Products</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Added in selected period
+                                    @else
+                                        Active in catalog
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_products'] }}</div>
                     </div>
                 </div>
             </div>
@@ -263,22 +155,26 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.orders.index') }}" class="text-decoration-none">
             <div class="card stats-card card-success h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">TOTAL ORDERS</div>
-                            <div class="stats-number">{{ $stats['total_orders'] }}</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Orders in selected period
-                                @else
-                                    All time orders
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Orders</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Orders in selected period
+                                    @else
+                                        All time orders
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-shopping-cart stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_orders'] }}</div>
                     </div>
                 </div>
             </div>
@@ -289,22 +185,26 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('admin.customers.index') }}" class="text-decoration-none">
             <div class="card stats-card card-info h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">TOTAL CUSTOMERS</div>
-                            <div class="stats-number">{{ $stats['total_customers'] }}</div>
-                            <small>
-                                @if($filter != 'all')
-                                    Registered in selected period
-                                @else
-                                    Registered users
-                                @endif
-                            </small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">Total Customers</div>
+                                <small class="text-white opacity-75">
+                                    @if($filter != 'all')
+                                        Registered in selected period
+                                    @else
+                                        Registered users
+                                    @endif
+                                </small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['total_customers'] }}</div>
                     </div>
                 </div>
             </div>
@@ -314,22 +214,26 @@
     <!-- Total Revenue Card -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card stats-card card-warning h-100">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="stats-label">TOTAL REVENUE</div>
-                        <div class="stats-number">₱{{ number_format($stats['revenue'], 2) }}</div>
-                        <small>
-                            @if($filter != 'all')
-                                Revenue in selected period
-                            @else
-                                Lifetime sales
-                            @endif
-                        </small>
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-icon-circle me-3">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <div class="stats-label text-uppercase small">Total Revenue</div>
+                            <small class="text-white opacity-75">
+                                @if($filter != 'all')
+                                    Revenue in selected period
+                                @else
+                                    Lifetime sales
+                                @endif
+                            </small>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-dollar-sign stats-icon"></i>
-                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="stats-number display-6 fw-bold">₱{{ number_format($stats['revenue'], 2) }}</div>
                 </div>
             </div>
         </div>
@@ -511,7 +415,7 @@
 
 <div class="row mt-4">
     <!-- Quick Stats -->
-    <div class="col-md-4">
+    {{-- <div class="col-md-4">
         <div class="card section-card">
             <div class="card-header">
                 <h6 class="m-0 font-weight-bold">
@@ -535,10 +439,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <!-- Quick Actions -->
-    <div class="col-md-8">
+    {{-- <div class="col-md-8">
         <div class="card section-card">
             <div class="card-header">
                 <h6 class="m-0 font-weight-bold">
@@ -565,11 +469,16 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Show welcome toast notification only if this is a fresh login
+    @if(session('login_success'))
+        showToast('Welcome back, {{ Auth::user()->name }}!', 'success');
+    @endif
+    
     const salesData = @json($salesData);
     
     // Prepare chart data
@@ -689,34 +598,123 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Filter functionality (existing code)
-    const filterRadios = document.querySelectorAll('input[name="filter"]');
+    // Custom Dropdown Functionality
+    const filterDropdownBtn = document.getElementById('filterDropdownBtn');
+    const filterDropdownMenu = document.getElementById('filterDropdownMenu');
+    const filterInput = document.getElementById('filterInput');
+    const selectedFilterText = document.getElementById('selectedFilterText');
     const customDateInputs = document.getElementById('customDateInputs');
     const form = document.getElementById('dashboardFilter');
 
-    filterRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'custom') {
+    // Toggle dropdown
+    filterDropdownBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterDropdownMenu.classList.toggle('show');
+        filterDropdownBtn.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!filterDropdownBtn.contains(e.target) && !filterDropdownMenu.contains(e.target)) {
+            filterDropdownMenu.classList.remove('show');
+            filterDropdownBtn.classList.remove('active');
+        }
+    });
+
+    // Handle filter option selection
+    const filterOptions = document.querySelectorAll('.filter-option');
+    filterOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            const text = this.getAttribute('data-text');
+            const icon = this.querySelector('i').cloneNode(true);
+            
+            // Update active state
+            filterOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update selected display
+            selectedFilterText.innerHTML = '';
+            selectedFilterText.appendChild(icon);
+            selectedFilterText.innerHTML += ' ' + text;
+            
+            // Update hidden input
+            filterInput.value = value;
+            
+            // Handle custom date range
+            if (value === 'custom') {
                 customDateInputs.style.display = 'block';
             } else {
                 customDateInputs.style.display = 'none';
-                if (this.value !== 'custom') {
-                    form.submit();
-                }
+                form.submit();
             }
+            
+            // Close dropdown
+            filterDropdownMenu.classList.remove('show');
+            filterDropdownBtn.classList.remove('active');
         });
     });
 
+    // Handle custom date inputs
     const startDate = document.getElementById('start_date');
     const endDate = document.getElementById('end_date');
 
     [startDate, endDate].forEach(input => {
         input.addEventListener('change', function() {
-            if (document.querySelector('input[name="filter"]:checked').value === 'custom') {
+            if (filterInput.value === 'custom') {
                 form.submit();
             }
         });
     });
+    
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast';
+        toast.style.cssText = `
+            pointer-events: none;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px; max-width: 400px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
 });
 </script>
 @endsection

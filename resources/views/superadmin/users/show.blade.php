@@ -1,426 +1,621 @@
 @extends('layouts.superadmin')
 
 @section('content')
-<div class="container-fluid px-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center py-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('superadmin.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('superadmin.users.index') }}">Users</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ $user->name }}</li>
-                </ol>
-            </nav>
-            <h1 class="h3 fw-bold mb-1">
-                <i class="fas fa-user-circle text-success opacity-75 me-2"></i>User Details: {{ $user->name }}
-            </h1>
-            <p class="text-muted mb-0">View and manage user account information and permissions</p>
-        </div>
-        <div class="btn-group">
-            <a href="{{ route('superadmin.users.index') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back to Users
-            </a>
-            <a href="{{ route('superadmin.users.edit', $user) }}" class="btn btn-warning">
-                <i class="fas fa-edit me-2"></i>Edit User
-            </a>
-        </div>
-    </div>
+<style>
+    :root {
+        --primary: #2C8F0C;
+        --primary-light: #E8F5E9;
+        --primary-dark: #1B5E20;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+    }
 
-    <div class="row">
-        <!-- Left Column - User Profile -->
-        <div class="col-xl-4 col-lg-5">
-            <!-- Profile Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-success bg-gradient text-white py-3">
-                    <h5 class="mb-0 fw-semibold">
-                        <i class="fas fa-id-card me-2"></i>User Profile
-                    </h5>
+    /* Remove page header card */
+    .page-header {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--gray-800);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1.75rem;
+    }
+
+    /* Cards */
+    .card-clean {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+        background: white;
+    }
+
+    .card-header-clean {
+        background: white;
+        border-bottom: 2px solid var(--gray-200);
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .card-header-clean h5 {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+    }
+
+    .card-body-clean {
+        padding: 1.5rem;
+    }
+
+    /* Profile Avatar */
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin: 0 auto 1.5rem;
+        border: 4px solid white;
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+        text-align: center;
+    }
+
+    .user-email {
+        color: var(--gray-600);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        background: var(--gray-50);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    .info-label {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: var(--gray-800);
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        background: white;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        width: 100%;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border: none;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--primary-dark), #1B5E20);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(44, 143, 12, 0.2);
+    }
+
+    .btn-outline {
+        background: white;
+        color: var(--gray-700);
+        border: 2px solid var(--gray-300);
+    }
+
+    .btn-outline:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        color: var(--gray-800);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10B981, #059669);
+        color: white;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #F59E0B, #D97706);
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        color: white;
+    }
+
+    /* Self Account Alert */
+    .self-account-alert {
+        background: linear-gradient(135deg, #E0F2FE, #BAE6FD);
+        border: 2px solid #0EA5E9;
+        border-radius: 8px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        width: 100%;
+    }
+
+    .self-account-alert i {
+        color: #0EA5E9;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .self-account-alert h6 {
+        margin: 0;
+        color: #0369A1;
+        font-weight: 600;
+    }
+
+    .self-account-alert p {
+        margin: 0.25rem 0 0;
+        color: #0C4A6E;
+        font-size: 0.875rem;
+    }
+
+    /* Tabs */
+    .detail-tabs {
+        background: var(--gray-50);
+        border-radius: 8px;
+        padding: 0.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .detail-tab {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        background: transparent;
+        color: var(--gray-600);
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .detail-tab.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .detail-tab:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.5);
+        color: var(--gray-700);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Modal */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--gray-200);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--gray-200);
+        padding: 1.25rem 1.5rem;
+    }
+
+    /* Form Elements */
+    .form-label {
+        font-weight: 500;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(44, 143, 12, 0.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .quick-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .detail-tabs {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="row">
+    <!-- Left Column - Profile Overview -->
+    <div class="col-xl-4 col-lg-5">
+        <!-- Profile Card -->
+        <div class="card-clean">
+            <div class="card-body-clean text-center">
+                <!-- Avatar -->
+                <div class="profile-avatar">
+                    {{ strtoupper(substr($user->first_name, 0, 1)) }}
                 </div>
-                <div class="card-body text-center p-4">
-                    <!-- Avatar -->
-                    <div class="position-relative mb-4">
-                        <div class="avatar-circle bg-success bg-opacity-10 text-success mx-auto" 
-                             style="width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border: 4px solid var(--success-light);">
-                            {{ strtoupper(substr($user->first_name, 0, 1)) }}
-                        </div>
-                        
-                        <!-- Status Badge -->
-                        <div class="position-absolute" style="bottom: 10px; right: calc(50% - 80px);">
-                            @if($user->is_active)
-                                <span class="badge bg-success rounded-pill p-2">
-                                    <i class="fas fa-circle me-1"></i>Active
-                                </span>
-                            @else
-                                <span class="badge bg-danger rounded-pill p-2">
-                                    <i class="fas fa-circle me-1"></i>Inactive
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <!-- User Info -->
-                    <h3 class="fw-bold mb-2">{{ $user->name }}</h3>
-                    <p class="text-muted mb-3">{{ $user->email }}</p>
-                    
-                    <!-- Role Badge -->
-                    <div class="mb-4">
+                
+                <!-- User Info -->
+                <h3 class="user-name">{{ $user->name }}</h3>
+                <p class="user-email">{{ $user->email }}</p>
+
+                <!-- Role - Simple Text -->
+                <div class="mb-3">
+                    <div style="font-weight: 600; color: var(--gray-800);">
                         @if($user->isSuperAdmin())
-                            <span class="badge bg-danger bg-gradient fs-6 p-2 px-3">
-                                <i class="fas fa-crown me-2"></i>Super Admin
-                            </span>
+                            Super Admin
                         @elseif($user->isAdmin())
-                            <span class="badge bg-primary bg-gradient fs-6 p-2 px-3">
-                                <i class="fas fa-user-shield me-2"></i>Admin
-                            </span>
+                            Admin
                         @elseif($user->isDelivery())
-                            <span class="badge bg-warning bg-gradient fs-6 p-2 px-3">
-                                <i class="fas fa-truck me-2"></i>Delivery Staff
-                            </span>
+                            Delivery Staff
                         @else
-                            <span class="badge bg-secondary bg-gradient fs-6 p-2 px-3">
-                                <i class="fas fa-user me-2"></i>Customer
-                            </span>
+                            Customer
                         @endif
                     </div>
-                    
-                    <!-- Quick Stats -->
-                    <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <div class="p-3 border rounded bg-light">
-                                <h5 class="fw-bold mb-1" id="accountAge">--</h5>
-                                <small class="text-muted">Account Age</small>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 border rounded bg-light">
-                                <h5 class="fw-bold mb-1" id="lastLogin">--</h5>
-                                <small class="text-muted">Last Login</small>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Status - Simple Text -->
+                <div class="mb-3">
+                    <div style="font-weight: 600; @if($user->is_active) color: #166534; @else color: #991B1B; @endif">
+                        @if($user->is_active)
+                            Active
+                        @else
+                            Inactive
+                        @endif
                     </div>
-                    
-                    <!-- This is Your Account Alert -->
-                    @if($user->id === auth()->id())
-                    <div class="alert alert-info border-info border-2">
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-user-circle fa-lg text-info me-3"></i>
-                            <div>
-                                <h6 class="mb-1 fw-bold">Your Account</h6>
-                                <p class="small mb-0">You are viewing your own account details</p>
-                            </div>
-                        </div>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ $user->created_at->diffForHumans() }}</div>
+                        <div class="stat-label">Account Age</div>
                     </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            @if($user->email_verified_at)
+                                Verified
+                            @else
+                                Not Verified
+                            @endif
+                        </div>
+                        <div class="stat-label">Email Status</div>
+                    </div>
+                </div>
+                
+                <!-- Self Account Alert -->
+                @if($user->id === auth()->id())
+                <div class="self-account-alert">
+                    <div>
+                        <h6>Your Account</h6>
+                        <p>You are viewing your own account details</p>
+                    </div>
+                </div>
+                @endif
+                
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    @if($user->id !== auth()->id())
+                        <!-- Toggle Status -->
+                        @if($user->is_active)
+                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST" class="w-100">
+                                @csrf
+                                <button type="submit" class="btn btn-warning">
+                                    Deactivate User
+                                </button>
+                            </form>
+                        @else
+                            <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST" class="w-100">
+                                @csrf
+                                <button type="submit" class="btn btn-success">
+                                    Activate User
+                                </button>
+                            </form>
+                        @endif
+                        
+                        <!-- Reset Password -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                            Reset Password
+                        </button>
+                        
+                        <!-- Delete User -->
+                        @if(!$user->isSuperAdmin())
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                            Delete User
+                        </button>
+                        @endif
+                    @else
+                        <!-- Self Account Actions -->
+                        <a href="{{ route('profile.show') }}" class="btn btn-primary">
+                            Edit Profile
+                        </a>
+                        <a href="{{ route('profile.password') }}" class="btn btn-primary">
+                            Change Password
+                        </a>
                     @endif
                 </div>
             </div>
-            
-            <!-- Account Actions Card -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 fw-semibold">
-                        <i class="fas fa-cogs me-2"></i>Account Actions
-                    </h5>
+        </div>
+    </div>
+    
+    <!-- Right Column - User Details -->
+    <div class="col-xl-8 col-lg-7">
+        <!-- Detail Tabs -->
+        <div class="detail-tabs">
+            <button class="detail-tab active" data-tab="personal">Personal Info</button>
+            <button class="detail-tab" data-tab="contact">Contact Info</button>
+            @if($user->role == 'delivery')
+            <button class="detail-tab" data-tab="delivery">Delivery Info</button>
+            @endif
+            <button class="detail-tab" data-tab="account">Account Info</button>
+        </div>
+        
+        <!-- Personal Information -->
+        <div class="tab-content active" id="personal-tab">
+            <div class="card-clean">
+                <div class="card-header-clean">
+                    <h5>Personal Information</h5>
                 </div>
-                <div class="card-body p-4">
-                    <div class="d-grid gap-3">
-                        @if($user->id !== auth()->id())
-                            <!-- Toggle Status -->
-                            @if($user->is_active)
-                                <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-warning w-100 py-3">
-                                        <i class="fas fa-user-slash me-2"></i>Deactivate Account
-                                    </button>
-                                </form>
-                            @else
-                                <form action="{{ route('superadmin.users.toggle-status', $user) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success w-100 py-3">
-                                        <i class="fas fa-user-check me-2"></i>Activate Account
-                                    </button>
-                                </form>
-                            @endif
-                            
-                            <!-- Reset Password -->
-                            <button type="button" class="btn btn-info w-100 py-3" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
-                                <i class="fas fa-key me-2"></i>Reset Password
-                            </button>
-                            
-                            <!-- Delete User -->
-                            @if(!$user->isSuperAdmin())
-                            <button type="button" class="btn btn-danger w-100 py-3" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
-                                <i class="fas fa-trash-alt me-2"></i>Delete User
-                            </button>
-                            @endif
-                        @else
-                            <!-- Self Account Actions -->
-                            <a href="{{ route('profile.show') }}" class="btn btn-success w-100 py-3">
-                                <i class="fas fa-user-edit me-2"></i>Edit Your Profile
-                            </a>
-                            <a href="{{ route('profile.password') }}" class="btn btn-info w-100 py-3">
-                                <i class="fas fa-key me-2"></i>Change Password
-                            </a>
-                            <button class="btn btn-outline-secondary w-100 py-3" disabled>
-                                <i class="fas fa-user-cog me-2"></i>Manage Account Settings
-                            </button>
+                <div class="card-body-clean">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">First Name</div>
+                            <div class="info-value">{{ $user->first_name }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Last Name</div>
+                            <div class="info-value">{{ $user->last_name }}</div>
+                        </div>
+                        @if($user->middle_name)
+                        <div class="info-item">
+                            <div class="info-label">Middle Name</div>
+                            <div class="info-value">{{ $user->middle_name }}</div>
+                        </div>
                         @endif
+                        <div class="info-item">
+                            <div class="info-label">Email Address</div>
+                            <div class="info-value">{{ $user->email }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Phone Number</div>
+                            <div class="info-value">{{ $user->phone ?? '—' }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Right Column - User Details -->
-        <div class="col-xl-8 col-lg-7">
-            <!-- Personal Information Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">
-                            <i class="fas fa-user me-2 text-success"></i>Personal Information
-                        </h5>
-                        <span class="badge bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-id-badge me-1"></i>Basic Details
-                        </span>
-                    </div>
+        <!-- Contact Information -->
+        <div class="tab-content" id="contact-tab">
+            <div class="card-clean">
+                <div class="card-header-clean">
+                    <h5>Contact Information</h5>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">First Name</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->first_name }}</p>
-                            </div>
+                <div class="card-body-clean">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Street Address</div>
+                            <div class="info-value">{{ $user->street_address ?? '—' }}</div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Last Name</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->last_name }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">Barangay</div>
+                            <div class="info-value">{{ $user->barangay ?? '—' }}</div>
                         </div>
-                        @if($user->middle_name)
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Middle Name</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->middle_name }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">City</div>
+                            <div class="info-value">{{ $user->city ?? '—' }}</div>
                         </div>
-                        @endif
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Email Address</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->email }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">Province</div>
+                            <div class="info-value">{{ $user->province ?? '—' }}</div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Phone Number</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->phone ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">Region</div>
+                            <div class="info-value">{{ $user->region ?? '—' }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Country</div>
+                            <div class="info-value">{{ $user->country ?? '—' }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">ZIP Code</div>
+                            <div class="info-value">{{ $user->zip_code ?? '—' }}</div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-<!-- Contact Information Card -->
-<div class="card border-0 shadow-sm mb-4">
-    <div class="card-header bg-white py-3">
-        <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-semibold">
-                <i class="fas fa-map-marker-alt me-2 text-success"></i>Contact Information
-            </h5>
-            <span class="badge bg-success bg-opacity-10 text-success">
-                <i class="fas fa-address-book me-1"></i>Location
-            </span>
-        </div>
-    </div>
-    <div class="card-body p-4">
-        <div class="row g-4">
-            <!-- Street Address -->
-            <div class="col-12">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">Street Address</label>
-                    <p class="fs-5 mb-0">{{ $user->street_address ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- Barangay -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">Barangay</label>
-                    <p class="fs-5 mb-0">{{ $user->barangay ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- City -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">City</label>
-                    <p class="fs-5 mb-0">{{ $user->city ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- Province -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">Province</label>
-                    <p class="fs-5 mb-0">{{ $user->province ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- Region -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">Region</label>
-                    <p class="fs-5 mb-0">{{ $user->region ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- Country -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">Country</label>
-                    <p class="fs-5 mb-0">{{ $user->country ?? '<span class="text-muted">Not provided</span>' }}</p>
-                </div>
-            </div>
-            
-            <!-- ZIP Code (Optional) -->
-            <div class="col-md-4">
-                <div class="detail-item">
-                    <label class="form-label text-muted small mb-1">ZIP/Postal Code</label>
-                    <p class="fs-5 mb-0">{{ $user->zip_code ?? '<span class="text-muted">Not provided</span>' }}</p>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-            
-            <!-- Delivery Information Card (if applicable) -->
-            @if($user->role == 'delivery')
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">
-                            <i class="fas fa-truck me-2 text-warning"></i>Delivery Information
-                        </h5>
-                        <span class="badge bg-warning bg-opacity-10 text-warning">
-                            <i class="fas fa-shipping-fast me-1"></i>Driver Details
-                        </span>
-                    </div>
+        
+        <!-- Delivery Information -->
+        @if($user->role == 'delivery')
+        <div class="tab-content" id="delivery-tab">
+            <div class="card-clean">
+                <div class="card-header-clean">
+                    <h5>Delivery Information</h5>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Vehicle Type</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->vehicle_type ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
+                <div class="card-body-clean">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Vehicle Type</div>
+                            <div class="info-value">{{ $user->vehicle_type ?? '—' }}</div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Vehicle Number</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->vehicle_number ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">Vehicle Number</div>
+                            <div class="info-value">{{ $user->vehicle_number ?? '—' }}</div>
                         </div>
-                        <div class="col-12">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">License Number</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->license_number ?? '<span class="text-muted">Not provided</span>' }}</p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">License Number</div>
+                            <div class="info-value">{{ $user->license_number ?? '—' }}</div>
                         </div>
                     </div>
                 </div>
             </div>
-            @endif
-            
-            <!-- Account Information Card -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold">
-                            <i class="fas fa-info-circle me-2 text-success"></i>Account Information
-                        </h5>
-                        <span class="badge bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-database me-1"></i>System Data
-                        </span>
-                    </div>
+        </div>
+        @endif
+        
+        <!-- Account Information -->
+        <div class="tab-content" id="account-tab">
+            <div class="card-clean">
+                <div class="card-header-clean">
+                    <h5>Account Information</h5>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Account Created</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->created_at->format('F d, Y h:i A') }}</p>
-                                <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
+                <div class="card-body-clean">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Account Created</div>
+                            <div class="info-value">{{ $user->created_at->format('M d, Y h:i A') }}</div>
+                            <small class="text-muted">{{ $user->created_at->diffForHumans() }}</small>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Last Updated</div>
+                            <div class="info-value">{{ $user->updated_at->format('M d, Y h:i A') }}</div>
+                            <small class="text-muted">{{ $user->updated_at->diffForHumans() }}</small>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email Verification</div>
+                            <div class="info-value">
+                                @if($user->email_verified_at)
+                                    <span style="color: #166534; font-weight: 600;">Verified</span>
+                                @else
+                                    <span style="color: #991B1B; font-weight: 600;">Not Verified</span>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Last Updated</label>
-                                <p class="fs-5 fw-bold mb-0">{{ $user->updated_at->format('F d, Y h:i A') }}</p>
-                                <small class="text-muted">{{ $user->updated_at->diffForHumans() }}</small>
+                        <div class="info-item">
+                            <div class="info-label">Account Status</div>
+                            <div class="info-value">
+                                @if($user->is_active)
+                                    <span style="color: #166534; font-weight: 600;">Active</span>
+                                @else
+                                    <span style="color: #991B1B; font-weight: 600;">Inactive</span>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Email Verification</label>
-                                <p class="fs-5 fw-bold mb-0">
-                                    @if($user->email_verified_at)
-                                        <span class="badge bg-success rounded-pill p-2">
-                                            <i class="fas fa-check-circle me-1"></i>Verified
-                                        </span>
-                                        <small class="d-block text-muted mt-1">
-                                            {{ $user->email_verified_at->format('M d, Y') }}
-                                        </small>
-                                    @else
-                                        <span class="badge bg-danger rounded-pill p-2">
-                                            <i class="fas fa-times-circle me-1"></i>Not Verified
-                                        </span>
-                                    @endif
-                                </p>
+                        <div class="info-item">
+                            <div class="info-label">User ID</div>
+                            <div class="info-value">
+                                <code class="text-muted">{{ $user->id }}</code>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Account Status</label>
-                                <p class="fs-5 fw-bold mb-0">
-                                    @if($user->is_active)
-                                        <span class="badge bg-success rounded-pill p-2">
-                                            <i class="fas fa-check-circle me-1"></i>Active
-                                        </span>
-                                    @else
-                                        <span class="badge bg-danger rounded-pill p-2">
-                                            <i class="fas fa-times-circle me-1"></i>Inactive
-                                        </span>
-                                    @endif
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">User ID</label>
-                                <p class="fs-5 fw-bold mb-0">
-                                    <code class="text-success">{{ $user->id }}</code>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="detail-item">
-                                <label class="form-label text-muted small mb-1">Role ID</label>
-                                <p class="fs-5 fw-bold mb-0">
-                                    <span class="badge 
-                                        @if($user->isSuperAdmin()) bg-danger
-                                        @elseif($user->isAdmin()) bg-primary
-                                        @elseif($user->isDelivery()) bg-warning
-                                        @else bg-secondary @endif 
-                                        bg-opacity-10 text-@if($user->isSuperAdmin())danger
-                                        @elseif($user->isAdmin())primary
-                                        @elseif($user->isDelivery())warning
-                                        @else secondary @endif">
-                                        {{ ucfirst($user->role) }}
-                                    </span>
-                                </p>
-                            </div>
+                        <div class="info-item">
+                            <div class="info-label">Role</div>
+                            <div class="info-value">{{ ucfirst($user->role) }}</div>
                         </div>
                     </div>
                 </div>
@@ -430,70 +625,28 @@
 </div>
 
 <!-- Reset Password Modal -->
-<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+<div class="modal fade" id="resetPasswordModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-success bg-gradient text-white">
-                <h5 class="modal-title fw-semibold" id="resetPasswordModalLabel">
-                    <i class="fas fa-key me-2"></i>Reset Password
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reset Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="{{ route('superadmin.users.reset-password', $user) }}" method="POST" id="resetPasswordForm">
+            <form action="{{ route('superadmin.users.reset-password', $user) }}" method="POST">
                 @csrf
-                <div class="modal-body p-4">
-                    <div class="text-center mb-4">
-                        <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block">
-                            <i class="fas fa-user-lock fa-2x text-success"></i>
-                        </div>
-                        <h5 class="fw-bold mt-3">Reset Password for {{ $user->name }}</h5>
-                        <p class="text-muted">Enter a new password for this user account.</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="new_password" class="form-label fw-medium">New Password *</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-lock text-muted"></i>
-                            </span>
-                            <input type="password" class="form-control ps-0" id="new_password" name="password" required minlength="8">
-                            <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                        <div class="password-strength mt-2">
-                            <div class="d-flex justify-content-between mb-1">
-                                <small class="text-muted">Password strength:</small>
-                                <small id="strengthText" class="fw-medium">None</small>
-                            </div>
-                            <div class="progress" style="height: 4px;">
-                                <div id="strengthBar" class="progress-bar" role="progressbar" 
-                                     style="width: 0%; transition: width 0.3s ease;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                <div class="modal-body">
                     <div class="mb-3">
-                        <label for="confirm_password" class="form-label fw-medium">Confirm Password *</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fas fa-lock text-muted"></i>
-                            </span>
-                            <input type="password" class="form-control ps-0" id="confirm_password" name="password_confirmation" required minlength="8">
-                        </div>
-                        <div id="passwordMatch" class="form-text mt-1">
-                            <i class="fas fa-info-circle text-muted me-1"></i>
-                            Passwords must match
-                        </div>
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="password" required minlength="8">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" name="password_confirmation" required minlength="8">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-2"></i>Reset Password
-                    </button>
+                    <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Reset Password</button>
                 </div>
             </form>
         </div>
@@ -502,59 +655,28 @@
 
 <!-- Delete User Modal -->
 @if(!$user->isSuperAdmin() && $user->id !== auth()->id())
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteUserModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-danger border-2">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title fw-semibold" id="deleteUserModalLabel">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Delete User Account
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Delete User Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ route('superadmin.users.destroy', $user) }}" method="POST" id="deleteUserForm">
                 @csrf
                 @method('DELETE')
-                <div class="modal-body p-4">
-                    <div class="text-center mb-4">
-                        <div class="bg-danger bg-opacity-10 p-4 rounded-circle d-inline-block mb-3">
-                            <i class="fas fa-trash-alt fa-3x text-danger"></i>
-                        </div>
-                        <h4 class="fw-bold text-danger mb-3">Delete {{ $user->name }}?</h4>
-                        <p class="text-muted">This action cannot be undone. All user data will be permanently deleted.</p>
-                    </div>
-                    
-                    <div class="alert alert-danger border-danger border-1">
-                        <div class="d-flex align-items-start">
-                            <i class="fas fa-exclamation-circle mt-1 me-3"></i>
-                            <div>
-                                <p class="fw-bold mb-1">What will be deleted:</p>
-                                <ul class="mb-0 small">
-                                    <li>User account and login credentials</li>
-                                    <li>All personal information</li>
-                                    <li>Order history and transaction records</li>
-                                    <li>Any associated delivery records</li>
-                                    <li>All activity logs</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="confirmDelete" class="form-label fw-medium">
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>{{ $user->name }}</strong>? This action cannot be undone.</p>
+                    <div class="mb-3">
+                        <label class="form-label">
                             Type <span class="text-danger fw-bold">"DELETE"</span> to confirm:
                         </label>
-                        <input type="text" class="form-control form-control-lg" id="confirmDelete" 
-                               placeholder="Type DELETE here" autocomplete="off">
-                        <div class="form-text text-danger" id="confirmError"></div>
+                        <input type="text" class="form-control" id="confirmDelete" placeholder="Type DELETE here">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-2"></i>Cancel
-                    </button>
-                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>
-                        <i class="fas fa-trash-alt me-2"></i>Delete User
-                    </button>
+                    <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteBtn" disabled>Delete User</button>
                 </div>
             </form>
         </div>
@@ -562,376 +684,47 @@
 </div>
 @endif
 
-<style>
-/* Custom Green Theme Styles */
-:root {
-    --success-light: #d1fae5;
-    --success-medium: #10b981;
-    --success-dark: #059669;
-    --success-bg: rgba(16, 185, 129, 0.1);
-}
-
-/* Avatar Circle */
-.avatar-circle {
-    transition: all 0.3s ease;
-}
-
-.avatar-circle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
-}
-
-/* Detail Items */
-.detail-item {
-    padding: 1rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.detail-item:hover {
-    background-color: var(--success-bg);
-    border-color: var(--success-light);
-}
-
-/* Badge Styling */
-.badge.bg-gradient {
-    background: linear-gradient(135deg, currentColor, rgba(0,0,0,0.1));
-}
-
-/* Card Styling */
-.card {
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-    border-radius: 12px 12px 0 0 !important;
-}
-
-/* Buttons */
-.btn-success {
-    background: linear-gradient(135deg, var(--success-medium), var(--success-dark));
-    border: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, var(--success-dark), #047857);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-}
-
-.btn-warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    border: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-warning:hover {
-    background: linear-gradient(135deg, #d97706, #b45309);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    border: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
-}
-
-.btn-info {
-    background: linear-gradient(135deg, #0ea5e9, #0284c7);
-    border: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-info:hover {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);
-}
-
-/* Modal Styling */
-.modal-content {
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-/* Progress Bar for Password Strength */
-.progress-bar {
-    background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
-    border-radius: 2px;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .avatar-circle {
-        width: 80px !important;
-        height: 80px !important;
-        font-size: 2rem !important;
-    }
-    
-    .detail-item {
-        padding: 0.75rem;
-    }
-    
-    .btn {
-        padding: 0.75rem !important;
-    }
-}
-
-/* Status Indicator */
-.badge.rounded-pill {
-    padding: 0.5rem 1rem;
-}
-
-/* Text Styling */
-.fs-5 {
-    font-size: 1.1rem !important;
-}
-
-.fw-bold {
-    font-weight: 700 !important;
-}
-
-/* Container */
-.container-fluid {
-    max-width: 1800px;
-}
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Calculate account age
-    const createdDate = new Date('{{ $user->created_at }}');
-    const now = new Date();
-    const diffTime = Math.abs(now - createdDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Tab functionality
+    const tabs = document.querySelectorAll('.detail-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
     
-    let accountAgeText;
-    if (diffDays < 30) {
-        accountAgeText = diffDays + ' day' + (diffDays > 1 ? 's' : '');
-    } else if (diffDays < 365) {
-        const months = Math.floor(diffDays / 30);
-        accountAgeText = months + ' month' + (months > 1 ? 's' : '');
-    } else {
-        const years = Math.floor(diffDays / 365);
-        const remainingMonths = Math.floor((diffDays % 365) / 30);
-        accountAgeText = years + ' year' + (years > 1 ? 's' : '');
-        if (remainingMonths > 0) {
-            accountAgeText += ', ' + remainingMonths + ' month' + (remainingMonths > 1 ? 's' : '');
-        }
-    }
-    
-    document.getElementById('accountAge').textContent = accountAgeText;
-    
-    // Simulate last login (in a real app, fetch from user's login history)
-    const lastLoginOptions = ['Today', 'Yesterday', '2 days ago', '1 week ago', '2 weeks ago'];
-    const randomLogin = lastLoginOptions[Math.floor(Math.random() * lastLoginOptions.length)];
-    document.getElementById('lastLogin').textContent = randomLogin;
-    
-    // Password strength indicator for reset modal
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        
-        if (password.length >= 8) strength++;
-        if (password.length >= 12) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[a-z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
-        
-        return Math.min(strength, 5);
-    }
-    
-    function updatePasswordStrength() {
-        const password = document.getElementById('new_password').value;
-        const strength = checkPasswordStrength(password);
-        const strengthBar = document.getElementById('strengthBar');
-        const strengthText = document.getElementById('strengthText');
-        
-        let width = 0;
-        let color = '#ef4444';
-        let text = 'Very Weak';
-        let textColor = '#ef4444';
-        
-        switch(strength) {
-            case 0:
-                width = 0;
-                color = '#ef4444';
-                text = 'Very Weak';
-                textColor = '#ef4444';
-                break;
-            case 1:
-                width = 20;
-                color = '#ef4444';
-                text = 'Weak';
-                textColor = '#ef4444';
-                break;
-            case 2:
-                width = 40;
-                color = '#f59e0b';
-                text = 'Fair';
-                textColor = '#f59e0b';
-                break;
-            case 3:
-                width = 60;
-                color = '#f59e0b';
-                text = 'Good';
-                textColor = '#f59e0b';
-                break;
-            case 4:
-                width = 80;
-                color = '#10b981';
-                text = 'Strong';
-                textColor = '#10b981';
-                break;
-            case 5:
-                width = 100;
-                color = '#10b981';
-                text = 'Very Strong';
-                textColor = '#10b981';
-                break;
-        }
-        
-        strengthBar.style.width = `${width}%`;
-        strengthBar.style.backgroundColor = color;
-        strengthText.textContent = text;
-        strengthText.style.color = textColor;
-    }
-    
-    // Password match indicator
-    function checkPasswordMatch() {
-        const password = document.getElementById('new_password').value;
-        const confirmPassword = document.getElementById('confirm_password').value;
-        const matchIndicator = document.getElementById('passwordMatch');
-        
-        if (confirmPassword === '') {
-            matchIndicator.innerHTML = '<i class="fas fa-info-circle text-muted me-1"></i> Passwords must match';
-            matchIndicator.className = 'form-text mt-1';
-            return;
-        }
-        
-        if (password === confirmPassword) {
-            matchIndicator.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Passwords match';
-            matchIndicator.className = 'form-text mt-1 text-success fw-bold';
-        } else {
-            matchIndicator.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i> Passwords do not match';
-            matchIndicator.className = 'form-text mt-1 text-danger fw-bold';
-        }
-    }
-    
-    // Password visibility toggle
-    const toggleNewPasswordBtn = document.getElementById('toggleNewPassword');
-    if (toggleNewPasswordBtn) {
-        toggleNewPasswordBtn.addEventListener('click', function() {
-            const passwordInput = document.getElementById('new_password');
-            const confirmInput = document.getElementById('confirm_password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
             
-            passwordInput.setAttribute('type', type);
-            confirmInput.setAttribute('type', type);
-            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show active content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add('active');
+                }
+            });
         });
-    }
-    
-    // Add event listeners for password fields
-    const newPasswordInput = document.getElementById('new_password');
-    const confirmPasswordInput = document.getElementById('confirm_password');
-    
-    if (newPasswordInput && confirmPasswordInput) {
-        newPasswordInput.addEventListener('input', function() {
-            updatePasswordStrength();
-            checkPasswordMatch();
-        });
-        
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-    }
+    });
     
     // Delete confirmation for modal
     const deleteUserModal = document.getElementById('deleteUserModal');
     if (deleteUserModal) {
         const confirmDeleteInput = document.getElementById('confirmDelete');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        const confirmError = document.getElementById('confirmError');
-        const deleteUserForm = document.getElementById('deleteUserForm');
         
         confirmDeleteInput.addEventListener('input', function() {
             const confirmText = this.value.trim().toUpperCase();
-            if (confirmText === 'DELETE') {
-                confirmDeleteBtn.disabled = false;
-                confirmError.textContent = '';
-                confirmDeleteInput.classList.remove('is-invalid');
-                confirmDeleteInput.classList.add('is-valid');
-            } else {
-                confirmDeleteBtn.disabled = true;
-                confirmDeleteInput.classList.remove('is-valid');
-                if (confirmText !== '') {
-                    confirmError.textContent = 'Please type exactly "DELETE" to confirm';
-                    confirmDeleteInput.classList.add('is-invalid');
-                } else {
-                    confirmError.textContent = '';
-                    confirmDeleteInput.classList.remove('is-invalid');
-                }
-            }
+            confirmDeleteBtn.disabled = confirmText !== 'DELETE';
         });
         
         // Reset form when modal is hidden
         deleteUserModal.addEventListener('hidden.bs.modal', function() {
             confirmDeleteInput.value = '';
             confirmDeleteBtn.disabled = true;
-            confirmError.textContent = '';
-            confirmDeleteInput.classList.remove('is-valid', 'is-invalid');
         });
     }
-    
-    // Reset password form validation
-    const resetPasswordForm = document.getElementById('resetPasswordForm');
-    if (resetPasswordForm) {
-        resetPasswordForm.addEventListener('submit', function(e) {
-            const password = document.getElementById('new_password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            
-            if (password.length < 8) {
-                e.preventDefault();
-                alert('Password must be at least 8 characters long');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                e.preventDefault();
-                alert('Passwords do not match');
-                return;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Resetting...';
-            submitBtn.disabled = true;
-        });
-    }
-    
-    // Tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
 });
 </script>
 @endsection

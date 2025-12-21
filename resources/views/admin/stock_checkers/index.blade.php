@@ -2,16 +2,33 @@
 
 @section('content')
 <style>
+    /* === Green Theme and Card Styling === */
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-left: 4px solid #2C8F0C;
+    }
+
+
+    .page-header h1 {
+        color: #2C8F0C;
+        font-weight: 700;
+    }
+
+
     .card-custom {
         border: none;
         border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: all 0.3s ease;
     }
 
     .card-custom:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
     }
 
     .card-header-custom {
@@ -31,51 +48,137 @@
         font-weight: 700;
     }
 
+    /* Improved Add Button */
+    .btn-add-checker {
+        background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    
+    .btn-add-checker:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+    
+    .btn-add-checker:active {
+        transform: translateY(0);
+    }
+
     .btn-primary {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         border: none;
-        font-weight: 600;
     }
 
     .btn-primary:hover {
         background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    }
+
+    /* Enhanced Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+    
+    .action-btn {
+        position: relative;
+    }
+    
+    .action-btn::after {
+        content: attr(data-title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+    
+    .action-btn:hover::after {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        border: 2px solid;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .action-btn:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
-
-    .btn-warning {
-        background: #FBC02D;
-        border: none;
-        color: #fff;
-        font-weight: 600;
-    }
-
-    .btn-warning:hover {
-        background: #F57C00;
-        transform: translateY(-2px);
-    }
-
-    .btn-outline-success {
-        border: 2px solid #2C8F0C;
+    
+    .btn-edit {
+        background-color: white;
+        border-color: #2C8F0C;
         color: #2C8F0C;
-        font-weight: 500;
     }
-
-    .btn-outline-success:hover {
+    
+    .btn-edit:hover {
         background-color: #2C8F0C;
         color: white;
-        transform: translateY(-2px);
     }
-
-    .btn-outline-warning {
-        border: 2px solid #FBC02D;
+    
+    .btn-archive {
+        background-color: white;
+        border-color: #FBC02D;
         color: #FBC02D;
-        font-weight: 500;
     }
-
-    .btn-outline-warning:hover {
+    
+    .btn-archive:hover {
         background-color: #FBC02D;
         color: white;
-        transform: translateY(-2px);
+    }
+    
+    .btn-unarchive {
+        background-color: white;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .btn-unarchive:hover {
+        background-color: #2C8F0C;
+        color: white;
+    }
+
+    /* Table Styling - Consistent */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table th {
@@ -83,12 +186,17 @@
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
-        padding: 1rem;
+        padding: 1rem 0.75rem;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .table td {
-        padding: 1rem;
+        padding: 1rem 0.75rem;
         vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
 
     .table tbody tr:hover {
@@ -96,34 +204,65 @@
         transition: background-color 0.2s ease;
     }
 
-    .badge-active {
-        background-color: #E8F5E6;
+    /* Alternating row colors */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Status styling - Consistent with other pages */
+    .status-text {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .status-text-active {
         color: #2C8F0C;
-        padding: 0.35em 0.65em;
-        border-radius: 0.25rem;
-        font-size: 0.75em;
-        font-weight: 600;
+    }
+    
+    .status-text-active::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #2C8F0C;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
     }
 
-    .badge-archived {
-        background-color: #FFF3E0;
-        color: #F57C00;
-        padding: 0.35em 0.65em;
-        border-radius: 0.25rem;
-        font-size: 0.75em;
-        font-weight: 600;
+    .status-text-archived {
+        color: #6c757d;
     }
 
-    /* Modal Styles */
-    .modal-header-custom {
+    .status-text-archived::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #6c757d;
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+    /* Modal Styling - Consistent */
+    .modal-header {
         background: linear-gradient(135deg, #2C8F0C, #4CAF50);
         color: white;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1.25rem;
     }
 
-    .modal-header-custom .modal-title {
+    .modal-title {
         font-weight: 700;
     }
 
@@ -133,6 +272,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
 
+    /* Form Styling */
     .form-label {
         font-weight: 600;
         color: #2C8F0C;
@@ -149,6 +289,34 @@
         box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
     }
 
+    /* Filter Section - Consistent */
+    .search-loading {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+    }
+
+    .position-relative {
+        position: relative;
+    }
+
+    /* Avatar Icon */
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Tips Box */
     .tips-box {
         background-color: #F8FDF8;
         border-left: 4px solid #2C8F0C;
@@ -163,35 +331,7 @@
         margin-right: 5px;
     }
 
-    .search-loading {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: none;
-    }
-
-    .position-relative {
-        position: relative;
-    }
-
-    .avatar-placeholder {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 8px;
-    }
-
+    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
@@ -203,21 +343,100 @@
         margin-bottom: 1rem;
     }
 
-    .fullname-cell {
+    /* Table Container for consistency */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Responsive adjustments */
+    @media (min-width: 1200px) {
+        .table-container {
+            overflow-x: visible;
+        }
+        
+        .table {
+            table-layout: fixed;
+        }
+    }
+
+    /* Column width control - compact for no scroll */
+    .id-col { min-width: 40px; width: 40px; }
+    .name-col { min-width: 120px; width: 150px; }
+    .contact-col { min-width: 90px; width: 90px; }
+    .address-col { min-width: 120px; max-width: 120px; width: 120px; }
+    .status-col { min-width: 80px; width: 80px; }
+    .action-col { min-width: 80px; width: 80px; }
+
+    /* Name Cell */
+    .checker-info-cell {
         display: flex;
         align-items: center;
         gap: 12px;
     }
+    
+    .checker-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .checker-contact {
+        color: #495057;
+        font-size: 0.9rem;
+    }
+    
+    .checker-address {
+        color: #6c757d;
+        font-size: 0.85rem;
+        max-width: 250px;
+        word-break: break-word;
+    }
+
+    /* Pagination styling - Consistent */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8FDF8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+
+    /* Remove old badge styles */
+    .badge-active,
+    .badge-archived {
+        display: none;
+    }
+
 </style>
 
-<!-- Filters -->
+<!-- Filters and Search - Consistent -->
 <div class="card card-custom mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.stock_checkers.index') }}" id="filterForm">
             <div class="row">
-                <div class="col-md-5">
+                <!-- Search by Name or Contact -->
+                <div class="col-md-7">
                     <div class="mb-3 position-relative">
-                        <label for="search" class="form-label fw-bold">Search Stock Checker</label>
+                        <label for="search" class="form-label fw-bold">Search Stock Checkers</label>
                         <input type="text" class="form-control" id="search" name="search"
                             value="{{ request('search') }}" placeholder="Search by name, contact, or address...">
                         <div class="search-loading" id="searchLoading">
@@ -227,23 +446,25 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Filter by Status -->
                 <div class="col-md-3">
                     <div class="mb-3">
                         <label for="status" class="form-label fw-bold">Filter by Status</label>
                         <select class="form-select" id="status" name="status">
-                            <option value="">All Status</option>
-                            <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="active" {{ request('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
                             <option value="archived" {{ request('status') == 'archived' ? 'selected' : '' }}>Archived</option>
                         </select>
                     </div>
                 </div>
+
+                <!-- Items per page selection -->
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="per_page" class="form-label fw-bold">Items per page</label>
                         <select class="form-select" id="per_page" name="per_page">
-                            @foreach ([5, 10, 15, 25, 50] as $option)
-                                <option value="{{ $option }}"
-                                    {{ request('per_page', 10) == $option ? 'selected' : '' }}>
+                            @foreach([2, 5, 10, 15, 25, 50] as $option)
+                                <option value="{{ $option }}" {{ request('per_page', 10) == $option ? 'selected' : '' }}>
                                     {{ $option }}
                                 </option>
                             @endforeach
@@ -259,93 +480,109 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom">
         <h5 class="mb-0">Stock Checker Management</h5>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
+        <button class="btn btn-add-checker" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
+            {{-- <i class="fas fa-user-plus"></i>  --}}
             Add Stock Checker
         </button>
     </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         @if($stockCheckers->count())
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th class="text-center">Actions</th>
+                            <th class="id-col">ID</th>
+                            <th class="name-col">Name</th>
+                            <th class="contact-col">Contact</th>
+                            <th class="address-col">Address</th>
+                            <th class="status-col">Status</th>
+                            <th class="action-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($stockCheckers as $checker)
-                            <tr>
-                                <td class="fw-semibold">#{{ $checker->id }}</td>
-                                <td>
-                                    <div class="fullname-cell">
-                                        <div class="avatar-placeholder">
-                                            {{ substr($checker->firstname, 0, 1) }}{{ substr($checker->lastname, 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <strong>{{ $checker->firstname }} {{ $checker->middlename ? $checker->middlename . ' ' : '' }}{{ $checker->lastname }}</strong>
+                        <tr data-id="{{ $checker->id }}">
+                            <td class="id-col">
+                                <span class="text-muted">#{{ $checker->id }}</span>
+                            </td>
+                            <td class="name-col">
+                                <div class="checker-info-cell">
+                                    <div class="avatar-placeholder">
+                                        {{ substr($checker->firstname, 0, 1) }}{{ substr($checker->lastname, 0, 1) }}
+                                    </div>
+                                    <div>
+                                        <div class="checker-name">
+                                            {{ $checker->firstname }} {{ $checker->middlename ? $checker->middlename . ' ' : '' }}{{ $checker->lastname }}
                                         </div>
                                     </div>
-                                </td>
-                                <td>
-                                    @if($checker->contact)
-                                        <span class="text-dark">{{ $checker->contact }}</span>
-                                    @else
-                                        <span class="text-muted">Not provided</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($checker->address)
-                                        <small class="text-muted">{{ Str::limit($checker->address, 50) }}</small>
-                                    @else
-                                        <span class="text-muted">Not provided</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="{{ $checker->is_archived ? 'badge-archived' : 'badge-active' }}">
-                                        {{ $checker->is_archived ? 'Archived' : 'Active' }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-success editBtn" data-bs-toggle="modal"
-                                            data-bs-target="#editStockCheckerModal" data-checker='@json($checker)'>
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                </div>
+                            </td>
+                            <td class="contact-col">
+                                @if($checker->contact)
+                                    <div class="checker-contact">{{ $checker->contact }}</div>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="address-col">
+                                @if($checker->address)
+                                    <div class="checker-address" title="{{ $checker->address }}">
+                                        {{ Str::limit($checker->address, 40) }}
+                                    </div>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="status-col">
+                                @if ($checker->is_archived)
+                                    <span class="status-text status-text-archived">Archived</span>
+                                @else
+                                    <span class="status-text status-text-active">Active</span>
+                                @endif
+                            </td>
+                            <td class="action-col">
+                                <div class="action-buttons">
+                                    <button class="action-btn btn-edit editBtn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editStockCheckerModal"
+                                            data-checker='@json($checker)'
+                                            data-title="Edit Stock Checker">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
 
-                                        @if (!$checker->is_archived)
-                                            <button class="btn btn-sm btn-outline-warning toggleStatusBtn"
-                                                data-id="{{ $checker->id }}" data-action="archive">
-                                                <i class="fas fa-archive"></i>
-                                            </button>
-                                        @else
-                                            <button class="btn btn-sm btn-outline-success toggleStatusBtn"
-                                                data-id="{{ $checker->id }}" data-action="unarchive">
-                                                <i class="fas fa-box-open"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    @if (!$checker->is_archived)
+                                        <button class="action-btn btn-archive archiveBtn" 
+                                                data-id="{{ $checker->id }}" 
+                                                data-title="Archive Stock Checker">
+                                            <i class="fas fa-archive"></i>
+                                        </button>
+                                    @else
+                                        <button class="action-btn btn-unarchive unarchiveBtn" 
+                                                data-id="{{ $checker->id }}" 
+                                                data-title="Unarchive Stock Checker">
+                                            <i class="fas fa-box-open"></i>
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <div class="mt-4 d-flex justify-content-center">
+            @if($stockCheckers->hasPages())
+            <div class="d-flex justify-content-center p-4">
                 {{ $stockCheckers->links('pagination::bootstrap-5') }}
             </div>
+            @endif
         @else
-            <div class="empty-state">
+            <div class="empty-state p-5">
                 <i class="fas fa-clipboard-check"></i>
                 <h5 class="text-muted">No Stock Checkers Found</h5>
                 <p class="text-muted mb-4">Add your first stock checker to get started</p>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
-                    <i class="fas fa-plus me-2"></i> Add First Stock Checker
+                <button class="btn btn-add-checker" data-bs-toggle="modal" data-bs-target="#addStockCheckerModal">
+                    <i class="fas fa-user-plus"></i> Add First Stock Checker
                 </button>
             </div>
         @endif
@@ -355,343 +592,347 @@
 <!-- Add Stock Checker Modal -->
 <div class="modal fade" id="addStockCheckerModal" tabindex="-1" aria-labelledby="addStockCheckerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="addStockCheckerModalLabel">
-                    <i class="fas fa-user-plus me-2"></i> Add New Stock Checker
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="addStockCheckerForm" action="{{ route('admin.stock_checkers.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="add_firstname" class="form-label">First Name *</label>
-                                <input type="text" id="add_firstname" name="firstname" class="form-control" 
-                                       placeholder="Enter first name" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="add_middlename" class="form-label">Middle Name</label>
-                                <input type="text" id="add_middlename" name="middlename" class="form-control" 
-                                       placeholder="Enter middle name">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="add_lastname" class="form-label">Last Name *</label>
-                                <input type="text" id="add_lastname" name="lastname" class="form-control" 
-                                       placeholder="Enter last name" required>
-                            </div>
+        <form id="addStockCheckerForm" action="{{ route('admin.stock_checkers.store') }}" method="POST">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStockCheckerModalLabel">Add New Stock Checker</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="add_firstname" class="form-label">First Name *</label>
+                            <input type="text" id="add_firstname" name="firstname" class="form-control" 
+                                   placeholder="Enter first name" required>
                         </div>
                     </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_contact" class="form-label">Contact Number</label>
-                                <input type="text" id="add_contact" name="contact" class="form-control" 
-                                       placeholder="Enter contact number">
-                            </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="add_middlename" class="form-label">Middle Name</label>
+                            <input type="text" id="add_middlename" name="middlename" class="form-control" 
+                                   placeholder="Enter middle name">
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="add_address" class="form-label">Address</label>
-                                <input type="text" id="add_address" name="address" class="form-control" 
-                                       placeholder="Enter complete address">
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="add_lastname" class="form-label">Last Name *</label>
+                            <input type="text" id="add_lastname" name="lastname" class="form-control" 
+                                   placeholder="Enter last name" required>
                         </div>
                     </div>
 
-                    <div class="tips-box mt-3">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Tips:</strong> Stock checkers are responsible for inventory management. Make sure to provide accurate contact information for easy communication.
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_contact" class="form-label">Contact Number</label>
+                            <input type="text" id="add_contact" name="contact" class="form-control" 
+                                   placeholder="Enter contact number">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="add_address" class="form-label">Address</label>
+                            <input type="text" id="add_address" name="address" class="form-control" 
+                                   placeholder="Enter complete address">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Tips:</strong> Stock checkers are responsible for inventory management. Make sure to provide accurate contact information for easy communication.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Save Stock Checker
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Stock Checker</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Edit Stock Checker Modal -->
 <div class="modal fade" id="editStockCheckerModal" tabindex="-1" aria-labelledby="editStockCheckerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-custom">
-                <h5 class="modal-title" id="editStockCheckerModalLabel">
-                    <i class="fas fa-edit me-2"></i> Edit Stock Checker
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="editStockCheckerForm" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="modal-body">
-                    <input type="hidden" name="id">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="edit_firstname" class="form-label">First Name *</label>
-                                <input type="text" id="edit_firstname" name="firstname" class="form-control" 
-                                       placeholder="Enter first name" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="edit_middlename" class="form-label">Middle Name</label>
-                                <input type="text" id="edit_middlename" name="middlename" class="form-control" 
-                                       placeholder="Enter middle name">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label for="edit_lastname" class="form-label">Last Name *</label>
-                                <input type="text" id="edit_lastname" name="lastname" class="form-control" 
-                                       placeholder="Enter last name" required>
-                            </div>
+        <form id="editStockCheckerForm" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStockCheckerModalLabel">Edit Stock Checker</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="edit_firstname" class="form-label">First Name *</label>
+                            <input type="text" id="edit_firstname" name="firstname" class="form-control" 
+                                   placeholder="Enter first name" required>
                         </div>
                     </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_contact" class="form-label">Contact Number</label>
-                                <input type="text" id="edit_contact" name="contact" class="form-control" 
-                                       placeholder="Enter contact number">
-                            </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="edit_middlename" class="form-label">Middle Name</label>
+                            <input type="text" id="edit_middlename" name="middlename" class="form-control" 
+                                   placeholder="Enter middle name">
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_address" class="form-label">Address</label>
-                                <input type="text" id="edit_address" name="address" class="form-control" 
-                                       placeholder="Enter complete address">
-                            </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="edit_lastname" class="form-label">Last Name *</label>
+                            <input type="text" id="edit_lastname" name="lastname" class="form-control" 
+                                   placeholder="Enter last name" required>
                         </div>
                     </div>
 
-                    <div class="tips-box mt-3">
-                        <i class="fas fa-lightbulb"></i>
-                        <strong>Note:</strong> Updating stock checker information will not affect their previous inventory records.
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_contact" class="form-label">Contact Number</label>
+                            <input type="text" id="edit_contact" name="contact" class="form-control" 
+                                   placeholder="Enter contact number">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="edit_address" class="form-label">Address</label>
+                            <input type="text" id="edit_address" name="address" class="form-control" 
+                                   placeholder="Enter complete address">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="tips-box mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            <strong>Note:</strong> Updating stock checker information will not affect their previous inventory records.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancel
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Update Stock Checker
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Stock Checker</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterForm = document.getElementById('filterForm');
-            const searchInput = document.getElementById('search');
-            const statusSelect = document.getElementById('status');
-            const perPageSelect = document.getElementById('per_page');
-            const searchLoading = document.getElementById('searchLoading');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    const searchInput = document.getElementById('search');
+    const statusSelect = document.getElementById('status');
+    const perPageSelect = document.getElementById('per_page');
+    const searchLoading = document.getElementById('searchLoading');
+    
+    let searchTimeout;
+
+    // Auto-submit search with delay
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchLoading.style.display = 'block';
+        
+        searchTimeout = setTimeout(() => {
+            filterForm.submit();
+        }, 800);
+    });
+
+    // Auto-submit status filter immediately
+    statusSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Auto-submit per page selection immediately
+    perPageSelect.addEventListener('change', function() {
+        filterForm.submit();
+    });
+
+    // Clear loading indicator when form submits
+    filterForm.addEventListener('submit', function() {
+        searchLoading.style.display = 'none';
+    });
+
+    /* === Add Stock Checker === */
+    document.getElementById('addStockCheckerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addStockCheckerModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error adding stock checker: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+
+    /* === Edit Stock Checker === */
+    document.querySelectorAll('.editBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const checker = JSON.parse(this.dataset.checker);
+            const form = document.getElementById('editStockCheckerForm');
             
-            let searchTimeout;
+            // Set form action
+            form.action = `/admin/stock-checkers/${checker.id}`;
+            
+            // Fill form fields
+            document.getElementById('edit_firstname').value = checker.firstname || '';
+            document.getElementById('edit_middlename').value = checker.middlename || '';
+            document.getElementById('edit_lastname').value = checker.lastname || '';
+            document.getElementById('edit_contact').value = checker.contact || '';
+            document.getElementById('edit_address').value = checker.address || '';
+        });
+    });
 
-            // Auto-submit search with delay
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchLoading.style.display = 'block';
-                
-                searchTimeout = setTimeout(() => {
-                    filterForm.submit();
-                }, 800);
-            });
+    document.getElementById('editStockCheckerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
 
-            // Auto-submit status filter immediately
-            statusSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
 
-            // Auto-submit per page selection immediately
-            perPageSelect.addEventListener('change', function() {
-                filterForm.submit();
-            });
+        fetch(form.action, {
+            method: 'POST',
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'X-HTTP-Method-Override': 'PUT' 
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editStockCheckerModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('Error updating stock checker: ' + (data.message || 'Unknown error'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
 
-            // Clear loading indicator when form submits
-            filterForm.addEventListener('submit', function() {
-                searchLoading.style.display = 'none';
-            });
+    /* === Archive Stock Checker === */
+    document.querySelectorAll('.archiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to archive this stock checker? This will make them inactive but preserve their data.')) return;
+            
+            const id = this.dataset.id;
+            const button = this;
 
-            // ADD STOCK CHECKER
-            document.getElementById('addStockCheckerForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const form = e.target;
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                // Disable button and show loading
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
-                
-                try {
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: new FormData(form)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        location.reload();
-                    } else {
-                        alert('Error: Could not add stock checker');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                } catch (error) {
-                    alert('Network error. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/stock-checkers/${id}/archive`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to archive stock checker: ' + (data.message || 'Unknown error'));
+                    location.reload();
                 }
-            });
-
-            // FILL EDIT MODAL
-            document.querySelectorAll('.editBtn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const checker = JSON.parse(btn.dataset.checker);
-                    const form = document.getElementById('editStockCheckerForm');
-                    
-                    // Set form action
-                    form.action = `/admin/stock_checkers/${checker.id}`;
-                    
-                    // Fill form fields
-                    form.querySelector('[name="id"]').value = checker.id;
-                    form.querySelector('[name="firstname"]').value = checker.firstname;
-                    form.querySelector('[name="middlename"]').value = checker.middlename || '';
-                    form.querySelector('[name="lastname"]').value = checker.lastname;
-                    form.querySelector('[name="contact"]').value = checker.contact || '';
-                    form.querySelector('[name="address"]').value = checker.address || '';
-                });
-            });
-
-            // UPDATE STOCK CHECKER
-            document.getElementById('editStockCheckerForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const form = e.target;
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                // Disable button and show loading
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
-                
-                try {
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'X-HTTP-Method-Override': 'PUT'
-                        },
-                        body: new FormData(form)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        location.reload();
-                    } else {
-                        alert('Error updating stock checker');
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalText;
-                    }
-                } catch (error) {
-                    alert('Network error. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
-            });
-
-            // ARCHIVE / UNARCHIVE
-            document.querySelectorAll('.toggleStatusBtn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (!confirm('Are you sure you want to change the status of this stock checker?')) {
-                        return;
-                    }
-                    
-                    const id = btn.dataset.id;
-                    const action = btn.dataset.action;
-                    const originalText = btn.innerHTML;
-                    
-                    // Show loading on button
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    
-                    try {
-                        const response = await fetch(`/admin/stock_checkers/${id}/${action}`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            }
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            location.reload();
-                        } else {
-                            alert('Failed to update status');
-                            btn.disabled = false;
-                            btn.innerHTML = originalText;
-                        }
-                    } catch (error) {
-                        alert('Network error. Please try again.');
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
-                    }
-                });
-            });
-
-            // Form validation
-            const forms = document.querySelectorAll('#addStockCheckerForm, #editStockCheckerForm');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    const firstName = form.querySelector('[name="firstname"]');
-                    const lastName = form.querySelector('[name="lastname"]');
-                    
-                    if (!firstName.value.trim() || !lastName.value.trim()) {
-                        e.preventDefault();
-                        alert('First name and last name are required.');
-                        return false;
-                    }
-                    
-                    return true;
-                });
-            });
-
-            // Clear add form when modal closes
-            const addModal = document.getElementById('addStockCheckerModal');
-            addModal.addEventListener('hidden.bs.modal', function () {
-                const form = this.querySelector('form');
-                if (form) {
-                    form.reset();
-                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                location.reload();
             });
         });
-    </script>
+    });
+
+    /* === Unarchive Stock Checker === */
+    document.querySelectorAll('.unarchiveBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (!confirm('Are you sure you want to unarchive this stock checker? They will become active again.')) return;
+            
+            const id = this.dataset.id;
+            const button = this;
+
+            // Disable button during processing
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch(`/admin/stock-checkers/${id}/unarchive`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to unarchive stock checker: ' + (data.message || 'Unknown error'));
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+                location.reload();
+            });
+        });
+    });
+
+    // Fix table layout on window resize
+    window.addEventListener('resize', function() {
+        const tableContainer = document.querySelector('.table-container');
+        const table = document.querySelector('.table');
+        
+        // Only apply horizontal scroll on mobile
+        if (window.innerWidth < 1200) {
+            tableContainer.style.overflowX = 'auto';
+            table.style.tableLayout = 'auto';
+        } else {
+            tableContainer.style.overflowX = 'visible';
+            table.style.tableLayout = 'fixed';
+        }
+    });
+});
+</script>
 @endpush
 @endsection

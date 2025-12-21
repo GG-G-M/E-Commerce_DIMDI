@@ -288,6 +288,11 @@
                     <h4 class="text-center mb-4">
                         <i class="fas fa-truck me-2"></i>DIMDI Delivery
                     </h4>
+                    @if(auth()->check() && auth()->user()->isSuperAdmin())
+                        <div class="text-center mb-2">
+                            <a href="{{ route('superadmin.dashboard') }}" class="btn btn-sm btn-outline-light">← Super Admin Panel</a>
+                        </div>
+                    @endif
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('delivery.dashboard') ? 'active' : '' }}"
@@ -327,7 +332,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('logout') }}" class="nav-link"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="logoutWithConfirm(event);">
                                 <i class="fas fa-sign-out-alt me-2"></i>
                                 <span>Logout</span>
                             </a>
@@ -340,7 +345,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-3 px-md-4" style="margin-left:270px;">
                 <!-- Top navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
                     <div class="container-fluid">
@@ -372,7 +377,7 @@
                 </nav>
 
                 <!-- Page content -->
-                <div class="container-fluid py-4">
+                <div class="container-fluid py-3 px-0">
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show">
                             {{ session('success') }}
@@ -394,6 +399,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @include('components.ui-elements')
     @stack('scripts')
 </body>
 

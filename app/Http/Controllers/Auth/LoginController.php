@@ -16,6 +16,23 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
+        // Redirect authenticated users to their appropriate dashboard
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Redirect based on role
+            if ($user->role === 'super_admin') {
+                return redirect()->route('superadmin.dashboard');
+            } elseif ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'delivery') {
+                return redirect()->route('delivery.dashboard');
+            }
+            
+            // Default redirect for customers
+            return redirect('/');
+        }
+        
         return view('auth.login');
     }
 
@@ -23,11 +40,35 @@ class LoginController extends Controller
     {
         $request->validate([
             'email' => 'required|string|email',
-            'password' => 'required|string',
+            'password' => 'nullable|string', // Made nullable for encrypted submissions
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $email = $request->input('email');
+        $password = $request->input('password');
+        
+        // Handle obfuscated password from client-side
+        if ($password && base64_decode($password, true) !== false) {
+            try {
+                // Decode the base64 obfuscated password
+                $decodedPassword = base64_decode($password);
+                
+                // Use the actual password for authentication
+                $password = $decodedPassword;
+            } catch (\Exception $e) {
+                // If decoding fails, use original password
+                $password = $password;
+            }
+        }
+        
+        $credentials = [
+            'email' => $email,
+            'password' => $password
+        ];
+        
         $remember = $request->has('remember');
+
+        // Check if email exists first
+        $userExists = User::where('email', $email)->exists();
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
@@ -39,20 +80,27 @@ class LoginController extends Controller
             
             // FIXED: Added super_admin role check FIRST (before admin)
             if ($user->role === 'super_admin') {
-                return redirect()->route('superadmin.dashboard')->with('success', 'Welcome back, Super Admin!');
+                return redirect()->route('superadmin.dashboard')->with('login_success', true);
             } elseif ($user->role === 'admin') {
-                return redirect()->route('admin.dashboard')->with('success', 'Welcome back, Admin!');
+                return redirect()->route('admin.dashboard')->with('login_success', true);
             } elseif ($user->role === 'delivery') {
-                return redirect()->route('delivery.dashboard')->with('success', 'Welcome back!');
+                return redirect()->route('delivery.dashboard')->with('login_success', true);
             }
 
             // Redirect to intended URL or home for customers
-            return redirect()->intended('/')->with('success', 'Login successful! Welcome back.');
+            return redirect()->intended('/')->with('login_success', true);
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        // Provide specific error messages
+        $errors = [];
+        
+        if (!$userExists) {
+            $errors['email'] = 'No account found with this email address. Please check your email or create a new account.';
+        } else {
+            $errors['email'] = 'Invalid username or password. Please check your credentials and try again.';
+        }
+
+        return back()->withErrors($errors)->onlyInput('email');
     }
 
     public function logout(Request $request)
@@ -183,18 +231,36 @@ class LoginController extends Controller
     private function redirectBasedOnRole($user)
     {
         if ($user->role === 'super_admin') {
-            return redirect()->route('superadmin.dashboard')
-                ->with('success', 'Welcome back, Super Admin!');
+            return redirect()->route('superadmin.dashboard')->with('login_success', true);
         } elseif ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard')
-                ->with('success', 'Welcome back, Admin!');
+            return redirect()->route('admin.dashboard')->with('login_success', true);
         } elseif ($user->role === 'delivery') {
-            return redirect()->route('delivery.dashboard')
-                ->with('success', 'Welcome back!');
+            return redirect()->route('delivery.dashboard')->with('login_success', true);
         }
         
-        return redirect()->intended('/')
-            ->with('success', 'Login successful! Welcome back.');
+        return redirect()->intended('/')->with('login_success', true);
+    }
+
+    /**
+     * Decrypt password received from client-side encryption
+     */
+    private function decryptPassword($encryptedData, $key)
+    {
+        try {
+            // Simple base64 decoding for now (in production, use proper encryption)
+            $decoded = base64_decode($encryptedData);
+            
+            // XOR decryption with key
+            $keyLength = strlen($key);
+            $decrypted = '';
+            for ($i = 0; $i < strlen($decoded); $i++) {
+                $decrypted .= chr(ord($decoded[$i]) ^ ord($key[$i % $keyLength]));
+            }
+            
+            return $decrypted;
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to decrypt password');
+        }
     }
 
     private function transferGuestCartToUser(User $user)

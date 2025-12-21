@@ -4,12 +4,38 @@
 
 @section('content')
 <style>
+    :root {
+        --green-primary: #2C8F0C;
+        --green-secondary: #4CAF50;
+        --green-light: #E8F5E6;
+        --green-lighter: #F8FDF8;
+        --green-dark: #1E6A08;
+        --orange-primary: #FF9800;
+        --orange-secondary: #FFB74D;
+        --orange-light: #FFF3E0;
+        --gray-light: #f8f9fa;
+        --gray-medium: #6c757d;
+        --gray-dark: #495057;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--green-primary);
+    }
+
+    /* Stats Cards */
     .stats-card {
         border: none;
         border-radius: 12px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         overflow: hidden;
+        color: white !important;
     }
     
     .stats-card:hover {
@@ -18,28 +44,39 @@
     }
     
     .card-primary {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
+        background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
+        color: white !important;
     }
     
     .card-success {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        background: linear-gradient(135deg, var(--green-dark), var(--green-primary));
+        color: white;
+    }
+    
+    .card-orange {
+        background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
         color: white;
     }
     
     .card-info {
-        background: linear-gradient(135deg, #4CAF50, #66BB6A);
-        color: white;
-    }
-    
-    .card-warning {
-        background: linear-gradient(135deg, #FFA000, #FFB300);
+        background: linear-gradient(135deg, var(--green-secondary), #66BB6A);
         color: white;
     }
     
     .stats-icon {
         font-size: 2rem;
         opacity: 0.8;
+    }
+    
+    .stats-icon-circle {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
     }
     
     .stats-number {
@@ -54,74 +91,7 @@
         font-weight: 500;
     }
     
-    .dashboard-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
-    
-    .section-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
-    }
-    
-    .section-card .card-header {
-        background: white;
-        border-bottom: 2px solid #E8F5E6;
-        font-weight: 600;
-        color: #2C8F0C;
-        padding: 1rem 1.5rem;
-    }
-    
-    .table th {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        font-weight: 600;
-        border-bottom: 2px solid #2C8F0C;
-    }
-    
-    .badge-success {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-    }
-    
-    .badge-warning {
-        background-color: #FFF3CD;
-        color: #856404;
-    }
-    
-    .badge-primary {
-        background-color: #E3F2FD;
-        color: #1976D2;
-    }
-    
-    .order-card {
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 0.75rem;
-        transition: all 0.3s ease;
-        border-left: 4px solid #2C8F0C;
-    }
-    
-    .order-card:hover {
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        transform: translateX(2px);
-    }
-    
-    .order-card-available {
-        border-left-color: #28a745;
-    }
-    
-    .order-card-my {
-        border-left-color: #007bff;
-    }
-    
+    /* Clickable Cards */
     .clickable-card {
         transition: all 0.3s ease;
         cursor: pointer;
@@ -132,27 +102,108 @@
         box-shadow: 0 12px 20px rgba(0,0,0,0.2) !important;
     }
 
+    /* Section Cards */
+    .section-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        background: white;
+        color: white; 
+    }
+    
+    .section-card .card-header {
+        background: white;
+        border-bottom: 2px solid var(--green-light);
+        font-weight: 600;
+        color: var(--green-primary);
+        padding: 1rem 1.5rem;
+    }
+    
+    /* Order Cards */
+    .order-card {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--green-primary);
+        background: white;
+    }
+    
+    .order-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transform: translateX(2px);
+    }
+    
+    .order-card-available {
+        border-left-color: var(--green-secondary);
+    }
+    
+    .order-card-my {
+        border-left-color: var(--green-dark);
+    }
+    
+    /* Table Styling */
+    .table th {
+        background-color: var(--green-light);
+        color: var(--green-primary);
+        font-weight: 600;
+        border-bottom: 2px solid var(--green-primary);
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: var(--green-lighter);
+    }
+    
+   
+    
+    /* Buttons */
     .btn-success {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
         border: none;
         font-weight: 500;
+        transition: all 0.3s ease;
     }
     
     .btn-success:hover {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-1px);
+        background: linear-gradient(135deg, var(--green-dark), var(--green-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
     }
     
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff, #0056b3);
+    .btn-outline-success {
+        background: white;
+        border: 2px solid var(--green-primary);
+        color: var(--green-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-success:hover {
+        background: var(--green-primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
         border: none;
         font-weight: 500;
+        transition: all 0.3s ease;
     }
     
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #F57C00, var(--orange-primary));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+    }
+    
+    /* Empty State */
     .empty-state {
         padding: 3rem 1rem;
         text-align: center;
-        color: #6c757d;
+        color: var(--gray-medium);
     }
     
     .empty-state i {
@@ -160,12 +211,134 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+
+    /* Action Buttons - Green Theme */
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+
+    .btn-pickup {
+        background: linear-gradient(135deg, var(--green-primary), var(--green-secondary));
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-pickup:hover {
+        background: linear-gradient(135deg, var(--green-dark), var(--green-primary));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.3);
+    }
+
+    .btn-deliver {
+        background: linear-gradient(135deg, var(--orange-primary), var(--orange-secondary));
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-deliver:hover {
+        background: linear-gradient(135deg, #F57C00, var(--orange-primary));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(255, 152, 0, 0.3);
+    }
+
+    /* Quick Actions */
+    .quick-action-btn {
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Status Colors */
+    .status-ready {
+        color: var(--green-primary);
+        font-weight: 600;
+    }
+
+    .status-active {
+        color: var(--green-dark);
+        font-weight: 600;
+    }
+
+    .status-delivered {
+        color: var(--green-secondary);
+        font-weight: 600;
+    }
+
+    /* Price Styling */
+    .price-amount {
+        color: var(--green-primary);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-number {
+            font-size: 1.5rem;
+        }
+        
+        .stats-icon {
+            font-size: 1.5rem;
+        }
+        
+        .order-card .card-body {
+            padding: 0.75rem;
+        }
+        
+        .btn-pickup, .btn-deliver {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stats-card, .section-card {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    /* Card Body */
+    .card-body {
+        color: var(--gray-dark);
+    }
+    /* Make all text white in stats cards */
+.card-primary *, .card-success *, .card-orange *, .card-info * { color: white !important; }
 </style>
 
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">Delivery Dashboard</h1>
+            <h1 class="h3 mb-1" style="color: var(--green-primary); font-weight: 700;">Delivery Dashboard</h1>
             <p class="mb-0 text-muted">Welcome back, {{ Auth::user()->name }}! Manage your delivery assignments efficiently.</p>
         </div>
         <div class="text-end">
@@ -180,16 +353,20 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.pickup') }}" class="text-decoration-none">
             <div class="card stats-card card-primary h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">AVAILABLE FOR PICKUP</div>
-                            <div class="stats-number">{{ $stats['availableOrdersCount'] }}</div>
-                            <small>Orders ready to be picked up</small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">AVAILABLE FOR PICKUP</div>
+                                <small class="text-white opacity-75">Orders ready to be picked up</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box-open stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['availableOrdersCount'] }}</div>
                     </div>
                 </div>
             </div>
@@ -199,17 +376,21 @@
     <!-- My Active Orders -->
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.my-orders') }}" class="text-decoration-none">
-            <div class="card stats-card h-100 clickable-card" style="color: #1E6A08">
-                <div class="card-body" style="color: #1E6A08">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">MY ACTIVE ORDERS</div>
-                            <div class="stats-number">{{ $stats['myActiveOrdersCount'] }}</div>
-                            <small>Orders you're delivering</small>
+            <div class="card stats-card card-success h-100 clickable-card">
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-truck-loading"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">MY ACTIVE ORDERS</div>
+                                <small class="text-white opacity-75">Orders you're delivering</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-truck-loading stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['myActiveOrdersCount'] }}</div>
                     </div>
                 </div>
             </div>
@@ -218,17 +399,21 @@
 
     <!-- Out for Delivery -->
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stats-card card-warning h-100">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="stats-label">OUT FOR DELIVERY</div>
-                        <div class="stats-number">{{ $stats['outForDeliveryCount'] }}</div>
-                        <small>Currently being delivered</small>
+        <div class="card stats-card card-orange h-100">
+            <div class="card-body d-flex flex-column justify-content-between h-100">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="stats-icon-circle me-3">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div>
+                            <div class="stats-label text-uppercase small">OUT FOR DELIVERY</div>
+                            <small class="text-white opacity-75">Currently being delivered</small>
+                        </div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-shipping-fast stats-icon"></i>
-                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="stats-number display-6 fw-bold">{{ $stats['outForDeliveryCount'] }}</div>
                 </div>
             </div>
         </div>
@@ -238,16 +423,20 @@
     <div class="col-xl-3 col-md-6 mb-4">
         <a href="{{ route('delivery.orders.delivered') }}" class="text-decoration-none">
             <div class="card stats-card card-info h-100 clickable-card">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="stats-label">DELIVERED TODAY</div>
-                            <div class="stats-number">{{ $stats['deliveredTodayCount'] }}</div>
-                            <small>Completed deliveries today</small>
+                <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="stats-icon-circle me-3">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <div class="stats-label text-uppercase small">DELIVERED TODAY</div>
+                                <small class="text-white opacity-75">Completed deliveries today</small>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-check-circle stats-icon"></i>
-                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="stats-number display-6 fw-bold">{{ $stats['deliveredTodayCount'] }}</div>
                     </div>
                 </div>
             </div>
@@ -277,7 +466,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h6 class="mb-0 fw-bold text-dark">#{{ $order->order_number }}</h6>
-                                            <span class="badge bg-success">Ready for Pickup</span>
+                                            <span >Ready for Pickup</span>
                                         </div>
                                         <p class="mb-1 text-muted">
                                             <i class="fas fa-user me-1"></i>{{ $order->customer_name }}
@@ -286,15 +475,12 @@
                                             <i class="fas fa-map-marker-alt me-1"></i>{{ Str::limit($order->shipping_address, 40) }}
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-success">₱{{ number_format($order->total_amount, 2) }}</span>
+                                            <span class="price-amount">₱{{ number_format($order->total_amount, 2) }}</span>
                                             <div>
-                                                <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                    <i class="fas fa-eye"></i> View
-                                                </a>
                                                 <form action="{{ route('delivery.orders.markAsPickedUp', $order) }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-success">
-                                                        <i class="fas fa-hand-paper me-1"></i>Pick Up
+                                                    <button type="submit" class="btn-pickup btn-sm">
+                                                        <i class="fas fa-hand-paper me-1"></i>
                                                     </button>
                                                 </form>
                                             </div>
@@ -321,10 +507,10 @@
 
     <!-- My Active Orders -->
     <div class="col-lg-6">
-        <div class="card section-card" style="color: #1E6A08" >
+        <div class="card section-card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold  " style="color: #1E6A08">
-                    <i class="fas fa-clipboard-list me-2" style="color: #1E6A08"></i>My Active Orders
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-clipboard-list me-2"></i>My Active Orders
                 </h6>
                 <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-success">
                     View All <i class="fas fa-arrow-right ms-1"></i>
@@ -340,7 +526,7 @@
                                     <div class="flex-grow-1">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
                                             <h6 class="mb-0 fw-bold text-dark">#{{ $order->order_number }}</h6>
-                                            <span class="badge" style="color: #1E6A08">{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
+                                            <span >{{ ucfirst(str_replace('_', ' ', $order->order_status)) }}</span>
                                         </div>
                                         <p class="mb-1 text-muted">
                                             <i class="fas fa-user me-1"></i>{{ $order->customer_name }}
@@ -349,18 +535,17 @@
                                             <i class="fas fa-map-marker-alt me-1"></i>{{ Str::limit($order->shipping_address, 40) }}
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold text-primary">₱{{ number_format($order->total_amount, 2) }}</span>
+                                            <span class="price-amount">₱{{ number_format($order->total_amount, 2) }}</span>
                                             <div>
-                                                <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-primary me-1">
-                                                    <i class="fas fa-eye"></i> View
-                                                </a>
                                                 @if($order->order_status == 'picked_up')
                                                 <form action="{{ route('delivery.orders.markAsDelivered', $order) }}" method="POST" class="d-inline">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-warning">
-                                                        <i class="fas fa-check me-1"></i>Mark Delivered
+                                                    <button type="submit" class="btn-deliver btn-sm">
+                                                        <i class="fas fa-check me-1"></i>Mark as Delivered
                                                     </button>
                                                 </form>
+                                                @else
+                                                <span>In Transit</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -408,7 +593,7 @@
                                     <th>Delivery Address</th>
                                     <th>Amount</th>
                                     <th>Delivered At</th>
-                                    <th>Actions</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -433,9 +618,7 @@
                                         </small>
                                     </td>
                                     <td>
-                                        <a href="{{ route('delivery.orders.show', $order) }}" class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
+                                        <span >Delivered</span>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -459,31 +642,87 @@
     <div class="col-12">
         <div class="card section-card">
             <div class="card-header">
-                <h6 class="m-0 font-weight-bold">
+                <h6 class="m-0 font-weight-bold text-success">
                     <i class="fas fa-bolt me-2"></i>Quick Actions
                 </h6>
             </div>
             <div class="card-body">
                 <div class="row g-2">
                     <div class="col-md-3">
-                        <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-success w-100">
+                        <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-success w-100 quick-action-btn">
                             <i class="fas fa-box me-2"></i>Pick Up Orders
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-success w-100">
+                        <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-success w-100 quick-action-btn">
                             <i class="fas fa-list me-2"></i>My Orders
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('delivery.orders.index') }}" class="btn btn-outline-primary w-100">
+                        <a href="{{ route('delivery.orders.index') }}" class="btn btn-outline-success w-100 quick-action-btn">
                             <i class="fas fa-shopping-cart me-2"></i>All Orders
                         </a>
                     </div>
                     <div class="col-md-3">
-                        <a href="{{ route('delivery.profile.show') }}" class="btn btn-outline-info w-100">
+                        <a href="{{ route('delivery.profile.show') }}" class="btn btn-outline-success w-100 quick-action-btn">
                             <i class="fas fa-user me-2"></i>My Profile
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delivery Tips -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card section-card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-lightbulb me-2"></i>Delivery Tips
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <div class="bg-success bg-opacity-10 p-2 rounded-circle">
+                                    <i class="fas fa-clock text-success"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Check Order Details</h6>
+                                <p class="small text-muted mb-0">Always verify order contents before pickup.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <div class="bg-warning bg-opacity-10 p-2 rounded-circle">
+                                    <i class="fas fa-map-marker-alt text-warning"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Optimize Route</h6>
+                                <p class="small text-muted mb-0">Plan your delivery route for efficiency.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-3">
+                                <div class="bg-info bg-opacity-10 p-2 rounded-circle">
+                                    <i class="fas fa-phone text-info"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Customer Contact</h6>
+                                <p class="small text-muted mb-0">Call ahead if you're running late.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

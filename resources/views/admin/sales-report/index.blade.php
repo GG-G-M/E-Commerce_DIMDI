@@ -5,145 +5,291 @@
 
 @section('content')
 <style>
-    /* === Green Theme and Card Styling === */
-    .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        border-left: 4px solid #2C8F0C;
-    }
+/* ===========================================
+   SALES REPORT SPECIFIC STYLES
+   =========================================== */
 
-    .page-header h1 {
-        color: #2C8F0C;
-        font-weight: 700;
-    }
+/* CSS Variables (keep these if not in main CSS) */
+:root {
+    --primary-green: #2C8F0C;
+    --secondary-green: #4CAF50;
+    --light-green: #E8F5E9;
+    --dark-green: #1B5E20;
+    --gradient-green: linear-gradient(135deg, #2C8F0C, #4CAF50);
+    --gradient-dark: linear-gradient(135deg, #1B5E20, #2C8F0C);
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+}
 
-    .card-custom {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-        margin-bottom: 1.5rem;
-    }
+/* Action Buttons (UNIQUE to sales report - put back inline) */
+.action-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap; /* Add this to prevent text breaking */
+    min-width: fit-content
+}
 
-    .card-custom:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    }
+.action-btn.btn-primary {
+    background: white;
+    color: var(--primary-green);
+    border: 2px solid rgba(255,255,255,0.3);
+}
 
-    .card-header-custom {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-        font-weight: 600;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        padding: 1rem 1.5rem;
-    }
+.action-btn.btn-primary:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
 
-    .btn-success {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        font-weight: 600;
-    }
+.action-btn.btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+}
 
-    .btn-success:hover {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-2px);
-    }
+.action-btn.btn-outline:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+}
 
-    .btn-outline-success {
-        border-color: #2C8F0C;
-        color: #2C8F0C;
-        font-weight: 500;
-    }
+/* Unified Dashboard Header Card */
+.dashboard-header-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid var(--gray-200);
+    transition: all 0.3s ease;
+}
 
-    .btn-outline-success:hover {
-        background-color: #2C8F0C;
-        border-color: #2C8F0C;
-    }
+.dashboard-header-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
 
-    .table th {
-        background-color: #E8F5E6;
-        color: #2C8F0C;
-        font-weight: 600;
-        border-bottom: 2px solid #2C8F0C;
-        padding: 1rem;
-    }
+.dashboard-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
 
-    .table td {
-        padding: 1rem;
-        vertical-align: middle;
-    }
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
 
-    .table tbody tr:hover {
-        background-color: #F8FDF8;
-        transition: background-color 0.2s ease;
-    }
+.dashboard-header h1 {
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+    position: relative;
+    z-index: 2;
+}
 
-    /* Smaller stat cards */
-    .stat-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fdf8 100%);
-        border-radius: 8px;
-        padding: 1rem;
-        border-left: 3px solid #2C8F0C;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        height: 100%;
-    }
+.dashboard-header .subtitle {
+    opacity: 0.9;
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 2;
+}
 
-    .stat-value {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2C8F0C;
-        margin-bottom: 0.25rem;
-    }
+.header-actions {
+    position: relative;
+    z-index: 2;
+    margin-top: 1rem;
+}
 
-    .stat-label {
-        color: #6c757d;
-        font-weight: 500;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-    }
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--gray-200);
+    margin-top: 1px;
+}
 
-   /* Enhanced Chart Styles */
+.stat-item {
+    background: white;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: var(--gray-50);
+    transform: translateY(-2px);
+}
+
+.stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: var(--gray-200);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.stat-label {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--light-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--primary-green);
+    font-size: 1.25rem;
+}
+
+/* Filter Card */
+.filter-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.filter-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+}
+
+.filter-header {
+    background: var(--gray-50);
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-body {
+    padding: 1.5rem;
+}
+
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.chart-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+.chart-body {
+    padding: 1.5rem;
+    position: relative;
+}
+
+/* Enhanced Chart Styles */
 .chart-container-enhanced {
     position: relative;
     height: 280px;
-    width: 100%;
-    background: linear-gradient(135deg, #f8fdf8 0%, #ffffff 100%);
-    border-radius: 8px;
-    padding: 1rem;
-}
-
-.chart-container-pie {
-    position: relative;
-    height: 220px;
     width: 100%;
     margin-bottom: 1rem;
 }
 
 .chart-stats {
-    background: #f8fdf8;
-    border-radius: 8px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
     padding: 1rem;
-    border-left: 3px solid #2C8F0C;
+    border-left: 3px solid var(--primary-green);
 }
 
-.chart-actions .btn {
-    border-radius: 20px;
-    font-size: 0.8rem;
-    padding: 0.25rem 0.75rem;
+/* Payment Method Legend */
+.payment-legend {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
 .payment-item {
-    background: #f8f9fa;
-    transition: all 0.3s ease;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
 }
 
 .payment-item:hover {
-    background: #e9ecef;
-    transform: translateX(5px);
+    border-color: var(--primary-green);
+    transform: translateX(3px);
 }
 
 .color-indicator {
@@ -151,181 +297,202 @@
     height: 12px;
     border-radius: 50%;
     display: inline-block;
+    margin-right: 0.5rem;
 }
 
-/* Chart tooltip improvements */
-.chartjs-tooltip {
-    background: rgba(44, 143, 12, 0.9) !important;
-    border: none !important;
-    border-radius: 8px !important;
-    color: white !important;
-    padding: 8px 12px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+/* Orders Table */
+.orders-card {
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    margin-top: 2rem;
 }
 
-/* Animation for chart loading */
-.chart-loading {
-    animation: pulse 1.5s ease-in-out infinite;
+.orders-header {
+    background: var(--gradient-green);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
 }
 
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
+/* Custom Date Range */
+#customDateRange {
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
+    border: 1px solid var(--gray-200);
 }
 
-/* Responsive chart adjustments */
+/* Responsive Design for Sales Report */
 @media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-item:not(:last-child)::after {
+        display: none;
+    }
+
+    .stat-item:not(:last-child) {
+        border-bottom: 1px solid var(--gray-200);
+    }
+
     .chart-container-enhanced {
         height: 250px;
     }
-    
-    .chart-container-pie {
-        height: 200px;
+
+    .dashboard-header {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.5rem;
     }
 }
 
-    .badge-success {
-        background-color: #2C8F0C;
-        color: white;
+@media (max-width: 576px) {
+    .header-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
     }
 
-    .filter-section {
-        background: #f8fdf8;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e8f5e6;
+    .action-btn {
+        width: 100%;
+        justify-content: center;
     }
 
-    .payment-method-badge {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.7rem;
+    .chart-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
     }
-
-    .small-card {
-        height: 100%;
-    }
+}
 </style>
 
-<!-- Add this button in the page-header div, next to the existing Export PDF button -->
-<div class="page-header d-flex justify-content-between align-items-center">
-    <div>
-        <h1 class="h3 mb-1">Sales Reports</h1>
-        <p class="text-muted mb-0">Track and analyze your sales performance</p>
+<!-- Unified Dashboard Header Card with Stats -->
+<div class="dashboard-header-card">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <h1>Sales Reports</h1>
+        <p class="subtitle">Track and analyze your sales performance</p>
+        
+        <div class="header-actions d-flex gap-2">
+            <a href="{{ route('admin.sales-report.comparison') }}" class="action-btn btn-outline">
+                <i class="fas fa-chart-line me-1"></i> Year Comparison
+            </a>
+            <a href="{{ route('admin.sales-report.export-pdf', request()->query()) }}" class="action-btn btn-primary" target="_blank">
+                <i class="fas fa-file-pdf me-1"></i> Download PDF
+            </a>
+        </div>
     </div>
-    <div>
-        <a href="{{ route('admin.sales-report.comparison') }}" class="btn btn-outline-success me-2">
-            <i class="fas fa-chart-line me-1"></i> Year Comparison
-        </a>
-        <button type="button" class="btn btn-success" onclick="exportReport('pdf')">
-            <i class="fas fa-download me-1"></i> Export PDF
-        </button>
-    </div>
-</div>
 
-
-<!-- Summary Cards - Smaller and more compact -->
-{{-- Simple 3-column layout without the redundant cards --}}
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
+    <!-- Stats Grid Section -->
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
             <div class="stat-value">₱{{ number_format($salesData['totalSales'], 2) }}</div>
             <div class="stat-label">Total Sales</div>
         </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
+        
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
             <div class="stat-value">{{ $salesData['totalOrders'] }}</div>
             <div class="stat-label">Total Orders</div>
         </div>
-    </div>
-    <div class="col-md-4 mb-3">
-        <div class="stat-card">
+        
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
             <div class="stat-value">₱{{ number_format($salesData['averageOrderValue'], 2) }}</div>
             <div class="stat-label">Avg Order Value</div>
         </div>
     </div>
 </div>
 
-<!-- Filters -->
-<div class="card card-custom">
-    <div class="card-body">
+<!-- Filters Card -->
+<div class="filter-card">
+    <div class="filter-header">
+        <i class="fas fa-filter"></i> Filter Reports
+    </div>
+    <div class="filter-body">
         <form action="{{ route('admin.sales-report.index') }}" method="GET" id="filterForm">
-            <div class="row">
+            <div class="row g-3">
                 <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Date Range</label>
-                        <select name="date_range" class="form-select" id="dateRangeSelect" onchange="handleDateRangeChange()">
-                            <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
-                            <option value="yesterday" {{ request('date_range') == 'yesterday' ? 'selected' : '' }}>Yesterday</option>
-                            <option value="this_week" {{ request('date_range') == 'this_week' ? 'selected' : '' }}>This Week</option>
-                            <option value="this_month" {{ request('date_range') == 'this_month' ? 'selected' : '' }}>This Month</option>
-                            <option value="this_year" {{ request('date_range') == 'this_year' ? 'selected' : '' }}>This Year</option>
-                            <option value="custom" {{ request('date_range') == 'custom' ? 'selected' : '' }}>Custom Range</option>
-                        </select>
-                    </div>
+                    <label class="form-label">Date Range</label>
+                    <select name="date_range" class="form-select" id="dateRangeSelect" onchange="handleDateRangeChange()">
+                        <option value="today" {{ request('date_range') == 'today' ? 'selected' : '' }}>Today</option>
+                        <option value="yesterday" {{ request('date_range') == 'yesterday' ? 'selected' : '' }}>Yesterday</option>
+                        <option value="this_week" {{ request('date_range') == 'this_week' ? 'selected' : '' }}>This Week</option>
+                        <option value="this_month" {{ request('date_range') == 'this_month' ? 'selected' : '' }}>This Month</option>
+                        <option value="this_year" {{ request('date_range') == 'this_year' ? 'selected' : '' }}>This Year</option>
+                        <option value="custom" {{ request('date_range') == 'custom' ? 'selected' : '' }}>Custom Range</option>
+                    </select>
                 </div>
                 
-                <div class="col-md-4" id="customDateRange" style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Start Date</label>
-                        <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request('start_date') }}" onchange="handleCustomDateChange()">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">End Date</label>
-                        <input type="date" name="end_date" class="form-control" id="endDate" value="{{ request('end_date') }}" onchange="handleCustomDateChange()">
-                    </div>
-                </div>
-
                 <div class="col-md-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Payment Method</label>
-                        <select name="payment_method" class="form-select" onchange="submitForm()">
-                            <option value="all">All Payments</option>
-                            <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Credit/Debit Card</option>
-                            <option value="gcash" {{ request('payment_method') == 'gcash' ? 'selected' : '' }}>GCash</option>
-                            <option value="grab_pay" {{ request('payment_method') == 'grab_pay' ? 'selected' : '' }}>GrabPay</option>
-                        </select>
+                    <label class="form-label">Payment Method</label>
+                    <select name="payment_method" class="form-select" onchange="submitForm()">
+                        <option value="all">All Payments</option>
+                        <option value="card" {{ request('payment_method') == 'card' ? 'selected' : '' }}>Credit/Debit Card</option>
+                        <option value="gcash" {{ request('payment_method') == 'gcash' ? 'selected' : '' }}>GCash</option>
+                        <option value="grab_pay" {{ request('payment_method') == 'grab_pay' ? 'selected' : '' }}>GrabPay</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Custom Date Range -->
+            <div id="customDateRange" style="display: {{ request('date_range') == 'custom' ? 'block' : 'none' }};">
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request('start_date') }}" max="{{ date('Y-m-d') }}" onchange="handleCustomDateChange()">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">End Date</label>
+                        <input type="date" name="end_date" class="form-control" id="endDate" value="{{ request('end_date') }}" max="{{ date('Y-m-d') }}" onchange="handleCustomDateChange()">
                     </div>
                 </div>
             </div>
             
-            <!-- Hidden submit button for form submission -->
             <button type="submit" id="hiddenSubmit" style="display: none;"></button>
         </form>
     </div>
 </div>
 
-<!-- Improved Charts Section -->
-<div class="row mt-4">
-    <!-- Dynamic Sales Trend Chart - Improved Design -->
+<!-- Charts Section -->
+<div class="row mt-3">
+    <!-- Sales Trend Chart -->
     <div class="col-xl-8 col-lg-7">
-        <div class="card card-custom">
-            <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div class="chart-card">
+            <div class="chart-header">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-chart-line me-2"></i> 
                     <span>Sales Trend</span>
-                    <div class="badge bg-light text-dark ms-2">
+                    <span class="badge bg-white text-dark ms-2">
                         <i class="fas fa-calendar me-1"></i>{{ $salesData['dateRangeText'] }}
-                    </div>
+                    </span>
                 </div>
-                <div class="chart-actions">
-                    <button class="btn btn-sm btn-outline-success" onclick="toggleChartType()">
-                        <i class="fas fa-chart-bar"></i> Switch View
-                    </button>
-                </div>
+                <button class="btn btn-sm btn-white text-dark" onclick="toggleChartType()">
+                    <i class="fas fa-exchange-alt me-1"></i> Switch View
+                </button>
             </div>
-            <div class="card-body">
+            <div class="chart-body">
                 <div class="chart-container-enhanced">
                     <canvas id="salesTrendChart"></canvas>
                 </div>
-                <div class="chart-stats mt-3">
+                <div class="chart-stats">
                     <div class="row text-center">
                         <div class="col-4">
                             <div class="text-success fw-bold">₱{{ number_format($salesData['dailySales']->max('total') ?? 0, 2) }}</div>
@@ -345,30 +512,30 @@
         </div>
     </div>
 
-    <!-- Payment Method Chart - Improved Design -->
+    <!-- Payment Method Chart -->
     <div class="col-xl-4 col-lg-5">
-        <div class="card card-custom">
-            <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div class="chart-card">
+            <div class="chart-header">
                 <div>
                     <i class="fas fa-credit-card me-2"></i> Payment Distribution
                 </div>
-                <div class="text-white small">
+                <div class="text-white">
                     {{ $salesData['totalOrders'] }} orders
                 </div>
             </div>
-            <div class="card-body">
-                <div class="chart-container-pie">
+            <div class="chart-body">
+                <div class="chart-container-enhanced">
                     <canvas id="paymentMethodChart"></canvas>
                 </div>
-                <div class="payment-legend mt-3">
+                <div class="payment-legend">
                     @php
                         $colors = ['#2C8F0C', '#4CAF50', '#8BC34A', '#CDDC39', '#AED581'];
                     @endphp
                     @if($salesData['salesByPayment']->count() > 0)
                         @foreach($salesData['salesByPayment'] as $method => $data)
-                        <div class="payment-item d-flex justify-content-between align-items-center mb-2 p-2 rounded">
+                        <div class="payment-item d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="color-indicator me-2" style="background-color: {{ $colors[$loop->index] ?? '#2C8F0C' }}"></div>
+                                <div class="color-indicator" style="background-color: {{ $colors[$loop->index] ?? '#2C8F0C' }}"></div>
                                 <span class="fw-medium">{{ ucfirst($method) }}</span>
                             </div>
                             <div class="text-end">
@@ -378,7 +545,7 @@
                         </div>
                         @endforeach
                     @else
-                        <p class="text-muted text-center">No payment method data available.</p>
+                        <p class="text-muted text-center mb-0">No payment method data available.</p>
                     @endif
                 </div>
             </div>
@@ -387,81 +554,81 @@
 </div>
 
 <!-- Orders Table -->
-<div class="card card-custom mt-4">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <div>
+<div class="orders-card">
+    <div class="orders-header">
+        <div class="d-flex align-items-center">
             <i class="fas fa-receipt me-2"></i> Sales Orders
         </div>
         <div class="text-white">
             Showing {{ $orders->count() }} of {{ $orders->total() }} orders
         </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Order #</th>
-                        <th>Customer</th>
-                        <th>Payment Method</th>
-                        <th>Total Amount</th>
-                        <th>Items</th>
-                        <th>Delivery Date</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($orders as $order)
-                    <tr>
-                        <td>
-                            <strong>{{ $order->order_number }}</strong>
-                        </td>
-                        <td>
-                            <div class="fw-bold">{{ $order->customer_name }}</div>
-                            <small class="text-muted">{{ $order->customer_email }}</small>
-                        </td>
-                        <td>
-                            <span class="payment-method-badge">{{ $order->payment_method }}</span>
-                        </td>
-                        <td>
-                            <strong class="text-success">₱{{ number_format($order->total_amount, 2) }}</strong>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark">{{ $order->items->count() }} items</span>
-                        </td>
-                        <td>
-                            @if($order->delivered_at)
-                                <span class="text-success">
-                                    {{ $order->delivered_at->format('M j, Y g:i A') }}
-                                </span>
-                            @else
-                                <span class="text-muted">N/A</span>
-                            @endif
-                        </td>
-                        <td class="text-center">
-                            <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-success">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </td>
-                    </tr>
-                    @endforeach
-                    @if($orders->count() === 0)
-                    <tr>
-                        <td colspan="7" class="text-center py-4">
-                            <i class="fas fa-search fa-2x text-muted mb-3"></i>
-                            <p class="text-muted">No orders found for the selected filters.</p>
-                        </td>
-                    </tr>
-                    @endif
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $orders->links() }}
-        </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Payment Method</th>
+                    <th>Total Amount</th>
+                    <th>Items</th>
+                    <th>Delivery Date</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($orders as $order)
+                <tr>
+                    <td>
+                        <strong>{{ $order->order_number }}</strong>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ $order->customer_name }}</div>
+                        <small class="text-muted">{{ $order->customer_email }}</small>
+                    </td>
+                    <td>
+                        <span class="badge-success">{{ $order->payment_method }}</span>
+                    </td>
+                    <td>
+                        <strong class="text-success">₱{{ number_format($order->total_amount, 2) }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ $order->items->count() }} items</span>
+                    </td>
+                    <td>
+                        @if($order->delivered_at)
+                            <span class="text-success">
+                                {{ $order->delivered_at->format('M j, Y g:i A') }}
+                            </span>
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-search ms-1"></i>
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+                @if($orders->count() === 0)
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No orders found for the selected filters.</p>
+                    </td>
+                </tr>
+                @endif
+            </tbody>
+        </table>
     </div>
+    
+    <!-- Pagination -->
+    @if($orders->hasPages())
+    <div class="d-flex justify-content-center p-3 border-top">
+        {{ $orders->links() }}
+    </div>
+    @endif
 </div>
 @endsection
 

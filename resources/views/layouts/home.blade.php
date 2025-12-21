@@ -635,7 +635,7 @@
                         </a>
 
                         <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                            <li><a class="dropdown-item" href="{{ route('home') }}#stats">Stats</a></li>
+                            {{-- <li><a class="dropdown-item" href="{{ route('home') }}#stats">Stats</a></li> --}}
                             <li><a class="dropdown-item" href="{{ route('home') }}#about">About</a></li>
                             <li><a class="dropdown-item" href="{{ route('home') }}#featured">Featured</a></li>
                             <li><a class="dropdown-item" href="{{ route('home') }}#why-choose-us">Why Choose Us</a></li>
@@ -658,8 +658,20 @@
                         </div>
                     </li>
 
-                    @auth
-                        @if (Auth::user()->isAdmin())
+                    <!-- Cart - Icon Only -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative cart-container" href="{{ route('cart.index') }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge badge bg-danger rounded-pill" id="cartCount">0</span>
+                        </a>
+                    </li>
+
+                        @auth
+                        @if (Auth::user()->isSuperAdmin())
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('superadmin.dashboard') }}">Super Admin</a>
+                            </li>
+                        @elseif (Auth::user()->isAdmin())
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('admin.dashboard') }}">Admin</a>
                             </li>
@@ -690,7 +702,7 @@
                                     <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                         @csrf
                                         <a class="dropdown-item" href="#"
-                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                            onclick="logoutWithConfirm(event);">
                                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                                         </a>
                                     </form>
@@ -825,6 +837,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @include('components.ui-elements')
     <script>
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');

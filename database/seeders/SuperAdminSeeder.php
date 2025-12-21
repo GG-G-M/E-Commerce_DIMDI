@@ -15,15 +15,15 @@ class SuperAdminSeeder extends Seeder
             User::create([
                 'first_name' => 'Super',
                 'last_name' => 'Admin',
-                'email' => 'superadmin@system.com',
-                'password' => Hash::make('SuperAdmin@123'), // Change this in production!
+                'email' => 'superadmin@gmail.com',
+                'password' => Hash::make('12345678'), 
                 'role' => User::ROLE_SUPER_ADMIN,
                 'phone' => '0000000000',
                 'is_active' => true,
             ]);
             $this->command->info('Super admin account created!');
-            $this->command->info('Email: superadmin@system.com');
-            $this->command->info('Password: SuperAdmin@123');
+            $this->command->info('Email: superadmin@gmail.com');
+            $this->command->info('Password: 12345678');
         }
     }
 }

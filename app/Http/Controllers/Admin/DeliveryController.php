@@ -45,7 +45,7 @@ class DeliveryController extends Controller
             'vehicle_number' => $request->vehicle_number,
             'license_number' => $request->license_number,
             'password' => Hash::make($request->password),
-            'role' => 'delivery', // THIS IS CRITICAL
+            'role' => 'delivery', 
             'is_active' => $request->has('is_active'),
         ]);
 
@@ -55,7 +55,7 @@ class DeliveryController extends Controller
 
     public function show(User $delivery)
     {
-        // Ensure this is a delivery user
+        
         if ($delivery->role !== 'delivery') {
             abort(404);
         }

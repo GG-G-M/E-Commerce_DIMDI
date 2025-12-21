@@ -36,6 +36,17 @@ class RegisterController extends Controller
             'country' => 'required|string|max:100',
         ]);
 
+        // Handle encrypted password
+        $password = $request->input('password');
+        
+        // If password is base64 encoded, decode it
+        if (preg_match('/^[A-Za-z0-9+\/]*={0,2}$/', $password) && base64_decode($password, true) !== false) {
+            $decodedPassword = base64_decode($password);
+        } else {
+            // Fallback for non-encrypted passwords (backward compatibility)
+            $decodedPassword = $password;
+        }
+
         // Build full name
         $fullName = $request->first_name;
         if ($request->middle_name) {
@@ -60,7 +71,7 @@ class RegisterController extends Controller
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($decodedPassword),
             'phone' => $request->phone,
             'street_address' => $request->street_address,
             'barangay' => $barangayName,

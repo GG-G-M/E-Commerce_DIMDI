@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/Admin/BannerController.php
+// app/Http\Controllers/Admin/BannerController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -7,13 +7,57 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str; // Add this
+use Illuminate\Support\Str;
 
 class BannerController extends Controller
 {
-    public function index()
+    public function index(Request $request) // Add Request parameter
     {
-        $banners = Banner::orderBy('order')->get();
+        // Get search and filter parameters
+        $search = $request->get('search');
+        $status = $request->get('status');
+        $sortBy = $request->get('sort_by', 'order');
+        $perPage = $request->get('per_page', 10);
+        
+        // Start query
+        $query = Banner::query();
+        
+        // Apply search filter
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('alt_text', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply status filter
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+        
+        // Apply sorting
+        switch ($sortBy) {
+            case 'title':
+                $query->orderBy('title');
+                break;
+            case 'created_at':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'order':
+            default:
+                $query->orderBy('order')->orderBy('created_at', 'desc');
+                break;
+        }
+        
+        // Use paginate() instead of get()
+        $banners = $query->paginate($perPage);
+        
+        // Pass request parameters for pagination links
+        $banners->appends($request->all());
+        
         return view('admin.banners.index', compact('banners'));
     }
 
@@ -141,6 +185,28 @@ class BannerController extends Controller
             return redirect()->back()->with('success', "Banner {$status} successfully!");
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Error updating banner status: ' . $e->getMessage());
+        }
+    }
+
+    public function clear()
+    {
+        try {
+            Banner::truncate();
+            
+            // Delete all banner images from public directory
+            $directory = public_path('images/banners');
+            if (file_exists($directory)) {
+                $files = glob($directory . '/*');
+                foreach($files as $file) {
+                    if(is_file($file)) {
+                        unlink($file);
+                    }
+                }
+            }
+
+            return redirect()->back()->with('success', 'All banners cleared successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error clearing banners: ' . $e->getMessage());
         }
     }
 }

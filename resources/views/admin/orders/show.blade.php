@@ -19,7 +19,6 @@
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border-left: 4px solid var(--primary-green);
     }
     
     /* Modern Info Grid */
@@ -36,6 +35,7 @@
         padding: 1.5rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         border: 1px solid var(--medium-gray);
+        margin-bottom: 2rem;
     }
     
     .info-header {
@@ -102,15 +102,6 @@
         overflow: hidden;
     }
     
-    .shipping-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--primary-green);
-    }
     
     .shipping-header {
         display: flex;
@@ -322,6 +313,7 @@
     .badge-confirmed { background: #D1ECF1; color: #0C5460; }
     .badge-processing { background: #E8F5E6; color: var(--primary-green); }
     .badge-shipped { background: #CCE5FF; color: #004085; }
+    .badge-out-for-delivery { background: #FFE5CC; color: #CC6600; }
     .badge-delivered { background: #D4EDDA; color: #155724; }
     .badge-cancelled { background: #F8D7DA; color: #721C24; }
     
@@ -352,35 +344,57 @@
     
     .timeline-item {
         position: relative;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .timeline-item.current .timeline-marker {
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 3px var(--primary-green);
+        transform: scale(1.3);
+        animation: pulse 2s infinite;
     }
     
     .timeline-marker {
         position: absolute;
         left: -30px;
         top: 5px;
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         background: #6c757d;
         transition: all 0.3s ease;
         z-index: 2;
     }
     
-    .timeline-item.current .timeline-marker {
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 2px var(--primary-green);
-        transform: scale(1.2);
-    }
-    
     .timeline-content {
-        padding-bottom: 10px;
+        padding-bottom: 15px;
         border-left: 2px solid #e9ecef;
-        padding-left: 20px;
+        padding-left: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
     }
     
     .timeline-item:last-child .timeline-content {
         border-left-color: transparent;
+    }
+    
+    .timeline-item:hover .timeline-marker {
+        transform: scale(1.4);
+    }
+    
+    .timeline-item:hover .timeline-content {
+        border-left-color: var(--primary-green);
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin-left: -5px;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(44, 143, 12, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(44, 143, 12, 0); }
     }
     
     .timeline-marker.bg-pending { background-color: #ffc107 !important; }
@@ -389,6 +403,50 @@
     .timeline-marker.bg-shipped { background-color: #007bff !important; }
     .timeline-marker.bg-delivered { background-color: #28a745 !important; }
     .timeline-marker.bg-cancelled { background-color: #dc3545 !important; }
+    .timeline-marker.bg-out-for-delivery { background-color: #fd7e14 !important; }
+    
+    /* Delivery Proof Section */
+    .delivery-proof-card {
+        background: linear-gradient(135deg, #f8fdf8 0%, #f0f9f0 100%);
+        border: 1px solid var(--light-green);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .proof-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .proof-header i {
+        color: var(--primary-green);
+        font-size: 1.25rem;
+        margin-right: 0.5rem;
+    }
+    
+    .proof-header h6 {
+        margin: 0;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+    
+    .proof-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border: 2px solid var(--light-green);
+    }
+    
+    .proof-notes {
+        background: white;
+        border: 1px solid var(--light-green);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
 </style>
 
 <div class="page-header">
@@ -404,13 +462,26 @@
                     'confirmed' => 'badge-confirmed',
                     'processing' => 'badge-processing',
                     'shipped' => 'badge-shipped',
+                    'out_for_delivery' => 'badge-out-for-delivery',
                     'delivered' => 'badge-delivered',
                     'cancelled' => 'badge-cancelled'
                 ][$order->order_status] ?? 'badge-pending';
             @endphp
             <span class="status-badge {{ $statusClass }}">
-                <i class="fas fa-{{ $order->order_status == 'pending' ? 'clock' : ($order->order_status == 'confirmed' ? 'check' : ($order->order_status == 'processing' ? 'cog' : ($order->order_status == 'shipped' ? 'shipping-fast' : ($order->order_status == 'delivered' ? 'check-circle' : 'times')))) }}"></i>
-                {{ ucfirst($order->order_status) }}
+                @php
+                    $statusIcon = match($order->order_status) {
+                        'pending' => 'clock',
+                        'confirmed' => 'check',
+                        'processing' => 'cog',
+                        'shipped' => 'shipping-fast',
+                        'out_for_delivery' => 'truck',
+                        'delivered' => 'check-circle',
+                        'cancelled' => 'times',
+                        default => 'clock'
+                    };
+                @endphp
+                <i class="fas fa-{{ $statusIcon }}"></i>
+                {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
             </span>
         </div>
     </div>
@@ -473,13 +544,15 @@
     </div>
 
     <!-- Shipping Address -->
-    <div class="shipping-card">
-        <div class="shipping-header">
+    <div class="info-section">
+        <div class="info-header">
             <i class="fas fa-map-marker-alt"></i>
-            <h6>Shipping Address</h6>
+            <h5>Shipping Address</h5>
         </div>
-        <div class="address-content">
-            {!! nl2br(e($order->shipping_address)) !!}
+        <div class="info-content">
+            <div class="address-content">
+                {!! nl2br(e($order->shipping_address)) !!}
+            </div>
         </div>
     </div>
 </div>
@@ -497,12 +570,23 @@
                 <div class="product-row">
                     @php
                         $itemImage = $item->product->image_url;
+                        $displayUnitPrice = $item->unit_price;
+                        $displayTotalPrice = $item->total_price;
+                        
                         if ($item->selected_size && $item->selected_size !== 'Standard') {
                             $variant = $item->product->variants->first(function($v) use ($item) {
                                 return ($v->size === $item->selected_size) || ($v->variant_name === $item->selected_size);
                             });
-                            if ($variant && $variant->image) {
-                                $itemImage = $variant->image_url;
+                            
+                            if ($variant) {
+                                // Use variant-specific image if available
+                                if ($variant->image_url) {
+                                    $itemImage = $variant->image_url;
+                                }
+                                
+                                // Use variant-specific price
+                                $displayUnitPrice = $variant->has_discount ? $variant->sale_price : $variant->current_price;
+                                $displayTotalPrice = $displayUnitPrice * $item->quantity;
                             }
                         }
                     @endphp
@@ -514,9 +598,9 @@
                         <span class="product-size">{{ $item->selected_size }}</span>
                         @endif
                         <div class="product-details">
-                            <span class="product-price">₱{{ number_format($item->unit_price, 2) }}</span>
+                            <span class="product-price">₱{{ number_format($displayUnitPrice, 2) }}</span>
                             <span class="product-quantity">Qty: {{ $item->quantity }}</span>
-                            <span class="product-total">₱{{ number_format($item->total_price, 2) }}</span>
+                            <span class="product-total">₱{{ number_format($displayTotalPrice, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -534,8 +618,17 @@
                 @if($order->statusHistory->count() > 0)
                 <div class="timeline">
                     @foreach($order->statusHistory as $history)
-                    <div class="timeline-item {{ $loop->first ? 'current' : '' }}">
-                        <div class="timeline-marker bg-{{ $history->status }}"></div>
+                    @php
+                        $isCurrentStatus = $history->status === $order->order_status;
+                    @endphp
+                    <div class="timeline-item {{ $isCurrentStatus ? 'current' : '' }}">
+                        <div class="timeline-marker 
+                            {{ $history->status === 'cancelled' ? 'bg-cancelled' : 
+                               ($history->status === 'delivered' ? 'bg-delivered' : 
+                               ($history->status === 'shipped' ? 'bg-shipped' : 
+                               ($history->status === 'confirmed' ? 'bg-confirmed' : 
+                               ($history->status === 'processing' ? 'bg-processing' : 'bg-pending')))) }}">
+                        </div>
                         <div class="timeline-content">
                             <h6 class="mb-1 text-{{ $history->status === 'cancelled' ? 'danger' : 
                                ($history->status === 'delivered' ? 'success' : 
@@ -543,7 +636,9 @@
                                ($history->status === 'confirmed' ? 'info' : 
                                ($history->status === 'processing' ? 'success' : 'warning')))) }}">
                                 {{ ucfirst($history->status) }}
-                                @if($loop->first)<small class="text-muted">(Current)</small>@endif
+                                @if($isCurrentStatus)
+                                <small class="text-muted">(Current)</small>
+                                @endif
                             </h6>
                             <p class="text-muted mb-1 small">{{ $history->created_at->format('M j, Y g:i A') }}</p>
                             @if($history->notes && $history->notes !== 'Order created')
@@ -597,6 +692,70 @@
                     <i class="fas fa-save me-2"></i>Update Status
                 </button>
             </form>
+        </div>
+
+        <!-- Delivery Proof -->
+        <div class="info-section">
+            <div class="info-header">
+                <i class="fas fa-camera"></i>
+                <h5>Delivery Proof</h5>
+            </div>
+            <div class="info-content">
+                @if($order->delivery_proof_photo || $order->delivery_notes)
+                    @if($order->delivery_proof_photo)
+                    <div class="delivery-proof-card">
+                        <div class="proof-header">
+                            <i class="fas fa-camera"></i>
+                            <h6>Delivery Photo</h6>
+                        </div>
+                        <div class="text-center">
+                            <a href="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                               target="_blank" 
+                               title="Click to view full size">
+                                <img src="{{ asset('storage/' . $order->delivery_proof_photo) }}" 
+                                     alt="Delivery Proof" 
+                                     class="proof-image mb-2"
+                                     style="cursor: pointer; transition: transform 0.2s ease;"
+                                     onmouseover="this.style.transform='scale(1.05)'"
+                                     onmouseout="this.style.transform='scale(1)'"
+                                     onerror="this.src='{{ asset('images/noproduct.png') }}'; this.onerror=null;">
+                            </a>
+                            <div class="text-muted small">
+                                <i class="fas fa-search-plus me-1"></i>Click image to view full size
+                            </div>
+                            @if($order->delivered_at)
+                            <div class="text-muted small mt-1">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ $order->delivered_at->format('M j, Y h:i A') }}
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @else
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-camera fa-2x mb-2"></i>
+                        <p>No delivery photo available</p>
+                    </div>
+                    @endif
+                    
+                    @if($order->delivery_notes)
+                    <div class="delivery-proof-card">
+                        <div class="proof-header">
+                            <i class="fas fa-comment"></i>
+                            <h6>Delivery Notes</h6>
+                        </div>
+                        <div class="proof-notes">
+                            {{ $order->delivery_notes }}
+                        </div>
+                    </div>
+                    @endif
+                @else
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-info-circle fa-2x mb-2"></i>
+                        <p>No delivery proof or notes available for this order.</p>
+                    </div>
+                @endif
+            </div>
         </div>
 
         <!-- Detailed Order Summary -->

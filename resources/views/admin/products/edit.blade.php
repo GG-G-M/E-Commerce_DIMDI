@@ -94,15 +94,69 @@
         margin-top: 1rem;
         border: 1px solid #2C8F0C;
     }
+
+    /* === Green Gradient Buttons (matching Add Product button from index) === */
+    .btn-custom-green {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(44, 143, 12, 0.2);
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green:hover {
+        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(44, 143, 12, 0.3);
+        color: white;
+    }
+
+    .btn-custom-green:active {
+        transform: translateY(0);
+    }
+
+    /* Secondary green button for cancel */
+    .btn-custom-green-secondary {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        color: #6c757d;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 46px;
+        text-decoration: none;
+    }
+    
+    .btn-custom-green-secondary:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        color: #495057;
+    }
 </style>
 
 <!-- Header -->
-<div class="page-header d-flex justify-content-between align-items-center">
+{{-- <div class="page-header d-flex justify-content-between align-items-center">
     <div>
         <h1 class="h3 mb-1">Edit Product</h1>
         <p class="text-muted mb-0">Update product details and manage variants.</p>
     </div>
-</div>
+</div> --}}
 
 <!-- Product Edit Form -->
 <div class="card card-custom">
@@ -203,7 +257,7 @@
                                 <label for="stock_quantity" class="form-label">Base Stock Quantity *</label>
                                 <input type="number" class="form-control @error('stock_quantity') is-invalid @enderror"
                                        id="stock_quantity" name="stock_quantity" value="{{ old('stock_quantity', $product->stock_quantity) }}" 
-                                       {{ $product->has_variants ? 'disabled' : 'required' }} readonly @disabled(true)>
+                                       {{ $product->has_variants ? 'disabled' : 'required' }} readonly @disabled(true) @readonly(true)>
                                 @error('stock_quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -262,7 +316,7 @@
                                                 <input type="number" class="form-control stock-input" 
                                                        name="variants[{{ $index }}][stock]" 
                                                        value="{{ old('variants.'.$index.'.stock', $variant->stock_quantity) }}" 
-                                                       min="0" required>
+                                                       min="0" readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -340,11 +394,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <strong>Total Variants:</strong> 
-                                    <span class="badge bg-info" id="totalVariants">{{ $product->has_variants ? $variants->count() : 0 }}</span>
+                                    <span id="totalVariants">{{ $product->has_variants ? $variants->count() : 0 }}</span>
                                 </div>
                                 <div class="col-md-6">
                                     <strong>Total Stock:</strong> 
-                                    <span class="badge bg-success" id="totalStock">{{ $product->total_stock }} units</span>
+                                    <span id="totalStock">{{ $product->total_stock }} units</span>
                                 </div>
                             </div>
                         </div>
@@ -387,8 +441,14 @@
             </div>
 
             <div class="d-flex justify-content-end mt-4">
-                <a href="{{ route('admin.products.index') }}" class="btn btn-secondary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Update Product</button>
+                <a href="{{ route('admin.products.index') }}" class="btn-custom-green-secondary me-2">
+                    {{-- <i class="fas fa-times"></i> --}}
+                    Cancel
+                </a>
+                <button type="submit" class="btn-custom-green">
+                    {{-- <i class="fas fa-save"></i> --}}
+                    Update Product
+                </button>
             </div>
         </form>
     </div>
@@ -443,7 +503,7 @@
                             <label class="form-label">Stock Quantity *</label>
                             <input type="number" class="form-control stock-input" 
                                    name="variants[${variantCount}][stock]" 
-                                   value="0" min="0" required>
+                                   value="0" min="0" readonly>
                         </div>
                     </div>
                 </div>
@@ -587,5 +647,57 @@
 
     // Initial summary update
     updateSummary();
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        document.querySelectorAll('.upper-middle-toast').forEach(toast => toast.remove());
+        
+        const bgColors = {
+            'success': '#2C8F0C',
+            'error': '#dc3545',
+            'warning': '#ffc107',
+            'info': '#17a2b8'
+        };
+        
+        const icons = {
+            'success': 'fa-check-circle',
+            'error': 'fa-exclamation-triangle',
+            'warning': 'fa-exclamation-circle',
+            'info': 'fa-info-circle'
+        };
+        
+        const bgColor = bgColors[type] || bgColors.success;
+        const icon = icons[type] || icons.success;
+        const textColor = type === 'warning' ? 'text-dark' : 'text-white';
+        
+        const toast = document.createElement('div');
+        toast.className = 'upper-middle-toast position-fixed start-50 translate-middle-x p-3';
+        toast.style.cssText = `
+            top: 100px;
+            z-index: 9999;
+            min-width: 300px;
+            text-align: center;
+        `;
+        
+        toast.innerHTML = `
+            <div class="toast align-items-center border-0 show shadow-lg" role="alert" style="background-color: ${bgColor}; border-radius: 10px;">
+                <div class="d-flex justify-content-center align-items-center p-3">
+                    <div class="toast-body ${textColor} d-flex align-items-center">
+                        <i class="fas ${icon} me-2 fs-5"></i>
+                        <span class="fw-semibold">${message}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 3000);
+    }
 </script>
 @endpush

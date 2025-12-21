@@ -15,7 +15,7 @@ class AdminMiddleware
             return redirect()->route('login')->with('error', 'Please login to access admin area.');
         }
 
-        if (!Auth::user()->isAdmin()) {
+        if (!Auth::user()->isAdmin() && !Auth::user()->isSuperAdmin()) {
             return redirect()->route('home')->with('error', 'Unauthorized access.');
         }
 

@@ -4,7 +4,7 @@
 <head>
     <title>Sales Report - {{ date('Y-m-d') }}</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body { font-family: 'Arial', sans-serif; margin: 20px; font-size: 12px; }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
         .summary { margin-bottom: 20px; }
         .summary-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
@@ -27,9 +27,9 @@
     <div class="summary">
         <h3>Summary</h3>
         <div class="summary-card">
-            <p><strong>Total Sales:</strong> ₱{{ number_format($salesData['totalSales'], 2) }}</p>
+            <p><strong>Total Sales:</strong> {{ pdf_currency($salesData['totalSales']) }}</p>
             <p><strong>Total Orders:</strong> {{ $salesData['totalOrders'] }}</p>
-            <p><strong>Average Order Value:</strong> ₱{{ number_format($salesData['averageOrderValue'], 2) }}</p>
+            <p><strong>Average Order Value:</strong> {{ pdf_currency($salesData['averageOrderValue']) }}</p>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
         @foreach($salesData['salesByPayment'] as $method => $data)
         <div class="payment-method">
             <strong>{{ ucfirst($method) }}:</strong> 
-            ₱{{ number_format($data['total'], 2) }} ({{ $data['count'] }} orders, {{ number_format($data['percentage'], 1) }}%)
+            {{ pdf_currency($data['total']) }} ({{ $data['count'] }} orders, {{ number_format($data['percentage'], 1) }}%)
         </div>
         @endforeach
     </div>
@@ -62,7 +62,7 @@
                     <td>{{ $order->order_number }}</td>
                     <td>{{ $order->customer_name }}</td>
                     <td>{{ $order->payment_method }}</td>
-                    <td>₱{{ number_format($order->total_amount, 2) }}</td>
+                    <td>{{ pdf_currency($order->total_amount) }}</td>
                     <td>{{ $order->items->count() }}</td>
                     <td>{{ $order->delivered_at ? $order->delivered_at->format('M j, Y') : 'N/A' }}</td>
                 </tr>

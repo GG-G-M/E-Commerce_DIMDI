@@ -32,6 +32,32 @@ class StockOutController extends Controller
             'reason' => 'nullable|string|max:255',
         ]);
 
+        // Check available stock before proceeding
+        $availableStock = StockIn::where('product_id', $request->product_id)
+            ->when($request->product_variant_id, function ($query) use ($request) {
+                return $query->where('product_variant_id', $request->product_variant_id);
+            })
+            ->when(!$request->product_variant_id, function ($query) {
+                return $query->where(function ($q) {
+                    $q->whereNull('product_variant_id')
+                      ->orWhereNotNull('product_variant_id');
+                });
+            })
+            ->where('remaining_quantity', '>', 0)
+            ->sum('remaining_quantity');
+
+        if ($request->quantity > $availableStock) {
+            $errorMessage = "Insufficient stock. Requested quantity ({$request->quantity}) exceeds available stock ({$availableStock}).";
+            
+            if ($isAuto) {
+                throw new \Exception($errorMessage);
+            }
+            
+            return back()
+                ->withInput()
+                ->withErrors(['quantity' => $errorMessage]);
+        }
+
         // If variant is selected, force product_id to match variant
         $variant = null;
         if ($request->product_variant_id) {
@@ -123,6 +149,30 @@ class StockOutController extends Controller
             'quantity' => 'required|integer|min:1',
             'reason' => 'nullable|string|max:255',
         ]);
+
+        // Check available stock before proceeding (accounting for current stock-out record)
+        $availableStock = StockIn::where('product_id', $request->product_id)
+            ->when($request->product_variant_id, function ($query) use ($request) {
+                return $query->where('product_variant_id', $request->product_variant_id);
+            })
+            ->when(!$request->product_variant_id, function ($query) {
+                return $query->where(function ($q) {
+                    $q->whereNull('product_variant_id')
+                      ->orWhereNotNull('product_variant_id');
+                });
+            })
+            ->where('remaining_quantity', '>', 0)
+            ->sum('remaining_quantity');
+
+        // Add back the current stock-out quantity since we're updating it
+        $netAvailableStock = $availableStock + $stockOut->quantity;
+
+        if ($request->quantity > $netAvailableStock) {
+            $errorMessage = "Insufficient stock. Requested quantity ({$request->quantity}) exceeds available stock ({$netAvailableStock}).";
+            return back()
+                ->withInput()
+                ->withErrors(['quantity' => $errorMessage]);
+        }
 
         $variant = null;
         if ($request->product_variant_id) {
@@ -226,5 +276,39 @@ class StockOutController extends Controller
         ]);
 
         return $this->store($request, true);
+    }
+
+    /**
+     * Check available stock for a product or variant
+     */
+    public function checkStock(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:product_variants,id',
+        ]);
+
+        $productId = $request->product_id;
+        $variantId = $request->variant_id;
+
+        // Calculate available stock using FIFO (same logic as stock-out)
+        $availableStock = StockIn::where('product_id', $productId)
+            ->when($variantId, function ($query) use ($variantId) {
+                return $query->where('product_variant_id', $variantId);
+            })
+            ->when(!$variantId, function ($query) {
+                return $query->where(function ($q) {
+                    $q->whereNull('product_variant_id')
+                      ->orWhereNotNull('product_variant_id');
+                });
+            })
+            ->where('remaining_quantity', '>', 0)
+            ->sum('remaining_quantity');
+
+        return response()->json([
+            'available_stock' => (int) $availableStock,
+            'product_id' => $productId,
+            'variant_id' => $variantId,
+        ]);
     }
 }

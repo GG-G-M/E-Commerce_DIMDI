@@ -4,296 +4,390 @@
 
 @section('content')
 <style>
+    /* === Consistent Green Theme === */
+    .card-custom {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        color: white;
+        font-weight: 600;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    /* Dashboard Header */
     .dashboard-header {
         background: white;
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         border-left: 4px solid #2C8F0C;
     }
     
-    .section-card {
-        border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin-bottom: 1.5rem;
+    /* Table Styling - Compact */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.9rem;
     }
-    
-    .section-card .card-header {
-        background: white;
-        border-bottom: 2px solid #E8F5E6;
-        font-weight: 600;
-        color: #2C8F0C;
-        padding: 1rem 1.5rem;
-    }
-    
+
     .table th {
         background-color: #E8F5E6;
         color: #2C8F0C;
         font-weight: 600;
         border-bottom: 2px solid #2C8F0C;
+        padding: 0.75rem 0.5rem;
+        white-space: nowrap;
     }
-    
-    .btn-success {
-        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
-        border: none;
-        font-weight: 500;
+
+    .table td {
+        padding: 0.75rem 0.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
     }
-    
-    .btn-success:hover {
-        background: linear-gradient(135deg, #1E6A08, #2C8F0C);
-        transform: translateY(-1px);
+
+    .table tbody tr:hover {
+        background-color: #F8FDF8;
+        transition: background-color 0.2s ease;
     }
-    
+
+    /* Alternating row colors */
+    .table tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #F8FDF8;
+    }
+
+    /* Update the button styles to match pick up button design */
+.btn-outline-success-custom {
+     background: white;
+    color: #2C8F0C;
+    border: 2px solid rgba(44, 143, 12, 0.3);
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: fit-content;
+    height: auto;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-outline-success-custom:hover {
+    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(44, 143, 12, 0.3);
+}
+
+/* If you want the active button to look different */
+.btn-outline-success-custom.active {
+    background: linear-gradient(135deg, #1E6A08, #2C8F0C);
+    box-shadow: 0 0 0 2px rgba(44, 143, 12, 0.3);
+}
+
+/* Update quick filter buttons to also match */
+.btn-outline-success-custom {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Make sure header buttons have proper spacing */
+.header-buttons .btn {
+    margin: 0;
+    font-size: 0.9rem;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    /* Search Box */
+    .search-box {
+        border-radius: 8px;
+        border: 1px solid #C8E6C9;
+        transition: border-color 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .search-box:focus {
+        border-color: #2C8F0C;
+        box-shadow: 0 0 0 0.15rem rgba(44,143,12,0.2);
+    }
+
+    /* Filter Buttons */
     .filter-active {
         background-color: #2C8F0C !important;
         color: white !important;
         border-color: #2C8F0C !important;
     }
+
+   
     
-    .search-box {
-        border-radius: 8px;
-        border: 1px solid #E8F5E6;
-        padding: 0.5rem 1rem;
-    }
-    
-    .search-box:focus {
-        border-color: #2C8F0C;
-        box-shadow: 0 0 0 0.2rem rgba(44, 143, 12, 0.25);
-    }
-    
-    .table-hover tbody tr:hover {
-        background-color: rgba(44, 143, 12, 0.05);
-    }
-    
+   
+    /* Empty State */
     .empty-state {
-        padding: 3rem 1rem;
         text-align: center;
-        color: #6c757d;
+        padding: 3rem 1rem;
     }
-    
+
     .empty-state i {
         font-size: 3rem;
+        color: #C8E6C9;
         margin-bottom: 1rem;
-        opacity: 0.5;
     }
-    
-    .status-available {
-        color: #28a745;
+
+    /* Table Container */
+    .table-container {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        max-width: 100%;
+    }
+
+    /* Column widths - More compact */
+    .order-col { width: 100px; min-width: 100px; }
+    .customer-col { width: 180px; min-width: 180px; }
+    .amount-col { width: 120px; min-width: 120px; }
+    .status-col { width: 130px; min-width: 130px; }
+    .assignment-col { width: 120px; min-width: 120px; }
+    .date-col { width: 100px; min-width: 100px; }
+
+    /* Customer Info */
+    .customer-name {
         font-weight: 600;
+        color: #333;
+        font-size: 0.85rem;
+        line-height: 1.2;
+        text-align: left;
     }
     
-    .status-my-order {
-        color: #007bff;
-        font-weight: 600;
-    }
-    
-    .status-assigned {
+    .customer-phone {
         color: #6c757d;
+        font-size: 0.75rem;
+        text-align: left;
+    }
+
+    /* Status and Assignment Styling */
+    .status-col span,
+    .assignment-col span {
+        text-align: left;
+        display: block;
+    }
+
+    /* Amount Styling */
+    .amount-text {
+        font-weight: 700;
+        color: #2C8F0C;
+        font-size: 0.9rem;
+        text-align: left;
+        display: block;
+    }
+
+    /* Order Number Styling */
+    .order-number {
+        text-align: left;
+        display: block;
         font-weight: 600;
     }
+
+    /* Date Styling */
+    .date-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-align: left;
+    }
+
+    .time-text {
+        font-size: 0.75rem;
+        color: #adb5bd;
+        text-align: left;
+    }
+
+    /* Pagination styling - Consistent */
+    .pagination .page-item .page-link {
+        color: #2C8F0C;
+        border: 1px solid #dee2e6;
+        margin: 0 1px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.85rem;
+    }
     
-    .status-processing { color: #ffc107; font-weight: 600; }
-    .status-shipped { color: #17a2b8; font-weight: 600; }
-    .status-out-for-delivery { color: #fd7e14; font-weight: 600; }
-    .status-delivered { color: #28a745; font-weight: 600; }
-    .status-cancelled { color: #dc3545; font-weight: 600; }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2C8F0C, #4CAF50);
+        border-color: #2C8F0C;
+        color: white;
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+        background-color: #E8FDF8;
+        border-color: #2C8F0C;
+        color: #2C8F0C;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+    }
+
+
+    /* Header button group */
+    .header-buttons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .header-buttons .btn {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Ensure header buttons content aligns left */
+    .header-buttons .btn i {
+        margin-right: 6px;
+    }
+
+    /* Form Styling */
+    .form-label {
+        font-weight: 600;
+        color: #2C8F0C;
+        font-size: 0.9rem;
+    }
+
+
+
+    /* Make table more compact on mobile */
+    @media (max-width: 768px) {
+        .header-buttons {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .table th,
+        .table td {
+            padding: 0.5rem 0.25rem;
+        }
+        
+       
+        .customer-name {
+            font-size: 0.8rem;
+        }
+        
+        .btn-outline-success-custom,
+        .btn-success-custom {
+            padding: 0.4rem 0.7rem;
+            font-size: 0.8rem;
+        }
+    }
 </style>
 
-<div class="dashboard-header">
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <h1 class="h3 mb-1" style="color: #2C8F0C; font-weight: 700;">All Orders</h1>
-            <p class="mb-0 text-muted">Manage and track all delivery orders in one place.</p>
-        </div>
-        <div class="text-end">
-            <small class="text-muted">Total Orders: {{ $orders->total() }}</small>
-        </div>
-    </div>
-</div>
 
-<!-- Filter and Search Section -->
-<div class="card section-card mb-4">
-    <div class="card-body">
-        <form id="filterForm" method="GET" action="{{ route('delivery.orders.index') }}">
-            <div class="row align-items-end">
-                <!-- Search Box -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold text-muted mb-2">Search Orders</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control search-box" name="search" 
-                               placeholder="Search by order number, customer name..." 
-                               value="{{ request('search') }}">
-                        <button class="btn btn-success" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Status Filter -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold text-muted mb-2">Order Status</label>
-                    <select class="form-select search-box" name="status" onchange="document.getElementById('filterForm').submit()">
-                        <option value="">All Statuses</option>
-                        <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
-                        <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                        <option value="out_for_delivery" {{ request('status') == 'out_for_delivery' ? 'selected' : '' }}>Out for Delivery</option>
-                        <option value="delivered" {{ request('status') == 'delivered' ? 'selected' : '' }}>Delivered</option>
-                        <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                    </select>
-                </div>
-
-                <!-- Assignment Filter -->
-                <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold text-muted mb-2">Assignment</label>
-                    <select class="form-select search-box" name="assignment" onchange="document.getElementById('filterForm').submit()">
-                        <option value="">All Assignments</option>
-                        <option value="available" {{ request('assignment') == 'available' ? 'selected' : '' }}>Available for Pickup</option>
-                        <option value="my_orders" {{ request('assignment') == 'my_orders' ? 'selected' : '' }}>My Orders</option>
-                        <option value="assigned" {{ request('assignment') == 'assigned' ? 'selected' : '' }}>Assigned to Others</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Quick Filter Buttons -->
-            <div class="row mt-3">
-                <div class="col-12">
-                    <label class="form-label fw-bold text-muted mb-2">Quick Filters</label>
-                    <div class="btn-group" role="group">
-                        <input type="radio" class="btn-check" name="date_filter" value="today" id="today" 
-                               {{ request('date_filter') == 'today' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="today">Today</label>
-
-                        <input type="radio" class="btn-check" name="date_filter" value="week" id="week" 
-                               {{ request('date_filter') == 'week' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="week">This Week</label>
-
-                        <input type="radio" class="btn-check" name="date_filter" value="month" id="month" 
-                               {{ request('date_filter') == 'month' ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="month">This Month</label>
-
-                        <input type="radio" class="btn-check" name="date_filter" value="" id="all_dates" 
-                               {{ !request('date_filter') ? 'checked' : '' }} autocomplete="off">
-                        <label class="btn btn-outline-success" for="all_dates">All Dates</label>
-                    </div>
-
-                    <!-- Reset Filters -->
-                    @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
-                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-outline-secondary ms-2">
-                        <i class="fas fa-times me-1"></i> Clear Filters
-                    </a>
-                    @endif
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
 
 @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+    <div class="alert alert-danger border-danger" style="background-color: #FFEBEE; border-color: #FFCDD2;" role="alert">
+        <i class="fas fa-exclamation-circle me-2" style="color: #C62828;"></i> 
+        <strong style="color: #C62828;">{{ session('error') }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 @endif
 
 <!-- Orders Table -->
-<div class="card section-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold">
-            <i class="fas fa-list me-2"></i>Orders List
-            @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
-                <small class="text-muted ms-2">(Filtered Results)</small>
-            @endif
-        </h6>
-        <div class="btn-group">
-            <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-sm btn-outline-success">
-                <i class="fas fa-box me-1"></i> Available Orders
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Orders Management</h5>
+        <div class="header-buttons">
+            <a href="{{ route('delivery.orders.pickup') }}" class="btn btn-outline-success-custom">
+                <i class="fas fa-box"></i> Available
             </a>
-            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-sm btn-outline-success">
-                <i class="fas fa-list me-1"></i> My Orders
+            <a href="{{ route('delivery.orders.my-orders') }}" class="btn btn-outline-success-custom">
+                <i class="fas fa-list"></i> My Orders
             </a>
         </div>
     </div>
     
     <div class="card-body p-0">
         @if($orders->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
                     <thead>
                         <tr>
-                            <th>Order #</th>
-                            <th>Customer</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                            <th>Assignment</th>
-                            <th>Order Date</th>
-                            <th>Actions</th>
+                            <th class="order-col text-start">Order #</th>
+                            <th class="customer-col text-start">Customer</th>
+                            <th class="amount-col text-start">Amount</th>
+                            <th class="status-col text-start">Status</th>
+                            <th class="assignment-col text-start">Assignment</th>
+                            <th class="date-col text-start">Order Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($orders as $order)
                         <tr>
-                            <td>
-                                <strong class="text-dark">#{{ $order->order_number }}</strong>
+                            <td class="order-col text-start">
+                                <strong class="text-dark order-number">#{{ $order->order_number }}</strong>
                             </td>
-                            <td>
+                            <td class="customer-col text-start">
                                 <div>
-                                    <strong>{{ $order->customer_name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ $order->customer_phone }}</small>
+                                    <div class="customer-name">{{ $order->customer_name }}</div>
+                                    <div class="customer-phone">{{ $order->customer_phone }}</div>
                                 </div>
                             </td>
-                            <td class="fw-bold text-success">
-                                ₱{{ number_format($order->total_amount, 2) }}
+                            <td class="amount-col text-start">
+                                <div class="amount-text">₱{{ number_format($order->total_amount, 2) }}</div>
                             </td>
-                            <td>
-                                <span class="status-{{ str_replace('_', '-', $order->order_status) }}">
-                                    {{ ucfirst(str_replace('_', ' ', $order->order_status)) }}
-                                </span>
+                            <td class="status-col text-start">
+                                @php
+                                    $statusClass = '' . str_replace('_', '-', $order->order_status);
+                                    $statusText = ucfirst(str_replace('_', ' ', $order->order_status));
+                                @endphp
+                                <span class="{{ $statusClass }}">{{ $statusText }}</span>
                             </td>
-                            <td>
+                            <td class="assignment-col text-start">
                                 @if(is_null($order->delivery_id))
-                                    <span class="status-available">Available</span>
+                                    <span >Available</span>
                                 @elseif($order->delivery_id == Auth::id())
-                                    <span class="status-my-order">My Order</span>
+                                    <span >My Order</span>
                                 @else
-                                    <span class="status-assigned">Assigned</span>
+                                    <span>Assigned</span>
                                 @endif
                             </td>
-                            <td>
-                                <small class="text-muted">
-                                    {{ $order->created_at->format('M j, Y') }}
-                                </small>
-                            </td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    
-                                    @if(is_null($order->delivery_id) && $order->order_status == 'processing')
-                                    <form action="{{ route('delivery.orders.pickup-order', $order) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-hand-paper"></i> Pick Up
-                                        </button>
-                                    </form>
-                                    @endif
-
-                                    @if($order->delivery_id == Auth::id() && in_array($order->order_status, ['shipped', 'out_for_delivery']))
-                                    <form action="{{ route('delivery.orders.deliver-order', $order) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-warning" 
-                                                onclick="return confirm('Mark order #{{ $order->order_number }} as delivered?')">
-                                            <i class="fas fa-check"></i> Deliver
-                                        </button>
-                                    </form>
-                                    @endif
+                            <td class="date-col text-start">
+                                <div class="date-text">{{ $order->created_at->format('M j, Y') }}</div>
+                                <div class="time-text" style="font-size: 0.75rem; color: #adb5bd;">
+                                    {{ $order->created_at->format('h:i A') }}
                                 </div>
                             </td>
                         </tr>
@@ -302,36 +396,35 @@
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="card-footer bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-muted">
-                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
-                        </small>
-                    </div>
-                    <div>
-                        {{ $orders->links() }}
-                    </div>
+            @if($orders->hasPages())
+            <div class="d-flex justify-content-between align-items-center p-3">
+                <div>
+                    <small class="text-muted">
+                        Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
+                    </small>
+                </div>
+                <div>
+                    {{ $orders->links('pagination::bootstrap-5') }}
                 </div>
             </div>
+            @endif
         @else
-            <div class="empty-state">
+            <div class="empty-state p-5">
                 <i class="fas fa-box-open"></i>
                 <h5 class="text-muted">No Orders Found</h5>
-                <p class="text-muted mb-3">
+                <p class="text-muted mb-4">
                     @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
-                        No orders match your current filters.
+                        No orders match your current filters. Try adjusting your search criteria.
                     @else
                         There are no orders available at the moment.
                     @endif
                 </p>
                 @if(request()->hasAny(['search', 'status', 'assignment', 'date_filter']))
-                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-success">
+                    <a href="{{ route('delivery.orders.index') }}" class="btn btn-success-custom">
                         <i class="fas fa-times me-1"></i> Clear Filters
                     </a>
                 @else
-                    <a href="{{ route('delivery.dashboard') }}" class="btn btn-success">
+                    <a href="{{ route('delivery.dashboard') }}" class="btn btn-success-custom">
                         <i class="fas fa-tachometer-alt me-1"></i> Back to Dashboard
                     </a>
                 @endif

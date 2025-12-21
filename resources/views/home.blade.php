@@ -1,7 +1,7 @@
 @extends('layouts.home')
 
 @section('content')
-    
+
     <!-- Main Content -->
     <main>
         <!-- Hero Section -->
@@ -24,7 +24,7 @@
         </section>
 
         <!-- Stats Section -->
-        <section class="stats-section" id="stats">
+        {{-- <section class="stats-section" id="stats">
 
             <div class="container">
                 <div class="row">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> --}}
 
         <!-- About Section -->
         <section class="about-section" id="about">
@@ -126,7 +126,9 @@
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             @if ($product->has_discount)
-                                                <span class="text-danger fw-bold">₱{{ $product->sale_price }}</span>
+                                                <span class="text-success fw-bold">
+                                                    ₱{{ number_format($product->sale_price, 2) }}
+                                                </span>
                                                 <span
                                                     class="text-muted text-decoration-line-through">₱{{ $product->price }}</span>
                                             @else
@@ -273,148 +275,158 @@
                     </div>
                 </div>
             </div>
-        </section>
+            </section>
 
-        <section class="testimonials-section" id="testimonials">
-        <section class="testimonials-section">
-            <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="section-title">What Our Customers Say</h2>
-                        <p class="lead text-muted">Hear from homeowners who transformed their spaces with DIMDI</p>
-                    </div>
-                </div>
+            <section class="testimonials-section" id="testimonials">
+                <section class="testimonials-section">
+                    <div class="container">
+                        <div class="row mb-5">
+                            <div class="col-12 text-center">
+                                <h2 class="section-title">What Our Customers Say</h2>
+                                <p class="lead text-muted">Hear from homeowners who transformed their spaces with DIMDI</p>
+                            </div>
+                        </div>
 
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"The quality of furniture from DIMDI exceeded my expectations. Our
-                                living room has never looked better, and the delivery team was professional and careful with
-                                installation."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
-                                    alt="Sarah Johnson" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Sarah Johnson</h5>
-                                    <p>Homeowner</p>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <p class="testimonial-text">"The quality of furniture from DIMDI exceeded my
+                                        expectations. Our
+                                        living room has never looked better, and the delivery team was professional and
+                                        careful with
+                                        installation."</p>
+                                    <div class="testimonial-author">
+                                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                                            alt="Sarah Johnson" class="author-avatar">
+                                        <div class="author-info">
+                                            <h5>Sarah Johnson</h5>
+                                            <p>Homeowner</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <p class="testimonial-text">"I was hesitant to buy appliances online, but DIMDI made
+                                        the
+                                        process seamless. The refrigerator and oven we purchased have been working perfectly
+                                        for
+                                        over a year now."</p>
+                                    <div class="testimonial-author">
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                                            alt="Michael Chen" class="author-avatar">
+                                        <div class="author-info">
+                                            <h5>Michael Chen</h5>
+                                            <p>Interior Designer</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="testimonial-card">
+                                    <p class="testimonial-text">"The bedroom set we bought from DIMDI completely
+                                        transformed our
+                                        space. The quality is exceptional, and the customer service was outstanding
+                                        throughout the
+                                        process."</p>
+                                    <div class="testimonial-author">
+                                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+                                            alt="Emily Rodriguez" class="author-avatar">
+                                        <div class="author-info">
+                                            <h5>Emily Rodriguez</h5>
+                                            <p>Home Stager</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"I was hesitant to buy appliances online, but DIMDI made the
-                                process seamless. The refrigerator and oven we purchased have been working perfectly for
-                                over a year now."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
-                                    alt="Michael Chen" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Michael Chen</h5>
-                                    <p>Interior Designer</p>
+                </section>
+
+                <!-- Contact Section -->
+                <section class="contact-section" id="contact">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-6 mb-5 mb-lg-0">
+                                <h2 class="section-title">Visit Our Store</h2>
+                                <p class="about-text mb-4">Come experience our products in person at our flagship showroom.
+                                    Our
+                                    design consultants are ready to help you create the home of your dreams.</p>
+
+                                <div class="contact-info">
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Our Location</h5>
+                                            <p class="text-muted">123 Home Design District, Furniture Street, Cityville
+                                                12345</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Call Us</h5>
+                                            <p class="text-muted">+1 (555) 123-4567</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Email Us</h5>
+                                            <p class="text-muted">info@dimdistore.com</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div>
+                                            <h5>Store Hours</h5>
+                                            <p class="text-muted">Mon-Sat: 9AM-8PM, Sun: 11AM-6PM</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="bg-light p-4 rounded-3 h-100">
+                                    <h4 class="mb-4">Get In Touch</h4>
+                                    <form>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <input type="text" class="form-control" placeholder="Your Name"
+                                                    required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="email" class="form-control" placeholder="Your Email"
+                                                    required>
+                                            </div>
+                                            <div class="col-12">
+                                                <input type="text" class="form-control" placeholder="Subject">
+                                            </div>
+                                            <div class="col-12">
+                                                <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-primary w-100"
+                                                    style="background-color: var(--primary-green); border-color: var(--primary-green); padding: 0.8rem;">Send
+                                                    Message</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="testimonial-card">
-                            <p class="testimonial-text">"The bedroom set we bought from DIMDI completely transformed our
-                                space. The quality is exceptional, and the customer service was outstanding throughout the
-                                process."</p>
-                            <div class="testimonial-author">
-                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
-                                    alt="Emily Rodriguez" class="author-avatar">
-                                <div class="author-info">
-                                    <h5>Emily Rodriguez</h5>
-                                    <p>Home Stager</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section class="contact-section" id="contact">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 mb-5 mb-lg-0">
-                        <h2 class="section-title">Visit Our Store</h2>
-                        <p class="about-text mb-4">Come experience our products in person at our flagship showroom. Our
-                            design consultants are ready to help you create the home of your dreams.</p>
-
-                        <div class="contact-info">
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </div>
-                                <div>
-                                    <h5>Our Location</h5>
-                                    <p class="text-muted">123 Home Design District, Furniture Street, Cityville 12345</p>
-                                </div>
-                            </div>
-
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-phone"></i>
-                                </div>
-                                <div>
-                                    <h5>Call Us</h5>
-                                    <p class="text-muted">+1 (555) 123-4567</p>
-                                </div>
-                            </div>
-
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div>
-                                    <h5>Email Us</h5>
-                                    <p class="text-muted">info@dimdistore.com</p>
-                                </div>
-                            </div>
-
-                            <div class="contact-item">
-                                <div class="contact-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div>
-                                    <h5>Store Hours</h5>
-                                    <p class="text-muted">Mon-Sat: 9AM-8PM, Sun: 11AM-6PM</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="bg-light p-4 rounded-3 h-100">
-                            <h4 class="mb-4">Get In Touch</h4>
-                            <form>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control" placeholder="Your Name" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="email" class="form-control" placeholder="Your Email" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <input type="text" class="form-control" placeholder="Subject">
-                                    </div>
-                                    <div class="col-12">
-                                        <textarea class="form-control" rows="5" placeholder="Your Message" required></textarea>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary w-100"
-                                            style="background-color: var(--primary-green); border-color: var(--primary-green); padding: 0.8rem;">Send
-                                            Message</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+                </section>
     </main>
 
     <script>

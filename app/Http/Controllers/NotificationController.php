@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
 use App\Models\Order;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,8 +38,8 @@ class NotificationController extends Controller
         // Mark notification as read
         $notification->markAsRead();
         
-        // Redirect to order page which has receipt
-        return redirect()->route('orders.show', $order);
+        // Render receipt view (allows download/preview using the notification id)
+        return view('receipt.view', compact('order', 'notification'));
     }
     
     public function downloadReceipt($id)
@@ -139,11 +139,44 @@ class NotificationController extends Controller
     
     public function checkNew()
     {
+        // If this is not an AJAX request, redirect to the notifications index page
+        if (!request()->ajax()) {
+            return redirect()->route('notifications.index');
+        }
+        
+        // Only return JSON for AJAX requests
+        if (!Auth::check()) {
+            return response()->json([
+                'error' => 'Not authenticated',
+                'new_count' => 0,
+                'latest' => null
+            ], 401);
+        }
+        
         $count = Auth::user()->unreadNotifications()->count();
+        $latest = null;
+        
+        // Get the latest notification if there are unread ones
+        if ($count > 0) {
+            $latestNotification = Auth::user()->unreadNotifications()
+                ->latest()
+                ->first();
+                
+            $latest = [
+                'message' => $latestNotification->data['message'] ?? 'New notification',
+                'order_number' => $latestNotification->data['order_number'] ?? null,
+                'status_display' => $latestNotification->data['status_display'] ?? null,
+                'icon' => $latestNotification->data['icon'] ?? 'fas fa-bell',
+                'color' => $latestNotification->data['color'] ?? 'primary',
+                'url' => $latestNotification->data['url'] ?? '#',
+                'created_at' => $latestNotification->created_at->diffForHumans()
+            ];
+        }
         
         return response()->json([
+            'new_count' => $count,
             'has_new' => $count > 0,
-            'count' => $count
+            'latest' => $latest
         ]);
     }
     

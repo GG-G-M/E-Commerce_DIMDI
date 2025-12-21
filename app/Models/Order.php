@@ -40,6 +40,10 @@ class Order extends Model
         'refund_method',
         'refund_notes',
         'refund_processed_at',
+        'delivery_proof_photo',
+        'delivery_notes',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
@@ -275,13 +279,8 @@ class Order extends Model
             'order_status' => 'delivered',
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order successfully delivered to customer',
-            ]);
-        }
+        // NOTE: Status history is created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }
@@ -316,6 +315,20 @@ class Order extends Model
      */
     public function reduceStock(): self
     {
+        // Load items with product and variants relationships if not already loaded
+        if (!$this->relationLoaded('items')) {
+            $this->load('items.product.variants');
+        } else {
+            // If items are loaded but product/variants aren't, load them
+            foreach ($this->items as $item) {
+                if (!$item->relationLoaded('product')) {
+                    $item->load('product.variants');
+                } elseif ($item->product && !$item->product->relationLoaded('variants')) {
+                    $item->product->load('variants');
+                }
+            }
+        }
+
         foreach ($this->items as $item) {
             if ($item->product) {
                 // If a variant was selected, deduct from variant stock
@@ -522,6 +535,8 @@ class Order extends Model
         });
     }
 
+
+
     // ========== ADDED METHODS FOR DELIVERY FLOW ==========
 
     /**
@@ -575,13 +590,8 @@ class Order extends Model
             'delivered_at' => now(),
         ]);
 
-        // Create status history
-        if ($this->relationLoaded('statusHistory') || method_exists($this, 'statusHistory')) {
-            $this->statusHistory()->create([
-                'status' => 'delivered',
-                'notes' => 'Order delivered to customer by delivery personnel',
-            ]);
-        }
+        // NOTE: Status history should be created by updateStatus() method to avoid duplicates
+        // This method only handles the delivered_at timestamp and order_status update
 
         return $this;
     }

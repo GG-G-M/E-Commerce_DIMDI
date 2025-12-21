@@ -266,7 +266,7 @@
                                             <i class="fas fa-user-plus me-2"></i>Create User
                                         </a>
                                     </li>
-                                    <li class="nav-item">
+                                    <!-- <li class="nav-item">
                                         <a class="nav-link {{ request()->routeIs('admin.customers.index') ? 'active' : '' }}"
                                             href="{{ route('admin.customers.index') }}">
                                             <i class="fas fa-user-tag me-2"></i>Customers
@@ -283,12 +283,12 @@
                                             href="{{ route('admin.stock_checkers.index') }}">
                                             <i class="fas fa-user-check me-2"></i>Stock Checkers
                                         </a>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- System Access -->
+                        <!-- System Access
                         <li class="nav-item">
                             <a class="nav-link collapsed" data-bs-toggle="collapse" href="#systemAccessMenu"
                                 role="button" aria-expanded="false" aria-controls="systemAccessMenu">
@@ -384,15 +384,24 @@
                                     </li>
                                 </ul>
                             </div>
-                        </li>
+                        </li> -->
 
                         <!-- Settings -->
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}"
                                 href="{{ route('superadmin.settings') }}">
                                 <i class="fas fa-sliders-h me-2"></i>System Settings
                             </a>
+                        </li> --}}
+
+                        <!-- Audit Log -->
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('superadmin.audits.*') ? 'active' : '' }}"
+                                href="{{ route('superadmin.audits.index') }}">
+                                <i class="fas fa-clipboard-list me-2"></i>Audit Log
+                            </a>
                         </li>
+
 
                         <!-- Quick Links -->
                         <li class="nav-item mt-4">
@@ -405,11 +414,11 @@
                                 <i class="fas fa-user-shield me-2"></i>Admin Panel
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('delivery.dashboard') }}">
                                 <i class="fas fa-truck me-2"></i>Delivery Panel
                             </a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('home') }}">
                                 <i class="fas fa-store me-2"></i>View Store
@@ -419,7 +428,7 @@
                         <!-- Logout -->
                         <li class="nav-item mt-4">
                             <a href="{{ route('logout') }}" class="nav-link"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                onclick="logoutWithConfirm(event);">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -447,6 +456,13 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <div class="collapse navbar-collapse" id="superAdminNavbar">
+                            <ul class="navbar-nav me-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link btn btn-outline-success me-2" href="{{ route('superadmin.dashboard') }}">
+                                        <i class="fas fa-crown me-1"></i>Super Admin Dashboard
+                                    </a>
+                                </li>
+                            </ul>
                             <ul class="navbar-nav ms-auto">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
@@ -499,6 +515,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @include('components.ui-elements')
     <script>
         // Auto-collapse other menus when one is opened
         document.addEventListener('DOMContentLoaded', function() {

@@ -9,6 +9,8 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use League\Csv\Reader;
 use League\Csv\Statement;
@@ -20,7 +22,15 @@ class ProductController extends Controller
     {
         $search = $request->get('search');
         $categoryId = $request->get('category_id');
+        $brandId = $request->get('brand_id');
         $status = $request->get('status', 'active');
+
+        // Respect per_page selection from the UI (fall back to 10)
+        $perPage = (int) $request->get('per_page', 10);
+        $allowedPerPage = [5, 10, 15, 25, 50];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
 
         $products = Product::with(['category', 'variants'])
             ->when($search, function ($query) use ($search) {
@@ -29,14 +39,18 @@ class ProductController extends Controller
             ->when($categoryId, function ($query) use ($categoryId) {
                 return $query->filterByCategory($categoryId);
             })
+            ->when($brandId, function ($query) use ($brandId) {
+                return $query->where('brand_id', $brandId);
+            })
             ->when($status, function ($query) use ($status) {
                 return $query->filterByStatus($status);
             })
             ->latest()
-            ->paginate(10)
-            ->appends($request->all());
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         $categories = Category::active()->get();
+        $brands = Brand::all();
         $statuses = [
             'active' => 'Active',
             'inactive' => 'Inactive',
@@ -45,7 +59,7 @@ class ProductController extends Controller
             'all' => 'All'
         ];
 
-        return view('admin.products.index', compact('products', 'categories', 'statuses'));
+        return view('admin.products.index', compact('products', 'categories', 'brands', 'statuses'));
     }
 
     public function create()
@@ -62,7 +76,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
+            'stock_quantity' => 'required_without:has_variants|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -94,13 +108,12 @@ class ProductController extends Controller
         }
 
         // Create product
-        $product = Product::create([
+        $productData = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
             'sale_price' => $request->sale_price,
-            'stock_quantity' => $request->stock_quantity,
             'sku' => 'SKU-' . strtoupper(Str::random(8)),
             'image' => $imagePath,
             'is_featured' => $request->has('is_featured'),
@@ -108,7 +121,16 @@ class ProductController extends Controller
             'is_archived' => false,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
-        ]);
+        ];
+        
+        // Add stock_quantity only if variants are not enabled
+        if (!$request->has('has_variants') || !$request->has_variants) {
+            $productData['stock_quantity'] = $request->stock_quantity ?? 0;
+        } else {
+            $productData['stock_quantity'] = 0; // Default to 0 when using variants
+        }
+        
+        $product = Product::create($productData);
 
         // Create variants if enabled
         if ($request->has('has_variants') && $request->has_variants && $request->variants) {
@@ -140,6 +162,14 @@ class ProductController extends Controller
             $product->updateTotalStock();
         }
 
+        // Check if this is an AJAX request
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully!'
+            ]);
+        }
+
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
     }
 
@@ -151,6 +181,7 @@ class ProductController extends Controller
 
         return view('admin.products.edit', compact('product', 'categories', 'brands', 'variants'));
     }
+
 
     public function update(Request $request, Product $product)
     {
@@ -208,7 +239,9 @@ class ProductController extends Controller
         } else {
             // No variants, use product stock
             $product->variants()->delete();
-            $product->update(['stock_quantity' => $validated['stock_quantity']]);
+            if (isset($validated['stock_quantity'])) {
+                $product->update(['stock_quantity' => $validated['stock_quantity']]);
+            }
         }
 
         return redirect()->route('admin.products.index')
@@ -269,14 +302,88 @@ class ProductController extends Controller
 
     public function archive(Product $product)
     {
-        $product->archive();
-        return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+        try {
+            // Log the archive attempt
+            Log::info('Archiving product', ['product_id' => $product->id, 'user_id' => Auth::id()]);
+            
+            // Archive the product
+            $product->archive();
+            
+            // Log successful archive
+            Log::info('Product archived successfully', ['product_id' => $product->id]);
+            
+            // Handle AJAX requests (return JSON)
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product archived successfully!'
+                ]);
+            }
+            
+            // Handle regular form submissions (redirect)
+            return redirect()->route('admin.products.index')->with('success', 'Product archived successfully!');
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to archive product', [
+                'product_id' => $product->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Handle AJAX requests with error response
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to archive product: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Handle regular form submissions with error redirect
+            return redirect()->route('admin.products.index')->with('error', 'Failed to archive product: ' . $e->getMessage());
+        }
     }
 
     public function unarchive(Product $product)
     {
-        $product->unarchive();
-        return redirect()->route('admin.products.index')->with('success', 'Product unarchived successfully!');
+        try {
+            // Log the unarchive attempt
+            Log::info('Unarchiving product', ['product_id' => $product->id, 'user_id' => Auth::id()]);
+            
+            // Unarchive the product
+            $product->unarchive();
+            
+            // Log successful unarchive
+            Log::info('Product unarchived successfully', ['product_id' => $product->id]);
+            
+            // Handle AJAX requests (return JSON)
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product unarchived successfully!'
+                ]);
+            }
+            
+            // Handle regular form submissions (redirect)
+            return redirect()->route('admin.products.index')->with('success', 'Product unarchived successfully!');
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to unarchive product', [
+                'product_id' => $product->id ?? 'unknown',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Handle AJAX requests with error response
+            if (request()->expectsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to unarchive product: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // Handle regular form submissions with error redirect
+            return redirect()->route('admin.products.index')->with('error', 'Failed to unarchive product: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Product $product)
