@@ -725,7 +725,7 @@
                                     <button class="action-btn btn-view viewBtn" data-bs-toggle="modal"
                                         data-bs-target="#viewCustomerModal" data-customer='@json($customer)'
                                         data-title="View Customer">
-                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-search"></i>
                                     </button>
                                     {{-- <button class="action-btn btn-edit editBtn" data-bs-toggle="modal" data-bs-target="#editCustomerModal" data-customer='@json($customer)' data-title="Edit Customer">
                                     <i class="fas fa-edit"></i>
@@ -1059,5 +1059,58 @@
         };
         
         console.log('Global archive/unarchive functions defined');
+        
+        // Handle View Customer Modal Population
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle view button clicks
+            const viewButtons = document.querySelectorAll('.viewBtn');
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const customerData = JSON.parse(this.getAttribute('data-customer'));
+                    populateViewModal(customerData);
+                });
+            });
+        });
+        
+        function populateViewModal(customer) {
+            // Populate avatar and basic info
+            document.getElementById('viewFirstName').textContent = customer.first_name ? customer.first_name.charAt(0) : '';
+            document.getElementById('viewLastName').textContent = customer.last_name ? customer.last_name.charAt(0) : '';
+            document.getElementById('viewFullName').textContent = `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'N/A';
+            document.getElementById('viewCustomerId').textContent = `Customer ID: #${customer.id}`;
+            
+            // Update status
+            const statusElement = document.getElementById('viewStatus');
+            if (customer.is_archived) {
+                statusElement.textContent = 'Archived';
+                statusElement.className = 'status-text status-text-archived';
+            } else {
+                statusElement.textContent = 'Active';
+                statusElement.className = 'status-text status-text-active';
+            }
+            
+            // Populate personal information
+            document.getElementById('viewFirstNameField').textContent = customer.first_name || '-';
+            document.getElementById('viewMiddleName').textContent = customer.middle_name || '-';
+            document.getElementById('viewLastNameField').textContent = customer.last_name || '-';
+            
+            // Populate contact information
+            document.getElementById('viewEmail').textContent = customer.email || '-';
+            document.getElementById('viewPhone').textContent = customer.phone || '-';
+            
+            // Populate account information
+            document.getElementById('viewRole').textContent = customer.role || 'Customer';
+            document.getElementById('viewAccountStatus').textContent = customer.is_archived ? 'Archived' : 'Active';
+            document.getElementById('viewCreatedAt').textContent = customer.created_at ? new Date(customer.created_at).toLocaleDateString() : '-';
+            document.getElementById('viewEmailVerified').textContent = customer.email_verified_at ? 'Yes' : 'No';
+            
+            // Populate address information
+            document.getElementById('viewStreetAddress').textContent = customer.street_address || '-';
+            document.getElementById('viewBarangay').textContent = customer.barangay ? `Barangay ${customer.barangay}` : '-';
+            document.getElementById('viewCity').textContent = customer.city || '-';
+            document.getElementById('viewProvince').textContent = customer.province || '-';
+            document.getElementById('viewRegion').textContent = customer.region || '-';
+            document.getElementById('viewCountry').textContent = customer.country || 'Philippines';
+        }
     </script>
 @endsection
