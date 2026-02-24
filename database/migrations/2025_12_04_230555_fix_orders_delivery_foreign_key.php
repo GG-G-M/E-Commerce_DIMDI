@@ -9,50 +9,51 @@ return new class extends Migration
 {
     public function up()
     {
-        // First, check what the current foreign key is
+        // Find foreign key constraint name safely (PostgreSQL version)
         $foreignKeys = DB::select("
-            SELECT CONSTRAINT_NAME 
-            FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
-            WHERE TABLE_SCHEMA = DATABASE() 
-            AND TABLE_NAME = 'orders' 
-            AND COLUMN_NAME = 'delivery_id'
+            SELECT constraint_name
+            FROM information_schema.key_column_usage
+            WHERE table_name = 'orders'
+            AND column_name = 'delivery_id'
+            AND constraint_schema = current_schema()
         ");
 
-        // Drop the existing foreign key if it exists
+        // Drop foreign key if exists
         if (!empty($foreignKeys)) {
-            $constraintName = $foreignKeys[0]->CONSTRAINT_NAME;
-            DB::statement("ALTER TABLE orders DROP FOREIGN KEY `{$constraintName}`");
-        }
+            $constraintName = $foreignKeys[0]->constraint_name;
 
-        // Check if deliveries table exists and has data
-        if (Schema::hasTable('deliveries')) {
-            // If deliveries table exists, we need to sync user IDs
-            // Copy delivery_id from deliveries table to users table reference
             DB::statement("
-                UPDATE orders o
-                JOIN deliveries d ON o.delivery_id = d.id
-                JOIN users u ON d.email = u.email
-                SET o.delivery_id = u.id
-                WHERE o.delivery_id IS NOT NULL
+                ALTER TABLE orders
+                DROP CONSTRAINT IF EXISTS {$constraintName}
             ");
         }
 
-        // Add new foreign key to reference users table
+        // Data synchronization if deliveries table exists
+        if (Schema::hasTable('deliveries')) {
+
+            DB::statement("
+                UPDATE orders o
+                SET delivery_id = u.id
+                FROM deliveries d
+                JOIN users u ON d.email = u.email
+                WHERE o.delivery_id = d.id
+                AND o.delivery_id IS NOT NULL
+            ");
+        }
+
+        // Add new foreign key constraint
         Schema::table('orders', function (Blueprint $table) {
             $table->foreign('delivery_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('set null');
+                ->nullOnDelete();
         });
     }
 
     public function down()
     {
-        // Drop the foreign key
         Schema::table('orders', function (Blueprint $table) {
             $table->dropForeign(['delivery_id']);
         });
-
-        // You can't easily revert the data changes, but at least remove the FK
     }
 };
