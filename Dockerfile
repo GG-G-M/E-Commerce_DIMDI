@@ -28,4 +28,8 @@ RUN php artisan config:clear
 
 EXPOSE 10000
 
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate --force \
+    && php artisan db:seed --force \
+    && php artisan cache:clear \
+    && php artisan config:cache \
+    && php artisan serve --host=0.0.0.0 --port=10000
